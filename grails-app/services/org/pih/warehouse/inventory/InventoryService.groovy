@@ -23,7 +23,7 @@ import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
-import org.pih.warehouse.core.InventoryAdjustmentEvent
+
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
@@ -817,16 +817,16 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Should be used with caution (i.e. not in a loop) since it requires an expensive call to
-     * calculate all quantity within a parent location.
+     * Get quantity by bin location for a single bin within a facility.
      *
      * @param location
      * @param internalLocation
      * @return
      */
     List getQuantityByBinLocation(Location location, Location internalLocation) {
-        List binLocationEntries = getQuantityByBinLocation(location)
-        return binLocationEntries.findAll { it.binLocation == internalLocation }
+        List<TransactionEntry> entries = getTransactionEntriesByInventoryAndBinLocation(location.inventory, internalLocation)
+        List<BinLocationItem> items = getQuantityByBinLocation(entries, false)
+        return items.findAll { it.binLocation == internalLocation }
     }
 
     List getProductQuantityByBinLocation(Location location, Product product) {
@@ -1280,8 +1280,9 @@ class InventoryService implements ApplicationContextAware {
                     def quantityAvailableMap = quantityAvailableInventoryItemMap[product][inventoryItem]
                     Integer quantityAvailable = quantityAvailableMap ? quantityAvailableMap[binLocation?.id] : 0
 
-                    // We don't want to show the negative values on the frontend
-                    quantityAvailable = quantityAvailable > 0 ? quantityAvailable : 0
+                    // A negative available quantity is normally a data anomaly and gets hidden as 0, but on a
+                    // bin that supports negative inventory it's a legitimate quantity and should be shown as-is
+                    quantityAvailable = (quantityAvailable > 0 || binLocation?.isNegativeInventorySupported()) ? quantityAvailable : 0
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantityOnHand != 0) {
@@ -1328,17 +1329,19 @@ class InventoryService implements ApplicationContextAware {
     }
 
     Integer getQuantityAvailableToPromise(Product product, Location location) {
-        def productAvailability = ProductAvailability.createCriteria().get {
-            projections {
-                sum("quantityAvailableToPromise")
-            }
+        List<ProductAvailability> productAvailabilityRecords = ProductAvailability.createCriteria().list {
             eq("location", location)
             eq("product", product)
-            // Filter out negative quantity available to promise (in a case when a record was picked and then recalled)
-            ge("quantityAvailableToPromise", 0)
         }
 
-        return productAvailability ?: 0
+        // A negative ATP record is normally a data anomaly (e.g. a pick that was later recalled) and should not
+        // pull down the total, but on a bin that supports negative inventory it's a legitimate quantity and
+        // must still be counted, otherwise the total would be overstated
+        Integer quantityAvailableToPromise = productAvailabilityRecords?.sum {
+            (it.quantityAvailableToPromise >= 0 || it.binLocation?.isNegativeInventorySupported()) ? it.quantityAvailableToPromise : 0
+        } as Integer ?: 0
+
+        return quantityAvailableToPromise ?: 0
     }
 
 
@@ -1528,8 +1531,6 @@ class InventoryService implements ApplicationContextAware {
 
             // 5. Check if there are any changes in quantity recorded. If there aren't, we're done.
             if (!adjustmentTransaction.transactionEntries) {
-                // Send a snapshot - count date if there are no adjustments made
-                grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent([cmd.product], cmd.inventory.warehouse, baselineTransaction, null))
                 return cmd
             }
 
@@ -1547,8 +1548,6 @@ class InventoryService implements ApplicationContextAware {
                 }
                 return null
             }
-
-            grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent([cmd.product],cmd.inventory.warehouse, baselineTransaction, adjustmentTransaction))
         } catch (Exception e) {
             cmd.errors.reject("Error saving an inventory record to the database: " + e.message)
         }
@@ -1881,6 +1880,64 @@ class InventoryService implements ApplicationContextAware {
         return transactionEntries
     }
 
+    /**
+     * Get all transaction entries for a single bin location within an inventory.
+     *
+     * @param inventory
+     * @param binLocation
+     * @return
+     */
+    List<TransactionEntry> getTransactionEntriesByInventoryAndBinLocation(Inventory inventory, Location binLocation) {
+        List<TransactionEntry> binEntries = TransactionEntry.createCriteria().list {
+            transaction {
+                eq("inventory", inventory)
+            }
+            eq("binLocation", binLocation)
+        }
+
+        Set<Product> productsInBin = binEntries*.product.findAll { it != null } as Set
+        Set<InventoryItem> itemsInBin = binEntries*.inventoryItem.findAll { it != null } as Set
+
+        if (!productsInBin && !itemsInBin) {
+            return binEntries
+        }
+
+        // INVENTORY/PRODUCT_INVENTORY entries reset quantity for an inventory item/product across ALL bins, so a
+        // reset recorded against a different bin can still invalidate stale activity in this one (see
+        // getTransactionEntriesByInventoryAndProductAndBinLocations for the equivalent single-product case).
+        // Only resets for products/items that already have an entry in this bin can affect this bin's result
+        // (see getQuantityByProductAndInventoryItemMap's reachedInventoryTransaction/reachedProductInventoryTransaction
+        // keys), so scope the lookup to those instead of every reset in the facility - otherwise viewing one bin
+        // pays for the facility's entire reset history, which in practice is most/all of it (PRODUCT_INVENTORY is
+        // the normal transaction type for routine counts).
+        List<TransactionEntry> resetEntries = TransactionEntry.createCriteria().list {
+            transaction {
+                eq("inventory", inventory)
+            }
+            or {
+                if (itemsInBin) {
+                    and {
+                        inList("inventoryItem", itemsInBin as List)
+                        transaction { transactionType { eq("transactionCode", TransactionCode.INVENTORY) } }
+                    }
+                }
+                if (productsInBin) {
+                    and {
+                        inList("product", productsInBin as List)
+                        transaction { transactionType { eq("transactionCode", TransactionCode.PRODUCT_INVENTORY) } }
+                    }
+                }
+            }
+        }
+
+        // Same row can satisfy both queries (e.g. a reset entry that's itself in this bin);
+        // getQuantityByProductAndInventoryItemMap sums every entry it's given, so duplicates would double-count.
+        // Note: TransactionEntry implements Comparable (delegating to Transaction.compareTo, by date), and
+        // Groovy's no-arg unique() dedupes using that natural ordering rather than equals()/hashCode() - which
+        // would wrongly collapse distinct entries that merely share a transactionDate. Dedupe by id instead.
+        return (binEntries + resetEntries).unique { it.id }
+    }
+
     List getTransactionEntriesByInventoryAndProductAndBinLocations(Inventory inventory, Product product, List<Location> binLocations) {
         def includeDefaultBinLocation = binLocations.contains(null)
         List<Location> bins = binLocations
@@ -1984,8 +2041,6 @@ class InventoryService implements ApplicationContextAware {
             if (!transaction.save()) {
                 throw new ValidationException("Error saving transaction", transaction.errors)
             }
-
-            grailsApplication.mainContext.publishEvent(new InventoryAdjustmentEvent([inventoryItem.product], location, null, transaction))
         }
         return command
     }
@@ -2018,19 +2073,20 @@ class InventoryService implements ApplicationContextAware {
             Integer quantityOnHand = getQuantityFromBinLocation(location, binLocation, inventoryItem)
 
             if (!otherLocation?.inventory) {
-                transaction.errors.reject("Destination does not have an inventory")
+                transaction.errors.reject("Destination location '${otherLocation?.name}' does not have an inventory")
             }
 
             if (location == otherLocation && binLocation == otherBinLocation) {
-                transaction.errors.reject("Cannot transfer to the same location")
+                transaction.errors.reject("Cannot transfer to the same location: '${binLocation?.name}'")
             }
 
             if (quantityOnHand < quantity) {
-                transaction.errors.reject("Quantity cannot exceed quantity on hand")
+                transaction.errors.reject("Quantity to transfer (${quantity}) cannot exceed available quantity (${quantityOnHand}) " +
+                        "of product '${inventoryItem.product?.productCode}' in location '${binLocation?.name}'")
             }
 
             if (quantity <= 0) {
-                transaction.errors.reject("Quantity must be greater than 0")
+                transaction.errors.reject("Quantity to transfer must be greater than 0, but ${quantity} was provided")
             }
 
             // Create transaction to handle transfer in / out

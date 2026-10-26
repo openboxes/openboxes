@@ -28,7 +28,7 @@ class Comment implements Comparable, Serializable {
     }
 
     static constraints = {
-        comment(nullable: false, maxSize: 255)
+        comment(nullable: false)
         sender(nullable: true)
         recipient(nullable: true)
         dateSent(nullable: true)

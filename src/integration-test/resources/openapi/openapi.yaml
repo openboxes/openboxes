@@ -1,0 +1,958 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes API
+  version: develop
+  description: |
+    The OpenBoxes REST API. Every operation below is routed by the application; operations marked
+    `x-doc-status: stub` are listed but not documented in detail yet.
+
+    ## Authentication
+
+    Calls are authenticated with the session of the web application (a `JSESSIONID` cookie):
+
+    1. `POST /api/login` with a JSON body `{"username": "...", "password": "..."}`. Add
+       `"location": "<location id>"` to pick the location in the same call. The response sets the
+       session cookie; every later call sends it.
+    2. If you did not pass a location, pick one with `PUT /api/chooseLocation/{id}`. Most operations
+       work on the current location.
+    3. `POST /api/logout` ends the session.
+
+    The server can also be configured to accept HTTP Basic credentials on `/api` calls
+    (`openboxes.interceptor.basicAuth.enabled`, off by default); the location then comes from the
+    user's remembered location, if one is set.
+
+    ## Errors
+
+    For JSON requests the API answers errors in one JSON shape,
+    `{"errorCode": 404, "errorMessage": "...", "errorMessages": [...]}` (`errorMessages` only when there
+    are several problems, e.g. validation errors), with the matching HTTP status: 400 invalid request,
+    401 not logged in, 403 not allowed for the user's role, 404 not found, 409 conflicts with existing
+    data, 500 unexpected error. Some operations answer an HTML page or a redirect instead.
+
+    ## Importing the spec
+
+    Postman, Insomnia and code generators can import this spec. It is kept as several YAML files
+    (`openapi.yaml` and the files it references); bundle them into one document first if a tool needs
+    a single file.
+servers:
+  - url: /openboxes
+security:
+  - cookieAuth: []
+paths:
+  # BEGIN GENERATED PATHS
+  '/api/attributes':
+    $ref: 'paths/attribute.yaml#/~1api~1attributes'
+  '/api/barcodes':
+    $ref: 'paths/session.yaml#/~1api~1barcodes'
+  '/api/binLocations':
+    $ref: 'paths/bin-location.yaml#/~1api~1binLocations'
+  '/api/binLocations/{id}':
+    $ref: 'paths/bin-location.yaml#/~1api~1binLocations~1{id}'
+  '/api/catalogOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1catalogOptions'
+  '/api/categories':
+    $ref: 'paths/category.yaml#/~1api~1categories'
+  '/api/categories/{id}':
+    $ref: 'paths/category.yaml#/~1api~1categories~1{id}'
+  '/api/categories/{id}:sortToContainer':
+    $ref: 'paths/category.yaml#/~1api~1categories~1{id}:sortToContainer'
+  '/api/categories:bulk':
+    $ref: 'paths/category.yaml#/~1api~1categories:bulk'
+  '/api/categoryOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1categoryOptions'
+  '/api/chooseLocale/{id}':
+    $ref: 'paths/session.yaml#/~1api~1chooseLocale~1{id}'
+  '/api/chooseLocation/{id}':
+    $ref: 'paths/session.yaml#/~1api~1chooseLocation~1{id}'
+  '/api/combineShipments/{id}':
+    $ref: 'paths/combine-shipment.yaml#/~1api~1combineShipments~1{id}'
+  '/api/combinedShipmentItems/addToShipment/{id}':
+    $ref: 'paths/combined-shipment-item.yaml#/~1api~1combinedShipmentItems~1addToShipment~1{id}'
+  '/api/combinedShipmentItems/exportTemplate':
+    $ref: 'paths/combined-shipment-item.yaml#/~1api~1combinedShipmentItems~1exportTemplate'
+  '/api/combinedShipmentItems/findOrderItems':
+    $ref: 'paths/combined-shipment-item.yaml#/~1api~1combinedShipmentItems~1findOrderItems'
+  '/api/combinedShipmentItems/getProductsInOrders':
+    $ref: 'paths/combined-shipment-item.yaml#/~1api~1combinedShipmentItems~1getProductsInOrders'
+  '/api/combinedShipmentItems/importTemplate/{id}':
+    $ref: 'paths/combined-shipment-item.yaml#/~1api~1combinedShipmentItems~1importTemplate~1{id}'
+  '/api/config/data/demo':
+    $ref: 'paths/load-data.yaml#/~1api~1config~1data~1demo'
+  '/api/containers':
+    $ref: 'paths/container.yaml#/~1api~1containers'
+  '/api/containers/{id}':
+    $ref: 'paths/container.yaml#/~1api~1containers~1{id}'
+  '/api/containers/{id}/details':
+    $ref: 'paths/container.yaml#/~1api~1containers~1{id}~1details'
+  '/api/containers/{id}/labels':
+    $ref: 'paths/container.yaml#/~1api~1containers~1{id}~1labels'
+  '/api/containers/{id}/status':
+    $ref: 'paths/container.yaml#/~1api~1containers~1{id}~1status'
+  '/api/cycleCounts':
+    $ref: 'paths/cycle-count.yaml#/~1api~1cycleCounts'
+  '/api/dashboard/averageInboundSortationTime':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1averageInboundSortationTime'
+  '/api/dashboard/backdatedInboundShipments':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1backdatedInboundShipments'
+  '/api/dashboard/backdatedOutboundShipments':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1backdatedOutboundShipments'
+  '/api/dashboard/config':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1config'
+  '/api/dashboard/defaultBin':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1defaultBin'
+  '/api/dashboard/delayedShipments':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1delayedShipments'
+  '/api/dashboard/discrepancy':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1discrepancy'
+  '/api/dashboard/expirationSummary':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1expirationSummary'
+  '/api/dashboard/expiredProductsInStock':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1expiredProductsInStock'
+  '/api/dashboard/fillRate':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1fillRate'
+  '/api/dashboard/fillRateDestinations':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1fillRateDestinations'
+  '/api/dashboard/fillRateSnapshot':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1fillRateSnapshot'
+  '/api/dashboard/inProgressPutaways':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1inProgressPutaways'
+  '/api/dashboard/inProgressShipments':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1inProgressShipments'
+  '/api/dashboard/inboundSortationItems':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1inboundSortationItems'
+  '/api/dashboard/incomingStock':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1incomingStock'
+  '/api/dashboard/inventoryByLotAndBin':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1inventoryByLotAndBin'
+  '/api/dashboard/inventorySummary':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1inventorySummary'
+  '/api/dashboard/inventoryValue':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1inventoryValue'
+  '/api/dashboard/itemsInventoried':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1itemsInventoried'
+  '/api/dashboard/itemsWithBackdatedShipments':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1itemsWithBackdatedShipments'
+  '/api/dashboard/lossCausedByExpiry':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1lossCausedByExpiry'
+  '/api/dashboard/lostAndFound':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1lostAndFound'
+  '/api/dashboard/openPurchaseOrdersCount':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1openPurchaseOrdersCount'
+  '/api/dashboard/openPutawayTasks':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1openPutawayTasks'
+  '/api/dashboard/openStockRequests':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1openStockRequests'
+  '/api/dashboard/outgoingStock':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1outgoingStock'
+  '/api/dashboard/percentageAdHoc':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1percentageAdHoc'
+  '/api/dashboard/productWithNegativeInventory':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1productWithNegativeInventory'
+  '/api/dashboard/productsInventoried':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1productsInventoried'
+  '/api/dashboard/readyToBeStaged':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1readyToBeStaged'
+  '/api/dashboard/receivedStockMovements':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1receivedStockMovements'
+  '/api/dashboard/receivingBin':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1receivingBin'
+  '/api/dashboard/requestsPendingApproval':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1requestsPendingApproval'
+  '/api/dashboard/requisitionsByYear':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1requisitionsByYear'
+  '/api/dashboard/sentStockMovements':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1sentStockMovements'
+  '/api/dashboard/stockOutLastMonth':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1stockOutLastMonth'
+  '/api/dashboard/{id}/config':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1{id}~1config'
+  '/api/dashboard/{id}/subdashboardKeys':
+    $ref: 'paths/dashboard.yaml#/~1api~1dashboard~1{id}~1subdashboardKeys'
+  '/api/facilities/{facilityId}/cycle-counts/candidates':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facilityId}~1cycle-counts~1candidates'
+  '/api/facilities/{facilityId}/cycle-counts/requests/batch':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facilityId}~1cycle-counts~1requests~1batch'
+  '/api/facilities/{facilityId}/cycle-counts/requests/pending':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facilityId}~1cycle-counts~1requests~1pending'
+  '/api/facilities/{facilityId}/inventories/import':
+    $ref: 'paths/inventory.yaml#/~1api~1facilities~1{facilityId}~1inventories~1import'
+  '/api/facilities/{facilityId}/inventories/reorderReport':
+    $ref: 'paths/inventory.yaml#/~1api~1facilities~1{facilityId}~1inventories~1reorderReport'
+  '/api/facilities/{facilityId}/inventory-items':
+    $ref: 'paths/inventory-item.yaml#/~1api~1facilities~1{facilityId}~1inventory-items'
+  '/api/facilities/{facilityId}/inventory-levels':
+    $ref: 'paths/inventory-level.yaml#/~1api~1facilities~1{facilityId}~1inventory-levels'
+  '/api/facilities/{facilityId}/inventory-levels/{identifier}':
+    $ref: 'paths/inventory-level.yaml#/~1api~1facilities~1{facilityId}~1inventory-levels~1{identifier}'
+  '/api/facilities/{facilityId}/products/classifications':
+    $ref: 'paths/product-classification.yaml#/~1api~1facilities~1{facilityId}~1products~1classifications'
+  '/api/facilities/{facility}/cycle-counts':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts'
+  '/api/facilities/{facility}/cycle-counts/items/batch':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1items~1batch'
+  '/api/facilities/{facility}/cycle-counts/items/upload/count':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1items~1upload~1count'
+  '/api/facilities/{facility}/cycle-counts/items/upload/recount':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1items~1upload~1recount'
+  '/api/facilities/{facility}/cycle-counts/items/{cycleCountItemId}':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1items~1{cycleCountItemId}'
+  '/api/facilities/{facility}/cycle-counts/recount/start/batch':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1recount~1start~1batch'
+  '/api/facilities/{facility}/cycle-counts/start/batch':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1start~1batch'
+  '/api/facilities/{facility}/cycle-counts/{cycleCountId}/count':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1{cycleCountId}~1count'
+  '/api/facilities/{facility}/cycle-counts/{cycleCountId}/items':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1{cycleCountId}~1items'
+  '/api/facilities/{facility}/cycle-counts/{cycleCountId}/items/batch':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1{cycleCountId}~1items~1batch'
+  '/api/facilities/{facility}/cycle-counts/{cycleCountId}/recount':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1{cycleCountId}~1recount'
+  '/api/facilities/{facility}/cycle-counts/{cycleCountId}/refresh':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1{cycleCountId}~1refresh'
+  '/api/facilities/{facility}/inbound-items/{product}/routing-suggestions':
+    $ref: 'paths/putaway-task.yaml#/~1api~1facilities~1{facility}~1inbound-items~1{product}~1routing-suggestions'
+  '/api/facilities/{facility}/inventory/record-stock/save':
+    $ref: 'paths/record-stock.yaml#/~1api~1facilities~1{facility}~1inventory~1record-stock~1save'
+  '/api/facilities/{facility}/pick-tasks':
+    $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks'
+  '/api/facilities/{facility}/pick-tasks/containers/{outboundContainerId}':
+    $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1containers~1{outboundContainerId}'
+  '/api/facilities/{facility}/pick-tasks/counts':
+    $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1counts'
+  '/api/facilities/{facility}/pick-tasks/{id}':
+    $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1{id}'
+  '/api/facilities/{facility}/pick-tasks/{id}/reallocate':
+    $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1{id}~1reallocate'
+  '/api/facilities/{facility}/putaway-tasks':
+    $ref: 'paths/putaway-task.yaml#/~1api~1facilities~1{facility}~1putaway-tasks'
+  '/api/facilities/{facility}/putaway-tasks/{id}':
+    $ref: 'paths/putaway-task.yaml#/~1api~1facilities~1{facility}~1putaway-tasks~1{id}'
+  '/api/facilities/{facility}/putaway-tasks/{id}/alternate-destinations':
+    $ref: 'paths/putaway-task.yaml#/~1api~1facilities~1{facility}~1putaway-tasks~1{id}~1alternate-destinations'
+  '/api/facilities/{facility}/putaway-tasks/{id}/status':
+    $ref: 'paths/putaway-task.yaml#/~1api~1facilities~1{facility}~1putaway-tasks~1{id}~1status'
+  '/api/fulfillments':
+    $ref: 'paths/fulfillment.yaml#/~1api~1fulfillments'
+  '/api/fulfillments/validate':
+    $ref: 'paths/fulfillment.yaml#/~1api~1fulfillments~1validate'
+  '/api/generic/{resource}/':
+    $ref: 'paths/generic.yaml#/~1api~1generic~1{resource}~1'
+  '/api/generic/{resource}/search':
+    $ref: 'paths/generic.yaml#/~1api~1generic~1{resource}~1search'
+  '/api/generic/{resource}/{id}':
+    $ref: 'paths/generic.yaml#/~1api~1generic~1{resource}~1{id}'
+  '/api/getAppContext':
+    $ref: 'paths/session.yaml#/~1api~1getAppContext'
+  '/api/getMenuConfig':
+    $ref: 'paths/session.yaml#/~1api~1getMenuConfig'
+  '/api/getRequestTypes':
+    $ref: 'paths/session.yaml#/~1api~1getRequestTypes'
+  '/api/glAccountOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1glAccountOptions'
+  '/api/globalSearch':
+    $ref: 'paths/json.yaml#/~1api~1globalSearch'
+  '/api/handlingRequirementsOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1handlingRequirementsOptions'
+  '/api/helpscout/configuration':
+    $ref: 'paths/help-scout.yaml#/~1api~1helpscout~1configuration'
+  '/api/indicators':
+    $ref: 'paths/indicator.yaml#/~1api~1indicators'
+  '/api/indicators/{id}':
+    $ref: 'paths/indicator.yaml#/~1api~1indicators~1{id}'
+  '/api/internalLocations':
+    $ref: 'paths/internal-location.yaml#/~1api~1internalLocations'
+  '/api/internalLocations/receiving':
+    $ref: 'paths/internal-location.yaml#/~1api~1internalLocations~1receiving'
+  '/api/internalLocations/search':
+    $ref: 'paths/internal-location.yaml#/~1api~1internalLocations~1search'
+  '/api/internalLocations/{id}':
+    $ref: 'paths/internal-location.yaml#/~1api~1internalLocations~1{id}'
+  '/api/internalLocations/{id}/labels':
+    $ref: 'paths/internal-location.yaml#/~1api~1internalLocations~1{id}~1labels'
+  '/api/inventories/expirationHistoryReport':
+    $ref: 'paths/inventory.yaml#/~1api~1inventories~1expirationHistoryReport'
+  '/api/inventoryLevels':
+    $ref: 'paths/inventory-level.yaml#/~1api~1inventoryLevels'
+  '/api/invoiceItems/{id}/validation':
+    $ref: 'paths/invoice.yaml#/~1api~1invoiceItems~1{id}~1validation'
+  '/api/invoiceStatuses':
+    $ref: 'paths/invoice.yaml#/~1api~1invoiceStatuses'
+  '/api/invoiceTypeCodes':
+    $ref: 'paths/invoice.yaml#/~1api~1invoiceTypeCodes'
+  '/api/invoices':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices'
+  '/api/invoices/{id}':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}'
+  '/api/invoices/{id}/invoiceItemCandidates':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1invoiceItemCandidates'
+  '/api/invoices/{id}/items':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1items'
+  '/api/invoices/{id}/orders':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1orders'
+  '/api/invoices/{id}/post':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1post'
+  '/api/invoices/{id}/prepaymentItems':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1prepaymentItems'
+  '/api/invoices/{id}/removeItem':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1removeItem'
+  '/api/invoices/{id}/shipments':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1shipments'
+  '/api/invoices/{id}/submit':
+    $ref: 'paths/invoice.yaml#/~1api~1invoices~1{id}~1submit'
+  '/api/loadData/listOfDemoData':
+    $ref: 'paths/load-data.yaml#/~1api~1loadData~1listOfDemoData'
+  '/api/loadDatas':
+    $ref: 'paths/load-data.yaml#/~1api~1loadDatas'
+  '/api/loadDatas/{id}':
+    $ref: 'paths/load-data.yaml#/~1api~1loadDatas~1{id}'
+  '/api/localizations':
+    $ref: 'paths/localization.yaml#/~1api~1localizations'
+  '/api/localizations/{id}':
+    $ref: 'paths/localization.yaml#/~1api~1localizations~1{id}'
+  '/api/locationGroups':
+    $ref: 'paths/location-group.yaml#/~1api~1locationGroups'
+  '/api/locationGroups/{id}':
+    $ref: 'paths/location-group.yaml#/~1api~1locationGroups~1{id}'
+  '/api/locations':
+    $ref: 'paths/location.yaml#/~1api~1locations'
+  '/api/locations/binLocations/template':
+    $ref: 'paths/location.yaml#/~1api~1locations~1binLocations~1template'
+  '/api/locations/importCsv':
+    $ref: 'paths/location.yaml#/~1api~1locations~1importCsv'
+  '/api/locations/locationTypes':
+    $ref: 'paths/location.yaml#/~1api~1locations~1locationTypes'
+  '/api/locations/supportedActivities':
+    $ref: 'paths/location.yaml#/~1api~1locations~1supportedActivities'
+  '/api/locations/template':
+    $ref: 'paths/location.yaml#/~1api~1locations~1template'
+  '/api/locations/{id}':
+    $ref: 'paths/location.yaml#/~1api~1locations~1{id}'
+  '/api/locations/{id}/binLocations/import':
+    $ref: 'paths/location.yaml#/~1api~1locations~1{id}~1binLocations~1import'
+  '/api/locations/{id}/productSummary':
+    $ref: 'paths/location.yaml#/~1api~1locations~1{id}~1productSummary'
+  '/api/locations/{id}/putawayCandidates':
+    $ref: 'paths/putaway-item.yaml#/~1api~1locations~1{id}~1putawayCandidates'
+  '/api/login':
+    $ref: 'paths/session.yaml#/~1api~1login'
+  '/api/logout':
+    $ref: 'paths/session.yaml#/~1api~1logout'
+  '/api/mobile/products/':
+    $ref: 'paths/mobile-product.yaml#/~1api~1mobile~1products~1'
+  '/api/mobile/products/search':
+    $ref: 'paths/mobile-product.yaml#/~1api~1mobile~1products~1search'
+  '/api/mobile/products/{id}/':
+    $ref: 'paths/mobile-product.yaml#/~1api~1mobile~1products~1{id}~1'
+  '/api/mobile/products/{id}/details':
+    $ref: 'paths/mobile-product.yaml#/~1api~1mobile~1products~1{id}~1details'
+  '/api/mobile/products/{id}/identifiers':
+    $ref: 'paths/mobile-product.yaml#/~1api~1mobile~1products~1{id}~1identifiers'
+  '/api/mobile/putaways':
+    $ref: 'paths/putaway.yaml#/~1api~1mobile~1putaways'
+  '/api/mobileProducts':
+    $ref: 'paths/mobile-product.yaml#/~1api~1mobileProducts'
+  '/api/mobileProducts/{id}':
+    $ref: 'paths/mobile-product.yaml#/~1api~1mobileProducts~1{id}'
+  '/api/noops':
+    $ref: 'paths/noop.yaml#/~1api~1noops'
+  '/api/noops/{id}':
+    $ref: 'paths/noop.yaml#/~1api~1noops~1{id}'
+  '/api/orderNumberOptions':
+    $ref: 'paths/combined-shipment-item.yaml#/~1api~1orderNumberOptions'
+  '/api/orderSummaryStatus':
+    $ref: 'paths/purchase-order.yaml#/~1api~1orderSummaryStatus'
+  '/api/organizations':
+    $ref: 'paths/organization.yaml#/~1api~1organizations'
+  '/api/organizations/{id}':
+    $ref: 'paths/organization.yaml#/~1api~1organizations~1{id}'
+  '/api/outbound-orders/{id}':
+    $ref: 'paths/outbound-order.yaml#/~1api~1outbound-orders~1{id}'
+  '/api/outbound-orders/{id}/items/{itemId}/allocations':
+    $ref: 'paths/outbound-order.yaml#/~1api~1outbound-orders~1{id}~1items~1{itemId}~1allocations'
+  '/api/outboundOrders/{id}':
+    $ref: 'paths/outbound-order.yaml#/~1api~1outboundOrders~1{id}'
+  '/api/partialReceiving':
+    $ref: 'paths/partial-receiving.yaml#/~1api~1partialReceiving'
+  '/api/partialReceiving/exportCsv/{id}':
+    $ref: 'paths/partial-receiving.yaml#/~1api~1partialReceiving~1exportCsv~1{id}'
+  '/api/partialReceiving/importCsv/{id}':
+    $ref: 'paths/partial-receiving.yaml#/~1api~1partialReceiving~1importCsv~1{id}'
+  '/api/partialReceiving/{id}':
+    $ref: 'paths/partial-receiving.yaml#/~1api~1partialReceiving~1{id}'
+  '/api/partialReceiving/{id}/receivingBinLocation':
+    $ref: 'paths/partial-receiving.yaml#/~1api~1partialReceiving~1{id}~1receivingBinLocation'
+  '/api/partialReceivings/{id}':
+    $ref: 'paths/partial-receiving.yaml#/~1api~1partialReceivings~1{id}'
+  '/api/paymentTermOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1paymentTermOptions'
+  '/api/persons':
+    $ref: 'paths/person.yaml#/~1api~1persons'
+  '/api/persons/{id}':
+    $ref: 'paths/person.yaml#/~1api~1persons~1{id}'
+  '/api/pickTasks':
+    $ref: 'paths/pick-task.yaml#/~1api~1pickTasks'
+  '/api/pickTasks/{id}':
+    $ref: 'paths/pick-task.yaml#/~1api~1pickTasks~1{id}'
+  '/api/picklistItems':
+    $ref: 'paths/picklist-item.yaml#/~1api~1picklistItems'
+  '/api/picklistItems/{id}':
+    $ref: 'paths/picklist-item.yaml#/~1api~1picklistItems~1{id}'
+  '/api/picklists':
+    $ref: 'paths/picklist.yaml#/~1api~1picklists'
+  '/api/picklists/{id}':
+    $ref: 'paths/picklist.yaml#/~1api~1picklists~1{id}'
+  '/api/picklists/{id}/items':
+    $ref: 'paths/picklist.yaml#/~1api~1picklists~1{id}~1items'
+  '/api/preferenceTypeOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1preferenceTypeOptions'
+  '/api/prepaymentInvoiceItems/{id}':
+    $ref: 'paths/prepayment-invoice-item.yaml#/~1api~1prepaymentInvoiceItems~1{id}'
+  '/api/prepaymentInvoices/{id}/invoiceItems':
+    $ref: 'paths/prepayment-invoice.yaml#/~1api~1prepaymentInvoices~1{id}~1invoiceItems'
+  '/api/priorityLevelOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1priorityLevelOptions'
+  '/api/productClassifications':
+    $ref: 'paths/product-classification.yaml#/~1api~1productClassifications'
+  '/api/productGroupOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1productGroupOptions'
+  '/api/productPackages':
+    $ref: 'paths/product-package.yaml#/~1api~1productPackages'
+  '/api/productSupplierAttributes/batch':
+    $ref: 'paths/product-supplier-attribute.yaml#/~1api~1productSupplierAttributes~1batch'
+  '/api/productSupplierPreferences':
+    $ref: 'paths/product-supplier-preference.yaml#/~1api~1productSupplierPreferences'
+  '/api/productSupplierPreferences/batch':
+    $ref: 'paths/product-supplier-preference.yaml#/~1api~1productSupplierPreferences~1batch'
+  '/api/productSupplierPreferences/{id}':
+    $ref: 'paths/product-supplier-preference.yaml#/~1api~1productSupplierPreferences~1{id}'
+  '/api/productSuppliers':
+    $ref: 'paths/product-supplier.yaml#/~1api~1productSuppliers'
+  '/api/productSuppliers/export':
+    $ref: 'paths/product-supplier.yaml#/~1api~1productSuppliers~1export'
+  '/api/productSuppliers/{id}':
+    $ref: 'paths/product-supplier.yaml#/~1api~1productSuppliers~1{id}'
+  '/api/products':
+    $ref: 'paths/product.yaml#/~1api~1products'
+  '/api/products/availableItems':
+    $ref: 'paths/product.yaml#/~1api~1products~1availableItems'
+  '/api/products/getLatestInventoryCountDate':
+    $ref: 'paths/product.yaml#/~1api~1products~1getLatestInventoryCountDate'
+  '/api/products/import':
+    $ref: 'paths/product.yaml#/~1api~1products~1import'
+  '/api/products/inventoryItems/lotNumbersWithExpirationDate':
+    $ref: 'paths/product.yaml#/~1api~1products~1inventoryItems~1lotNumbersWithExpirationDate'
+  '/api/products/search':
+    $ref: 'paths/product.yaml#/~1api~1products~1search'
+  '/api/products/{id}':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}'
+  '/api/products/{id}/associatedProducts':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1associatedProducts'
+  '/api/products/{id}/availableBins':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1availableBins'
+  '/api/products/{id}/demand':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1demand'
+  '/api/products/{id}/demandSummary':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1demandSummary'
+  '/api/products/{id}/labels':
+    $ref: 'paths/mobile-product.yaml#/~1api~1products~1{id}~1labels'
+  '/api/products/{id}/productAvailability':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1productAvailability'
+  '/api/products/{id}/productAvailabilityAndDemand':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1productAvailabilityAndDemand'
+  '/api/products/{id}/productDemand':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1productDemand'
+  '/api/products/{id}/productSummary':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1productSummary'
+  '/api/products/{id}/substitutions':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1substitutions'
+  '/api/products/{id}/withCatalogs':
+    $ref: 'paths/product.yaml#/~1api~1products~1{id}~1withCatalogs'
+  '/api/products/{productId}/inventoryItems/{lotNumber}':
+    $ref: 'paths/product.yaml#/~1api~1products~1{productId}~1inventoryItems~1{lotNumber}'
+  '/api/productsConfiguration/categoriesCount':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1categoriesCount'
+  '/api/productsConfiguration/categoryOptions':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1categoryOptions'
+  '/api/productsConfiguration/downloadCategories':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1downloadCategories'
+  '/api/productsConfiguration/downloadCategoryTemplate':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1downloadCategoryTemplate'
+  '/api/productsConfiguration/importCategories':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1importCategories'
+  '/api/productsConfiguration/importCategoryCsv':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1importCategoryCsv'
+  '/api/productsConfiguration/importProducts':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1importProducts'
+  '/api/productsConfiguration/productOptions':
+    $ref: 'paths/products-configuration.yaml#/~1api~1productsConfiguration~1productOptions'
+  '/api/purchaseOrders':
+    $ref: 'paths/purchase-order.yaml#/~1api~1purchaseOrders'
+  '/api/purchaseOrders/{id}':
+    $ref: 'paths/purchase-order.yaml#/~1api~1purchaseOrders~1{id}'
+  '/api/purchaseOrders/{id}/rollback':
+    $ref: 'paths/purchase-order.yaml#/~1api~1purchaseOrders~1{id}~1rollback'
+  '/api/putawayItems':
+    $ref: 'paths/putaway-item.yaml#/~1api~1putawayItems'
+  '/api/putawayItems/{id}':
+    $ref: 'paths/putaway-item.yaml#/~1api~1putawayItems~1{id}'
+  '/api/putawayTasks':
+    $ref: 'paths/putaway-task.yaml#/~1api~1putawayTasks'
+  '/api/putawayTasks/{id}':
+    $ref: 'paths/putaway-task.yaml#/~1api~1putawayTasks~1{id}'
+  '/api/putaways':
+    $ref: 'paths/putaway.yaml#/~1api~1putaways'
+  '/api/putaways/{id}':
+    $ref: 'paths/putaway.yaml#/~1api~1putaways~1{id}'
+  '/api/ratingTypeCodeOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1ratingTypeCodeOptions'
+  '/api/reason-codes':
+    $ref: 'paths/reason-code.yaml#/~1api~1reason-codes'
+  '/api/reasonCodes':
+    $ref: 'paths/reason-code.yaml#/~1api~1reasonCodes'
+  '/api/reasonCodes/{id}':
+    $ref: 'paths/reason-code.yaml#/~1api~1reasonCodes~1{id}'
+  '/api/replenishments':
+    $ref: 'paths/replenishment.yaml#/~1api~1replenishments'
+  '/api/replenishments/statusOptions':
+    $ref: 'paths/replenishment.yaml#/~1api~1replenishments~1statusOptions'
+  '/api/replenishments/{id}':
+    $ref: 'paths/replenishment.yaml#/~1api~1replenishments~1{id}'
+  '/api/replenishments/{id}/':
+    $ref: 'paths/replenishment.yaml#/~1api~1replenishments~1{id}~1'
+  '/api/replenishments/{id}/picklistItem':
+    $ref: 'paths/replenishment.yaml#/~1api~1replenishments~1{id}~1picklistItem'
+  '/api/replenishments/{id}/picklists':
+    $ref: 'paths/replenishment.yaml#/~1api~1replenishments~1{id}~1picklists'
+  '/api/replenishments/{id}/removeItem':
+    $ref: 'paths/replenishment.yaml#/~1api~1replenishments~1{id}~1removeItem'
+  '/api/reports/auto-issuance-transactions':
+    $ref: 'paths/auto-issuance-transaction-report.yaml#/~1api~1reports~1auto-issuance-transactions'
+  '/api/reports/cycle-count-details':
+    $ref: 'paths/cycle-count.yaml#/~1api~1reports~1cycle-count-details'
+  '/api/reports/cycle-count-summary':
+    $ref: 'paths/cycle-count.yaml#/~1api~1reports~1cycle-count-summary'
+  '/api/reports/indicators/inventoryAccuracy':
+    $ref: 'paths/indicator.yaml#/~1api~1reports~1indicators~1inventoryAccuracy'
+  '/api/reports/indicators/inventoryShrinkage':
+    $ref: 'paths/indicator.yaml#/~1api~1reports~1indicators~1inventoryShrinkage'
+  '/api/reports/indicators/productsInventoried':
+    $ref: 'paths/indicator.yaml#/~1api~1reports~1indicators~1productsInventoried'
+  '/api/reports/inventory-audit-details':
+    $ref: 'paths/inventory-audit-report.yaml#/~1api~1reports~1inventory-audit-details'
+  '/api/reports/inventory-audit-summary':
+    $ref: 'paths/inventory-audit-report.yaml#/~1api~1reports~1inventory-audit-summary'
+  '/api/reports/inventory-transactions-summary':
+    $ref: 'paths/inventory-transaction-summary.yaml#/~1api~1reports~1inventory-transactions-summary'
+  '/api/requirements':
+    $ref: 'paths/replenishment.yaml#/~1api~1requirements'
+  '/api/requisitions/{id}/allocate':
+    $ref: 'paths/allocation.yaml#/~1api~1requisitions~1{id}~1allocate'
+  '/api/requisitions/{id}/deallocate':
+    $ref: 'paths/allocation.yaml#/~1api~1requisitions~1{id}~1deallocate'
+  '/api/resettingInstance/command':
+    $ref: 'paths/session.yaml#/~1api~1resettingInstance~1command'
+  '/api/shipments':
+    $ref: 'paths/shipment.yaml#/~1api~1shipments'
+  '/api/shipments/{id}':
+    $ref: 'paths/shipment.yaml#/~1api~1shipments~1{id}'
+  '/api/status':
+    $ref: 'paths/session.yaml#/~1api~1status'
+  '/api/stockAdjustments':
+    $ref: 'paths/stock-adjustment.yaml#/~1api~1stockAdjustments'
+  '/api/stockMovementItems':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems'
+  '/api/stockMovementItems/{id}':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}'
+  '/api/stockMovementItems/{id}/cancelItem':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1cancelItem'
+  '/api/stockMovementItems/{id}/clearPicklist':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1clearPicklist'
+  '/api/stockMovementItems/{id}/createPicklist':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1createPicklist'
+  '/api/stockMovementItems/{id}/details':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1details'
+  '/api/stockMovementItems/{id}/picklistItems':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1picklistItems'
+  '/api/stockMovementItems/{id}/removeItem':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1removeItem'
+  '/api/stockMovementItems/{id}/revertItem':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1revertItem'
+  '/api/stockMovementItems/{id}/substituteItem':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1substituteItem'
+  '/api/stockMovementItems/{id}/updatePicklist':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovementItems~1{id}~1updatePicklist'
+  '/api/stockMovements':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements'
+  '/api/stockMovements/createCombinedShipments':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1createCombinedShipments'
+  '/api/stockMovements/createPickList/{id}':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1createPickList~1{id}'
+  '/api/stockMovements/exportPickListItems/{id}':
+    $ref: 'paths/picklist.yaml#/~1api~1stockMovements~1exportPickListItems~1{id}'
+  '/api/stockMovements/importPackListItems/{id}':
+    $ref: 'paths/pack-list.yaml#/~1api~1stockMovements~1importPackListItems~1{id}'
+  '/api/stockMovements/importPickListItems/{id}':
+    $ref: 'paths/picklist.yaml#/~1api~1stockMovements~1importPickListItems~1{id}'
+  '/api/stockMovements/packingList/template':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1packingList~1template'
+  '/api/stockMovements/packlistTemplate/{id}':
+    $ref: 'paths/pack-list.yaml#/~1api~1stockMovements~1packlistTemplate~1{id}'
+  '/api/stockMovements/pendingRequisitionDetails':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1pendingRequisitionDetails'
+  '/api/stockMovements/pendingRequisitionItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1pendingRequisitionItems'
+  '/api/stockMovements/picklistTemplate/{id}':
+    $ref: 'paths/picklist.yaml#/~1api~1stockMovements~1picklistTemplate~1{id}'
+  '/api/stockMovements/requisitionsStatusCodes':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1requisitionsStatusCodes'
+  '/api/stockMovements/shipmentStatusCodes':
+    $ref: 'paths/select-options.yaml#/~1api~1stockMovements~1shipmentStatusCodes'
+  '/api/stockMovements/shippedItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1shippedItems'
+  '/api/stockMovements/{id}':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}'
+  '/api/stockMovements/{id}/documents':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1documents'
+  '/api/stockMovements/{id}/packingLocation':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1packingLocation'
+  '/api/stockMovements/{id}/removeAllItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1removeAllItems'
+  '/api/stockMovements/{id}/reviseItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1reviseItems'
+  '/api/stockMovements/{id}/rollbackApproval':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1rollbackApproval'
+  '/api/stockMovements/{id}/status':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1status'
+  '/api/stockMovements/{id}/stockMovementItems':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovements~1{id}~1stockMovementItems'
+  '/api/stockMovements/{id}/substitutionItems':
+    $ref: 'paths/stock-movement-item.yaml#/~1api~1stockMovements~1{id}~1substitutionItems'
+  '/api/stockMovements/{id}/updateAdjustedItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1updateAdjustedItems'
+  '/api/stockMovements/{id}/updateInventoryItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1updateInventoryItems'
+  '/api/stockMovements/{id}/updateItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1updateItems'
+  '/api/stockMovements/{id}/updateRequisition':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1updateRequisition'
+  '/api/stockMovements/{id}/updateShipment':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1updateShipment'
+  '/api/stockMovements/{id}/updateShipmentItems':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1updateShipmentItems'
+  '/api/stockMovements/{id}/validatePicklist':
+    $ref: 'paths/stock-movement.yaml#/~1api~1stockMovements~1{id}~1validatePicklist'
+  '/api/stockTransferItems/{id}/':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransferItems~1{id}~1'
+  '/api/stockTransfers':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers'
+  '/api/stockTransfers/candidates':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers~1candidates'
+  '/api/stockTransfers/statusOptions':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers~1statusOptions'
+  '/api/stockTransfers/{id}':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers~1{id}'
+  '/api/stockTransfers/{id}/removeAllItems':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers~1{id}~1removeAllItems'
+  '/api/stockTransfers/{id}/rollback':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers~1{id}~1rollback'
+  '/api/stockTransfers/{id}/sendShipment':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers~1{id}~1sendShipment'
+  '/api/stockTransfers/{id}/status':
+    $ref: 'paths/stock-transfer.yaml#/~1api~1stockTransfers~1{id}~1status'
+  '/api/stocklistItems':
+    $ref: 'paths/stocklist-item.yaml#/~1api~1stocklistItems'
+  '/api/stocklistItems/availableStocklists':
+    $ref: 'paths/stocklist-item.yaml#/~1api~1stocklistItems~1availableStocklists'
+  '/api/stocklistItems/{id}':
+    $ref: 'paths/stocklist-item.yaml#/~1api~1stocklistItems~1{id}'
+  '/api/stocklists':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists'
+  '/api/stocklists/sendMail/{id}':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists~1sendMail~1{id}'
+  '/api/stocklists/{id}':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists~1{id}'
+  '/api/stocklists/{id}/clear':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists~1{id}~1clear'
+  '/api/stocklists/{id}/clone':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists~1{id}~1clone'
+  '/api/stocklists/{id}/export':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists~1{id}~1export'
+  '/api/stocklists/{id}/publish':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists~1{id}~1publish'
+  '/api/stocklists/{id}/unpublish':
+    $ref: 'paths/stocklist.yaml#/~1api~1stocklists~1{id}~1unpublish'
+  '/api/supportLinks':
+    $ref: 'paths/session.yaml#/~1api~1supportLinks'
+  '/api/tagOptions':
+    $ref: 'paths/select-options.yaml#/~1api~1tagOptions'
+  '/api/unitOfMeasure/currencies':
+    $ref: 'paths/unit-of-measure.yaml#/~1api~1unitOfMeasure~1currencies'
+  '/api/unitOfMeasures':
+    $ref: 'paths/unit-of-measure.yaml#/~1api~1unitOfMeasures'
+  '/api/unitOfMeasures/options':
+    $ref: 'paths/unit-of-measure.yaml#/~1api~1unitOfMeasures~1options'
+  '/api/unitOfMeasures/{id}':
+    $ref: 'paths/unit-of-measure.yaml#/~1api~1unitOfMeasures~1{id}'
+  '/api/users':
+    $ref: 'paths/select-options.yaml#/~1api~1users'
+  # END GENERATED PATHS
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+  schemas:
+    Envelope:
+      $ref: 'components/schemas.yaml#/Envelope'
+    Error:
+      $ref: 'components/schemas.yaml#/Error'
+    IdRef:
+      $ref: 'components/catalog.yaml#/IdRef'
+    RefInput:
+      $ref: 'components/catalog.yaml#/RefInput'
+    OptionalRefInput:
+      $ref: 'components/catalog.yaml#/OptionalRefInput'
+    Option:
+      $ref: 'components/catalog.yaml#/Option'
+    OptionList:
+      $ref: 'components/catalog.yaml#/OptionList'
+    Product:
+      $ref: 'components/catalog.yaml#/Product'
+    ProductDetail:
+      $ref: 'components/catalog.yaml#/ProductDetail'
+    ProductInput:
+      $ref: 'components/catalog.yaml#/ProductInput'
+    Category:
+      $ref: 'components/catalog.yaml#/Category'
+    CategoryInput:
+      $ref: 'components/catalog.yaml#/CategoryInput'
+    UnitOfMeasure:
+      $ref: 'components/catalog.yaml#/UnitOfMeasure'
+    UnitOfMeasureInput:
+      $ref: 'components/catalog.yaml#/UnitOfMeasureInput'
+    Location:
+      $ref: 'components/catalog.yaml#/Location'
+    ProductCreate:
+      $ref: 'components/catalog.yaml#/ProductCreate'
+    CategoryCreate:
+      $ref: 'components/catalog.yaml#/CategoryCreate'
+    UnitOfMeasureCreate:
+      $ref: 'components/catalog.yaml#/UnitOfMeasureCreate'
+    LocationSummary:
+      $ref: 'components/stock-movement.yaml#/LocationSummary'
+    StockMovement:
+      $ref: 'components/stock-movement.yaml#/StockMovement'
+    StockMovementItem:
+      $ref: 'components/stock-movement.yaml#/StockMovementItem'
+    StockMovementInput:
+      $ref: 'components/stock-movement.yaml#/StockMovementInput'
+    StockMovementCreate:
+      $ref: 'components/stock-movement.yaml#/StockMovementCreate'
+    IdOrEmpty:
+      $ref: 'components/stock-movement.yaml#/IdOrEmpty'
+    LineItemsInput:
+      $ref: 'components/stock-movement.yaml#/LineItemsInput'
+    StockMovementDocument:
+      $ref: 'components/stock-movement.yaml#/StockMovementDocument'
+    SubstitutionCandidate:
+      $ref: 'components/stock-movement.yaml#/SubstitutionCandidate'
+    PackingListValidated:
+      $ref: 'components/schemas.yaml#/PackingListValidated'
+    PackingListInvalid:
+      $ref: 'components/schemas.yaml#/PackingListInvalid'
+    PackingListSaveError:
+      $ref: 'components/schemas.yaml#/PackingListSaveError'
+    PicklistItem:
+      $ref: 'components/receiving.yaml#/PicklistItem'
+    Picklist:
+      $ref: 'components/receiving.yaml#/Picklist'
+    PicklistInput:
+      $ref: 'components/receiving.yaml#/PicklistInput'
+    PartialReceiptItem:
+      $ref: 'components/receiving.yaml#/PartialReceiptItem'
+    PartialReceipt:
+      $ref: 'components/receiving.yaml#/PartialReceipt'
+    PartialReceiptInput:
+      $ref: 'components/receiving.yaml#/PartialReceiptInput'
+    PutawayCandidate:
+      $ref: 'components/receiving.yaml#/PutawayCandidate'
+    ProductLot:
+      $ref: 'components/receiving.yaml#/ProductLot'
+    ReceiptItem:
+      $ref: 'components/receiving.yaml#/ReceiptItem'
+    Receipt:
+      $ref: 'components/receiving.yaml#/Receipt'
+    ReceiptItemsSave:
+      $ref: 'components/receiving.yaml#/ReceiptItemsSave'
+    ReceiptItemComment:
+      $ref: 'components/receiving.yaml#/ReceiptItemComment'
+    ShipmentReceivingSummary:
+      $ref: 'components/receiving.yaml#/ShipmentReceivingSummary'
+    StatusOption:
+      $ref: 'components/purchasing.yaml#/StatusOption'
+    InvoiceSummary:
+      $ref: 'components/purchasing.yaml#/InvoiceSummary'
+    Invoice:
+      $ref: 'components/purchasing.yaml#/Invoice'
+    InvoiceItem:
+      $ref: 'components/purchasing.yaml#/InvoiceItem'
+    InvoiceItemCandidate:
+      $ref: 'components/purchasing.yaml#/InvoiceItemCandidate'
+    PurchaseOrderSummary:
+      $ref: 'components/purchasing.yaml#/PurchaseOrderSummary'
+    PurchaseOrder:
+      $ref: 'components/purchasing.yaml#/PurchaseOrder'
+    HandlingIcon:
+      $ref: 'components/transfers.yaml#/HandlingIcon'
+    Requirement:
+      $ref: 'components/transfers.yaml#/Requirement'
+    StockTransferItem:
+      $ref: 'components/transfers.yaml#/StockTransferItem'
+    StockTransferSummary:
+      $ref: 'components/transfers.yaml#/StockTransferSummary'
+    StockTransfer:
+      $ref: 'components/transfers.yaml#/StockTransfer'
+    LooseRef:
+      $ref: 'components/transfers.yaml#/LooseRef'
+    StockTransferInput:
+      $ref: 'components/transfers.yaml#/StockTransferInput'
+    ReplenishmentItem:
+      $ref: 'components/transfers.yaml#/ReplenishmentItem'
+    Replenishment:
+      $ref: 'components/transfers.yaml#/Replenishment'
+    ReplenishmentInput:
+      $ref: 'components/transfers.yaml#/ReplenishmentInput'
+    ReplenishmentPickPage:
+      $ref: 'components/transfers.yaml#/ReplenishmentPickPage'
+    ProductRef:
+      $ref: 'components/inventory.yaml#/ProductRef'
+    NamedRef:
+      $ref: 'components/inventory.yaml#/NamedRef'
+    CycleCountCandidate:
+      $ref: 'components/inventory.yaml#/CycleCountCandidate'
+    CountAssignment:
+      $ref: 'components/inventory.yaml#/CountAssignment'
+    CycleCountRequest:
+      $ref: 'components/inventory.yaml#/CycleCountRequest'
+    PendingCycleCountRequest:
+      $ref: 'components/inventory.yaml#/PendingCycleCountRequest'
+    CycleCountItem:
+      $ref: 'components/inventory.yaml#/CycleCountItem'
+    CycleCount:
+      $ref: 'components/inventory.yaml#/CycleCount'
+    CountResult:
+      $ref: 'components/inventory.yaml#/CountResult'
+    CycleCountTransaction:
+      $ref: 'components/inventory.yaml#/CycleCountTransaction'
+    CycleCountDetailsRow:
+      $ref: 'components/inventory.yaml#/CycleCountDetailsRow'
+    CycleCountSummaryRow:
+      $ref: 'components/inventory.yaml#/CycleCountSummaryRow'
+    InventoryLevel:
+      $ref: 'components/inventory.yaml#/InventoryLevel'
+    ReorderReportRow:
+      $ref: 'components/inventory.yaml#/ReorderReportRow'
+    NumberIndicator:
+      $ref: 'components/dashboard.yaml#/NumberIndicator'
+    ColorNumber:
+      $ref: 'components/dashboard.yaml#/ColorNumber'
+    ChartDataset:
+      $ref: 'components/dashboard.yaml#/ChartDataset'
+    ChartIndicator:
+      $ref: 'components/dashboard.yaml#/ChartIndicator'
+    NumbersRow:
+      $ref: 'components/dashboard.yaml#/NumbersRow'
+    NumbersIndicator:
+      $ref: 'components/dashboard.yaml#/NumbersIndicator'
+    TableData:
+      $ref: 'components/dashboard.yaml#/TableData'
+    TableIndicator:
+      $ref: 'components/dashboard.yaml#/TableIndicator'
+    NumbersTableIndicator:
+      $ref: 'components/dashboard.yaml#/NumbersTableIndicator'
+    ColorNumberListIndicator:
+      $ref: 'components/dashboard.yaml#/ColorNumberListIndicator'
+    DashboardLayout:
+      $ref: 'components/dashboard.yaml#/DashboardLayout'
+    DashboardConfig:
+      $ref: 'components/dashboard.yaml#/DashboardConfig'
+    StocklistSummary:
+      $ref: 'components/stocklist.yaml#/StocklistSummary'
+    Stocklist:
+      $ref: 'components/stocklist.yaml#/Stocklist'
+    StocklistInput:
+      $ref: 'components/stocklist.yaml#/StocklistInput'
+    StocklistCreate:
+      $ref: 'components/stocklist.yaml#/StocklistCreate'
+    StocklistItem:
+      $ref: 'components/stocklist.yaml#/StocklistItem'
+    StocklistItemRow:
+      $ref: 'components/stocklist.yaml#/StocklistItemRow'
+    AvailableStocklist:
+      $ref: 'components/stocklist.yaml#/AvailableStocklist'
+    Person:
+      $ref: 'components/directory.yaml#/Person'
+    Organization:
+      $ref: 'components/directory.yaml#/Organization'
+    AvailableItem:
+      $ref: 'components/products.yaml#/AvailableItem'
+    ProductAssociation:
+      $ref: 'components/products.yaml#/ProductAssociation'
+    AssociatedProducts:
+      $ref: 'components/products.yaml#/AssociatedProducts'
+    Substitutions:
+      $ref: 'components/products.yaml#/Substitutions'
+    LotAvailability:
+      $ref: 'components/products.yaml#/LotAvailability'
+    LotOnHand:
+      $ref: 'components/products.yaml#/LotOnHand'
+    ProductSupplier:
+      $ref: 'components/products.yaml#/ProductSupplier'
+    ProductSupplierExportRow:
+      $ref: 'components/products.yaml#/ProductSupplierExportRow'
+    ReportProduct:
+      $ref: 'components/reports.yaml#/ReportProduct'
+    ReportFacility:
+      $ref: 'components/reports.yaml#/ReportFacility'
+    InventoryAuditDetailsRow:
+      $ref: 'components/reports.yaml#/InventoryAuditDetailsRow'
+    InventoryAuditSummaryRow:
+      $ref: 'components/reports.yaml#/InventoryAuditSummaryRow'
+    InventoryTransactionsSummaryRow:
+      $ref: 'components/reports.yaml#/InventoryTransactionsSummaryRow'
+    InventoryIndicator:
+      $ref: 'components/reports.yaml#/InventoryIndicator'
+  requestBodies:
+    StubBody:
+      $ref: 'components/request-bodies.yaml#/StubBody'
+    PackingListImport:
+      $ref: 'components/request-bodies.yaml#/PackingListImport'
+  responses:
+    StubSuccess:
+      $ref: 'components/responses.yaml#/StubSuccess'
+    StubCreated:
+      $ref: 'components/responses.yaml#/StubCreated'
+    StubNoContent:
+      $ref: 'components/responses.yaml#/StubNoContent'
+    Error:
+      $ref: 'components/responses.yaml#/Error'
+    BadRequest:
+      $ref: 'components/responses.yaml#/BadRequest'
+    Unauthorized:
+      $ref: 'components/responses.yaml#/Unauthorized'
+    Forbidden:
+      $ref: 'components/responses.yaml#/Forbidden'
+    NotFound:
+      $ref: 'components/responses.yaml#/NotFound'
+    Conflict:
+      $ref: 'components/responses.yaml#/Conflict'
+    ServerError:
+      $ref: 'components/responses.yaml#/ServerError'
+    PackingListValidated:
+      $ref: 'components/responses.yaml#/PackingListValidated'
+    PackingListInvalid:
+      $ref: 'components/responses.yaml#/PackingListInvalid'
+    PackingListSaveInvalid:
+      $ref: 'components/responses.yaml#/PackingListSaveInvalid'

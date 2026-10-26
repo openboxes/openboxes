@@ -1,0 +1,105 @@
+Envelope:
+  description: Standard response envelope. Collections may also carry `count` and `totalCount`.
+  type: object
+  properties:
+    data: {}
+  additionalProperties: true
+Error:
+  description: |
+    Every API error has this shape, with the HTTP status in errorCode as well. errorMessages is present when
+    there are several things to report, e.g. one per validation error.
+  type: object
+  required: [errorCode, errorMessage]
+  properties:
+    errorCode:
+      type: integer
+      example: 404
+    errorMessage:
+      type: string
+      example: Product with identifier 123 not found
+    errorMessages:
+      type: array
+      items:
+        type: string
+  additionalProperties: false
+PackingListValidated:
+  description: A valid packing list - no errors, and its rows.
+  type: object
+  required: [errors, data]
+  properties:
+    errors: &packingListErrors
+      description: |
+        Validation messages grouped by section and field, e.g. {"sendingOptions": {"expectedDeliveryDate": ["..."]}};
+        packingList is keyed by row id, or holds generalErrors when the list is missing or empty.
+      type: object
+      properties:
+        fulfillmentDetails:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        sendingOptions:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        packingList:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    data: &packingListRows
+      type: array
+      items:
+        description: A packing list row as the import screen shows it.
+        type: object
+        properties:
+          rowId:
+            type: string
+          product:
+            type: object
+            additionalProperties: true
+          lotNumber:
+            type: string
+            nullable: true
+          binLocation:
+            type: string
+            nullable: true
+          quantityPicked:
+            type: integer
+            nullable: true
+        additionalProperties: true
+  additionalProperties: false
+PackingListInvalid:
+  description: A packing list with validation errors, in the API's error shape plus the row errors and rows.
+  type: object
+  required: [errorCode, errorMessage, errors, data]
+  properties:
+    errorCode:
+      type: integer
+      example: 400
+    errorMessage:
+      type: string
+    errors: *packingListErrors
+    data: *packingListRows
+  additionalProperties: false
+PackingListSaveError:
+  description: |
+    The API's error; when the packing list itself has validation errors (not when the outbound it describes cannot
+    be saved, e.g. because its generated name is too long) it also carries errors and data, as for validate.
+  type: object
+  required: [errorCode, errorMessage]
+  properties:
+    errorCode:
+      type: integer
+      example: 400
+    errorMessage:
+      type: string
+    errorMessages:
+      type: array
+      items:
+        type: string
+    errors: *packingListErrors
+    data: *packingListRows
+  additionalProperties: false

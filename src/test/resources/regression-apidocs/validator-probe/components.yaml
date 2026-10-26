@@ -1,0 +1,14 @@
+Thing:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+    quantity:
+      type: integer
+Envelope:
+  type: object
+  required: [data]
+  properties:
+    data:
+      $ref: '#/Thing'

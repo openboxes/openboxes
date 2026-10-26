@@ -29,6 +29,9 @@
                 <th class="bottom">
                     <warehouse:message code="inventory.stockTransfers.transferredTo" default="Transferred To"/>
                 </th>
+                <th class="bottom">
+                    <warehouse:message code="default.reasonCode.label"/>
+                </th>
             </tr>
             </thead>
 
@@ -59,6 +62,11 @@
                     </td>
                     <td>
                         ${orderItem?.destinationBinLocation?.name}
+                    </td>
+                    <td>
+                        <g:if test="${orderItem?.discrepancyReasonCode}">
+                            ${warehouse.message(code: 'enum.ReasonCode.' + orderItem?.discrepancyReasonCode)}
+                        </g:if>
                     </td>
                 </tr>
             </g:each>

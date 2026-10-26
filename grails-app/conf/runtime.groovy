@@ -3,7 +3,8 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.identification.RandomCondition
-import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.allocation.AllocationSourceStrategy
+import org.pih.warehouse.allocation.RotationRule
 
 // OpenBoxes identifier config
 openboxes.identifier.attempts.max = 10
@@ -94,8 +95,8 @@ openboxes.products.merge.enabled = false
 // Cycle Count configuration (OBPIH-7033)
 openboxes.cycleCount.products.maxAmount = 50
 
-// Default order allocation strategies
-openboxes.order.allocation.strategies = [AllocationStrategy.FEFO]
+openboxes.order.allocation.source = AllocationSourceStrategy.STORAGE_FIRST
+openboxes.order.allocation.rotation = RotationRule.FEFO
 
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
@@ -122,7 +123,28 @@ openboxes.security.rbac.rules = [
     [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
     [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
     [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
+    // Data export queries run as SQL, so changing one needs the same role as the console
+    [controller: 'dataExport', actions: ['update', 'editDialog'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
     [controller: 'user', actions: ['changePassword'], accessRules: [ minimumRequiredRole: RoleType.ROLE_AUTHENTICATED]],
+    [controller: 'requisition', actions: ['unassignPicker', 'reassignPicker', 'reassignPickerDialog'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN ]],
+    // Warehouse task, allocation and label actions whose names match none of RoleInterceptor's change prefixes.
+    // Pick and putaway task changes: Assistant, as for other stock movement changes
+    [controller: 'pickTaskApi', actions: ['patch', 'reallocate', 'drop'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'putawayTaskApi', actions: ['patch'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    // Allocation: Manager
+    [controller: 'allocationApi', actions: ['allocate', 'deallocate'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    [controller: 'outboundOrderApi', actions: ['allocate'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    [controller: 'allocation', actions: ['allocate', 'deallocate', 'redoAutopick'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    [controller: 'stockMovement', actions: ['allocate', 'clearPicklist', 'redoAutopick'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    // Packing location, labels, rollbacks, auto-receive and issue: Assistant
+    [controller: 'stockMovementApi', actions: ['packingLocation'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'mobileProductApi', actions: ['printLabel'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'containerApi', actions: ['printLabel'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'internalLocationApi', actions: ['printLabel'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'putaway', actions: ['rollback', 'rollbackAndDelete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'stockMovement', actions: ['rollbackAndDelete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'partialReceiving', actions: ['autoreceive'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'requisition', actions: ['issue'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
     // Other controller actions that might need explicit rules
     //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
@@ -629,6 +651,11 @@ openboxes {
                         [
                             widgetId: "averageInboundSortationTime",
                             order   : 8
+                        ],
+
+                        [
+                            widgetId: "readyToBeStaged",
+                            order   : 9
                         ],
 
                         [
@@ -1226,6 +1253,15 @@ openboxes {
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/openPutawayTasks"
+            }
+            readyToBeStaged {
+                enabled = true
+                title = "react.dashboard.readyToStage.title.label"
+                info = "react.dashboard.readyToStage.info.label"
+                subtitle = "react.dashboard.subtitle.pickTasks.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/readyToBeStaged"
             }
             inboundSortationItems {
                 enabled = true

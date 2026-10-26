@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { RiCloseFill } from 'react-icons/all';
 import {
+  RiAlertLine,
   RiArrowGoBackLine,
   RiArrowRightSLine, RiCheckFill,
   RiDeleteBinLine,
@@ -12,6 +13,7 @@ import {
 } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
@@ -233,18 +235,37 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
       accessor: 'displayStatus',
       fixed: 'left',
-      width: 170,
+      width: 190,
       sortable: false,
       Cell: (row) => (
-        <TableCell
-          {...row}
-          tooltip
-          tooltipLabel={getStatusTooltip(row.value?.name)}
-        >
-          <StatusIndicator
-            variant={row?.value?.variant}
-            status={row?.value?.label}
-          />
+        <TableCell {...row}>
+          <div className="d-flex align-items-center">
+            <Tooltip
+              arrow="true"
+              delay="150"
+              duration="250"
+              hideDelay="50"
+              html={getStatusTooltip(row.value?.name)}
+              className="cursor-help"
+            >
+              <StatusIndicator
+                variant={row?.value?.variant}
+                status={row?.value?.label}
+              />
+            </Tooltip>
+            {row.original.hasError && (
+              <Tooltip
+                arrow="true"
+                delay="150"
+                duration="250"
+                hideDelay="50"
+                html={row.original.errorMessage}
+                className="cursor-help"
+              >
+                <RiAlertLine className="text-warning ml-1 requisition-error-icon" data-testid="requisition-error-icon" />
+              </Tooltip>
+            )}
+          </div>
         </TableCell>
       ),
     },

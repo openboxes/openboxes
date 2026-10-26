@@ -1,0 +1,18 @@
+{
+  "name": "openboxes-e2e",
+  "private": true,
+  "description": "End-to-end suite for OpenBoxes (feature/obaf-integration) and the openboxes-mobile API contract. See README.md.",
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.5",
+    "mysql2": "3.24.5",
+    "typescript": "5.9.3"
+  }
+}

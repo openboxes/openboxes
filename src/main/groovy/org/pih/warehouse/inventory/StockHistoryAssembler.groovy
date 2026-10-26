@@ -385,7 +385,7 @@ class StockHistoryAssembler {
         }
 
         Requisition.executeQuery("""
-            SELECT r.id, r.requestNumber, r.name
+            SELECT r.id, r.requestNumber, r.name, r.autoIssuanceRequested
             FROM Requisition r
             WHERE r.id IN :ids
         """, [ids: requisitionIds]).each { Object[] row ->
@@ -394,6 +394,7 @@ class StockHistoryAssembler {
                     id: id,
                     requestNumber: row[1] as String,
                     name: row[2] as String,
+                    autoIssuanceRequested: row[3] as Boolean
             )
         }
 

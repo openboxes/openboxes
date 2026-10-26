@@ -32,4 +32,13 @@ enum DeliveryTypeCode {
         { a, b -> a.priority <=> b.priority } as Comparator<DeliveryTypeCode>
     }
 
+    // SQL formula mapping delivery_type_code to its priority, for use as a Hibernate formula-mapped
+    // property (e.g. ordering requisitions by delivery type priority at the database level).
+    // A null/unrecognized delivery type is treated as the lowest priority (sorts last).
+    static String getPriorityFormula() {
+        return "(case delivery_type_code " +
+                values().collect { "when '${it.name()}' then ${it.priority} " }.join() +
+                "else ${Integer.MAX_VALUE} end)"
+    }
+
 }

@@ -15,11 +15,11 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.gorm.PagedResultList
 import grails.validation.Validateable
-import org.apache.http.client.fluent.Request
-import org.apache.http.entity.ContentType
 import org.grails.gsp.GroovyPagesTemplateEngine
 import org.hibernate.SessionFactory
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.OutboundStockMovementService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.invoice.Invoice
@@ -28,6 +28,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentWorkflow
+import org.springframework.beans.BeansException
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
 import util.RedirectUtil
@@ -39,17 +40,21 @@ class DocumentController {
 
     DocumentService documentService
     def documentTemplateService
+    MessageLocalizer messageLocalizer
     def fileService
     def shipmentService
     ZebraService zebraService
+    def userService
     SessionFactory sessionFactory
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
     GrailsApplication grailsApplication
-    TemplateService templateService
+    BeanPropertyTemplateService beanPropertyTemplateService
     StockMovementService stockMovementService
     OutboundStockMovementService outboundStockMovementService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+    private static final String OCTET_STREAM = "application/octet-stream"
 
     def index() {
         redirect(action: "list", params: params)
@@ -73,21 +78,45 @@ class DocumentController {
     def save() {
 
         log.info "Params " + params
-        def documentInstance = new Document(params)
+        // The file and what describes it come only from the uploaded file below
+        Document documentInstance = new Document()
+        bindData(documentInstance, params, [exclude: ['fileContents', 'filename', 'extension', 'contentType', 'documentType']])
+        documentInstance.documentType = requestedDocumentType()
+        if (!canChangeDataExport(documentInstance.documentType)) {
+            refuseDataExportChange(null)
+            return
+        }
 
-        def file = request.getFile("fileContents")
+        MultipartFile file = request.getFile("fileContents")
         // file must not be empty and must be less than 10MB
         if (!file || file?.isEmpty()) {
             flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
+            render(view: "create", model: [documentInstance: documentInstance])
+            return
+        }
+        // Templates and data exports are created here with their own file types; other documents get the upload check
+        else if (!isTemplateType(documentInstance.documentType) && !isAllowedUpload(file)) {
+            flash.message = uploadNotAllowedMessage()
+            render(view: "create", model: [documentInstance: documentInstance])
+            return
         }
         // FIXME The size limit should be configurable
-        else if (file.size < 10 * 1024 * 1000) {
+        else if (file.size >= 10 * 1024 * 1000) {
+            flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
+            render(view: "create", model: [documentInstance: documentInstance])
+            return
+        }
+        else {
 
             documentInstance.name = file.originalFilename
             documentInstance.filename = file.originalFilename
             documentInstance.fileContents = file.bytes
             documentInstance.extension = FileUtil.getExtension(file.originalFilename)
             documentInstance.contentType = file.contentType
+            // A template file of a type uploads do not accept is stored as plain bytes, never as a page or an image
+            if (!Document.isAllowedFile(file.originalFilename, file.contentType)) {
+                documentInstance.contentType = OCTET_STREAM
+            }
         }
 
         if (documentInstance.save(flush: true)) {
@@ -133,7 +162,27 @@ class DocumentController {
                 }
             }
 
-            documentInstance.properties = params
+            DocumentType requestedType = requestedDocumentType()
+            if (!canChangeDataExport(documentInstance.documentType, requestedType)) {
+                refuseDataExportChange(documentInstance)
+                return
+            }
+            // The form edits the extension and content type as text: a change must give a file type uploads accept
+            String extension = (params.containsKey('extension') ? params.extension : documentInstance.extension) ?: null
+            String contentType = (params.containsKey('contentType') ? params.contentType : documentInstance.contentType) ?: null
+            boolean fileTypeChanged = extension != (documentInstance.extension ?: null) || contentType != (documentInstance.contentType ?: null)
+            if (fileTypeChanged && !Document.isAllowedFile("file.${extension}", contentType)) {
+                flash.message = uploadNotAllowedMessage()
+                redirect(action: "edit", id: documentInstance.id)
+                return
+            }
+
+            // The file itself is replaced only through upload, which checks it. The type is chosen by its id only:
+            // the document type itself is not changed from here
+            bindData(documentInstance, params, [exclude: ['fileContents', 'documentType']])
+            if (params.containsKey('documentType.id')) {
+                documentInstance.documentType = requestedType
+            }
 
             if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
@@ -190,28 +239,30 @@ class DocumentController {
         // file must not be empty and must be less than 10MB
         // FIXME The size limit needs to go somewhere
         if (!(file?.size || command.fileUri)) {
-            flash.message = "${warehouse.message(code: 'document.documentTooLarge.message')}"
-        } else if (file.size < 10 * 1024 * 1000) {
+            flash.message = "${warehouse.message(code: 'document.documentCannotBeEmpty.message')}"
+        // Validate the file type only if it's an actual file upload (if it has size), not if it's only an URI (stored as a link)
+        } else if (file && file.size && !isAllowedUpload(file)) {
+            flash.message = uploadNotAllowedMessage()
+        } else if (!file || file.size < 10 * 1024 * 1000) {
             log.info "Creating new document "
             // Document type with id 9 is "Other" and it's default in case there's no document type chosen
             String typeId = command?.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID;
             DocumentType documentType = DocumentType.get(typeId)
 
             Document documentInstance = new Document(
-                    size: file.size,
-                    name: command.name ?: file.originalFilename,
-                    filename: file.originalFilename,
-                    fileContents: command.fileContents.bytes,
+                    size: file?.size,
+                    name: command.name ?: file?.originalFilename,
+                    filename: file?.originalFilename,
+                    fileContents: command.fileContents?.bytes,
                     fileUri: command.fileUri,
-                    contentType: file.contentType,
-                    extension: FileUtil.getExtension(file.originalFilename),
+                    contentType: file?.contentType,
+                    extension: file?.originalFilename ? FileUtil.getExtension(file.originalFilename) : null,
                     documentNumber: command.documentNumber,
                     documentType: documentType)
 
             documentInstance.validate()
 
-            List<DocumentCode> forbiddenDocumentCodes = DocumentCode.templateList()
-            if (documentType && forbiddenDocumentCodes.contains(documentType.documentCode)) {
+            if (isTypeNotForRecords(documentType)) {
                 documentInstance.errors.reject("documentType", "Template types are not allowed for this document upload")
             }
 
@@ -328,10 +379,22 @@ class DocumentController {
                 }
             }
 
-            def multipartFile = request.getFile("fileContents")
-            if (multipartFile?.empty) {
+            if (!canChangeDataExport(documentInstance.documentType)) {
+                refuseDataExportChange(documentInstance)
+                return
+            }
+
+            MultipartFile multipartFile = request.getFile("fileContents")
+            if (!multipartFile || multipartFile.empty) {
                 flash.message = "${g.message(code: 'file')}"
+            } else if (!isAllowedReplacement(documentInstance, multipartFile)) {
+                flash.message = keepsStoredFileType(documentInstance) ?
+                        messageLocalizer.localize('document.replacementTypeNotAllowed.message', [storedExtension(documentInstance)] as Object[]) :
+                        uploadNotAllowedMessage()
+                redirect(action: "edit", id: documentInstance.id)
+                return
             } else {
+                boolean keepFileType = keepsStoredFileType(documentInstance)
 
                 // Only change the name if it was never modified from the original filename
                 if (documentInstance.filename == documentInstance.name) {
@@ -340,8 +403,21 @@ class DocumentController {
 
                 documentInstance.filename = multipartFile.originalFilename
                 documentInstance.fileContents = multipartFile.bytes
-                documentInstance.extension = FileUtil.getExtension(multipartFile.originalFilename)
-                documentInstance.contentType = multipartFile.contentType
+                // A template keeps its stored extension and content type; a content type uploads do not accept
+                // for that extension becomes plain bytes
+                if (keepFileType) {
+                    if (!Document.isAllowedFile("file.${storedExtension(documentInstance)}", documentInstance.contentType)) {
+                        documentInstance.contentType = OCTET_STREAM
+                    }
+                } else {
+                    documentInstance.extension = FileUtil.getExtension(multipartFile.originalFilename)
+                    documentInstance.contentType = multipartFile.contentType
+                    // A template file of a type uploads do not accept is stored as plain bytes
+                    if (isTemplateType(documentInstance.documentType) &&
+                            !Document.isAllowedFile(multipartFile.originalFilename, multipartFile.contentType)) {
+                        documentInstance.contentType = OCTET_STREAM
+                    }
+                }
             }
 
             if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
@@ -507,15 +583,28 @@ class DocumentController {
             throw new RuntimeException("Unable to retrieve document " + params.documentId)
         }
 
+        // Refuse what uploadDocument refuses before anything changes on the document
+        MultipartFile multipartFile = command.fileContents
+        if (multipartFile && !multipartFile.empty && !isAllowedUpload(multipartFile)) {
+            flash.message = uploadNotAllowedMessage()
+            redirectToAddDocument(command, documentInstance)
+            return
+        }
+        DocumentType requestedType = DocumentType.get(command.typeId)
+        if (isTypeNotForRecords(documentInstance.documentType) || isTypeNotForRecords(requestedType)) {
+            flash.message = messageLocalizer.localize('document.templateTypeNotAllowed.message')
+            redirectToAddDocument(command, documentInstance)
+            return
+        }
+
         // bind the command object to the document object ignoring the shipmentId and fileContents params (which can't change after creation)
         //bindData(documentInstance, command, ['shipmentId','orderId'])
         // manually update the document type
         documentInstance.name = command.name
         documentInstance.documentNumber = command.documentNumber
-        documentInstance.documentType = DocumentType.get(command.typeId)
+        documentInstance.documentType = requestedType
 
         // If a new file is passed we should update all of the read-only properties
-        def multipartFile = command.fileContents
         if (multipartFile && !multipartFile.empty) {
             documentInstance.name = command.name ?: multipartFile.originalFilename
             documentInstance.filename = multipartFile.originalFilename
@@ -532,32 +621,124 @@ class DocumentController {
                 redirect(controller: 'order', action: 'show', id: command.orderId)
             } else if (command.invoiceId) {
                 redirect(controller: 'invoice', action: 'show', id: command.invoiceId)
+            } else if (command.requestId) {
+                redirect(controller: 'requisition', action: 'show', id: command.requestId)
             }
         } else {
-            if (command.shipmentId) {
-                redirect(controller: "shipment", action: "addDocument", id: command.shipmentId,
-                        model: [shipmentInstance: Shipment.get(command.shipmentId), documentInstance: documentInstance])
-            } else if (command.orderId) {
-                redirect(controller: "order", action: "addDocument", id: command.orderId,
-                        model: [orderInstance: Order.get(command.orderId), documentInstance: documentInstance])
+            redirectToAddDocument(command, documentInstance)
+        }
+    }
 
-            } else if (command.invoiceId) {
-                redirect(controller: "invoice", action: "addDocument", id: command.invoiceId,
-                        model: [invoiceInstance: Invoice.get(command.invoiceId), documentInstance: documentInstance])
+    private void redirectToAddDocument(DocumentCommand command, Document documentInstance) {
+        if (command.shipmentId) {
+            redirect(controller: "shipment", action: "addDocument", id: command.shipmentId,
+                    model: [shipmentInstance: Shipment.get(command.shipmentId), documentInstance: documentInstance])
+        } else if (command.orderId) {
+            redirect(controller: "order", action: "addDocument", id: command.orderId,
+                    model: [orderInstance: Order.get(command.orderId), documentInstance: documentInstance])
+        } else if (command.invoiceId) {
+            redirect(controller: "invoice", action: "addDocument", id: command.invoiceId,
+                    model: [invoiceInstance: Invoice.get(command.invoiceId), documentInstance: documentInstance])
+        } else if (command.requestId) {
+            redirect(controller: "requisition", action: "show", id: command.requestId)
+        } else {
+            redirect(action: "edit", id: documentInstance.id)
+        }
+    }
 
+    /**
+     * The file check every path that stores an uploaded file applies (the same as uploadDocument): the file's
+     * name, type and content must agree on a type documents accept.
+     */
+    private static boolean isAllowedUpload(MultipartFile file) {
+        return Document.isAllowedUpload(file)
+    }
+
+    private String uploadNotAllowedMessage() {
+        return messageLocalizer.localize('document.uploadNotAllowed.message', [Document.allowedExtensions().join(', ')] as Object[])
+    }
+
+    /**
+     * Templates and data exports are kept up to date by replacing their file on the document page, and their files
+     * (label templates, queries) are not of the types an upload accepts. A replacement for one of them must have
+     * the same extension as the stored file, and the stored extension and content type are kept.
+     */
+    private static boolean keepsStoredFileType(Document document) {
+        return isTemplateType(document.documentType) && storedExtension(document)
+    }
+
+    private static boolean isAllowedReplacement(Document document, MultipartFile file) {
+        if (keepsStoredFileType(document)) {
+            String extension = storedExtension(document)
+            boolean sameExtension = file.originalFilename?.contains('.') &&
+                    FileUtil.getExtension(file.originalFilename).equalsIgnoreCase(extension)
+            // A file type uploads accept (a .docx template, say) also gets the content check, with the stored type
+            if (sameExtension && Document.isAllowedFile("file.${extension}", document.contentType)) {
+                return Document.isAllowedFile(file.originalFilename, document.contentType, file.inputStream)
             }
+            return sameExtension
+        }
+        // A template with no known file type takes any file; it is stored as plain bytes unless uploads accept it
+        return isTemplateType(document.documentType) || isAllowedUpload(file)
+    }
+
+    /** The document type chosen on the document form (documentType.id), if any. */
+    private DocumentType requestedDocumentType() {
+        String id = params['documentType.id']
+        return id ? DocumentType.get(id) : null
+    }
+
+    /** The stored file's extension, from the document or else from its filename. */
+    private static String storedExtension(Document document) {
+        if (document.extension) {
+            return document.extension
+        }
+        return document.filename?.contains('.') ? FileUtil.getExtension(document.filename) : null
+    }
+
+    /** Templates and data exports: documents whose content the application interprets. */
+    private static boolean isTemplateType(DocumentType documentType) {
+        DocumentCode documentCode = documentType?.documentCode
+        return documentCode && (DocumentCode.templateList().contains(documentCode) || documentCode == DocumentCode.DATA_EXPORT)
+    }
+
+    /** Types a document attached to a shipment, order, request, product or invoice cannot have. */
+    private static boolean isTypeNotForRecords(DocumentType documentType) {
+        return isTemplateType(documentType)
+    }
+
+    /** Data export queries run as SQL: creating or changing one needs a superuser, as dataExport/update does. */
+    private boolean canChangeDataExport(DocumentType... documentTypes) {
+        boolean isDataExport = documentTypes.any { it?.documentCode == DocumentCode.DATA_EXPORT }
+        return !isDataExport || userService.isSuperuser(session.user)
+    }
+
+    private void refuseDataExportChange(Document documentInstance) {
+        flash.message = messageLocalizer.localize('document.dataExportNotAllowed.message')
+        if (documentInstance?.id) {
+            redirect(action: "edit", id: documentInstance.id)
+        } else {
+            redirect(action: "list")
         }
     }
 
     def printZebraTemplate() {
-        Document document = Document.get(params.id)
+        Document document = loadZebraTemplate(params.id)
         Product product = Product.get(params?.product?.id)
         Location facility = Location.get(session.warehouse.id)
         Location location = Location.get(params?.location?.id)
         InventoryItem inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
 
         Map context = [document: document, inventoryItem: inventoryItem, product: inventoryItem?.product?:product, facility: facility, location: location]
-        String renderedContent = templateService.renderTemplate(document, context)
+        String renderedContent
+        try {
+            renderedContent = renderLabelTemplate(document, context)
+        } catch (LabelTemplateException e) {
+            log.warn(e.message)
+            flash.message = e.message
+            RedirectUtil.redirect(this, [location: location, product: product])
+            return
+        }
 
         try {
             if (params.protocol=="usb") {
@@ -585,48 +766,103 @@ class DocumentController {
     }
 
     def buildZebraTemplate() {
-        Document document = Document.get(params.id)
+        Document document = loadZebraTemplate(params.id)
         Product product = Product.get(params?.product?.id)
         InventoryItem inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
         Location facility = Location.get(session.warehouse.id)
         Location location = Location.get(params?.location?.id)
         Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
+        String renderedContent
+        try {
+            renderedContent = renderLabelTemplate(document, model)
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        }
         log.info "renderedContent: ${renderedContent}"
         response.setHeader("Content-disposition", "attachment; filename=\"${product?.productCode?:location?.locationNumber}.zpl\"")
         render(contentType: "text/csv", text: renderedContent, encoding: "UTF-8")
     }
 
     def renderZebraTemplate() {
-        Document document = Document.get(params.id)
+        Document document = loadZebraTemplate(params.id)
         Product product = Product.get(params?.product?.id)
         InventoryItem inventoryItem = InventoryItem.get(params?.inventoryItem?.id)
         Location facility = Location.get(session.warehouse.id)
         Location location = Location.get(params?.location?.id)
         Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
-        String body = templateService.renderTemplate(document, model)
+        String body
+        try {
+            body = renderLabelTemplate(document, model)
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        }
 
+        InputStream image
+        try {
+            image = zebraService.renderPreview(body)
+        } catch (LabelPreviewDisabledException e) {
+            renderLabelPreviewDisabled(e)
+            return
+        }
         response.contentType = 'image/png'
-        // TODO Move labelary URL to application.yml
-        response.outputStream << Request.Post('https://api.labelary.com/v1/printers/8dpmm/labels/3x2/0/')
-            .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
-            .execute()
-            .returnContent()
-            .asStream()
+        response.outputStream << image
     }
 
 
     def exportZebraTemplate() {
-        Document document = Document.get(params.id)
+        Document document = loadZebraTemplate(params.id)
         Product product = Product.get(params?.product?.id)
         InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
         Location facility = Location.get(session.warehouse.id)
         Location location = Location.get(params?.location?.id)
         Map model = [document: document, inventoryItem: inventoryItem, product: product?:inventoryItem?.product, facility: facility, location: location]
-        String renderedContent = templateService.renderTemplate(document, model)
-        // TODO Move labelary URL to application.yml
-        String url = "https://labelary.com/viewer.html?zpl=" + renderedContent
+        String renderedContent
+        try {
+            renderedContent = renderLabelTemplate(document, model)
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        }
+        String url
+        try {
+            url = zebraService.getViewerUrl(renderedContent)
+        } catch (LabelPreviewDisabledException e) {
+            renderLabelPreviewDisabled(e)
+            return
+        }
         redirect(url: url)
+    }
+
+    private String renderLabelTemplate(Document document, Map model) {
+        try {
+            return beanPropertyTemplateService.renderTemplate(document, model)
+        } catch (IllegalArgumentException | BeansException e) {
+            throw new LabelTemplateException(document, e)
+        }
+    }
+
+    private void renderLabelTemplateError(LabelTemplateException e) {
+        log.warn(e.message)
+        response.status = 400
+        render(contentType: "text/plain", text: e.message, encoding: "UTF-8")
+    }
+
+    private void renderLabelPreviewDisabled(LabelPreviewDisabledException e) {
+        response.status = 503
+        render(contentType: "text/plain", text: e.message, encoding: "UTF-8")
+    }
+
+    private Document loadZebraTemplate(Serializable id) {
+        Document document = Document.get(id)
+        if (document == null) {
+            throw new ObjectNotFoundException(id, Document.name)
+        }
+        if (document.documentType?.documentCode != DocumentCode.ZEBRA_TEMPLATE) {
+            throw new IllegalArgumentException("Only documents of type ZEBRA_TEMPLATE can be rendered as Zebra templates")
+        }
+        return document
     }
 
 }

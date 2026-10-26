@@ -36,6 +36,8 @@
             </g:isSuperuser>
             <g:each var="entry" in="${commandInstance.availableItems}" status="status">
                 <g:set var="styleClass" value="${(status%2==0)?'even':'odd' } ${entry?.recalled ? 'recalled' : (entry?.onHold ? 'restricted' : '')}"/>
+                <g:set var="quantityOnHandStyleClass" value="${entry?.quantityOnHand < 0 ? 'negative-quantity' : ''}"/>
+                <g:set var="quantityAvailableStyleClass" value="${entry?.quantityAvailable < 0 ? 'negative-quantity' : ''}"/>
                 <tr class="prop ${styleClass}" title="${entry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : (entry?.onHold ?  warehouse.message(code: 'inventoryItem.restrictedBin.label') : '')}">
                     <td class="middle" style="text-align: left; width: 10%" nowrap="nowrap">
                         <g:render template="actionsCurrentStock"
@@ -65,11 +67,11 @@
                     <td>
                         <g:expirationDate date="${entry?.inventoryItem?.expirationDate}"/>
                     </td>
-                    <td>
+                    <td class="${quantityOnHandStyleClass}">
                         ${g.formatNumber(number: entry?.quantityOnHand, format: '###,###,###') }
                         ${entry?.inventoryItem?.product?.unitOfMeasure}
                     </td>
-                    <td>
+                    <td class="${quantityAvailableStyleClass}">
                         ${g.formatNumber(number: entry?.quantityAvailable, format: '###,###,###') }
                         ${entry?.inventoryItem?.product?.unitOfMeasure}
                     </td>
@@ -103,14 +105,8 @@
                 </td>
                 <td>
                     <div class="large">
-                        <g:set var="styleClass" value="color: black;"/>
-                        <g:if test="${commandInstance.totalQuantity < 0}">
-                            <g:set var="styleClass" value="color: red;"/>
-                        </g:if>
-                        <span style="${styleClass }" id="totalQuantity">
+                        <span class="${commandInstance.totalQuantity < 0 ? 'negative-quantity' : ''}" id="totalQuantity">
                             ${g.formatNumber(number: commandInstance.totalQuantity, format: '###,###,###') }
-                        </span>
-                        <span class="">
                             <g:if test="${commandInstance?.product?.unitOfMeasure }">
                                 <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
                             </g:if>
@@ -122,14 +118,8 @@
                 </td>
                 <td>
                     <div class="large">
-                        <g:set var="styleClass" value="color: black;"/>
-                        <g:if test="${commandInstance.totalQuantityAvailableToPromise < 0}">
-                            <g:set var="styleClass" value="color: red;"/>
-                        </g:if>
-                        <span style="${styleClass }" id="totalQuantityAvailableToPromise">
+                        <span class="${commandInstance.totalQuantityAvailableToPromise < 0 ? 'negative-quantity' : ''}" id="totalQuantityAvailableToPromise">
                             ${g.formatNumber(number: commandInstance.totalQuantityAvailableToPromise, format: '###,###,###') }
-                        </span>
-                        <span class="">
                             <g:if test="${commandInstance?.product?.unitOfMeasure }">
                                 <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
                             </g:if>

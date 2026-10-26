@@ -27,7 +27,7 @@ ul.assigned-locations li {
                     <label><warehouse:message code="product.onHandQuantity.label"/></label>
                 </td>
                 <td class="value">
-                    <div>
+                    <div class="${totalQuantity < 0 ? 'negative-quantity' : ''}">
                         ${g.formatNumber(number: totalQuantity, format: '###,###,###') }
                         <g:if test="${productInstance?.unitOfMeasure }">
                             <format:metadata obj="${productInstance?.unitOfMeasure}"/>
@@ -51,24 +51,22 @@ ul.assigned-locations li {
                     </g:if>
                 </td>
             </tr>
-            <g:if test="${totalQuantityAvailableToPromise >= 0}">
-                <tr class="prop">
-                    <td class="label">
-                        <label><warehouse:message code="product.quantityAvailableToPromise.label" default="Quantity Available"/></label>
-                    </td>
-                    <td class="value">
-                        <div>
-                            ${g.formatNumber(number: totalQuantityAvailableToPromise, format: '###,###,###') }
-                            <g:if test="${productInstance?.unitOfMeasure }">
-                                <format:metadata obj="${productInstance?.unitOfMeasure}"/>
-                            </g:if>
-                            <g:else>
-                                ${warehouse.message(code:'default.each.label') }
-                            </g:else>
-                        </div>
-                    </td>
-                </tr>
-            </g:if>
+            <tr class="prop">
+                <td class="label">
+                    <label><warehouse:message code="product.quantityAvailableToPromise.label" default="Quantity Available"/></label>
+                </td>
+                <td class="value">
+                    <div class="${totalQuantityAvailableToPromise < 0 ? 'negative-quantity' : ''}">
+                        ${g.formatNumber(number: totalQuantityAvailableToPromise, format: '###,###,###') }
+                        <g:if test="${productInstance?.unitOfMeasure }">
+                            <format:metadata obj="${productInstance?.unitOfMeasure}"/>
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code:'default.each.label') }
+                        </g:else>
+                    </div>
+                </td>
+            </tr>
             <g:if test="${grailsApplication.config.openboxes.forecasting.enabled}">
                 <tr class="prop">
                     <td class="label">

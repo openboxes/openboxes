@@ -1,0 +1,612 @@
+# Shared schemas of the product catalog and reference data (products, categories, locations, units of measure,
+# option lists). Listed under components/schemas in openapi.yaml so every operation refers to one definition.
+# Properties not listed here may appear in responses; the listed ones are always there (required) or may be null
+# (nullable), as the integration tests check against real responses.
+
+IdRef:
+  description: A reference to another record by its id. The id is null when there is no such record.
+  type: object
+  required:
+  - id
+  properties:
+    id:
+      type: string
+      nullable: true
+  additionalProperties: true
+
+RefInput:
+  description: 'A reference to another record in a request: the record''s id.'
+  type: object
+  required:
+  - id
+  properties:
+    id:
+      type: string
+      minLength: 1
+  additionalProperties: true
+
+OptionalRefInput:
+  description: 'An optional reference in a request: the record''s id, or null to clear it.'
+  type: object
+  nullable: true
+  required:
+  - id
+  properties:
+    id:
+      type: string
+      minLength: 1
+  additionalProperties: true
+
+Option:
+  description: One entry of an option list, as shown in a select box.
+  type: object
+  required:
+  - id
+  - label
+  properties:
+    id:
+      type: string
+      description: The id to send back (a record id, or an enum name for fixed lists).
+    label:
+      type: string
+      description: The text to show, in the session's language where the list is translated.
+    value:
+      type: string
+      description: Same as id; present in some lists for select components that expect it.
+  additionalProperties: true
+
+OptionList:
+  type: object
+  required:
+  - data
+  properties:
+    data:
+      type: array
+      items:
+        $ref: '#/Option'
+  additionalProperties: true
+
+Product:
+  description: A product, as the product list and the generic read show it.
+  type: object
+  required:
+  - id
+  - productCode
+  - name
+  - active
+  - handlingIcons
+  - lotAndExpiryControl
+  properties:
+    id:
+      type: string
+    productCode:
+      type: string
+      description: The product's code (generated on create when none is given).
+    name:
+      type: string
+    description:
+      type: string
+      nullable: true
+    category:
+      type: string
+      nullable: true
+      description: The category's name.
+    unitOfMeasure:
+      type: string
+      nullable: true
+    pricePerUnit:
+      type: number
+      nullable: true
+    dateCreated:
+      type: string
+      format: date-time
+    lastUpdated:
+      type: string
+      format: date-time
+    updatedBy:
+      type: string
+      nullable: true
+      description: Name of the user who last changed the product.
+    color:
+      type: string
+      nullable: true
+    handlingIcons:
+      type: array
+      description: Icons for the product's handling requirements (cold chain, controlled substance, ...).
+      items: {$ref: 'transfers.yaml#/HandlingIcon'}
+    lotAndExpiryControl:
+      type: boolean
+    active:
+      type: boolean
+    displayNames:
+      type: object
+      description: The product's display name per language ("default" when none is set for a language).
+      additionalProperties:
+        type: string
+        nullable: true
+  additionalProperties: true
+
+ProductDetail:
+  description: A product with its full set of fields, as saved.
+  type: object
+  required:
+  - id
+  - productCode
+  - name
+  - active
+  - productType
+  - category
+  properties:
+    id:
+      type: string
+    productCode:
+      type: string
+    name:
+      type: string
+    description:
+      type: string
+      nullable: true
+    productType:
+      $ref: '#/IdRef'
+    category:
+      $ref: '#/IdRef'
+    glAccount:
+      $ref: '#/IdRef'
+    productFamily:
+      $ref: '#/IdRef'
+    unitOfMeasure:
+      type: string
+      nullable: true
+    abcClass:
+      type: string
+      nullable: true
+    upc:
+      type: string
+      nullable: true
+    ndc:
+      type: string
+      nullable: true
+    pricePerUnit:
+      type: number
+      nullable: true
+    costPerUnit:
+      type: number
+      nullable: true
+    active:
+      type: boolean
+    coldChain:
+      type: boolean
+    controlledSubstance:
+      type: boolean
+    hazardousMaterial:
+      type: boolean
+    reconditioned:
+      type: boolean
+    lotAndExpiryControl:
+      type: boolean
+    manufacturer:
+      type: string
+      nullable: true
+    manufacturerCode:
+      type: string
+      nullable: true
+    brandName:
+      type: string
+      nullable: true
+    vendor:
+      type: string
+      nullable: true
+    vendorCode:
+      type: string
+      nullable: true
+    color:
+      type: string
+      nullable: true
+    dateCreated:
+      type: string
+      format: date-time
+    lastUpdated:
+      type: string
+      format: date-time
+  additionalProperties: true
+
+ProductInput:
+  description: 'The fields of a product to create or change. On update, only the fields sent change. References to other
+
+    records are objects with the record''s id.
+
+    '
+  type: object
+  properties:
+    name:
+      type: string
+      maxLength: 255
+    description:
+      type: string
+    productCode:
+      type: string
+      description: Leave out on create to get a generated code.
+    category:
+      $ref: '#/RefInput'
+    productType:
+      $ref: '#/RefInput'
+    glAccount:
+      $ref: '#/OptionalRefInput'
+    productFamily:
+      $ref: '#/OptionalRefInput'
+    active:
+      type: boolean
+    unitOfMeasure:
+      type: string
+    pricePerUnit:
+      type: number
+    costPerUnit:
+      type: number
+    abcClass:
+      type: string
+    upc:
+      type: string
+    ndc:
+      type: string
+    manufacturer:
+      type: string
+    manufacturerCode:
+      type: string
+    manufacturerName:
+      type: string
+    brandName:
+      type: string
+    modelNumber:
+      type: string
+    vendor:
+      type: string
+    vendorCode:
+      type: string
+    vendorName:
+      type: string
+    color:
+      type: string
+    coldChain:
+      type: boolean
+    controlledSubstance:
+      type: boolean
+    hazardousMaterial:
+      type: boolean
+    reconditioned:
+      type: boolean
+    lotAndExpiryControl:
+      type: boolean
+    tags:
+      type: array
+      description: The product's tags.
+      items:
+        $ref: '#/RefInput'
+    attributes:
+      type: array
+      description: Values of product attributes.
+      items:
+        type: object
+        additionalProperties: true
+  additionalProperties: true
+
+Category:
+  description: A product category. Categories form a tree; `categories` holds the direct children.
+  type: object
+  required:
+  - id
+  - name
+  - isRoot
+  - deleted
+  - categories
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    description:
+      type: string
+      nullable: true
+    version:
+      type: integer
+    sortOrder:
+      type: integer
+      nullable: true
+    isRoot:
+      type: boolean
+    deleted:
+      type: boolean
+    dateCreated:
+      type: string
+      nullable: true
+      description: Creation time, formatted for display (e.g. "30/Sep/2026 01:54 PM"); null in the create response.
+    lastUpdated:
+      type: string
+      nullable: true
+      description: Last change, formatted for display; null in the create response.
+    categories:
+      type: array
+      nullable: true
+      description: The direct subcategories; null in the create response.
+      items:
+        type: object
+        additionalProperties: true
+  additionalProperties: true
+
+CategoryInput:
+  type: object
+  properties:
+    name:
+      type: string
+      maxLength: 255
+    description:
+      type: string
+      maxLength: 255
+    sortOrder:
+      type: integer
+    parentCategory:
+      $ref: '#/OptionalRefInput'
+  additionalProperties: true
+
+UnitOfMeasure:
+  type: object
+  required:
+  - id
+  - code
+  - name
+  properties:
+    id:
+      type: string
+    code:
+      type: string
+      description: Abbreviation, unique (e.g. EA).
+    name:
+      type: string
+    description:
+      type: string
+      nullable: true
+    uomClass:
+      description: The class of unit (QUANTITY, CURRENCY, ...), or null.
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+      additionalProperties: true
+    dateCreated:
+      type: string
+      format: date-time
+    lastUpdated:
+      type: string
+      format: date-time
+    createdBy:
+      $ref: '#/IdRef'
+    updatedBy:
+      $ref: '#/IdRef'
+  additionalProperties: true
+
+UnitOfMeasureInput:
+  type: object
+  properties:
+    code:
+      type: string
+      maxLength: 255
+    name:
+      type: string
+      maxLength: 255
+    description:
+      type: string
+      maxLength: 255
+    uomClass:
+      $ref: '#/OptionalRefInput'
+  additionalProperties: true
+
+Location:
+  description: A location (depot, ward, supplier, bin, ...).
+  type: object
+  required:
+  - id
+  - name
+  - locationType
+  - active
+  - supportedActivities
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    description:
+      type: string
+      nullable: true
+    locationNumber:
+      type: string
+      nullable: true
+    active:
+      type: boolean
+    locationType:
+      type: object
+      required:
+      - id
+      - name
+      - locationTypeCode
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        locationTypeCode:
+          type: string
+          description: DEPOT, WARD, SUPPLIER, BIN_LOCATION, ZONE, ...
+      additionalProperties: true
+    locationGroup:
+      type: object
+      nullable: true
+      additionalProperties: true
+    parentLocation:
+      type: object
+      nullable: true
+      description: The location this one is inside of (for bins and internal locations).
+      additionalProperties: true
+    organization:
+      type: object
+      nullable: true
+      additionalProperties: true
+    organizationName:
+      type: string
+      nullable: true
+    organizationCode:
+      type: string
+      nullable: true
+    address:
+      type: object
+      nullable: true
+      additionalProperties: true
+    manager:
+      type: object
+      nullable: true
+      additionalProperties: true
+    zoneId:
+      type: string
+      nullable: true
+    zoneName:
+      type: string
+      nullable: true
+    sortOrder:
+      type: integer
+      nullable: true
+    backgroundColor:
+      type: string
+      nullable: true
+    hasBinLocationSupport:
+      type: boolean
+    hasPackingSupport:
+      type: boolean
+    hasPartialReceivingSupport:
+      type: boolean
+    hasCentralPurchasingEnabled:
+      type: boolean
+    supportedActivities:
+      type: array
+      description: What the location supports (ActivityCode names, e.g. MANAGE_INVENTORY).
+      items:
+        type: string
+  additionalProperties: true
+
+ProductCreate:
+  description: The fields of a new product (as ProductInput); name, category and productType are required.
+  type: object
+  required:
+  - name
+  - category
+  - productType
+  properties:
+    name:
+      type: string
+      maxLength: 255
+    description:
+      type: string
+    productCode:
+      type: string
+      description: Leave out on create to get a generated code.
+    category:
+      $ref: '#/RefInput'
+    productType:
+      $ref: '#/RefInput'
+    glAccount:
+      $ref: '#/OptionalRefInput'
+    productFamily:
+      $ref: '#/OptionalRefInput'
+    active:
+      type: boolean
+    unitOfMeasure:
+      type: string
+    pricePerUnit:
+      type: number
+    costPerUnit:
+      type: number
+    abcClass:
+      type: string
+    upc:
+      type: string
+    ndc:
+      type: string
+    manufacturer:
+      type: string
+    manufacturerCode:
+      type: string
+    manufacturerName:
+      type: string
+    brandName:
+      type: string
+    modelNumber:
+      type: string
+    vendor:
+      type: string
+    vendorCode:
+      type: string
+    vendorName:
+      type: string
+    color:
+      type: string
+    coldChain:
+      type: boolean
+    controlledSubstance:
+      type: boolean
+    hazardousMaterial:
+      type: boolean
+    reconditioned:
+      type: boolean
+    lotAndExpiryControl:
+      type: boolean
+    tags:
+      type: array
+      description: The product's tags.
+      items:
+        $ref: '#/RefInput'
+    attributes:
+      type: array
+      description: Values of product attributes.
+      items:
+        type: object
+        additionalProperties: true
+  additionalProperties: true
+
+CategoryCreate:
+  description: The fields of a new category (as CategoryInput); name is required.
+  type: object
+  required:
+  - name
+  properties:
+    name:
+      type: string
+      maxLength: 255
+    description:
+      type: string
+      maxLength: 255
+    sortOrder:
+      type: integer
+    parentCategory:
+      $ref: '#/OptionalRefInput'
+  additionalProperties: true
+
+UnitOfMeasureCreate:
+  description: The fields of a new unit of measure (as UnitOfMeasureInput); code (unique) and name are required.
+  type: object
+  required:
+  - code
+  - name
+  properties:
+    code:
+      type: string
+      maxLength: 255
+    name:
+      type: string
+      maxLength: 255
+    description:
+      type: string
+      maxLength: 255
+    uomClass:
+      $ref: '#/OptionalRefInput'
+  additionalProperties: true

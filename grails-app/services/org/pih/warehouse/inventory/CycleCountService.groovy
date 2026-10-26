@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
-import grails.converters.JSON
+
+import grails.core.GrailsApplication
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
@@ -12,18 +13,16 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Order
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.DateUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.CycleCountCompletedEvent
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.report.CycleCountReportCommand
-
-import java.time.LocalDate
 
 @Transactional
 class CycleCountService {
@@ -35,6 +34,7 @@ class CycleCountService {
 
     CycleCountTransactionService cycleCountTransactionService
     CycleCountProductAvailabilityService cycleCountProductAvailabilityService
+    GrailsApplication grailsApplication
 
     List<CycleCountCandidate> getCandidates(CycleCountCandidateFilterCommand command, String facilityId) {
         if (command.hasErrors()) {
@@ -331,6 +331,34 @@ class CycleCountService {
             cycleCountRequest.save()
         }
         return cycleCountsRequests
+    }
+
+    /**
+     * Creates a cycle count request for a product whose quantity has fallen below zero, stamped with
+     * {@link CycleCountRequestType#SYSTEM_REQUEST} so that a request the system raised off a negative
+     * quantity stays distinguishable from one a person scheduled.
+     */
+    CycleCountRequest getOrCreateCycleCountRequest(Location facility, Product product) {
+        CycleCountRequest existingRequest = CycleCountRequest.findByProductAndFacilityAndStatusNotInList(
+                product, facility, [CycleCountRequestStatus.COMPLETED, CycleCountRequestStatus.CANCELED])
+        if (existingRequest) {
+            return existingRequest
+        }
+
+        CycleCountRequest cycleCountRequest = new CycleCountRequest(
+                facility: facility,
+                product: product,
+                status: CycleCountRequestStatus.CREATED,
+                requestType: CycleCountRequestType.SYSTEM_REQUEST,
+                blindCount: false
+        )
+
+        if (!cycleCountRequest.validate()) {
+            throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
+        }
+
+        cycleCountRequest.save(failOnError: true)
+        return cycleCountRequest
     }
 
     /**
@@ -801,6 +829,7 @@ class CycleCountService {
         // The count completed successfully, so commit the adjustments and close out the cycle count request.
         cycleCountTransactionService.createTransactions(cycleCount, countedProducts, refreshQuantityOnHand)
         cycleCount.cycleCountRequest.status = CycleCountRequestStatus.COMPLETED
+        grailsApplication.mainContext.publishEvent(new CycleCountCompletedEvent(cycleCount))
     }
 
     List<CycleCountItemDto> updateCycleCountItems(List<CycleCountUpdateItemCommand> items) {
@@ -991,6 +1020,20 @@ class CycleCountService {
             }
             if (command.products) {
                 "in"("product", command.products)
+            }
+        }
+    }
+
+    List<Transaction> getCycleCountTransactions(CycleCount cycleCount, TransactionType transactionType = null) {
+        return Transaction.createCriteria().list {
+            if (transactionType) {
+                eq("transactionType", transactionType)
+            }
+            or {
+                eq("cycleCount", cycleCount)
+                transactionSource {
+                    eq("cycleCount", cycleCount)
+                }
             }
         }
     }

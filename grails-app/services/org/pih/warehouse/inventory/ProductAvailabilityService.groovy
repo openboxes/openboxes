@@ -166,6 +166,10 @@ class ProductAvailabilityService {
     }
 
     def refreshProductAvailability(Location location, Product product, Boolean forceRefresh) {
+        if (!location?.supports(ActivityCode.MANAGE_INVENTORY)) {
+            log.info "Skipping refresh product availability for location ${location} because it does not support ${ActivityCode.MANAGE_INVENTORY}"
+            return
+        }
         log.info "Refreshing product availability location ${location}, product ${product}, forceRefresh ${forceRefresh}..."
         def startTime = System.currentTimeMillis()
         List binLocations = product ? calculateBinLocations(location, product) : calculateBinLocations(location)
@@ -989,6 +993,34 @@ class ProductAvailabilityService {
             }
         }
         return results.inject([:]) { map, it -> map << [(it.inventoryItem): it.quantityOnHand] }
+    }
+
+    /**
+     * Returns quantity on hand for each product and bin combination in the given facility
+     * (including bins with negative quantity).
+     * */
+    Map<ProductAndBinKey, Integer> getQuantityOnHandByProductAndBin(Location facility, List<String> productIds) {
+        if (!productIds) {
+            return [:]
+        }
+
+        String hql = """
+            select pa.product.id, bin.id, sum(pa.quantityOnHand)
+            from ProductAvailability pa
+            left join pa.binLocation bin
+            where pa.location = :facility
+              and pa.product.id in (:productIds)
+            group by pa.product.id, bin.id
+        """
+
+        List<Object[]> results = ProductAvailability.executeQuery(hql, [
+                facility  : facility,
+                productIds: productIds,
+        ]) as List<Object[]>
+
+        return results.collectEntries { Object[] row ->
+            [(new ProductAndBinKey((String) row[0], (String) row[1])): ((Number) row[2]).intValue()]
+        }
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, String productId) {

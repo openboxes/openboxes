@@ -63,8 +63,11 @@ class SearchPutawayTaskCommand implements Validateable {
     Location destination
     String destinationIdentifier
 
+    // Bound from a "putawayOrder" request param rather than "order" - "order" is already
+    // reserved app-wide for sort direction (asc/desc), sent alongside "sort" on every
+    // DataTable fetch, so reusing it here would collide with sorting on this list.
     @BindUsing({ SearchPutawayTaskCommand obj, DataBindingSource src ->
-        String identifier = src['order']
+        String identifier = src['putawayOrder']
         obj.orderIdentifier = identifier
         if (!identifier) return null
 

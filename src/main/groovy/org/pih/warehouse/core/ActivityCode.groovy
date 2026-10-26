@@ -156,12 +156,24 @@ enum ActivityCode {
     // Staging location codes
     STAGING_LOCATION('STAGING_LOCATION'),
 
+    // Pre-pick location codes
+    PREPICK_STOCK('PREPICK_STOCK'),
+
+    // Enables zone-level validation of the staging location scanned during pick drop (facility-level toggle)
+    VALIDATE_STAGING_LOCATION_ZONE('VALIDATE_STAGING_LOCATION_ZONE'),
+
     PICKING_SHORTAGE('PICKING_SHORTAGE'),
 
     // Track internal locations
     TRACK_INTERNAL_TRANSACTIONS('TRACK_INTERNAL_TRANSACTIONS'),
 
     DISPLAY_STOCK('DISPLAY_STOCK'),
+
+    // Must be enabled on both the facility and the bin location for a quantity to go below zero
+    ALLOW_NEGATIVE_INVENTORY('ALLOW_NEGATIVE_INVENTORY'),
+
+    // Marks the fallback location that accepts a stock movement when no other location can
+    NEGATIVE_INVENTORY_FALLBACK('NEGATIVE_INVENTORY_FALLBACK'),
 
     NONE('NONE')
 
@@ -244,6 +256,8 @@ enum ActivityCode {
                 // Internal locations used for picking
                 OUTBOUND_CONTAINER,
                 STAGING_LOCATION,
+                PREPICK_STOCK,
+                VALIDATE_STAGING_LOCATION_ZONE,
 
                 // Allows classification of location by delivery type
                 DELIVERY_TYPE_LOCAL_DELIVERY,
@@ -255,6 +269,8 @@ enum ActivityCode {
 
                 TRACK_INTERNAL_TRANSACTIONS,
                 DISPLAY_STOCK,
+                ALLOW_NEGATIVE_INVENTORY,
+                NEGATIVE_INVENTORY_FALLBACK,
         ]
     }
 

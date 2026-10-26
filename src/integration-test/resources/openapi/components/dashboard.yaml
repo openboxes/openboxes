@@ -1,0 +1,166 @@
+# Shared schemas of the dashboard API (/api/dashboard...). Each indicator answers in the shape its widget type draws:
+# a number tile, a chart, a row of numbers, a table, or numbers with a table. Labels and titles are in the session's
+# language. Objects are open: the documented properties are guaranteed (required) or nullable, others may appear.
+
+NumberIndicator:
+  description: A number tile.
+  type: object
+  required: [number]
+  properties:
+    number: {type: number, nullable: true, description: The value (null when it cannot be computed).}
+    link: {type: string, nullable: true, description: 'Server page that lists what the number counts ("" for none).'}
+    tooltipData: {type: string, nullable: true, description: 'Details for the tooltip (negative inventory: one line per product and bin).'}
+  additionalProperties: true
+
+ColorNumber:
+  description: A number with a label and a status colour (null where a widget shows none).
+  type: object
+  nullable: true
+  properties:
+    value: {nullable: true, description: 'The value (a number, or text such as "75%").'}
+    value2: {nullable: true, description: A second value (e.g. the change against the target).}
+    subtitle: {type: string, nullable: true}
+    link: {type: string, nullable: true}
+    color: {type: string, nullable: true, description: 'success, warning or error.'}
+    order: {type: integer, nullable: true}
+  additionalProperties: true
+
+ChartDataset:
+  description: One series of a chart.
+  type: object
+  required: [data]
+  properties:
+    label: {type: string, nullable: true}
+    data: {type: array, items: {type: number}}
+    links: {type: array, nullable: true, items: {type: string, nullable: true}, description: Server page per point.}
+    type: {type: string, nullable: true, description: 'bar, line, doughnut, ... (null: the widget''s chart type).'}
+    yAxisID: {type: string, nullable: true}
+  additionalProperties: true
+
+ChartIndicator:
+  description: A chart (bar, line, doughnut, ...).
+  type: object
+  required: [data]
+  properties:
+    data:
+      type: object
+      required: [labels, datasets]
+      properties:
+        labels:
+          type: array
+          items:
+            description: A label, or a message (code and text) for the page to translate.
+            oneOf:
+            - {type: string}
+            - {type: object, additionalProperties: true, properties: {code: {type: string}, message: {type: string}}}
+        datasets: {type: array, items: {$ref: '#/ChartDataset'}}
+        colorNumber: {$ref: '#/ColorNumber'}
+      additionalProperties: true
+    link: {type: string, nullable: true}
+  additionalProperties: true
+
+NumbersRow:
+  description: Up to four numbers side by side.
+  type: object
+  properties:
+    first: {$ref: '#/ColorNumber'}
+    second: {$ref: '#/ColorNumber'}
+    third: {$ref: '#/ColorNumber'}
+    fourth: {$ref: '#/ColorNumber'}
+  additionalProperties: true
+
+NumbersIndicator:
+  description: A row of up to four numbers.
+  type: object
+  required: [data]
+  properties:
+    data: {$ref: '#/NumbersRow'}
+    link: {type: string, nullable: true}
+  additionalProperties: true
+
+TableData:
+  description: A table - column titles and rows.
+  type: object
+  required: [body]
+  properties:
+    name: {type: string, nullable: true, description: Title of the name column.}
+    number: {type: string, nullable: true, description: Title of the number column.}
+    value: {type: string, nullable: true, description: Title of the value column.}
+    body: {type: array, items: {type: object, additionalProperties: true}}
+  additionalProperties: true
+
+TableIndicator:
+  description: A table.
+  type: object
+  required: [data]
+  properties:
+    data: {$ref: '#/TableData'}
+    link: {type: string, nullable: true}
+  additionalProperties: true
+
+NumbersTableIndicator:
+  description: A row of numbers above a table.
+  type: object
+  required: [data]
+  properties:
+    data:
+      type: object
+      properties:
+        numbersIndicator: {$ref: '#/NumbersRow'}
+        tableData: {$ref: '#/TableData'}
+      additionalProperties: true
+    link: {type: string, nullable: true}
+  additionalProperties: true
+
+ColorNumberListIndicator:
+  description: A list of numbers with labels and status colours.
+  type: object
+  required: [data]
+  properties:
+    data:
+      type: object
+      required: [listColorNumber]
+      properties:
+        listColorNumber: {type: array, items: {$ref: '#/ColorNumber'}}
+      additionalProperties: true
+    link: {type: string, nullable: true}
+  additionalProperties: true
+
+DashboardLayout:
+  description: >-
+    The sub-dashboards (tabs) of a dashboard and the widgets each shows, in order, by sub-dashboard key (personal,
+    warehouse, ...).
+  type: object
+  additionalProperties:
+    type: object
+    properties:
+      name: {type: string}
+      filters: {type: object, additionalProperties: true, description: 'Filters of the tab, each with the endpoint its options load from.'}
+      widgets:
+        type: array
+        items:
+          type: object
+          required: [widgetId]
+          properties:
+            widgetId: {type: string, description: Key of the widget in dashboardWidgets.}
+            order: {type: number}
+          additionalProperties: true
+    additionalProperties: true
+
+DashboardConfig:
+  description: A dashboard as the user sees it (their own layout once they saved one) and every widget it can show.
+  type: object
+  required: [dashboard, dashboardWidgets]
+  properties:
+    dashboard: {$ref: '#/DashboardLayout'}
+    dashboardWidgets:
+      type: object
+      description: 'Every widget by key: its title, type (number, graph, ...), and the endpoint its data comes from.'
+      additionalProperties:
+        type: object
+        properties:
+          title: {type: string}
+          type: {type: string}
+          endpoint: {type: string}
+        additionalProperties: true
+  additionalProperties: true

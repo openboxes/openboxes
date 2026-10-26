@@ -1,27 +1,56 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.allocation
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RequisitionEvent
+import org.pih.warehouse.core.WebhookEventType
+import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class AllocationService {
 
     StockMovementService stockMovementService
     GrailsApplication grailsApplication
+    AuthService authService
+    RequisitionService requisitionService
+    ProductAvailabilityService productAvailabilityService
+    AllocationFallbackService allocationFallbackService
+    CycleCountService cycleCountService
+    InventoryService inventoryService
+
+    AllocationSourceStrategyHandlerResolver allocationSourceStrategyHandlerResolver = new AllocationSourceStrategyHandlerResolver()
+    RotationStrategyResolver rotationStrategyResolver = new RotationStrategyResolver()
 
     @Transactional(readOnly = true)
     StockMovement getOutboundOrder(String id) {
@@ -52,7 +81,7 @@ class AllocationService {
         return outboundOrder
     }
 
-    AllocationDetailsDto allocate(String requisitionItemId, AllocationMode mode, List<AllocationDto> allocations, List<AllocationStrategy> strategies = []) {
+    AllocationDetailsDto allocate(String requisitionItemId, AllocationMode mode, List<AllocationDto> allocations, List<AllocationSourceStrategy> strategies = []) {
         RequisitionItem requisitionItem = RequisitionItem.get(requisitionItemId)
         if (!requisitionItem) {
             throw new IllegalArgumentException("Requisition item not found")
@@ -60,10 +89,15 @@ class AllocationService {
 
         if (mode == AllocationMode.AUTO) {
             Integer quantityRequired = requisitionItem.calculateQuantityRequired()
-            List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies)
+            List<SuggestedItem> suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, strategies, [], false, mode)
 
-            stockMovementService.clearPicklist(requisitionItem)
-            stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
+            // No suggestion means allocation declined this line rather than failed to find stock - a
+            // backordered line is left to the cross-dock release. Clearing the picklist would delete
+            // whatever that release has already covered.
+            if (suggestedItems) {
+                stockMovementService.clearPicklist(requisitionItem)
+                stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, true)
+            }
         } else if (mode == AllocationMode.MANUAL) {
             List<PicklistItem> existingPickListItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
             Set<String> processedPickIds = []
@@ -122,14 +156,21 @@ class AllocationService {
         RequisitionItem requisitionItem = request.requisitionItem
         Integer quantityRequired = request.quantityRequired ?: requisitionItem.calculateQuantityRequired()
         List<SuggestedItem> suggestedItems
+        List<SuggestedItem> prepickItems = []
         if (mode == AllocationMode.AUTO) {
-            suggestedItems = getAutoSuggestedItems(requisitionItem, quantityRequired, request.allocationStrategies)
+            prepickItems = getPrepickSuggestedItems(requisitionItem, quantityRequired, request.crossDockRelease)
+            Integer quantityPrepicked = (prepickItems.sum { it.quantityPicked } ?: 0) as Integer
+            Integer quantityOutstanding = quantityRequired - quantityPrepicked
+            suggestedItems = quantityOutstanding > 0
+                    ? getAutoSuggestedItems(requisitionItem, quantityOutstanding,
+                            request.allocationStrategies, [], request.crossDockRelease, mode)
+                    : []
         } else if (mode == AllocationMode.MANUAL) {
             List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
             suggestedItems = stockMovementService.getSuggestedItems(manualItems, quantityRequired)
             Integer quantitySuggested = suggestedItems.sum { it.quantityAvailable } ?: 0
             if (quantitySuggested < quantityRequired) {
-                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems)
+                List<SuggestedItem> remainingItems = getAutoSuggestedItems(requisitionItem, quantityRequired - quantitySuggested, null, suggestedItems, false, mode)
                 suggestedItems.addAll(remainingItems)
             }
         } else {
@@ -137,10 +178,16 @@ class AllocationService {
         }
 
         if (saveAllocation) {
-            stockMovementService.clearPicklist(requisitionItem)
+            // The cross-dock release only ever allocates the quantity still outstanding, so the
+            // picklist is added to rather than rebuilt - clearing it would drop what an earlier
+            // delivery already covered.
+            if (!request.crossDockRelease) {
+                stockMovementService.clearPicklist(requisitionItem)
+            }
             stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, mode == AllocationMode.AUTO)
+            stockMovementService.allocatePrepickItems(requisitionItem, prepickItems)
         }
-        return new AllocationResult(allocationRequest: request, suggestedItems: suggestedItems)
+        return new AllocationResult(allocationRequest: request, suggestedItems: suggestedItems, prepickItems: prepickItems)
     }
 
     Boolean deallocate(Requisition requisition) {
@@ -180,8 +227,8 @@ class AllocationService {
     AllocationResult allocate(RequisitionItem requisitionItem, Integer quantityRequired, AllocationMode allocationMode, List list) {
         AllocationRequest request
         if (allocationMode == AllocationMode.AUTO) {
-            List<AllocationStrategy> allocationStrategyList = list
-            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
+            List<AllocationSourceStrategy> allocationSourceStrategyList = list
+            request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationSourceStrategyList)
         } else if (allocationMode == AllocationMode.MANUAL) {
             List<AvailableItem> allocationItemList = list
             request = new AllocationRequest(quantityRequired: quantityRequired, requisitionItem: requisitionItem, allocationMode: allocationMode, availableItems: allocationItemList)
@@ -191,89 +238,332 @@ class AllocationService {
         return allocate(request)
     }
 
-    List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationStrategy> allocationStrategyList) {
-        List<AllocationResult> results = []
-        requisition?.requisitionItems?.each { requisitionItem ->
-            AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationStrategyList)
-            AllocationResult singleResult = allocate(allocationRequest)
-            results.add(singleResult)
-        }
-        return results
-    }
+    List<AllocationResult> allocate(Requisition requisition, AllocationMode allocationMode, List<AllocationSourceStrategy> allocationSourceStrategyList) {
+        try {
+            List<AllocationResult> results = requisition?.requisitionItems?.collect { requisitionItem ->
+                AllocationRequest allocationRequest = new AllocationRequest(requisitionItem: requisitionItem, allocationMode: allocationMode, allocationStrategies: allocationSourceStrategyList)
+                allocate(allocationRequest, false)
+            } ?: []
 
-    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationStrategy> strategies, List<AvailableItem> excludeList = []) {
-        Location location = requisitionItem.requisition.origin
-        List<AvailableItem> allAvailableItems = stockMovementService.getAvailableItems(location, requisitionItem, false)
-        List<AvailableItem> filteredItems = applyStrategies(location, allAvailableItems, strategies)
-        List<AvailableItem> includedItems = filteredItems.findAll { !excludeList.contains(it) }
-
-        boolean isBackordered = requisitionItem.isBackordered()
-        if (isBackordered) {
-            quantityRequired = requisitionItem.quantityBackordered
-        }
-        Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
-        if (quantityAvailable < quantityRequired) {
-            boolean partialAllocationAllowed = requisitionItem.requisition.partialAllocationAllowed
-            if (isBackordered && partialAllocationAllowed) {
-                return []
+            results.each { AllocationResult result ->
+                if (!result.suggestedItems && !result.prepickItems) {
+                    return
+                }
+                RequisitionItem requisitionItem = result.allocationRequest.requisitionItem
+                stockMovementService.clearPicklist(requisitionItem)
+                stockMovementService.allocateSuggestedItems(requisitionItem, result.suggestedItems, allocationMode == AllocationMode.AUTO)
+                stockMovementService.allocatePrepickItems(requisitionItem, result.prepickItems)
             }
-            throw new IllegalArgumentException("Insufficient stock. Required: ${quantityRequired}, Available: ${quantityAvailable}")
+            return results
+        } catch (Exception e) {
+            String message = "${Constants.ALLOCATION_FAILED} ${e.message ?: 'Unknown error'}"
+            // TODO: For testing purposes leaving both Comment and EventLog in place.
+            requisitionService.logRequisitionComment(requisition?.id, message)
+            requisitionService.logRequisitionEvent(requisition?.id, message)
+            throw e
         }
-
-        return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
     }
 
-    private List<AvailableItem> applyStrategies(Location facility, List<AvailableItem> availableItems, List<AllocationStrategy> strategies) {
-        if (!strategies || strategies.isEmpty()) {
-            strategies = grailsApplication.config.openboxes.order.allocation.strategies
-        }
-        if (!strategies || strategies.isEmpty()) {
-            return availableItems
-        }
+    void allocateRequisition(String requisitionId) {
+        try {
+            authService.withSystemUser {
+                Requisition requisition = Requisition.get(requisitionId)
+                if (!requisition) {
+                    log.warn("Requisition ${requisitionId} not found, skipping")
+                    return
+                }
 
-        List<AvailableItem> displayItems = availableItems.findAll { it.binLocation?.isDisplay() }
-        List<AvailableItem> warehouseItems = availableItems.findAll { !it.binLocation?.isDisplay() }
-        Set<Location> preferredBinLocations = getPreferredBinLocations(facility, warehouseItems?.find()?.inventoryItem?.product)
-        List<AvailableItem> preferredItems = warehouseItems?.findAll {preferredBinLocations.contains(it.binLocation) }
-        List<AvailableItem> remainingItems = (warehouseItems?: []) - (preferredItems?: [])
-        List<AvailableItem> result = []
+                if (!requisition.isEligibleForAutomaticAllocation()) {
+                    log.debug("Requisition ${requisitionId} is not eligible for automatic allocation, skipping")
+                    return
+                }
 
-        strategies.each { strategy ->
-            switch (strategy) {
-                case AllocationStrategy.DISPLAY_FIRST:
-                    result.addAll(displayItems)
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    break
+                Integer maxAllocationAttempts = grailsApplication.config.openboxes.jobs.automaticAllocationJob.maxAttempts ?: 3
+                if (requisition.allocationAttemptCount >= maxAllocationAttempts) {
+                    requisitionService.logRequisitionComment(requisition.id,
+                            "Max attempts (${maxAllocationAttempts}) at automatic allocation for " +
+                                "requisition ${requisition.requestNumber} reached, skipping")
+                    return
+                }
 
-                case AllocationStrategy.WAREHOUSE_FIRST:
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    result.addAll(displayItems)
-                    break
-
-                case AllocationStrategy.WAREHOUSE_ONLY:
-                    result.addAll(preferredItems)
-                    result.addAll(remainingItems)
-                    break
-
-                case AllocationStrategy.FEFO:
-                    // availableItems come already sorted by expiration dates
-                    result = availableItems
-                    break
+                log.info("Automatic allocation for requisition ${requisition.requestNumber} (${requisition.id}) ...")
+                List<AllocationResult> results = allocate(requisition, AllocationMode.AUTO, [])
+                completeAllocation(requisition, results.any { it.suggestedItems || it.prepickItems })
             }
+        } catch (Exception e) {
+            log.error("Error processing requisition ${requisitionId}", e)
         }
-
-        return result
     }
 
-    private Set<Location> getPreferredBinLocations(Location facility, Product product) {
-        if (!product) {
+    /**
+     * Finishes an allocation: issues the requisition right away if auto-issuance was requested,
+     * otherwise moves it to PICKING for manual picking/issuance. Shared by the automatic allocation
+     * job and the manual "Allocate" action, so a requisition that was stuck (e.g. after the automatic
+     * job hit its max allocation attempts) and is later allocated manually still gets auto-issued.
+     */
+    void completeAllocation(Requisition requisition, Boolean allocationResultNotEmpty) {
+        if (requisition.autoIssuanceRequested) {
+            try {
+                stockMovementService.issueRequisition(requisition)
+                // TODO this is sync refresh as a temporary workaround for async refresh after transaction creation
+                //  it should be implemented in better way, ticket for it - OBLS-937
+                productAvailabilityService.refreshProductsAvailability(
+                        requisition.origin?.id, requisition.requisitionItems*.product*.id, false)
+            } catch (Exception e) {
+                requisitionService.logRequisitionEvent(requisition.id, "${Constants.ISSUANCE_FAILED} ${e.message ?: 'Unknown error'}")
+                throw e
+            }
+        } else if (allocationResultNotEmpty && isFullyPrepicked(requisition)) {
+            stageRequisition(requisition)
+        } else if (allocationResultNotEmpty) {
+            stockMovementService.updateRequisitionStatus(requisition.id, RequisitionStatus.PICKING)
+        }
+    }
+
+    private boolean isFullyPrepicked(Requisition requisition) {
+        def picklistItems = requisition.picklist?.picklistItems
+        return picklistItems &&
+                picklistItems.every { it.status == PickTaskStatus.STAGED.name() } &&
+                requisition.requisitionItems.every { it.calculateQuantityRequired() == 0 || it.isAllocated() }
+    }
+
+    private void stageRequisition(Requisition requisition) {
+        requisition.status = RequisitionStatus.STAGED
+        if (!requisition.shipment) {
+            Shipment shipment = stockMovementService.createShipment(requisition)
+            stockMovementService.createMissingShipmentItems(requisition, shipment)
+        }
+        requisition.save(failOnError: true)
+        grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.REQUISITION_STAGED))
+    }
+
+    /**
+     * Stock a back counter operator already matched and scanned into a pre-pick bin. It is consumed before any
+     * pick is raised, so the warehouse never fetches a part the technician is holding. Matching is by product
+     * only - there is no reservation per order, so whichever line allocates first takes it.
+     */
+    private List<SuggestedItem> getPrepickSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired,
+                                                         Boolean crossDockRelease) {
+        if (crossDockRelease || !quantityRequired || quantityRequired <= 0) {
             return []
         }
 
-        Set<InventoryLevel> inventoryLevels = facility?.inventory?.configuredProducts?.findAll { it.product == product && it.preferredBinLocation != null }
-        return inventoryLevels?.collect { it.preferredBinLocation }
+        if (requisitionItem.requisition?.deliveryTypeCode != DeliveryTypeCode.SERVICE) {
+            return []
+        }
+
+        List<AvailableItem> availableItems = stockMovementService.getPrepickAvailableItems(
+                requisitionItem.requisition.origin, requisitionItem)
+
+        if (!availableItems) {
+            return []
+        }
+
+        return stockMovementService.getPrepickSuggestedItems(
+                applyRotation(getConfiguredRotationRule(), availableItems), quantityRequired)
+    }
+
+    private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], Boolean crossDockRelease = false,
+                                                      AllocationMode allocationMode = null) {
+        Location facility = requisitionItem.requisition.origin
+        Product product = requisitionItem.product
+
+        // A backordered line is a cross-dock line, which waits for its inbound and is allocated only by the
+        // cross-dock release
+        if (requisitionItem.isBackordered() && !crossDockRelease) {
+            log.info("Requisition item ${requisitionItem.id} is backordered, skipping ordinary allocation")
+            return []
+        }
+
+        List<AvailableItem> allAvailableItems =
+                stockMovementService.getAvailableItems(facility, requisitionItem, false, !crossDockRelease)
+
+        allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isNegativeInventoryFallbackLocation() }
+
+        List<AllocationSourceStrategy> resolvedStrategies = resolveStrategies(requisitionItem.requisition, strategies)
+        RotationRule rotationRule = getConfiguredRotationRule()
+
+        // Cross-dock release: take the cross-dock zone first and fall back to ordinary stock only for
+        // the quantity no inbound covered
+        if (crossDockRelease) {
+            List<AvailableItem> ordered = crossDockFirst(orderByStrategy(
+                    resolvedStrategies.first(), facility, product,
+                    applyRotation(rotationRule, allAvailableItems)), requisitionItem)
+            return stockMovementService.getSuggestedItems(ordered, quantityRequired)
+        }
+
+        Integer bestQuantityAvailable = 0
+        List<AvailableItem> bestItems = []
+        AllocationSourceStrategy bestStrategy = null
+        for (AllocationSourceStrategy strategy : resolvedStrategies) {
+            List<AvailableItem> ordered = orderByStrategy(strategy, facility, product, applyRotation(rotationRule, allAvailableItems))
+            List<AvailableItem> includedItems = ordered.findAll {
+                !excludeList.contains(it) && it.quantityAvailable > 0 && it.pickable
+            }
+            Integer quantityAvailable = includedItems.sum { it.quantityAvailable } ?: 0
+            if (bestStrategy == null || quantityAvailable > bestQuantityAvailable) {
+                bestQuantityAvailable = quantityAvailable
+                bestItems = includedItems
+                bestStrategy = strategy
+            }
+            if (canSatisfy(includedItems, quantityRequired)) {
+                return stockMovementService.getSuggestedItems(includedItems, quantityRequired)
+            }
+        }
+
+        // No location holds enough, so rather than abandon the order we take whatever stock exists and record
+        // the rest against a location permitted to go negative or the facility's fallback location
+        if (isNegativeAllocationApplicable(allocationMode, facility, requisitionItem.requisition)) {
+            List<SuggestedItem> fallbackItems =
+                    getFallbackSuggestedItems(requisitionItem, quantityRequired, bestStrategy, bestItems)
+            if (fallbackItems != null) {
+                return fallbackItems
+            }
+        }
+
+        throw new IllegalArgumentException("Insufficient stock for product ${product?.productCode} - " +
+                "${product?.name} in order ${requisitionItem.requisition?.requestNumber}. " +
+                "Required quantity: ${quantityRequired}, Available quantity: ${bestQuantityAvailable}. " +
+                "Negative allocation also failed: it is either disabled for this order or no location " +
+                "is configured to allow it.")
+    }
+
+    /**
+     * Checks if allocating below zero is allowed. It should be applicable for auto allocations and only
+     * when both the order and the facility permit it
+     */
+    private static boolean isNegativeAllocationApplicable(AllocationMode allocationMode, Location facility,
+                                                          Requisition requisition) {
+        if (allocationMode != AllocationMode.AUTO) {
+            return false
+        }
+
+        if (!requisition?.negativeAllocationAllowed) {
+            return false
+        }
+
+        return facility?.isNegativeInventoryEnabled()
+    }
+
+    /**
+     * Picks whatever real stock exists first and only sends the remainder to a fallback location
+     */
+    private List<SuggestedItem> getFallbackSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired,
+                                                          AllocationSourceStrategy strategy,
+                                                          List<AvailableItem> bestItems) {
+        Location facility = requisitionItem.requisition.origin
+        Product product = requisitionItem.product
+
+        List<SuggestedItem> suggestedItemsFromStock = stockMovementService.getSuggestedItems(bestItems, quantityRequired)
+        Integer quantityFromStock = suggestedItemsFromStock.sum { it.quantityPicked } ?: 0
+        Integer quantityShortfall = quantityRequired - quantityFromStock
+
+        // Defensive only: every strategy already failed canSatisfy, so the shortfall is always positive here.
+        if (quantityShortfall <= 0) {
+            return suggestedItemsFromStock
+        }
+
+        AllocationFallbackResolution resolution = allocationFallbackService.resolve(facility, product, strategy)
+        if (!resolution) {
+            return null
+        }
+
+        log.warn("Allocation fallback for product ${product?.productCode} in order " +
+                "${requisitionItem.requisition?.requestNumber}: ${resolution}, quantity ${quantityShortfall}")
+
+        // Below steps leave a balance that no longer matches the bin, and a count is the only thing that
+        // ever corrects it
+        cycleCountService.getOrCreateCycleCountRequest(facility, product)
+
+        String message
+        if (resolution.step == AllocationStep.NEGATIVE_INVENTORY) {
+            message = "Negative inventory: allocated quantity ${quantityShortfall} of product " +
+                    "${product?.productCode} - ${product?.name} to ${resolution.binLocation?.name}, which is " +
+                    "permitted to hold a negative quantity. Cycle count requested."
+        } else {
+            message = "Inventory shortfall: no location at ${facility?.name} could supply quantity " +
+                    "${quantityShortfall} of product ${product?.productCode} - ${product?.name}. " +
+                    "Allocated to ${resolution.binLocation?.name}. Cycle count requested."
+        }
+
+        requisitionService.addSystemComment(requisitionItem.requisition, message)
+        requisitionService.addSystemEventLog(requisitionItem.requisition, message)
+
+        InventoryItem inventoryItem = inventoryService.findOrCreateDefaultInventoryItem(product)
+
+        // Every suggested item becomes its own picklist row, so a line already picking the same lot from the
+        // same bin has to absorb the shortfall instead of gaining a duplicate alongside it.
+        SuggestedItem existingItem = suggestedItemsFromStock.find {
+            it.inventoryItem?.id == inventoryItem?.id && it.binLocation?.id == resolution.binLocation?.id
+        }
+        if (existingItem) {
+            existingItem.quantityPicked = (existingItem.quantityPicked ?: 0) + quantityShortfall
+            return suggestedItemsFromStock
+        }
+
+        SuggestedItem shortfallItem = new SuggestedItem(
+                inventoryItem: inventoryItem,
+                binLocation: resolution.binLocation,
+                quantityAvailable: 0,
+                quantityOnHand: 0,
+                quantityRequested: quantityShortfall,
+                quantityPicked: quantityShortfall
+        )
+
+        return suggestedItemsFromStock + [shortfallItem]
+    }
+
+    private List<AllocationSourceStrategy> resolveStrategies(Requisition requisition, List<AllocationSourceStrategy> explicit) {
+        if (explicit) {
+            return explicit
+        }
+        if (requisition?.allocationSourceStrategy) {
+            return [requisition.allocationSourceStrategy]
+        }
+        return [getConfiguredSourceStrategy()]
+    }
+
+    private AllocationSourceStrategy getConfiguredSourceStrategy() {
+        return (grailsApplication.config.openboxes.order.allocation.source ?: AllocationSourceStrategy.STORAGE_FIRST) as AllocationSourceStrategy
+    }
+
+    private RotationRule getConfiguredRotationRule() {
+        return (grailsApplication.config.openboxes.order.allocation.rotation ?: RotationRule.FEFO) as RotationRule
+    }
+
+    /**
+     * The order's own cross-dock zone first, then ordinary stock. Other cross-dock zones are left out, since
+     * what sits there was bought for other orders.
+     */
+    private List<AvailableItem> crossDockFirst(List<AvailableItem> availableItems, RequisitionItem requisitionItem) {
+        ActivityCode deliveryActivityCode = requisitionItem.requisition.deliveryTypeCode?.activityCode
+        List<AvailableItem> ownZoneItems = availableItems.findAll {
+            deliveryActivityCode && it.binLocation?.supports(ActivityCode.CROSS_DOCKING) &&
+                    it.binLocation.supports(deliveryActivityCode)
+        }
+        List<AvailableItem> ordinaryItems = availableItems.findAll {
+            !it.binLocation?.supports(ActivityCode.CROSS_DOCKING)
+        }
+        return ownZoneItems + ordinaryItems
+    }
+
+    private List<AvailableItem> orderByStrategy(AllocationSourceStrategy strategy, Location facility, Product product, List<AvailableItem> availableItems) {
+        AllocationSourceStrategyHandler handler = allocationSourceStrategyHandlerResolver.handlerFor(strategy)
+        if (handler) {
+            return handler.orderAvailableItems(facility, product, availableItems)
+        }
+
+        log.warn("No allocation source strategy handler registered for ${strategy}, using natural order")
+        return availableItems
+    }
+
+    private List<AvailableItem> applyRotation(RotationRule rotationRule, List<AvailableItem> sourceOrdered) {
+        return rotationStrategyResolver.forRule(rotationRule).sort(sourceOrdered)
+    }
+
+    private static boolean canSatisfy(List<AvailableItem> orderedItems, Integer quantityRequired) {
+        Integer quantityAvailable = orderedItems.sum { it.quantityAvailable } ?: 0
+        return quantityAvailable >= quantityRequired
     }
 
     private AllocationDetailsDto buildAllocationDetailsDto(RequisitionItem requisitionItem) {

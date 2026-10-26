@@ -16,6 +16,8 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.BaseDomainApiController
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.LabelPreviewDisabledException
+import org.pih.warehouse.core.LabelTemplateException
 import org.pih.warehouse.inventory.LotStatusCode
 
 @Transactional
@@ -38,8 +40,19 @@ class ContainerApiController extends BaseDomainApiController {
         if (!document) {
             throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
         }
+        InputStream image
+        try {
+            image = zebraService.renderDocument(document, [container:container])
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        } catch (LabelPreviewDisabledException e) {
+            response.status = 503
+            render([errorCode: 503, errorMessage: e.message] as JSON)
+            return
+        }
         response.contentType = "image/png"
-        response.outputStream << zebraService.renderDocument(document, [container:container])
+        response.outputStream << image
     }
 
     def printLabel() {
@@ -52,6 +65,8 @@ class ContainerApiController extends BaseDomainApiController {
             zebraService.printDocument(document, [container:container])
             render([data: "Container barcode label has been printed"] as JSON)
             return
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
@@ -125,5 +140,11 @@ class ContainerApiController extends BaseDomainApiController {
 
         shipmentService.updateContainerStatus(container, updatedContainerStatus)
         render status: 200
+    }
+
+    private void renderLabelTemplateError(LabelTemplateException e) {
+        log.warn(e.message)
+        response.status = 400
+        render([errorCode: 400, errorMessage: e.message] as JSON)
     }
 }

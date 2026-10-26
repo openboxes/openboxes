@@ -9,32 +9,41 @@ import org.pih.warehouse.core.history.HistoryProvider
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderHistoryProvider
 import org.pih.warehouse.putaway.PutawayService
+import org.pih.warehouse.requisition.RequisitionHistoryProvider
 import org.pih.warehouse.shipping.ShipmentHistoryProvider
 
 /**
  * Constructs a history of actions performed on a stock movement.
  *
  * Stock movement history is built by combining the history from a number of different sources, including
- * shipment and order.
+ * the requisition, shipment, and order.
  */
 @Component
 class StockMovementHistoryProvider extends HistoryProvider<StockMovement> {
 
     final OrderHistoryProvider orderHistoryProvider
     final ShipmentHistoryProvider shipmentHistoryProvider
+    final RequisitionHistoryProvider requisitionHistoryProvider
     final PutawayService putawayService
 
     StockMovementHistoryProvider(final OrderHistoryProvider orderHistoryProvider,
                                  final ShipmentHistoryProvider shipmentHistoryProvider,
+                                 final RequisitionHistoryProvider requisitionHistoryProvider,
                                  final PutawayService putawayService) {
         this.orderHistoryProvider = orderHistoryProvider
         this.shipmentHistoryProvider = shipmentHistoryProvider
+        this.requisitionHistoryProvider = requisitionHistoryProvider
         this.putawayService = putawayService
     }
 
     @Override
     List<HistoryItem> doGetHistory(StockMovement source, HistoryContext context) {
         List<HistoryItem> historyItems = []
+
+        if (source?.requisition) {
+            historyItems.addAll(requisitionHistoryProvider.getHistory(source.requisition, context))
+        }
+
         if (!source?.shipment) {
             return historyItems
         }

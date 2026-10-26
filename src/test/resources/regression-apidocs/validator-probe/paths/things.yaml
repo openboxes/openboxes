@@ -1,0 +1,37 @@
+thingById:
+  get:
+    operationId: thingApi_read
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: A thing
+        content:
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Envelope'
+  post:
+    operationId: thingApi_update
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/Thing'
+    responses:
+      '200':
+        description: Updated
+        content:
+          application/json:
+            schema:
+              $ref: '../components.yaml#/Envelope'

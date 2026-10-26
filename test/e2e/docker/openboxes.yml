@@ -1,0 +1,82 @@
+# OpenBoxes config for the e2e stack (mounted as ~/.grails/openboxes.yml, the last and strongest
+# config location). Purpose: a production-mode app (grails.env=prod) whose outbound integrations
+# are inert or pointed at the in-network label stub. The containers have no route to the
+# internet regardless (compose.yml: internal network).
+dataSource:
+    url: "jdbc:mysql://db:3306/openboxes?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true"
+    username: openboxes
+    password: openboxes
+
+grails:
+    serverURL: "http://127.0.0.1:@E2E_HTTP_PORT@/openboxes"
+    mail:
+        disabled: true
+
+openboxes:
+    # webhooks / n8n (WebhookPublisherService): off, and no endpoint
+    webhook:
+        enabled: false
+        endpoint:
+            url: "http://127.0.0.1:9/"
+    n8n:
+        enabled: false
+        endpoint:
+            url: "http://127.0.0.1:9/"
+    mail:
+        enabled: false
+    signup:
+        recaptcha:
+            enabled: false
+    # Zebra printer (raw TCP) and the labelary render: the label stub on the sealed network
+    barcode:
+        printer:
+            ipAddress: labelstub
+            port: 9100
+        labelaryApi:
+            url: "http://labelstub:8081/v1/printers/12dpmm/labels/2x1/0/"
+            documentPreviewUrl: "http://labelstub:8081/v1/printers/8dpmm/labels/3x2/0/"
+            # the browser follows the viewer link: the label stub's published loopback port
+            viewerUrl: "http://127.0.0.1:@E2E_LABEL_PORT@/viewer.html"
+    locale:
+        currencyApi:
+            url: "http://127.0.0.1:9/%s"
+    report:
+        logo:
+            url: "http://127.0.0.1:9/logo.png"
+    fullstory:
+        enabled: false
+    hotjar:
+        enabled: false
+    jira:
+        issue:
+            collector:
+                enabled: false
+    helpscout:
+        widget:
+            enabled: false
+    uservoice:
+        widget:
+            enabled: false
+    zopim:
+        widget:
+            enabled: false
+    # Polling crons would act on fixtures at arbitrary moments: park them in 2099. The event-driven
+    # triggers (allocation on release, receipt / backorder reallocation after a shipment event,
+    # putaway reassignment) still fire exactly as in production.
+    jobs:
+        automaticStateTransitionPollingJob:
+            cronExpression: "0 0 0 1 1 ? 2099"
+        automaticReceiptJob:
+            cronExpression: "0 0 0 1 1 ? 2099"
+        automaticBackorderReallocationJob:
+            cronExpression: "0 0 0 1 1 ? 2099"
+        automaticAllocationJob:
+            cronExpression: "0 0 0 1 1 ? 2099"
+        dataCleaningJob:
+            cronExpression: "0 0 0 1 1 ? 2099"
+        assignIdentifierJob:
+            cronExpression: "0 0 0 1 1 ? 2099"
+        sendStockAlertsJob:
+            enabled: false
+        updateExchangeRatesJob:
+            enabled: false

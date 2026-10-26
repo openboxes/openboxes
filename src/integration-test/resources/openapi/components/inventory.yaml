@@ -1,0 +1,247 @@
+# Shared schemas of the cycle count, inventory level and reorder report API (/api/facilities/{id}/cycle-counts...,
+# /api/reports/cycle-count-..., /api/facilities/{id}/inventory-levels..., /api/facilities/{id}/inventories/reorderReport).
+# Objects are open: the documented properties are guaranteed (required) or nullable, others may appear.
+
+ProductRef:
+  description: A product, by id with its code and name.
+  type: object
+  required: [id]
+  properties:
+    id: {type: string}
+    name: {type: string, nullable: true}
+    productCode: {type: string, nullable: true}
+  additionalProperties: true
+
+NamedRef:
+  description: A record by id with its name (both may be null when nothing is set).
+  type: object
+  properties:
+    id: {type: string, nullable: true}
+    name: {type: string, nullable: true}
+  additionalProperties: true
+
+CycleCountCandidate:
+  description: >-
+    A product the facility holds (or held) that can be counted, with when it was last counted and what a count would
+    cover.
+  type: object
+  required: [product]
+  properties:
+    product: {$ref: '#/ProductRef'}
+    dateLastCount: {type: string, format: date-time, nullable: true, description: When the product was last counted here.}
+    dateNextCount: {type: string, format: date-time, nullable: true, description: When it is due next (by its ABC class).}
+    daysUntilNextCount: {type: integer, nullable: true}
+    category: {$ref: '#/NamedRef'}
+    internalLocations: {type: string, nullable: true, description: 'Names of the bins holding it, comma separated.'}
+    tags: {type: array, items: {type: object, additionalProperties: true}}
+    productCatalogs: {type: array, items: {type: object, additionalProperties: true}}
+    abcClass: {type: string, nullable: true}
+    quantityOnHand: {type: integer, nullable: true}
+    quantityAllocated: {type: integer, nullable: true}
+    cycleCountRequest: {type: object, nullable: true, additionalProperties: true, description: 'The open count request, if any.'}
+    status: {type: string, nullable: true, description: 'Status of the open count, or the text "null" when there is none.'}
+    inventoryItemCount: {type: integer, nullable: true, description: Lots and bins a count would cover.}
+    negativeItemCount: {type: integer, nullable: true, description: 'Of those, how many have negative stock.'}
+    hasStockOnHandOrNegativeStock: {type: boolean, nullable: true}
+    sortOrder: {type: integer, nullable: true}
+  additionalProperties: true
+
+CountAssignment:
+  description: Who is to do a count (or recount) and by when.
+  type: object
+  properties:
+    deadline: {type: string, nullable: true, description: 'yyyy-MM-dd.'}
+    assignee: {type: object, nullable: true, additionalProperties: true, description: 'The person (id, name, ...).'}
+  additionalProperties: true
+
+CycleCountRequest:
+  description: A request to count a product at a facility (before the count starts).
+  type: object
+  required: [id, status]
+  properties:
+    id: {type: string}
+    facility: {type: string, description: Facility id.}
+    product: {type: object, additionalProperties: true, description: The product (full).}
+    status: {type: string, description: 'CREATED, then the status of its count once started (REQUESTED, COUNTING, ...).'}
+    requestType: {type: string, nullable: true, description: 'MANUAL_REQUEST (requested by a user) or a scheduled kind.'}
+    initialCount: {$ref: '#/CountAssignment'}
+    verificationCount: {$ref: '#/CountAssignment'}
+    inventoryItemsCount: {type: integer, nullable: true}
+    blindCount: {type: boolean, nullable: true, description: The counter does not see the quantity on hand.}
+    dateCreated: {type: string, nullable: true}
+    lastUpdated: {type: string, nullable: true}
+  additionalProperties: true
+
+PendingCycleCountRequest:
+  description: An open count request of the facility with its product's stock details.
+  type: object
+  required: [cycleCountRequest, product]
+  properties:
+    id: {type: string}
+    facility: {type: string}
+    cycleCountRequest: {$ref: '#/CycleCountRequest'}
+    product: {$ref: '#/ProductRef'}
+    category: {$ref: '#/NamedRef'}
+    internalLocations: {type: string, nullable: true}
+    tags: {type: array, items: {type: object, additionalProperties: true}}
+    productCatalogs: {type: array, items: {type: object, additionalProperties: true}}
+    abcClass: {type: string, nullable: true}
+    quantityOnHand: {type: integer, nullable: true}
+    quantityAllocated: {type: integer, nullable: true}
+    status: {type: string, nullable: true}
+    negativeItemCount: {type: integer, nullable: true}
+    requestType: {type: string, nullable: true}
+    blindCount: {type: boolean, nullable: true}
+    dateCreated: {type: string, nullable: true}
+    lastUpdated: {type: string, nullable: true}
+  additionalProperties: true
+
+CycleCountItem:
+  description: One row of a count - a lot of the product in a bin - with what was counted.
+  type: object
+  required: [id, status]
+  properties:
+    id: {type: string}
+    facility: {type: object, additionalProperties: true}
+    binLocation: {type: object, nullable: true, additionalProperties: true}
+    product: {type: object, additionalProperties: true}
+    inventoryItem: {type: object, nullable: true, additionalProperties: true, description: 'The lot (lotNumber, expirationDate MM/dd/yyyy).'}
+    countIndex: {type: integer, description: '0 for the count, 1 and up for recounts.'}
+    status: {type: string, description: 'READY_TO_COUNT, COUNTING, COUNTED, APPROVED, ...'}
+    quantityOnHand: {type: integer, nullable: true}
+    quantityCounted: {type: integer, nullable: true}
+    quantityVariance: {type: integer, nullable: true}
+    discrepancyReasonCode: {type: string, nullable: true}
+    comment: {type: string, nullable: true}
+    custom: {type: boolean, description: A row the counter added (stock not on record); only these can be removed.}
+    dateCounted: {type: string, nullable: true}
+    dateCreated: {type: string, nullable: true}
+    assignee: {type: object, nullable: true, additionalProperties: true}
+  additionalProperties: true
+
+CycleCount:
+  description: A count of a product at a facility with its rows.
+  type: object
+  required: [id, status, cycleCountItems]
+  properties:
+    id: {type: string}
+    status: {type: string, description: 'REQUESTED, COUNTING, COUNTED, INVESTIGATING, COMPLETED, ...'}
+    requestId: {type: string, nullable: true}
+    cycleCountItems: {type: array, items: {$ref: '#/CycleCountItem'}}
+    initialCount: {$ref: '#/CountAssignment'}
+    verificationCount: {$ref: '#/CountAssignment'}
+    maxCountIndex: {type: integer, nullable: true}
+  additionalProperties: true
+
+CountResult:
+  description: What one count (or the verification recount) found.
+  type: object
+  properties:
+    assignee: {$ref: '#/NamedRef'}
+    dateCounted: {type: string, nullable: true}
+    quantityOnHand: {type: integer, nullable: true}
+    quantityCounted: {type: integer, nullable: true}
+    quantityVariance: {type: integer, nullable: true}
+    varianceTypeCode: {type: string, nullable: true, description: 'LESS, MORE or EQUAL.'}
+    varianceReasonCode: {type: string, nullable: true}
+    varianceComment: {type: string, nullable: true}
+  additionalProperties: true
+
+CycleCountTransaction:
+  description: The stock transaction a completed count recorded.
+  type: object
+  properties:
+    id: {type: string}
+    transactionNumber: {type: string, nullable: true}
+    transactionType: {type: string, nullable: true}
+    dateRequested: {type: string, nullable: true}
+    dateInitiated: {type: string, nullable: true}
+    dateRecorded: {type: string, nullable: true}
+    requestedBy: {$ref: '#/NamedRef'}
+    initiatedBy: {$ref: '#/NamedRef'}
+    recordedBy: {$ref: '#/NamedRef'}
+  additionalProperties: true
+
+CycleCountDetailsRow:
+  description: One lot and bin of a completed count.
+  type: object
+  required: [cycleCount]
+  properties:
+    id: {type: integer}
+    cycleCount: {$ref: '#/CycleCountTransaction'}
+    inventoryItem:
+      type: object
+      additionalProperties: true
+      properties:
+        product: {$ref: '#/ProductRef'}
+        lotNumber: {type: string, nullable: true}
+        expirationDate: {type: string, nullable: true}
+        internalLocation: {type: object, nullable: true, additionalProperties: true}
+    blindCount: {$ref: '#/CountResult'}
+    verificationCount: {$ref: '#/CountResult'}
+  additionalProperties: true
+
+CycleCountSummaryRow:
+  description: One completed count of a product (all its lots and bins together).
+  type: object
+  required: [cycleCount, product]
+  properties:
+    id: {type: integer}
+    cycleCount: {$ref: '#/CycleCountTransaction'}
+    product: {$ref: '#/ProductRef'}
+    blindCount: {$ref: '#/CountResult'}
+    verificationCount: {$ref: '#/CountResult'}
+  additionalProperties: true
+
+InventoryLevel:
+  description: >-
+    The stock settings of a product at a facility (min, reorder and max quantities, bins), as the database row: ids of
+    related records only, status as an enum object.
+  type: object
+  required: [id, product]
+  properties:
+    id: {type: string}
+    product: {type: object, additionalProperties: true, properties: {id: {type: string}}}
+    inventory: {type: object, nullable: true, additionalProperties: true}
+    status:
+      type: object
+      nullable: true
+      additionalProperties: true
+      properties:
+        enumType: {type: string}
+        name: {type: string, description: 'SUPPORTED, NOT_SUPPORTED, SUPPORTED_NON_INVENTORY, FORMULARY, ...'}
+    minQuantity: {type: integer, nullable: true}
+    reorderQuantity: {type: integer, nullable: true}
+    maxQuantity: {type: integer, nullable: true}
+    forecastQuantity: {type: number, nullable: true}
+    forecastPeriodDays: {type: number, nullable: true}
+    expectedLeadTimeDays: {type: number, nullable: true}
+    replenishmentPeriodDays: {type: number, nullable: true}
+    demandTimePeriodDays: {type: number, nullable: true}
+    abcClass: {type: string, nullable: true}
+    preferred: {type: boolean, nullable: true}
+    comments: {type: string, nullable: true}
+    binLocation: {type: string, nullable: true, description: Legacy bin name.}
+    preferredBinLocation: {type: object, nullable: true, additionalProperties: true}
+    replenishmentLocation: {type: object, nullable: true, additionalProperties: true}
+    internalLocation: {type: object, nullable: true, additionalProperties: true}
+    dateCreated: {type: string, nullable: true}
+    lastUpdated: {type: string, nullable: true}
+  additionalProperties: true
+
+ReorderReportRow:
+  description: A product of the facility with its stock against its inventory level and what to order.
+  type: object
+  required: [product]
+  properties:
+    product: {type: object, additionalProperties: true}
+    inventoryLevel: {type: object, nullable: true, additionalProperties: true, description: 'The product''s inventory level, if it has one.'}
+    inventoryStatus: {type: string, nullable: true, description: 'IN_STOCK, BELOW_MINIMUM, OUT_OF_STOCK, ...'}
+    monthlyDemand: {type: number, nullable: true}
+    expiredQuantityAvailableToPromise: {type: integer, nullable: true}
+    finalQuantityAvailableToPromise: {type: integer, nullable: true}
+    quantityToOrder: {type: integer, nullable: true, description: Up to the max quantity; null without one.}
+    unitCost: {type: number, nullable: true}
+    expectedReorderCost: {type: number, nullable: true}
+    tags: {type: array, items: {type: object, additionalProperties: true}}
+  additionalProperties: true

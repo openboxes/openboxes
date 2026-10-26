@@ -7,16 +7,21 @@ import org.apache.commons.lang.StringUtils
  */
 enum FileExtension {
 
-    NONE(""),
-    CSV(".csv"),
-    DOC(".doc"),
-    DOCX(".docx"),
-    JSON(".json"),
-    PDF(".pdf"),
-    TXT(".txt"),
-    XLS(".xls"),
-    XLSX(".xlsx"),
-    XML(".xml")
+    NONE(''),
+    CSV('csv'),
+    DOC('doc'),
+    DOCX('docx'),
+    GIF('gif'),
+    JPEG('jpeg'),
+    JPG('jpg'),
+    JSON('json'),
+    PDF('pdf'),
+    PNG('png'),
+    TXT('txt'),
+    WEBP('webp'),
+    XLS('xls'),
+    XLSX('xlsx'),
+    XML('xml')
 
     /**
      * The file extension associated with that file type.
@@ -28,14 +33,10 @@ enum FileExtension {
     }
 
     static FileExtension fromExtensionString(String extension) {
-        String extensionSanitized = extension?.trim()?.toLowerCase()
+        String extensionSanitized = extension?.trim()?.toLowerCase()?.replaceFirst('^\\.', '')
 
         if (StringUtils.isBlank(extensionSanitized)) {
             return NONE
-        }
-
-        if (!extensionSanitized.startsWith('.')) {
-            extensionSanitized = '.' + extensionSanitized
         }
 
         return values().find { it.extension == extensionSanitized }

@@ -1668,7 +1668,7 @@ class DocumentService {
             or {
                 isNull("documentCode")
                 not {
-                    'in'('documentCode', DocumentCode.templateList())
+                    'in'('documentCode', DocumentCode.templateList() + [DocumentCode.DATA_EXPORT])
                 }
             }
         }.sort { it.name }

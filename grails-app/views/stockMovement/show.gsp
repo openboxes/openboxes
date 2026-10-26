@@ -118,7 +118,7 @@
                     </g:if>
                 </g:else>
 
-                <g:if test="${stockMovement?.hasBeenIssued() && (stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())}">
+                <g:if test="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}">
                     <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                         <warehouse:message code="default.button.receive.label" />
@@ -145,8 +145,8 @@
                             <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                         </g:link>
                     </g:if>
-                    <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
-                            stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
+                    <g:elseif test="${stockMovement?.hasBeenIssued() || stockMovement?.hasBeenShipped()
+                            || (stockMovement?.hasBeenPartiallyReceived() && stockMovement?.isFromOrder)}">
                         <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                             <warehouse:message code="default.button.rollback.label" />
@@ -202,9 +202,8 @@
                     </g:isUserAdmin>
                 </g:if>
 
-                <g:if test="${grailsApplication.config.openboxes.stockMovement.allocate.enabled}">
-                    <g:isUserAdmin>
-                        <g:if test="${stockMovement?.canGeneratePickList()}">
+                <g:isUserAdmin>
+                        <g:if test="${isSameOrigin && stockMovement?.canGeneratePickList()}">
                             <g:link
                                 controller="stockMovement"
                                 action="allocate"
@@ -256,9 +255,27 @@
                                     <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
                                 </g:link>
                             </g:else>
+                            <g:if test="${currentAssignee}">
+                                <g:form controller="requisition" action="unassignPicker" style="display:inline-block; float:left; margin: 0;">
+                                    <g:hiddenField name="id" value="${stockMovement?.requisition?.id}"/>
+                                    <button
+                                            class="button"
+                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                    >
+                                        <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
+                                        Unassign picker
+                                    </button>
+                                </g:form>
+                            </g:if>
+                            <a href="javascript:void(0);" class="button btn-show-dialog"
+                               data-height="200" data-width="500"
+                               data-title="Reassign picker"
+                               data-url="${request.contextPath}/requisition/reassignPickerDialog/${stockMovement?.requisition?.id}">
+                                <img src="${resource(dir: 'images/icons/silk/', file: 'user_add.png')}" />&nbsp;
+                                Reassign picker
+                            </a>
                         </g:if>
-                    </g:isUserAdmin>
-                </g:if>
+                </g:isUserAdmin>
 
                 <g:isSuperuser>
                     <a href="javascript:void(0);" class="button btn-show-dialog"
@@ -342,6 +359,16 @@
                                 ${stockMovement?.displayStatus?.label}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.requisition?.status in [RequisitionStatus.PICKING, RequisitionStatus.PICKED, RequisitionStatus.CHECKING, RequisitionStatus.STAGED]}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <warehouse:message code="picklist.assignee.label" default="Picker"/>
+                                </td>
+                                <td class="value">
+                                    ${currentAssignee?.name ?: 'Unassigned'}
+                                </td>
+                            </tr>
+                        </g:if>
                         <g:if test="${stockMovement?.fulfillmentStatus}">
                             <tr class="prop">
                                 <td class="name">

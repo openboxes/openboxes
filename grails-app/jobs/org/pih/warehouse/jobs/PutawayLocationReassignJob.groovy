@@ -1,0 +1,76 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
+package org.pih.warehouse.jobs
+
+import org.pih.warehouse.api.Putaway
+import org.pih.warehouse.api.PutawayItem
+import org.pih.warehouse.api.PutawayStatus
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
+import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.putaway.PutawayService
+import org.quartz.JobExecutionContext
+
+class PutawayLocationReassignmentJob {
+
+    PutawayService putawayService
+    LocationService locationService
+
+    def sessionRequired = false
+
+    void execute(JobExecutionContext context) {
+        if (!JobUtils.shouldExecute(PutawayLocationReassignmentJob)) {
+            log.info("Reassign Putaway location job is disabled")
+            return
+        }
+        log.info "Executing PutawayLocationReassign job"
+
+        String inventoryLevelId = context.mergedJobDataMap.get('inventoryLevelId')
+        InventoryLevel inventoryLevel = InventoryLevel.read(inventoryLevelId)
+        if (!inventoryLevel) {
+            log.warn "InventoryLevel with id ${inventoryLevelId} not found, cannot trigger reassigning"
+            return
+        }
+        if (inventoryLevel.preferredBinLocation?.supports(ActivityCode.UNDEFINED_LOCATION)) {
+            // the update hasn't changed preferredBinLocation type from UNDEFINED; no reassigning
+            log.debug "InventoryLevel with ${ActivityCode.UNDEFINED_LOCATION} preferredBinLocation. Skip."
+            return
+        }
+        if (inventoryLevel.internalLocation?.supports(ActivityCode.UNDEFINED_LOCATION)) {
+            // the update hasn't changed internalLocation type from UNDEFINED; no reassigning
+            log.debug "InventoryLevel with ${ActivityCode.UNDEFINED_LOCATION} internalLocation. Skip."
+            return
+        }
+
+        List<Location> binLocations = locationService.getLocationsSupportingActivity(ActivityCode.UNDEFINED_LOCATION)
+        List<Putaway> pendingPutaways = putawayService.getPendingPutawayOrders(inventoryLevel.product, binLocations, inventoryLevel.inventory.warehouse)
+        log.info("Reassigning Putaway location for product ${inventoryLevel.product}, found ${pendingPutaways?.size()} putaways")
+        pendingPutaways?.each { Putaway putaway ->
+            List<PutawayItem> putawayItems = putaway.putawayItems.findAll {
+                it.putawayLocation?.supports(ActivityCode.UNDEFINED_LOCATION)
+            }
+
+            Location newPutawayLocation = inventoryLevel.preferredBinLocation ?: inventoryLevel.internalLocation
+            putawayItems?.each { setPutawayLocation(it, newPutawayLocation) }
+            putawayService.savePutaway(putaway)
+        }
+    }
+
+    private void setPutawayLocation(PutawayItem putawayItem, Location putawayLocation) {
+        if (putawayItem?.putawayStatus != PutawayStatus.COMPLETED && putawayItem?.putawayStatus != PutawayStatus.CANCELED) {
+            putawayItem.putawayLocation = putawayLocation
+            log.debug "Modified putawayLocation as ${putawayLocation} for ${putawayItem.id}"
+        }
+        putawayItem.splitItems?.each { PutawayItem splitItem ->
+            setPutawayLocation(splitItem, putawayLocation)
+        }
+    }
+}

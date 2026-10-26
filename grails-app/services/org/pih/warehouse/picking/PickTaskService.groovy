@@ -8,10 +8,16 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.RequisitionEvent
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.WebhookPublisherService
@@ -42,6 +48,8 @@ class PickTaskService {
     StockMovementService stockMovementService
     WebhookPublisherService webhookPublisherService
     RequisitionService requisitionService
+    UserService userService
+    LocationService locationService
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -49,6 +57,7 @@ class PickTaskService {
 
         Integer max = params.int('max') ?: 100
         Integer offset = params.int('offset') ?: 0
+        boolean excludeAssignedRequisitions = command.excludeAssignedRequisitions ?: false
 
         List<String> requisitionIds = findRequisitionIdsForPicking(command)
 
@@ -57,13 +66,19 @@ class PickTaskService {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         }
 
+        List<String> assignedRequisitions
+        if (excludeAssignedRequisitions) {
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
+        }
+
         List<PickTask> tasks = PickTask.createCriteria().list(max: max, offset: offset) {
             if (command.facility) {
                 eq("facility", command.facility)
             }
 
-            if (!requisitionIds.isEmpty()) {
-                'in'("requisition.id", requisitionIds)
+            if (command.ordersCount) {
+                // an empty candidate list must yield no results rather than an unfiltered search
+                'in'("requisition.id", requisitionIds ?: [""])
             }
 
             if (command.deliveryTypeCode) {
@@ -98,6 +113,11 @@ class PickTaskService {
                     eq("r.id", command.requisitionId)
                     eq("r.requestNumber", command.requisitionId)
                 }
+            } else if (assignedRequisitions) {
+                // apply assignedRequisitions only when command.requisitionId is not given
+                not {
+                    'in'("requisition.id", assignedRequisitions)
+                }
             }
 
             order("priority", "asc")
@@ -106,35 +126,65 @@ class PickTaskService {
             order("l.name", "asc")
         }
 
+        // PickTask is a denormalized snapshot (see the pick_task DB view), not live-linked to the stock
+        // ledger, so a PICKED task's stock can be moved or removed later through a side channel (stock
+        // transfer, manual removal) that never updates it. Flag those rather than hide them, so users
+        // can still recover the work but see it needs a closer look. Only meaningful for a PICKED-only
+        // search - other statuses are left untouched (hasStockIssue stays null).
+        if (statusesToSearch == [PickTaskStatus.PICKED]) {
+            annotateStockIssues(tasks)
+        }
+
         return tasks
     }
 
-    @Transactional(readOnly = true)
-    List<Map> countOrdersByDeliveryType(Location facility) {
-        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(
-                facility, [PickTaskStatus.PENDING, PickTaskStatus.PICKING])
+    private void annotateStockIssues(List<PickTask> tasks) {
+        tasks.each { PickTask task ->
+            task.hasStockIssue = !hasPickedStockStillAvailable(task)
+        }
+    }
 
-        Map<DeliveryTypeCode, Integer> total = countDistinctRequisitionsByDeliveryType(facility, null)
+    private boolean hasPickedStockStillAvailable(PickTask task) {
+        Location binLocation = task.outboundContainer ?: task.location
+        if (!binLocation) {
+            return false
+        }
+        BigDecimal quantityOnHand = productAvailabilityService.getQuantityOnHandInBinLocation(task.inventoryItem, binLocation)
+        return quantityOnHand != null && quantityOnHand >= (task.quantityPicked ?: 0)
+    }
+
+    @Transactional(readOnly = true)
+    List<Map> countOrdersByDeliveryType(SearchPickTaskCommand command) {
+        Map<DeliveryTypeCode, Integer> available = countDistinctRequisitionsByDeliveryType(command)
 
         return DeliveryTypeCode.values().collect { DeliveryTypeCode code ->
             [
                     deliveryTypeCode: code.name(),
                     availableCount  : available[code] ?: 0,
-                    totalCount      : total[code] ?: 0,
             ]
         }
     }
 
-    private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(
-            Location facility, List<PickTaskStatus> statuses) {
+    private Map<DeliveryTypeCode, Integer> countDistinctRequisitionsByDeliveryType(SearchPickTaskCommand command) {
+        List<PickTaskStatus> statuses = command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
+        List<String> assignedRequisitions
+        if (command.excludeAssignedRequisitions) {
+            assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statuses)
+        }
         List results = PickTask.createCriteria().list {
             projections {
                 groupProperty("deliveryTypeCode")
                 countDistinct("requisition")
             }
-            eq("facility", facility)
-            if (statuses) {
-                'in'("status", statuses)
+            eq("facility", command.facility)
+            'in'("requisitionStatus", RequisitionStatus.listNotYetPicked())
+            'in'("status", statuses)
+
+            if (assignedRequisitions) {
+                not {
+                    'in'("requisition.id", assignedRequisitions)
+                }
             }
         }
         return results.collectEntries { row -> [(row[0]): (row[1] as Integer)] }
@@ -149,26 +199,42 @@ class PickTaskService {
         return PickTask.get(id)
     }
 
-    PickTask patch(String id, Map data = [:]) {
+    /**
+     * The pick task, if it belongs to the facility (the facility in the request URL); null otherwise.
+     */
+    @Transactional(readOnly = true)
+    PickTask get(String id, Location facility) {
         PickTask task = get(id)
+        return task && facility && task.facility?.id == facility.id ? task : null
+    }
+
+    /**
+     * Applies an action to a pick task. When a facility is given (the facility in the request URL), a task of
+     * another facility is not found. The signed-in user is recorded as the picker; the assignee is the signed-in
+     * user unless assigneeId names someone else, which needs the admin role at the task's facility.
+     */
+    PickTask patch(String id, Map data = [:], Location facility = null) {
+        PickTask task = facility ? get(id, facility) : get(id)
 
         if (!task) {
             throw new ObjectNotFoundException(id, "Pick task ${id} was not found")
         }
 
+        String currentUserId = AuthService.currentUser?.id
+
         switch (data?.action) {
 
             case 'start':
-                start(task, data.assigneeId as String)
+                start(task, assigneeFor(task, data.assigneeId as String))
                 break
 
             case 'pick':
-                pick(task, data.outboundContainerId as String, data.pickedById as String)
+                pick(task, data.outboundContainerId as String, currentUserId)
                 break
 
             case 'short-pick':
                 shortPick(task, data.outboundContainerId as String, data.quantityPicked as Integer,
-                        data.pickedById as String, data.reasonCode as String)
+                        currentUserId, data.reasonCode as String)
                 break
 
             default:
@@ -182,7 +248,34 @@ class PickTaskService {
         return task
     }
 
+    /**
+     * The user to assign the task to: the signed-in user, unless the request names another user, which needs the
+     * admin role at the task's facility (the same role that reassigns the picker of an order).
+     */
+    private String assigneeFor(PickTask task, String requestedAssigneeId) {
+        User currentUser = AuthService.currentUser
+        if (!requestedAssigneeId || requestedAssigneeId == currentUser?.id) {
+            return currentUser?.id
+        }
+        String message = null
+        if (!userService.isUserInRoleAtLocation(currentUser, task.facility, RoleType.ROLE_ADMIN)) {
+            message = "Only an administrator can assign pick task ${task.id} to another user"
+        } else if (!User.get(requestedAssigneeId)) {
+            message = "User ${requestedAssigneeId} was not found"
+        }
+        if (message) {
+            task.errors.reject("assignee", message)
+            throw new ValidationException(message, task.errors)
+        }
+        return requestedAssigneeId
+    }
+
     void start(PickTask task, String assigneeId) {
+        if (task.assignee && task.assignee.id != assigneeId) {
+            task.errors.reject("assignee", "Pick task ${task.id} is already assigned to another user")
+            throw new ValidationException("Pick task ${task.id} is already assigned to another user", task.errors)
+        }
+
         executeStateTransition(task, PickTaskStatus.PICKING)
         webhookPublisherService.publishRequisitionEvent(task.requisition, WebhookEventType.PICK_STARTED)
 
@@ -195,11 +288,11 @@ class PickTaskService {
     }
 
     void pick(PickTask task, String outboundContainerId, String pickedById) {
-        Location outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+        Location outboundContainer = findInFacility(outboundContainerId, task.facility)
         validateOutboundContainer(outboundContainer, task)
 
-        executeStateTransition(task, PickTaskStatus.PICKED)
         transferToContainer(task, outboundContainer, task.quantityRequired.toInteger())
+        executeStateTransition(task, PickTaskStatus.PICKED)
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.pickedBy = Person.get(pickedById)
@@ -213,7 +306,7 @@ class PickTaskService {
     void shortPick(PickTask task, String outboundContainerId, Integer quantityPicked, String pickedById, String reasonCode) {
         Location outboundContainer = null
         if (outboundContainerId != null) {
-            outboundContainer = Location.findByLocationNumberOrId(outboundContainerId, outboundContainerId)
+            outboundContainer = findInFacility(outboundContainerId, task.facility)
             validateOutboundContainer(outboundContainer, task)
         }
 
@@ -259,6 +352,13 @@ class PickTaskService {
             throw new IllegalStateException("Pick task ${task.id} has no associated requisition item")
         }
 
+        // The new bins must exist at the task's facility; check them all before anything is deleted
+        picklistItems.each { item ->
+            if (item.binLocation?.id && !findInFacility(item.binLocation.id as String, task.facility)) {
+                throw new IllegalArgumentException("Bin location ${item.binLocation.id} is not a location of facility ${task.facility?.name}")
+            }
+        }
+
         // Delete only the specific picklist item being reallocated (task.id === picklistItem.id)
         String locationId = null
         String productId = requisitionItem?.product?.id
@@ -286,7 +386,7 @@ class PickTaskService {
                     InventoryItem.get(item.inventoryItem.id) : null
 
             Location binLocation = item.binLocation?.id ?
-                    Location.get(item.binLocation.id) : null
+                    findInFacility(item.binLocation.id as String, task.facility) : null
 
             Integer quantityToPick = item.quantity ? new Integer(item.quantity) : null
 
@@ -312,11 +412,18 @@ class PickTaskService {
         if (!outboundContainer) {
             throw new IllegalArgumentException("Outbound container with identifier ${outboundContainerId} does not exist")
         }
+        return drop(outboundContainer, data)
+    }
 
+    /**
+     * Applies an action to an outbound container. The signed-in user is recorded as the user who staged it.
+     */
+    def drop(Location outboundContainer, Map data = [:]) {
         switch (data?.action) {
 
             case 'drop':
-                dropToStaging(outboundContainer, data.stagingLocationId as String, data.stagedById as String)
+                dropToStaging(outboundContainer, data.stagingLocationId as String, AuthService.currentUser?.id,
+                        data.overrideStagingLocationZone as Boolean ?: false)
                 break
 
             default:
@@ -375,8 +482,9 @@ class PickTaskService {
         task.status = to
     }
 
-    void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById) {
-        Location stagingLocation = Location.findByLocationNumberOrId(stagingLocationId, stagingLocationId)
+    void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById,
+                        boolean overrideStagingLocationZone = false) {
+        Location stagingLocation = findInFacility(stagingLocationId, outboundContainer.parentLocation)
         validateStagingLocation(stagingLocation)
 
         List<AvailableItem> itemsToMove = productAvailabilityService.getAvailableItems(outboundContainer)
@@ -385,14 +493,21 @@ class PickTaskService {
             throw new IllegalStateException("Outbound container with number ${outboundContainer.locationNumber} is empty")
         }
 
+        // Validate the zone for every task up front so the drop fails atomically rather than
+        // partially transferring stock before hitting a mismatch on a later item.
+        List<PickTask> allTasks = itemsToMove.collectMany { item ->
+            PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
+        }.unique { it.id }
+        allTasks.each { task -> validateStagingLocationZone(stagingLocation, task, overrideStagingLocationZone) }
+
         Person stagedBy = Person.get(stagedById)
         itemsToMove.each { item ->
             List<PickTask> tasks = PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(
                     outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
             tasks.each { task ->
-                executeStateTransition(task, PickTaskStatus.STAGED)
                 transferToStaging(task, item, stagingLocation)
 
+                executeStateTransition(task, PickTaskStatus.STAGED)
                 PicklistItem existingPickItem = PicklistItem.get(task.id)
                 existingPickItem.stagingLocation = stagingLocation
                 existingPickItem.dateStaged = new Date()
@@ -431,7 +546,7 @@ class PickTaskService {
         command.location = item.binLocation?.parentLocation
         command.binLocation = item.binLocation
         command.inventoryItem = item.inventoryItem
-        command.quantity = item.quantityOnHand.toInteger()
+        command.quantity = task.quantityPicked.toInteger()
         command.otherLocation = item.binLocation?.parentLocation
         command.otherBinLocation = stagingLocation
         command.transferOut = Boolean.TRUE
@@ -443,6 +558,12 @@ class PickTaskService {
         task.discard()
 
         Transaction transaction = inventoryService.transferStock(command)
+        if (transaction.hasErrors()) {
+            String errorMessage = transaction.errors.allErrors.collect { it.defaultMessage ?: it.code }.join('; ')
+            throw new ValidationException(
+                    "Unable to transfer stock for pick task ${task.identifier} (order ${task.requisitionNumber}): ${errorMessage}",
+                    transaction.errors)
+        }
         transaction.transactionSource = createPickTaskTransactionSource(task)
 
         grailsApplication.mainContext.publishEvent(new PickTaskUpdateEvent(task))
@@ -507,44 +628,150 @@ class PickTaskService {
         return true
     }
 
-    private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {
-        Integer ordersCount = command.ordersCount
-        DeliveryTypeCode deliveryTypeCode = command.deliveryTypeCode
-        if (ordersCount) {
-            boolean searchForAllOrders = deliveryTypeCode == null
+    /**
+     * `.find` returns only the first picklist item that has an assignee, on the assumption that any item being
+     * assigned means the whole order is assigned to that same person. Unassign/reassign (below) act on this
+     * same assumption, clearing or overwriting the assignee on ALL picklist items at once.
+     *
+     * That assumption can currently be violated by the mobile app, which assigns one picklist item at a time
+     * and could let different items on the same order end up with different assignees. Unassign/reassign exist
+     * precisely to let an admin recover from that kind of stuck/inconsistent state from the web app.
+     */
+    Person getCurrentAssignee(Requisition requisition) {
+        return requisition?.picklist?.picklistItems?.find { PicklistItem item ->
+            item.assignee && (!item.status || item.status in [PickTaskStatus.PENDING.name(), PickTaskStatus.PICKING.name()])
+        }?.assignee
+    }
 
-            def criteria = Requisition.createCriteria()
-            List<Requisition> allCandidates = criteria.list() {
-                eq("origin", command.facility)
-                eq("status", RequisitionStatus.PICKING)
+    void unassign(Requisition requisition) {
+        validateAssignmentChangeAllowed(requisition)
 
-                if (!searchForAllOrders) {
-                    eq("deliveryTypeCode", deliveryTypeCode)
-                    order("dateCreated", "asc")
-                }
-            }
-
-            if (!allCandidates) {
-                return []
-            }
-
-            List<Requisition> selectedRequisitions
-            if (searchForAllOrders) {
-                def sortedCandidates = allCandidates.sort { a, b ->
-                    Integer p1 = a.deliveryTypeCode?.priority ?: 99
-                    Integer p2 = b.deliveryTypeCode?.priority ?: 99
-
-                    return p1 <=> p2 ?: a.dateCreated <=> b.dateCreated
-                }
-                selectedRequisitions = sortedCandidates.take(ordersCount)
-            } else {
-                selectedRequisitions = allCandidates.take(ordersCount)
-            }
-
-            return selectedRequisitions.collect { it.id }
+        Person previousAssignee = getCurrentAssignee(requisition)
+        if (!previousAssignee) {
+            return
         }
 
-        return []
+        requisition.picklist?.picklistItems?.each { PicklistItem item ->
+            if (item.assignee) {
+                item.assignee = null
+                item.dateAssigned = null
+                item.save(failOnError: true)
+            }
+        }
+
+        requisitionService.logRequisitionEvent(requisition.id, "Picker ${previousAssignee.name} was unassigned", EventLogCode.INFO_OCCURRED)
+    }
+
+    void reassign(Requisition requisition, String assigneeId) {
+        validateAssignmentChangeAllowed(requisition)
+
+        Person newAssignee = Person.get(assigneeId)
+        if (!newAssignee) {
+            throw new IllegalArgumentException("Assignee ${assigneeId} not found")
+        }
+
+        Person previousAssignee = getCurrentAssignee(requisition)
+        Date now = new Date()
+        requisition.picklist?.picklistItems?.each { PicklistItem item ->
+            item.assignee = newAssignee
+            item.dateAssigned = now
+            item.save(failOnError: true)
+        }
+
+        requisitionService.logRequisitionEvent(requisition.id,
+                "Picker was reassigned from ${previousAssignee?.name ?: 'Unassigned'} to ${newAssignee.name}", EventLogCode.INFO_OCCURRED)
+    }
+
+    private void validateAssignmentChangeAllowed(Requisition requisition) {
+        if (requisition.status >= RequisitionStatus.ISSUED) {
+            throw new IllegalStateException("Cannot change picker assignment for requisition with status: ${requisition.status}")
+        }
+    }
+
+    /**
+     * The outbound container of the facility with this id or location number, or null.
+     */
+    @Transactional(readOnly = true)
+    Location findOutboundContainer(String outboundContainerId, Location facility) {
+        return findInFacility(outboundContainerId, facility)
+    }
+
+    /**
+     * The internal location of the facility with this id or location number, or null.
+     */
+    private Location findInFacility(String idOrNumber, Location facility) {
+        if (!idOrNumber || !facility) {
+            return null
+        }
+        Location location = Location.get(idOrNumber)
+        if (location?.parentLocation?.id == facility.id) {
+            return location
+        }
+        return Location.findByLocationNumberAndParentLocation(idOrNumber, facility)
+    }
+
+    private List<String> findRequisitionIdsForPicking(SearchPickTaskCommand command) {
+        Integer ordersCount = command.ordersCount
+        if (!ordersCount) {
+            return []
+        }
+
+        List<PickTaskStatus> statusesToSearch = command.status ?: [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
+        // FIXME refactor findRequisitionIdsWithPickTaskAssigned method to include it in the query itself,
+        //  it could return a DetachedCriteria and be treated as a subquery instead of two separate queries
+        List<String> assignedRequisitions = findRequisitionIdsWithPickTaskAssigned(command.facility, statusesToSearch)
+
+        List<Requisition> candidates = PickTask.createCriteria().list {
+            projections {
+                distinct("requisition")
+            }
+            eq("facility", command.facility)
+            'in'("requisitionStatus", RequisitionStatus.listNotYetPicked())
+            'in'("status", statusesToSearch)
+
+            if (command.deliveryTypeCode) {
+                eq("deliveryTypeCode", command.deliveryTypeCode)
+            }
+
+            if (assignedRequisitions) {
+                not {
+                    'in'("requisition.id", assignedRequisitions)
+                }
+            }
+        }
+
+        return candidates.sort { a, b ->
+            Integer p1 = a.deliveryTypeCode?.priority ?: 99
+            Integer p2 = b.deliveryTypeCode?.priority ?: 99
+
+            return p1 <=> p2 ?: a.dateCreated <=> b.dateCreated
+        }.take(ordersCount)*.id
+    }
+
+    private List<String> findRequisitionIdsWithPickTaskAssigned(Location facility, List<PickTaskStatus> statusesToSearch) {
+        // A requisition assigned to the current mobile user should still be offered to them (e.g. after
+        // navigating back out of it), so only requisitions assigned to someone else are excluded here.
+        Person currentUser = AuthService.currentUser
+
+        List<Requisition> requisitions = PickTask.createCriteria().list {
+            projections {
+                distinct("requisition")
+            }
+            isNotNull("assignee")
+            if (currentUser) {
+                ne("assignee.id", currentUser.id)
+            }
+            if (statusesToSearch) {
+                'in'("status", statusesToSearch)
+            }
+            'in' ("requisitionStatus", RequisitionStatus.listNotYetPicked())
+            if (facility) {
+                eq("facility", facility)
+            }
+        }
+
+        return requisitions*.id
     }
 
     private void validateOutboundContainer(Location outboundContainer, PickTask pickTask) {
@@ -561,7 +788,7 @@ class PickTaskService {
         }
 
         ActivityCode taskDeliveryTypeActivity = pickTask.getDeliveryTypeCode().getActivityCode()
-        if (!outboundContainer.supports(taskDeliveryTypeActivity)) {
+        if (taskDeliveryTypeActivity && !outboundContainer.supports(taskDeliveryTypeActivity)) {
             throw new IllegalArgumentException("Container ${outboundContainer.name} does not support ${taskDeliveryTypeActivity} activity")
         }
     }
@@ -577,6 +804,38 @@ class PickTaskService {
 
         if (!stagingLocation.supports(ActivityCode.HOLD_STOCK)) {
             throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.HOLD_STOCK} activity")
+        }
+    }
+
+    // Zone-level check, on top of validateStagingLocation's bin-capability check. Opt-in per
+    // facility via ActivityCode.VALIDATE_STAGING_LOCATION_ZONE so behaviour can be tuned per
+    // facility rather than hard-coded (OBLS-853). Fails closed on missing zone/config so an
+    // incomplete facility setup surfaces as a validation failure rather than silently no-op'ing.
+    // The mismatch is overridable: the caller (mobile app) can show the message carried on the
+    // thrown StagingLocationMismatchException and resubmit with overrideStagingLocationZone = true.
+    private void validateStagingLocationZone(Location stagingLocation, PickTask task, boolean overrideStagingLocationZone) {
+        ActivityCode deliveryTypeActivity = task.deliveryTypeCode?.activityCode
+        if (!deliveryTypeActivity) {
+            // Nothing to validate the zone against (e.g. DEFAULT delivery type)
+            return
+        }
+
+        if (!task.facility?.supports(ActivityCode.VALIDATE_STAGING_LOCATION_ZONE)) {
+            return
+        }
+
+        if (overrideStagingLocationZone) {
+            return
+        }
+
+        Location zone = stagingLocation.zone
+        if (!zone || !zone.supports(deliveryTypeActivity)) {
+            List<Location> expectedZones = locationService.getZones(task.facility).findAll { it.supports(deliveryTypeActivity) }
+            String zoneNames = expectedZones ? expectedZones*.name.join(', ') : 'none'
+            String message = "This order is ${task.deliveryTypeCode}. You scanned ${stagingLocation.name} " +
+                    "(zone: ${zone?.name ?: 'none'}), expected zone is ${zoneNames}."
+
+            throw new StagingLocationMismatchException(message)
         }
     }
 }

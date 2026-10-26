@@ -26,7 +26,7 @@ enum RoleType {
     ROLE_PRODUCT_MANAGER('Product Manager', 100),
 
     // Notification roles for general system events
-            ROLE_ERROR_NOTIFICATION('Error Notification', 100),
+    ROLE_ERROR_NOTIFICATION('Error Notification', 100),
     ROLE_FEEDBACK_NOTIFICATION('Feedback Notifications', 100),
     ROLE_PRODUCT_NOTIFICATION('Product Notifications', 100),
     ROLE_ORDER_NOTIFICATION('Order Notifications', 100),
@@ -43,7 +43,7 @@ enum RoleType {
     ROLE_STOCK_TRANSFER_NOTIFICATION('Stock Transfer Notifications', 100),
 
     // Notification roles for stock alerts
-            ROLE_ITEM_ALL_NOTIFICATION('All Stock Notifications', 100),
+    ROLE_ITEM_ALL_NOTIFICATION('All Stock Notifications', 100),
     ROLE_ITEM_EXPIRY_NOTIFICATION('Expiry Notifications', 100),
     ROLE_ITEM_OVERSTOCK_NOTIFICATION('Overstock Notifications', 100),
     ROLE_ITEM_REORDER_NOTIFICATION('Reorder Notifications', 100),

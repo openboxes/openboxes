@@ -31,6 +31,8 @@ class UtilInterceptor {
     boolean after() {
         request._timeAfterRequest = System.currentTimeMillis()
         request?.pageLoadInMilliseconds = request?._timeAfterRequest - request?._timeBeforeRequest
+        String queryString = request?.queryString ? "?${request.queryString}" : ""
+        log.info("${request.requestURI}${queryString} responded in ${request.pageLoadInMilliseconds} ms")
         return true
     }
 

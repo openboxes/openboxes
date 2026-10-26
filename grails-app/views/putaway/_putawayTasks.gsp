@@ -1,5 +1,4 @@
 <%@ page import="org.pih.warehouse.api.PutawayTaskStatus" %>
-<%@ page import="org.pih.warehouse.requisition.Requisition" %>
 <div id="tab-content" class="box">
     <h2>
         <warehouse:message code="putaway.tasks.label" default="Putaway Tasks"/>
@@ -37,14 +36,16 @@
                             <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                         </button>
                         <div class="actions">
-                            <div class="action-menu-item">
-                                <a href="javascript:void(0)"
-                                   class="btn-edit-putaway-task"
-                                   data-task-id="${task.id}">
-                                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
-                                    &nbsp;<warehouse:message code="putawayTask.edit.label" default="Edit Putaway Task"/>
-                                </a>
-                            </div>
+                            <g:if test="${task.status?.isOpen()}">
+                                <div class="action-menu-item">
+                                    <a href="javascript:void(0)"
+                                       class="btn-edit-putaway-task"
+                                       data-task-id="${task.id}">
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
+                                        &nbsp;<warehouse:message code="putawayTask.edit.label" default="Edit Putaway Task"/>
+                                    </a>
+                                </div>
+                            </g:if>
                             <div class="action-menu-item">
                                 <a href="${createLink(controller: 'putaway', action: 'putawayTaskTicket', id: task.id)}"
                                    target="_blank">
@@ -63,6 +64,22 @@
                                     </a>
                                 </div>
                             </g:if>
+                            <g:elseif test="${task.status == PutawayTaskStatus.IN_PROGRESS}">
+                                <%-- Rerunning strategy for an in-progress task reassigns the destination only
+                                     (the container it's already been scanned into does not change), so it's
+                                     restricted to superusers. --%>
+                                <g:isSuperuser>
+                                    <div class="action-menu-item">
+                                        <a href="javascript:void(0)"
+                                           class="btn-rerun-strategy"
+                                           data-task-id="${task.id}"
+                                           data-facility-id="${orderInstance?.destination?.id}">
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh.png')}" />
+                                            &nbsp;<warehouse:message code="react.putawayTask.rerunStrategy.label" default="Rerun Strategy"/>
+                                        </a>
+                                    </div>
+                                </g:isSuperuser>
+                            </g:elseif>
                         </div>
                     </span>
                 </td>
@@ -122,9 +139,16 @@
                 </td>
                 <td>
                     <g:if test="${task.backorderReferenceNumber}">
-                        <g:link controller="stockMovement" action="show" id="${Requisition.findByRequestNumber(task.backorderReferenceNumber)?.id}">
+                        <g:set var="backorderRequisitionId" value="${task.shipmentItem?.resolveBackorderReference()}"/>
+                        <g:if test="${backorderRequisitionId}">
+                            <g:link controller="stockMovement" action="show" id="${backorderRequisitionId}">
+                                ${task.backorderReferenceNumber}
+                            </g:link>
+                        </g:if>
+                        <g:else>
                             ${task.backorderReferenceNumber}
-                        </g:link>
+                            <small class="fade">(<warehouse:message code="default.pending.label"/>)</small>
+                        </g:else>
                     </g:if>
                     <g:else>-</g:else>
                 </td>

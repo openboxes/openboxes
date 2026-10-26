@@ -155,4 +155,64 @@ class RequisitionServiceSpec extends Specification implements ServiceUnitTest<Re
         jsonOfCopiedRequisition.remove('name')
         jsonOfOriginalRequisition == jsonOfCopiedRequisition
     }
+
+    // NOTE: getRequisitionsPendingAutoAllocation orders results using a createCriteria query, ordering
+    // partly by deliveryTypePriority, a Hibernate formula-mapped property computed via raw SQL. The
+    // grails-gorm-testing-support mockDomain used by this spec does not execute real SQL, so it can
+    // filter and order by plain columns (origin/status/autoAllocationRequested/priority, verified below)
+    // but cannot evaluate the formula-based deliveryTypePriority ordering or reliably control dateCreated
+    // (GORM overwrites it on insert). The full three-level ordering is verified against a real database
+    // in RequisitionServiceIntegrationSpec.
+    void 'getRequisitionsPendingAutoAllocation should filter to CREATED requisitions pending auto allocation for the given origin, ordered by priority (highest first)'() {
+        given:
+        Location origin = new Location(id: 1)
+
+        Requisition lowPriority = new Requisition(
+                id: "1",
+                origin: origin,
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: true,
+                priority: 0,
+        )
+        Requisition highPriority = new Requisition(
+                id: "2",
+                origin: origin,
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: true,
+                priority: 100,
+        )
+
+        and: 'requisitions that should not be included'
+        Requisition notCreated = new Requisition(
+                id: "3",
+                origin: origin,
+                status: RequisitionStatus.PICKED,
+                autoAllocationRequested: true,
+                priority: 100,
+        )
+        Requisition notRequestedForAutoAllocation = new Requisition(
+                id: "4",
+                origin: origin,
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: false,
+                priority: 100,
+        )
+        Requisition differentOrigin = new Requisition(
+                id: "5",
+                origin: new Location(id: 2),
+                status: RequisitionStatus.CREATED,
+                autoAllocationRequested: true,
+                priority: 100,
+        )
+
+        [lowPriority, highPriority, notCreated, notRequestedForAutoAllocation, differentOrigin].each {
+            it.save(validate: false, flush: true)
+        }
+
+        when:
+        List<Requisition> requisitions = service.getRequisitionsPendingAutoAllocation(origin)
+
+        then:
+        requisitions == [highPriority, lowPriority]
+    }
 }

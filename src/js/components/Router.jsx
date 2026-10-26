@@ -237,6 +237,11 @@ const AsyncPutawayTaskList = Loadable({
   loading: Loading,
 });
 
+const AsyncPickTaskList = Loadable({
+  loader: () => import('components/pick-task/list/PickTaskList'),
+  loading: Loading,
+});
+
 const Router = () => {
   useConnectionListener();
 
@@ -257,6 +262,7 @@ const Router = () => {
         <FlashScopeListenerWrapper>
           <Switch>
             <MainLayoutRoute path="**/putawayTask/list" component={AsyncPutawayTaskList} />
+            <MainLayoutRoute path="**/pickTask/list" component={AsyncPickTaskList} />
             <MainLayoutRoute path="**/putaway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />

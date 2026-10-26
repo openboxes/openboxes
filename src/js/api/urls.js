@@ -129,6 +129,9 @@ export const PUTAWAY_GENERATE_PDF = (id) => `/putaway/generatePdf/${id}`;
 // PUTAWAY TASK
 export const PUTAWAY_TASK_API = (facilityId) => `${API}/facilities/${facilityId}/putaway-tasks`;
 
+// PICK TASK
+export const PICK_TASK_API = (facilityId) => `${API}/facilities/${facilityId}/pick-tasks`;
+
 // SUPPORT LINKS
 export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
 
@@ -190,6 +193,7 @@ export const FULFILLMENT_VALIDATION = `${FULFILLMENT_API}/validate`;
 
 // SELECT OPTIONS
 export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions`;
+export const PRIORITY_LEVEL_OPTIONS = `${API}/priorityLevelOptions`;
 
 // INTERNAL LOCATIONS
 export const INTERNAL_LOCATIONS = `${API}/internalLocations`;
@@ -220,6 +224,8 @@ export const INVENTORY_AUDIT_SUMMARY_REPORT = `${REPORTS}/inventory-audit-summar
 export const INVENTORY_AUDIT_SUMMARY_REPORT_CSV = `${INVENTORY_AUDIT_SUMMARY_REPORT}.csv`;
 export const INVENTORY_TRANSACTIONS_SUMMARY = `${REPORTS}/inventory-transactions-summary`;
 export const INVENTORY_TRANSACTIONS_SUMMARY_CSV = `${INVENTORY_TRANSACTIONS_SUMMARY}.csv`;
+export const AUTO_ISSUANCE_TRANSACTIONS_REPORT = `${REPORTS}/auto-issuance-transactions`;
+export const AUTO_ISSUANCE_TRANSACTIONS_REPORT_CSV = `${AUTO_ISSUANCE_TRANSACTIONS_REPORT}.csv`;
 
 // INDICATORS
 export const INDICATORS_REPORT = `${API}/reports/indicators`;

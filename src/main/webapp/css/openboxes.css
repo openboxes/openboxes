@@ -2361,6 +2361,42 @@ img.photo_tiny {
 .tag-info { color: #31708f; background-color: #d9edf7; border-color: #bce8f1; }
 .tag-warning { color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; }
 
+/* Two-part pill built on the same look as .tag, for showing two related statuses (e.g. status + fulfillment status)
+   side by side as one combined indicator instead of two separate tags. TODO: Support other tag colors */
+.tag-pill {
+    display: flex;
+    border: 1px solid #a5d24a;
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    border-radius: 2px;
+    font-size:13px;
+    cursor: help;
+}
+.tag-pill-segment {
+    padding: 5px 10px;
+    white-space: nowrap;
+    text-wrap:none;
+    background: #cde69c;
+    color: #638421;
+}
+.tag-pill-segment-secondary {
+    background: transparent;
+    color: #666;
+    border-left: 1px solid #a5d24a;
+}
+
+.status-tag-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.requisition-error-icon {
+    color: #f0ad4e;
+    font-size: 1.4em;
+    cursor: help;
+}
 
 
 /*span.lotNumber { 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; color: black; font-weight: bold; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px; }*/
@@ -4167,4 +4203,35 @@ table.pvtTable tr th { background-color: #ddd; }
 
 .grayed {
     background-color: var(--gray-200) !important;
+}
+
+/* typography
+-------------------------------------------------------------*/
+/*
+ * body already carries 'Inter' (see the body rule above), but the selectors
+ * below set type with the `font:` shorthand, and a shorthand resets
+ * font-family along with everything else. That is what kept Inter from
+ * reaching tables, form controls and buttons. `font: inherit` hands them
+ * back to the body. Keep this block last so it lands after the YUI reset
+ * (reset-fonts-grids.css, linked earlier in custom.gsp).
+ */
+body {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+td, th {
+    font: inherit;
+    line-height: 1.45;
+}
+
+th {
+    /* `font: inherit` takes the body's weight too, so restore the emphasis */
+    font-weight: 600;
+}
+
+select, input, textarea, button,
+.button, .breadcrumb,
+.actions .action-menu-item a {
+    font: inherit;
 }

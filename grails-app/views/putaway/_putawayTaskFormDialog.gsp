@@ -33,6 +33,8 @@
         color: #333;
     }
 </style>
+<%-- Once the item has been placed (IN_PROGRESS), stock has already been moved into the container --%>
+<g:set var="containerEditable" value="${task?.status in [PutawayTaskStatus.PENDING, PutawayTaskStatus.STARTED]}"/>
 <g:form name="editPutawayTaskForm" method="post">
     <g:hiddenField id="dlgTaskId" name="task.id" value="${task?.id}"/>
 
@@ -87,13 +89,10 @@
         <tbody>
         <tr class="prop">
             <td valign="top" class="name">
-                <label for="dlgStatus"><warehouse:message code="putawayTask.status.label" default="Status"/></label>
+                <label><warehouse:message code="putawayTask.status.label" default="Status"/></label>
             </td>
             <td valign="top" class="value">
-                <g:select id="dlgStatus" name="status"
-                          from="${PutawayTaskStatus.values()}"
-                          value="${task?.status}"
-                          class="select2"/>
+                ${task?.status}
             </td>
         </tr>
         <tr class="prop">
@@ -114,12 +113,17 @@
                 <label for="dlgContainer"><warehouse:message code="putawayTask.container.label" default="Putaway Container"/></label>
             </td>
             <td valign="top" class="value">
-                <g:selectInternalLocation id="dlgContainer"
-                                          name="container.id"
-                                          value="${task?.container?.id}"
-                                          from="${facility?.internalLocations?.sort { it.name }}"
-                                          class="select2"
-                                          noSelection="['':'']"/>
+                <g:if test="${containerEditable}">
+                    <g:selectInternalLocation id="dlgContainer"
+                                              name="container.id"
+                                              value="${task?.container?.id}"
+                                              from="${facility?.internalLocations?.sort { it.name }}"
+                                              class="select2"
+                                              noSelection="['':'']"/>
+                </g:if>
+                <g:else>
+                    ${task?.container?.name ?: '-'}
+                </g:else>
             </td>
         </tr>
         <tr class="prop">
@@ -139,11 +143,10 @@
                 <label><warehouse:message code="putawayTask.dateStarted.label" default="Date Started"/></label>
             </td>
             <td valign="top" class="value">
-                <g:datePicker name="dateStarted"
-                              value="${task?.dateStarted}"
-                              precision="minute"
-                              default="none"
-                              noSelection="['':'']"/>
+                <g:if test="${task?.dateStarted}">
+                    <g:formatDate date="${task.dateStarted}" format="dd/MM/yyyy HH:mm"/>
+                </g:if>
+                <g:else>-</g:else>
             </td>
         </tr>
         <tr class="prop">
@@ -151,11 +154,10 @@
                 <label><warehouse:message code="putawayTask.dateCompleted.label" default="Date Completed"/></label>
             </td>
             <td valign="top" class="value">
-                <g:datePicker name="dateCompleted"
-                              value="${task?.dateCompleted}"
-                              precision="minute"
-                              default="none"
-                              noSelection="['':'']"/>
+                <g:if test="${task?.dateCompleted}">
+                    <g:formatDate date="${task.dateCompleted}" format="dd/MM/yyyy HH:mm"/>
+                </g:if>
+                <g:else>-</g:else>
             </td>
         </tr>
         </tbody>

@@ -1,11 +1,18 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.inventory
 
 import grails.validation.Validateable
 import org.pih.warehouse.api.FulfillmentStatusResolver
 import org.pih.warehouse.api.FulfillmentStatusCode
-import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -184,9 +191,11 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
                 received            : isReceived,
                 requestType         : requestType,
                 sourceType          : sourceType?.name,
-                autoAllocationEnabled   : requisition?.autoAllocationEnabled,
+                autoAllocationRequested   : requisition?.autoAllocationRequested,
                 partialAllocationAllowed: requisition?.partialAllocationAllowed,
                 partialIssuanceAllowed  : requisition?.partialIssuanceAllowed,
+                allocationSourceStrategy      : requisition?.allocationSourceStrategy?.name(),
+                autoIssuanceRequested     : requisition?.autoIssuanceRequested,
         ]
     }
 
@@ -241,7 +250,8 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
     }
 
     Boolean canGeneratePickList() {
-        return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
+        return requisition?.status < RequisitionStatus.PICKING &&
+                !getLineItems().every { StockMovementItem item -> item.requisitionItem && !item.requisitionItem.effectiveItems }
     }
 
     Boolean hasBeenStaged() {

@@ -432,9 +432,20 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         if (!reasonCode) {
             errors.rejectValue("cancelReasonCode", "requisitionItem.reasonCode.invalid")
         }
+        if (!requisition.isEligibleForCancellation()) {
+            // Order has progressed past Allocated (picking already started) - cancelling would
+            // require rolling back picklist/shipment items that may already be picked or staged.
+            // Refuse outright rather than cancelling the quantity while leaving the allocation in
+            // place; the picked items must be manually rolled back before this item can be cancelled.
+            errors.reject("requisitionItem.notEligibleForCancellation.message")
+        }
         if (hasErrors() || !validate()) {
             throw new ValidationException("Validation errors on requisition item", errors)
         }
+
+        quantityCanceled = quantity
+        cancelReasonCode = reasonCode
+        cancelComments = comments
 
         // Remove all picklist items
         def picklistItems = getPicklistItems()
@@ -443,10 +454,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             it.picklist.removeFromPicklistItems(it)
             it.delete()
         }
-
-        quantityCanceled = quantity
-        cancelReasonCode = reasonCode
-        cancelComments = comments
     }
 
 
@@ -528,7 +535,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     def isReduced() {
-        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKED ? quantity - calculateQuantityPicked() : 0) > 0 && !isBackordered()
+        return (modificationItem ? quantity - modificationItem.quantity : requisition.status >= RequisitionStatus.PICKED ? quantity - calculateQuantityPicked() : 0) > 0 && !isBackordered() && !isCanceled()
     }
 
     /**
@@ -543,6 +550,29 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def isCanceledOrSubstituted() {
         return isCanceled() || isSubstituted()
+    }
+
+    /**
+     * The item itself, or the items that replaced it, leaving out any that are fully canceled. An empty
+     * list means the line has no demand left. A substitution is not carried any backorder recorded
+     * against the line it replaces: the product has usually changed, and even when it has not the
+     * substitution starts from its own quantity.
+     */
+    List<RequisitionItem> getEffectiveItems() {
+        if (isSubstituted()) {
+            // isSubstituted() also covers a substitution linked only through substitutionItem, in which
+            // case the typed child collection is empty
+            Collection<RequisitionItem> substitutions = substitutionItems ?: [substitutionItem].findAll()
+            return substitutions.collectMany { it.getEffectiveItems() }
+        }
+        if (modificationItem) {
+            return modificationItem.getEffectiveItems()
+        }
+        // Cancellation is all or nothing (cancelQuantity sets quantityCanceled to the full quantity), so
+        // a canceled line has no demand left. isCanceled() cannot be used here because it reports false
+        // while a backorder is still recorded against the item, and whenever the item has been replaced.
+        boolean isFullyCanceled = (quantityCanceled ?: 0) >= (quantity ?: 0)
+        return isFullyCanceled ? [] : [this]
     }
 
 
@@ -628,7 +658,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def canCancelQuantity() {
         def startTime = System.currentTimeMillis()
-        def canCancelQuantity = !isChanged() && !isApproved() && !isCanceled()
+        def canCancelQuantity = !isChanged() && !isApproved() && !isCanceled() && requisition.isEligibleForCancellation()
 
         //println "canCancelQuantity: " + (System.currentTimeMillis() - startTime) + " ms"
         return canCancelQuantity
@@ -665,10 +695,17 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 quantityBackordered ? (quantity - quantityBackordered) : null
     }
 
+    /**
+     * Quantity that still needs to be picked from ordinary stock: the ordered quantity after any
+     * cancellation, less anything backordered and waiting on an inbound delivery. A revised item
+     * carries its own quantity and backorder, so the modification item answers for itself.
+     */
     def calculateQuantityRequired() {
-        return modificationItem ? modificationItem?.quantity :
-                quantityCanceled ? (quantity - quantityCanceled) :
-                quantityBackordered ? (quantity - quantityBackordered) : quantity
+        if (modificationItem) {
+            return modificationItem.calculateQuantityRequired()
+        }
+        Integer quantityOrdered = quantityCanceled ? (quantity - quantityCanceled) : quantity
+        return Math.max(0, (quantityOrdered ?: 0) - (quantityBackordered ?: 0))
     }
 
     def calculateQuantityRemaining() {
@@ -696,7 +733,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                     // When a shortage occurred (reasonCode is set), use quantityPicked instead of quantity
                     // to avoid counting canceled/unpicked quantities
                     picklistItem.reasonCode ? (picklistItem.quantityPicked ?: 0) : picklistItem.quantity
-                }
+                } ?: 0
             }
         } else {
             quantityAllocated = PicklistItem.findAllByRequisitionItem(this).sum { picklistItem ->
@@ -857,6 +894,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 totalQuantity         : totalQuantity(),
                 quantityCanceled      : quantityCanceled,
                 totalQuantityCanceled : totalQuantityCanceled(),
+                quantityBackordered   : quantityBackordered,
+                backorderedReasonCode : backorderedReasonCode,
                 comment               : comment,
                 recipient             : recipient,
                 substitutable         : substitutable,

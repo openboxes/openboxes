@@ -25,6 +25,7 @@ import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPageItem
+import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
@@ -43,6 +44,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementItemParamsCommand
 import org.pih.warehouse.core.StockMovementItemsParamsCommand
@@ -2232,17 +2234,176 @@ class StockMovementService {
     }
 
     List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus) {
+        return getAvailableItems(location, requisitionItem, calculateStatus, true)
+    }
+
+    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus, Boolean releaseOwnAllocation) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
-        availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
+        availableItems = availableItems.findAll {
+            !it.binLocation?.supports(ActivityCode.INBOUND_SORTATION) &&
+                    !it.binLocation?.supports(ActivityCode.PUTAWAY_CART) &&
+                    !it.binLocation?.supports(ActivityCode.PREPICK_STOCK)
+        }
+        if (releaseOwnAllocation) {
+            availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
+        }
 
         if (calculateStatus) {
             return calculateAvailableItemsStatus(requisitionItem, availableItems)
         }
 
         return productAvailabilityService.sortAvailableItems(availableItems)
+    }
+
+    /**
+     * Stock sitting in a pre-pick bin. These bins are kept out of {@link #getAvailableItems} so that no other
+     * order can take from them, which leaves this as the only way in.
+     */
+    List<AvailableItem> getPrepickAvailableItems(Location location, RequisitionItem requisitionItem) {
+        List<AvailableItem> availableItems =
+                productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
+
+        availableItems = availableItems.findAll { it.binLocation?.supports(ActivityCode.PREPICK_STOCK) }
+        availableItems.each {
+            it.quantityOnHand = inventoryService.getQuantityFromBinLocation(location, it.binLocation, it.inventoryItem) ?: 0
+        }
+        availableItems = availableItems.findAll { it.quantityOnHand > 0 }
+
+        return productAvailabilityService.sortAvailableItems(availableItems)
+    }
+
+    /**
+     * Mirrors {@link #getSuggestedItems} for pre-pick bins. Those bins are deliberately held (HOLD_STOCK), which
+     * makes them unpickable, so the ordinary suggestion logic would discard them. Here the hold is the point -
+     * the stock is reserved for the back counter and this is the only path that may take it.
+     */
+    List<SuggestedItem> getPrepickSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
+        List<SuggestedItem> suggestedItems = []
+        Integer quantityRemaining = quantityRequested
+
+        for (AvailableItem availableItem : availableItems) {
+            if (quantityRemaining <= 0) {
+                break
+            }
+
+            Integer quantityOnHand = availableItem.quantityOnHand?.toInteger() ?: 0
+            if (quantityOnHand <= 0) {
+                continue
+            }
+
+            Integer quantityPicked = Math.min(quantityRemaining, quantityOnHand)
+            suggestedItems << new SuggestedItem(
+                    inventoryItem: availableItem.inventoryItem,
+                    binLocation: availableItem.binLocation,
+                    quantityAvailable: availableItem.quantityAvailable,
+                    quantityOnHand: availableItem.quantityOnHand,
+                    quantityRequested: quantityRequested,
+                    quantityPicked: quantityPicked)
+            quantityRemaining -= quantityPicked
+        }
+
+        return suggestedItems
+    }
+
+    /**
+     * Records pre-picked stock as already picked and staged. The part physically left the pre-pick bin when the
+     * back counter handed it over, so there is nothing left for a picker to do and no pick task is raised.
+     */
+    void allocatePrepickItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems) {
+        if (!suggestedItems) {
+            return
+        }
+
+        Requisition requisition = requisitionItem.requisition
+        Location stagingLocation = findPrepickStagingLocation(requisition)
+
+        for (SuggestedItem suggestedItem : suggestedItems) {
+            Integer quantity = suggestedItem.quantityPicked?.intValueExact() ?: 0
+            if (quantity <= 0) {
+                continue
+            }
+
+            createOrUpdatePicklistItem(requisitionItem, null, suggestedItem.inventoryItem,
+                    suggestedItem.binLocation, quantity, null, null, true, quantity)
+
+            PicklistItem picklistItem = requisitionItem.picklistItems?.find {
+                it.binLocation == suggestedItem.binLocation && it.inventoryItem == suggestedItem.inventoryItem
+            }
+            if (!picklistItem) {
+                log.warn("Could not find the pick created for pre-picked stock of product " +
+                        "${requisitionItem.product?.productCode} in order ${requisitionItem.requisition?.requestNumber}")
+                continue
+            }
+
+            if (stagingLocation) {
+                transferPrepickStock(suggestedItem, stagingLocation, quantity)
+            }
+
+            Date now = new Date()
+            picklistItem.status = PickTaskStatus.STAGED.name()
+            picklistItem.quantityPicked = quantity
+            picklistItem.datePicked = now
+            picklistItem.dateStaged = now
+            picklistItem.stagingLocation = stagingLocation
+        }
+
+        requisitionItem.requisition?.picklist?.save(flush: true)
+    }
+
+    /**
+     * The staging location the pickers would have dropped to, which is the one marked for the order's delivery
+     * type. Without one there is nowhere sensible to put the stock, so it stays in the pre-pick bin.
+     */
+    private Location findPrepickStagingLocation(Requisition requisition) {
+        Location facility = requisition?.origin
+        ActivityCode deliveryTypeActivity = requisition?.deliveryTypeCode?.activityCode
+        if (!facility || !deliveryTypeActivity) {
+            return null
+        }
+
+        Location stagingLocation = locationService
+                .getInternalLocations(facility, [ActivityCode.STAGING_LOCATION])
+                ?.find { it.supports(ActivityCode.HOLD_STOCK) && it.supports(deliveryTypeActivity) }
+
+        if (!stagingLocation) {
+            log.warn("No staging location supporting ${deliveryTypeActivity} and ${ActivityCode.HOLD_STOCK} " +
+                    "in facility ${facility.name}, pre-picked stock will be left in the pre-pick bin")
+        }
+
+        return stagingLocation
+    }
+
+    private void transferPrepickStock(SuggestedItem suggestedItem, Location stagingLocation, Integer quantity) {
+        Location facility = suggestedItem.binLocation?.parentLocation
+        if (!facility?.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+            log.warn("Skipping transfer of pre-picked stock: facility does not support " +
+                    "${ActivityCode.TRACK_INTERNAL_TRANSACTIONS} activity")
+            return
+        }
+
+        TransferStockCommand command = new TransferStockCommand()
+        command.location = facility
+        command.binLocation = suggestedItem.binLocation
+        command.inventoryItem = suggestedItem.inventoryItem
+        command.quantity = quantity
+        command.otherLocation = facility
+        command.otherBinLocation = stagingLocation
+        command.transferOut = Boolean.TRUE
+        command.disableRefresh = Boolean.TRUE
+
+        Transaction transaction = inventoryService.transferStock(command)
+        if (transaction.hasErrors()) {
+            String errorMessage = transaction.errors.allErrors.collect { it.defaultMessage ?: it.code }.join('; ')
+            throw new ValidationException("Unable to move pre-picked stock to staging: ${errorMessage}",
+                    transaction.errors)
+        }
+
+        productAvailabilityService.refreshProductsAvailability(facility.id, [suggestedItem.inventoryItem?.product?.id],
+                [suggestedItem.binLocation?.id, stagingLocation.id], false)
     }
 
     List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {
@@ -2374,8 +2535,9 @@ class StockMovementService {
 
 
     void allocateSuggestedItems(RequisitionItem requisitionItem, List<SuggestedItem> suggestedItems, Boolean isAutoAllocated = true) {
-        // If origin requires mobile picking we are only allocating = setting quantity picked to 0
-        Boolean allocateOnly = requisitionItem?.requisition?.origin?.requiresMobilePicking()
+        // If origin requires mobile picking we are only allocating = setting quantity picked to 0.
+        Boolean allocateOnly = requisitionItem?.requisition?.origin?.requiresMobilePicking() &&
+                !requisitionItem?.requisition?.autoIssuanceRequested
         for (SuggestedItem suggestedItem : suggestedItems) {
             Integer quantityPicked = allocateOnly ? 0 : suggestedItem.quantityPicked?.intValueExact()
             Integer quantityToPick = suggestedItem.quantityPicked.toInteger()
@@ -2595,6 +2757,8 @@ class StockMovementService {
 
         requisition.type = stockMovement.requestType
         requisition.sourceType = stockMovement.sourceType
+        requisition.allocationSourceStrategy = stockMovement.allocationSourceStrategy
+        requisition.autoIssuanceRequested = stockMovement.autoIssuanceRequested
         requisition.requisitionTemplate = stockMovement.stocklist
         requisition.description = stockMovement.description
         requisition.destination = stockMovement.destination
@@ -2859,6 +3023,17 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
+                boolean isCancellation = stockMovementItem.quantityRevised?.intValueExact() == 0 &&
+                        stockMovementItem.reasonCode != ReasonCode.BACKORDER.toString()
+
+                if (isCancellation && !requisition.isEligibleForCancellation()) {
+                    // Order has progressed past Allocated (picking already started) - leave this
+                    // item entirely untouched. The picked/staged items must be manually rolled back
+                    // before it can be cancelled; flag it for review instead of attempting the change.
+                    logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)
+                    return
+                }
+
                 log.info 'Removing previous changes, picklists and shipments, if present'
                 removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
                 if (requisitionItem.isChanged() || requisitionItem.isCanceled() || requisitionItem.isBackordered()) {
@@ -2930,9 +3105,18 @@ class StockMovementService {
     }
 
     def cancelItem(StockMovementItem stockMovementItem) {
-        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
-
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
+        Requisition requisition = requisitionItem.requisition
+
+        if (!requisition.isEligibleForCancellation()) {
+            // Order has progressed past Allocated (picking already started) - leave this item
+            // entirely untouched. The picked/staged items must be manually rolled back before it
+            // can be cancelled; flag it for review instead of attempting the cancellation.
+            logManualCancellationReviewNeeded(requisitionItem, stockMovementItem.reasonCode)
+            return StockMovementItem.createFromRequisitionItem(requisitionItem)
+        }
+
+        removeShipmentItemsForModifiedRequisitionItem(stockMovementItem)
 
         log.debug "Item canceled " + requisitionItem.id
         requisitionItem.cancelQuantity(stockMovementItem.reasonCode, stockMovementItem.comments)
@@ -2941,6 +3125,15 @@ class StockMovementService {
         requisitionItem.save()
 
         return StockMovementItem.createFromRequisitionItem(requisitionItem)
+    }
+
+    private void logManualCancellationReviewNeeded(RequisitionItem requisitionItem, String reasonCode) {
+        String message = "Cancellation requested for item ${requisitionItem.id} " +
+                "(product: ${requisitionItem.product?.productCode}, qty: ${requisitionItem.quantity}, " +
+                "reason: ${reasonCode}) while order status is ${requisitionItem.requisition.status} - " +
+                "allocation was not automatically rolled back and requires manual review."
+        requisitionService.logRequisitionComment(requisitionItem.requisition.id, message)
+        requisitionService.logRequisitionEvent(requisitionItem.requisition.id, message)
     }
 
     /**
@@ -3466,6 +3659,8 @@ class StockMovementService {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
+        createMissingShipmentItems(requisition, shipment)
+
         // If synchronizeDateShipped is true, use the current date instead of the dateShipped from stockMovement,
         // which is expectedShippingDate from the past. Useful for setting the actual (current) issue date.
         Date dateShipped = stockMovement.dateShipped && !synchronizeDateShipped ? stockMovement.dateShipped : new Date()
@@ -3886,7 +4081,7 @@ class StockMovementService {
         Requisition requisition = stockMovement.requisition
         if (requisition) {
             requisition.priority = params.priority as int
-            requisition.deliveryTypeCode = params.deliveryTypeCode
+            requisition.deliveryTypeCode = params.deliveryTypeCode ?: null
             // Order type is set from the Scheduling tab for outbound movements only;
             requisition.orderTypeCode = params?.orderTypeCode ?: null
             requisition.requestedDeliveryDate = params.requestedDeliveryDate

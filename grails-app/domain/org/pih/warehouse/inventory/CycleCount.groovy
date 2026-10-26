@@ -102,7 +102,7 @@ class CycleCount {
      * @return The largest count index of all the cycle count items. Helps determine what count we're on.
      */
     Integer getMaxCountIndex() {
-        return cycleCountItems.max{ it.countIndex }?.countIndex
+        return cycleCountItems?.max{ it.countIndex }?.countIndex
     }
 
     /**
@@ -110,7 +110,7 @@ class CycleCount {
      */
     Set<CycleCountItem> getItemsOfMostRecentCount() {
         Integer countIndex = maxCountIndex
-        return cycleCountItems.findAll { it.countIndex == countIndex}
+        return cycleCountItems?.findAll { it.countIndex == countIndex } ?: [] as Set
     }
 
     Integer getNumberOfItemsOfMostRecentCount() {
@@ -118,14 +118,14 @@ class CycleCount {
     }
 
     Set<CycleCountItem> getItemsOfSpecificCount(Integer countIndex) {
-        return cycleCountItems.findAll { it.countIndex == countIndex }
+        return cycleCountItems?.findAll { it.countIndex == countIndex } ?: [] as Set
     }
 
     /**
      * @return a list of all the products being counted by the cycle count.
      */
     List<Product> getProducts() {
-        return cycleCountItems.collect{ it.product }.unique{ it.id }
+        return cycleCountItems?.collect{ it.product }?.unique{ it.id } ?: []
     }
 
     /**
@@ -134,7 +134,7 @@ class CycleCount {
     CycleCountItem getCycleCountItem(
             Product product, Location binLocation, InventoryItem inventoryItem, int countIndex) {
 
-        return cycleCountItems.find{
+        return cycleCountItems?.find{
                     it.product == product &&
                     it.location == binLocation &&
                     it.inventoryItem == inventoryItem &&

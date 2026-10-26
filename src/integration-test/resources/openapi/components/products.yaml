@@ -1,0 +1,340 @@
+# Shared schemas of the product availability, product association and product source operations.
+# Documented properties are guaranteed (required) or nullable; other properties may appear.
+
+AvailableItem:
+  description: Stock of one product in one bin and lot at a location, with what can still be picked.
+  type: object
+  required: [inventoryItem.id, product, productCode, quantityAvailable, status]
+  properties:
+    inventoryItem.id:
+      type: string
+      description: The lot (inventory item) id.
+    product:
+      $ref: 'catalog.yaml#/Product'
+    product.name:
+      type: string
+    productCode:
+      type: string
+    lotNumber:
+      type: string
+      nullable: true
+    expirationDate:
+      type: string
+      nullable: true
+      description: The lot's expiry (MM/dd/yyyy); null for lots that do not expire.
+    binLocation:
+      type: object
+      description: The bin, as a Location; null for stock held at the location without a bin.
+      nullable: true
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      additionalProperties: true
+    binLocation.id:
+      type: string
+      nullable: true
+    binLocation.name:
+      type: string
+      nullable: true
+    zone:
+      type: object
+      nullable: true
+      description: The zone of the bin, when bins are grouped into zones.
+      additionalProperties: true
+    quantityOnHand:
+      type: integer
+      nullable: true
+    quantityAvailable:
+      type: integer
+      description: Quantity on hand less what is already picked or allocated.
+    status:
+      type: string
+      description: AVAILABLE, or why the stock cannot be picked (e.g. RECALLED, ON_HOLD, PICKED).
+    pickedRequisitionNumbers:
+      type: string
+      description: Requests that already picked from this bin and lot, comma-separated ("" when none).
+  additionalProperties: true
+
+ProductAssociation:
+  description: A product associated with another one (a substitute, an equivalent, ...), with its stock at the location.
+  type: object
+  required: [id, type, product, conversionFactor]
+  properties:
+    id:
+      type: string
+    type:
+      type: string
+      description: The association type (SUBSTITUTE, EQUIVALENT, ...).
+    product:
+      $ref: 'catalog.yaml#/Product'
+    conversionFactor:
+      type: number
+      description: How many of the associated product make one of the product.
+    comments:
+      type: string
+      nullable: true
+    minExpirationDate:
+      type: string
+      format: date-time
+      nullable: true
+      description: The earliest expiry of the associated product's stock at the location; null without expiring stock.
+    availableQuantity:
+      type: number
+      nullable: true
+      description: The associated product's available stock at the location; null without stock.
+  additionalProperties: true
+
+AssociatedProducts:
+  description: A product with its stock at the location and its associated products of the asked types.
+  type: object
+  required: [product, availableItems, hasAssociations, hasEarlierExpiringItems, productAssociations]
+  properties:
+    product:
+      $ref: 'catalog.yaml#/Product'
+    availableItems:
+      type: array
+      description: The product's own available stock at the location (empty without a location).
+      items:
+        $ref: '#/AvailableItem'
+    hasAssociations:
+      type: boolean
+    hasEarlierExpiringItems:
+      type: boolean
+      description: True when an associated product has stock that expires before the product's own earliest-expiring lot.
+    productAssociations:
+      type: array
+      items:
+        $ref: '#/ProductAssociation'
+  additionalProperties: true
+
+Substitutions:
+  description: A product with its stock at the location and its substitutes.
+  type: object
+  required: [product, availableItems, hasAssociations, hasEarlierExpiringItems, substitutions]
+  properties:
+    product:
+      $ref: 'catalog.yaml#/Product'
+    availableItems:
+      type: array
+      description: The product's own available stock at the location (empty without a location).
+      items:
+        $ref: '#/AvailableItem'
+    hasAssociations:
+      type: boolean
+    hasEarlierExpiringItems:
+      type: boolean
+      description: True when a substitute has stock that expires before the product's own earliest-expiring lot.
+    substitutions:
+      type: array
+      items:
+        $ref: '#/ProductAssociation'
+  additionalProperties: true
+
+LotAvailability:
+  description: One product lot with its expiry and the depots that hold it.
+  type: object
+  required: [productId, lotNumber, quantityOnHand, depots]
+  properties:
+    productId:
+      type: string
+    lotNumber:
+      type: string
+      nullable: true
+    expirationDate:
+      type: string
+      format: date
+      nullable: true
+    quantityOnHand:
+      type: integer
+      description: The lot's stock in all depots together (positive quantities only).
+    depots:
+      type: array
+      items:
+        type: object
+        required: [depot, quantityOnHand]
+        properties:
+          depot:
+            type: object
+            required: [id, name]
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              locationNumber:
+                type: string
+                nullable: true
+              active:
+                type: boolean
+            additionalProperties: true
+          quantityOnHand:
+            type: integer
+        additionalProperties: true
+  additionalProperties: true
+
+LotOnHand:
+  description: A lot of a product, with the quantity on hand at every location together.
+  type: object
+  required: [inventoryItem, quantityOnHand]
+  properties:
+    inventoryItem:
+      type: object
+      nullable: true
+      description: The lot; null when the product has no lot with this number.
+      required: [id, product]
+      properties:
+        id:
+          type: string
+        product:
+          $ref: 'inventory.yaml#/ProductRef'
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+          description: MM/dd/yyyy.
+      additionalProperties: true
+    quantityOnHand:
+      type: integer
+      description: 0 when the lot does not exist.
+  additionalProperties: true
+
+ProductSupplier:
+  description: A product source - where a product can be bought, with the supplier's codes, packages and prices.
+  type: object
+  required: [id, product, active, productSupplierPreferences, attributes]
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+      nullable: true
+    code:
+      type: string
+      nullable: true
+      description: The source code (generated from the product and supplier codes when created without one).
+    product:
+      $ref: 'inventory.yaml#/ProductRef'
+    supplier:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+          nullable: true
+        displayName:
+          type: string
+      additionalProperties: true
+    supplierCode:
+      type: string
+      nullable: true
+      description: The supplier's own item number.
+    manufacturer:
+      type: object
+      nullable: true
+      additionalProperties: true
+    manufacturerCode:
+      type: string
+      nullable: true
+    brandName:
+      type: string
+      nullable: true
+    description:
+      type: string
+      nullable: true
+    productCode:
+      type: string
+      nullable: true
+      description: A legacy product code kept on the source.
+    defaultProductPackage:
+      type: object
+      nullable: true
+      additionalProperties: true
+    contractPrice:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+        price:
+          type: number
+          nullable: true
+        validUntil:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: true
+    minOrderQuantity:
+      type: number
+      nullable: true
+    packageSize:
+      type: string
+      nullable: true
+      description: The default package as unit/quantity (e.g. BX/12).
+    packagePrice:
+      type: number
+      nullable: true
+    unitPrice:
+      type: number
+      nullable: true
+    ratingTypeCode:
+      type: string
+      nullable: true
+    tieredPricing:
+      type: boolean
+    active:
+      type: boolean
+    productSupplierPreferences:
+      type: array
+      description: The source's preferences (one without a destination is the default one).
+      items:
+        type: object
+        additionalProperties: true
+    attributes:
+      type: array
+      items:
+        type: object
+        additionalProperties: true
+    dateCreated:
+      type: string
+      format: date-time
+    lastUpdated:
+      type: string
+      format: date-time
+    createdBy:
+      type: object
+      nullable: true
+      additionalProperties: true
+    updatedBy:
+      type: object
+      nullable: true
+      additionalProperties: true
+  additionalProperties: true
+
+ProductSupplierExportRow:
+  description: One product source as an export row, keyed by the export's column titles.
+  type: object
+  required: [ID, Product Code, Product Name]
+  properties:
+    active:
+      type: boolean
+    ID:
+      type: string
+    Product Source Code:
+      type: string
+      nullable: true
+    Product Source Name:
+      type: string
+      nullable: true
+    Product Code:
+      type: string
+    Product Name:
+      type: string
+  additionalProperties: true

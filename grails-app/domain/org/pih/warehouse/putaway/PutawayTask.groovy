@@ -100,6 +100,12 @@ class PutawayTask {
     }
 
     String getBackorderReferenceNumber() {
+        // Inbound qty can be split between cross dock and other bins (e.g. preferred bin),
+        // only the cross dock putaway is fulfilling the backorder
+        if (putawayTypeCode != PutawayTypeCode.CROSS_DOCK) {
+            return null
+        }
+
         if (shipmentItem?.backorderReference) {
             return shipmentItem?.backorderReference
         }

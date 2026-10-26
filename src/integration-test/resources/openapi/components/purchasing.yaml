@@ -1,0 +1,152 @@
+# Shared schemas of purchase orders and invoices. Listed under components/schemas in openapi.yaml.
+# Listed properties are always there (required) or may be null (nullable); others may appear.
+
+StatusOption:
+  description: One entry of a status list, with the colour variant the user interface shows it in.
+  type: object
+  required: [id, value, label]
+  properties:
+    id: {type: string}
+    value: {type: string}
+    label: {type: string, description: In the session's language.}
+    variant: {type: string, nullable: true, description: 'Colour variant (e.g. WARNING, SUCCESS).'}
+  additionalProperties: true
+
+InvoiceSummary:
+  description: A row of the invoice list.
+  type: object
+  required: [id, invoiceNumber, status, itemCount]
+  properties:
+    id: {type: string}
+    invoiceNumber: {type: string}
+    invoiceTypeCode: {type: string, nullable: true, description: 'INVOICE, PREPAYMENT_INVOICE or ...'}
+    status: {type: string, description: 'PENDING, SUBMITTED, POSTED, ...'}
+    partyCode: {type: string, nullable: true, description: Vendor code and name.}
+    vendorInvoiceNumber: {type: string, nullable: true}
+    totalValue: {type: number, nullable: true}
+    currency: {type: string, nullable: true}
+    itemCount: {type: string, description: Number of items (a string).}
+  additionalProperties: true
+
+Invoice:
+  description: An invoice from a vendor to the buying organization.
+  type: object
+  required: [id, invoiceNumber, status, invoiceType, isPrepaymentInvoice, hasPrepaymentInvoice, totalValue]
+  properties:
+    id: {type: string}
+    invoiceNumber: {type: string}
+    vendorInvoiceNumber: {type: string, nullable: true}
+    name: {type: string, nullable: true}
+    description: {type: string, nullable: true}
+    partyFrom: {type: object, nullable: true, description: The buying organization., additionalProperties: true}
+    vendor: {type: string, nullable: true, description: Vendor organization id.}
+    vendorName: {type: string, nullable: true}
+    dateInvoiced: {type: string, nullable: true, description: MM/dd/yyyy.}
+    dateSubmitted: {type: string, nullable: true}
+    datePosted: {type: string, nullable: true}
+    dateDue: {type: string, nullable: true}
+    datePaid: {type: string, nullable: true}
+    currencyUom: {type: object, nullable: true, description: The currency (a unit of measure)., additionalProperties: true}
+    totalCount: {type: integer, description: Number of items.}
+    totalValue: {type: number}
+    invoiceType: {type: string, nullable: true}
+    isPrepaymentInvoice: {type: boolean}
+    hasPrepaymentInvoice: {type: boolean}
+    status: {type: string, description: 'PENDING, SUBMITTED, POSTED, ...'}
+    documents: {type: array, items: {type: object, additionalProperties: true}}
+  additionalProperties: true
+
+InvoiceItem:
+  description: A line of an invoice - an order line, an order adjustment (e.g. freight) or a shipment line.
+  type: object
+  required: [id, quantity, inverse]
+  properties:
+    id: {type: string}
+    orderNumber: {type: string, nullable: true}
+    orderId: {type: string, nullable: true}
+    shipmentNumber: {type: string, nullable: true}
+    shipmentId: {type: string, nullable: true}
+    budgetCode: {type: string, nullable: true}
+    glCode: {type: string, nullable: true}
+    productCode: {type: string, nullable: true}
+    productName: {type: string, nullable: true}
+    description: {type: string, nullable: true}
+    quantity: {type: integer}
+    uom: {type: string, nullable: true, description: 'Unit of measure and quantity per unit, e.g. EA/1.'}
+    unitPrice: {type: number, nullable: true}
+    amount: {type: number, nullable: true}
+    totalAmount: {type: number, nullable: true}
+    totalPrepaymentAmount: {type: number, nullable: true}
+    inverse: {type: boolean, description: 'An inverse line of a prepaid order (the prepayment taken back).'}
+    isCanceled: {type: boolean, nullable: true}
+    quantityAvailableToInvoice: {type: integer, nullable: true}
+    unitPriceAvailableToInvoice: {type: number, nullable: true}
+  additionalProperties: true
+
+InvoiceItemCandidate:
+  description: An order line, order adjustment or shipment line the invoice can take.
+  type: object
+  required: [id, quantityToInvoice, isAdjustment]
+  properties:
+    id: {type: string}
+    orderNumber: {type: string, nullable: true}
+    orderId: {type: string, nullable: true}
+    shipmentNumber: {type: string, nullable: true, description: Empty for order lines and adjustments.}
+    shipmentId: {type: string, nullable: true}
+    budgetCode: {type: string, nullable: true}
+    glCode: {type: string, nullable: true}
+    productCode: {type: string, nullable: true}
+    productName: {type: string, nullable: true}
+    supplierCode: {type: string, nullable: true}
+    description: {type: string, nullable: true}
+    quantity: {type: integer, nullable: true}
+    quantityToInvoice: {type: integer, description: What is left to invoice.}
+    uom: {type: string, nullable: true}
+    unitPrice: {type: number, nullable: true}
+    isAdjustment: {type: boolean}
+  additionalProperties: true
+
+PurchaseOrderSummary:
+  description: A row of the purchase order list.
+  type: object
+  required: [id, orderNumber, status]
+  properties:
+    id: {type: string}
+    orderNumber: {type: string, nullable: true}
+    name: {type: string, nullable: true}
+    status: {type: string, nullable: true, description: 'Derived status: PENDING, PLACED, PARTIALLY_SHIPPED, ...'}
+    paymentTerm: {type: object, nullable: true, description: The payment term (id and name)., additionalProperties: true}
+    origin: {type: string, nullable: true, description: Supplier location with its organization code.}
+    destination: {type: string, nullable: true}
+    dateOrdered: {type: string, nullable: true, format: date-time}
+    orderedBy: {type: string, nullable: true}
+    createdBy: {type: string, nullable: true}
+    orderItemsCount: {type: integer}
+    orderedOrderItemsCount: {type: integer}
+    shippedItemsCount: {type: integer}
+    receivedItemsCount: {type: integer}
+    invoicedItemsCount: {type: integer}
+    shipmentsCount: {type: integer}
+    total: {type: string, description: Total with its currency code.}
+    totalNormalized: {type: string, description: Total in the default currency.}
+  additionalProperties: true
+
+PurchaseOrder:
+  description: A purchase order with its supplier and destination locations, lines and adjustments.
+  type: object
+  required: [id, orderNumber, status, origin, destination]
+  properties:
+    id: {type: string}
+    orderNumber: {type: string, nullable: true}
+    name: {type: string, nullable: true}
+    status:
+      type: object
+      nullable: true
+      description: The order status (name is PENDING, PLACED, ...).
+      required: [name]
+      properties:
+        name: {type: string}
+      additionalProperties: true
+    origin: {type: object, description: The supplier location., additionalProperties: true}
+    destination: {type: object, description: The receiving location., additionalProperties: true}
+  additionalProperties: true

@@ -1,0 +1,94 @@
+name: Regression Tests
+
+# Runs the regression suite (docs/developer-guide/regression-suite.md) whenever a pull request is created or
+# updated, next to "Test Pull Request" (which does not run this suite): the unit specs in one job, the integration
+# specs split over parallel shards so the suite adds only a few minutes to a pull request.
+on:
+  # pull_request (not pull_request_target) for security purposes and so that the tests run on the source branch.
+  pull_request:
+    types: [opened, synchronize, reopened]
+  # Every change that lands on the branch runs on both databases.
+  push:
+    branches: [ 'feature/obaf-integration' ]
+  workflow_dispatch:
+    inputs:
+      database:
+        description: Testcontainers database image for the integration specs
+        default: mysql:8.0.36
+        type: choice
+        options: ["mysql:8.0.36", "mariadb:10.3.39"]
+
+# The jobs only read the repository.
+permissions:
+  contents: read
+
+# A newer push to the same pull request cancels the run of the older one.
+concurrency:
+  group: regression-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 8
+          distribution: temurin
+          cache: gradle
+
+      # No spec needs the webpack bundle (processResources builds it by default; about 4 minutes on a runner).
+      - name: Run Regression Unit Specs
+        run: ./gradlew regressionTest -x npm_run_bundle --no-daemon
+
+      - name: Upload Test Report
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-unit-report
+          path: build/reports/tests/regressionTest
+
+  integration:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # The shards are balanced by gradle/regression-spec-times.txt. Change both lists together.
+        shard: [1, 2, 3, 4, 5, 6]
+        shards: [6]
+        # Pull requests: MySQL 8.0.36 (or the database chosen when run by hand); pushes to the branch: both databases.
+        database: ${{ github.event_name == 'push' && fromJSON('["mysql:8.0.36", "mariadb:10.3.39"]') || fromJSON(format('["{0}"]', inputs.database || 'mysql:8.0.36')) }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 8
+          distribution: temurin
+          cache: gradle
+
+      # Skips the webpack bundle, as the unit job does.
+      - name: Run Regression Integration Specs (shard ${{ matrix.shard }} of ${{ matrix.shards }}, ${{ matrix.database }})
+        run: ./gradlew regressionIntegrationTest -PregressionShard=${{ matrix.shard }}/${{ matrix.shards }} -x npm_run_bundle --no-daemon
+        env:
+          TEST_DATABASE: ${{ matrix.database }}
+
+      - name: Upload Test Report
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-integration-report-${{ matrix.shard }}-${{ strategy.job-index }}
+          path: build/reports/tests/regressionIntegrationTest

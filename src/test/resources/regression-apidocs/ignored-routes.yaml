@@ -1,0 +1,160 @@
+# Routes the application reaches but the API docs deliberately leave out. Every entry names the
+# kind of finding, the path, the method(s) ('*' = the route answers any method), the controller
+# action it reaches, and why it is left out. OpenApiCompletenessSpec fails on a finding with no
+# matching entry and on an entry that no longer matches its finding, so this list only shrinks as
+# routing is cleaned up. Kinds:
+#   missing-action      explicit mapping to an action that does not exist
+#   shadowed            explicit mapping that another mapping answers instead
+#   dynamic-shadow      "/api/${resource}s" route that respells a path an explicit mapping documents
+#   wildcard-alias      any-method wildcard reaching an action documented under its own path
+#   wildcard-only       any-method wildcard reaching an action nothing else routes to
+#   method-fallthrough  method missing from a mapping's method map, dispatched to the default action
+#   excluded            a routed operation left out of the docs on purpose
+# build/reports/api-docs/unaccounted-routes.yaml lists findings that still need an entry.
+#
+# OBAF's own findings are in the "OBAF" section at the end.
+
+- kind: missing-action
+  path: /api/partialReceiving
+  method: POST
+  target: partialReceivingApi/create
+  reason: The mapping points at an action that does not exist, so the request ends in a 404.
+
+- kind: shadowed
+  path: '/api/stocklistItems/{id}'
+  method: POST
+  target: stocklistItemApi/save
+  reason: >-
+    The mapping names stocklistItemApi/save, which does not exist; the dynamic
+    "/api/${resource}s/$id" mapping answers instead (stocklistItemApi/update, documented).
+
+# The dynamic "/api/${resource}s" mappings also answer under the controller name plus "s".
+- kind: dynamic-shadow
+  path: /api/categorys
+  method: GET
+  target: categoryApi/list
+  reason: &shadow >-
+    Second spelling of a path that an explicit mapping documents (/api/categories,
+    /api/partialReceiving), created by the dynamic "/api/${resource}s" mappings. Not documented.
+- {kind: dynamic-shadow, path: '/api/categorys/{id}', method: GET, target: categoryApi/read, reason: *shadow}
+- {kind: dynamic-shadow, path: '/api/categorys/{id}', method: DELETE, target: categoryApi/delete, reason: *shadow}
+- {kind: dynamic-shadow, path: /api/partialReceivings, method: GET, target: partialReceivingApi/list, reason: *shadow}
+- {kind: dynamic-shadow, path: '/api/partialReceivings/{id}', method: GET, target: partialReceivingApi/read, reason: *shadow}
+- {kind: dynamic-shadow, path: '/api/partialReceivings/{id}', method: POST, target: partialReceivingApi/update, reason: *shadow}
+
+- kind: wildcard-only
+  path: '/api/products/{id}/create'
+  method: '*'
+  target: productApi/create
+  reason: >-
+    Inherited BaseDomainApiController.create, reachable only through the "/api/products/$id/$action"
+    wildcard; products are created with POST /api/products (save).
+
+- kind: wildcard-only
+  path: '/api/locations/{id}/bindLocationData'
+  method: '*'
+  target: locationApi/bindLocationData
+  reason: A public helper method that Grails exposes as an action; not an endpoint.
+
+- kind: excluded
+  path: /api/baseDomains
+  method: GET
+  target: baseDomainApi/list
+  reason: &baseDomain >-
+    BaseDomainApiController is the shared base class of eight API controllers; as a controller of its
+    own it also answers the dynamic "/api/${resource}s" mappings. Not an endpoint.
+- {kind: excluded, path: /api/baseDomains, method: POST, target: baseDomainApi/create, reason: *baseDomain}
+- {kind: excluded, path: '/api/baseDomains/{id}', method: GET, target: baseDomainApi/read, reason: *baseDomain}
+- {kind: excluded, path: '/api/baseDomains/{id}', methods: [POST, PUT], target: baseDomainApi/update, reason: *baseDomain}
+- {kind: excluded, path: '/api/baseDomains/{id}', method: DELETE, target: baseDomainApi/delete, reason: *baseDomain}
+
+# The any-method wildcards "/api/products/$id/$action", "/api/locations/$id/$action" and
+# "/api/$action/$id?" also reach every other action of their controller.
+- kind: wildcard-alias
+  path: '/api/locations/{id}/delete'
+  method: '*'
+  target: locationApi/delete
+  reason: &alias >-
+    Reached through an any-method wildcard; the action is documented under its own mapped path.
+- {kind: wildcard-alias, path: '/api/locations/{id}/downloadBinLocationTemplate', method: '*', target: locationApi/downloadBinLocationTemplate, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/downloadTemplate', method: '*', target: locationApi/downloadTemplate, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/importBinLocations', method: '*', target: locationApi/importBinLocations, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/importCsv', method: '*', target: locationApi/importCsv, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/list', method: '*', target: locationApi/list, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/locationTypes', method: '*', target: locationApi/locationTypes, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/read', method: '*', target: locationApi/read, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/supportedActivities', method: '*', target: locationApi/supportedActivities, reason: *alias}
+- {kind: wildcard-alias, path: '/api/locations/{id}/update', method: '*', target: locationApi/update, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/availableItems', method: '*', target: productApi/availableItems, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/delete', method: '*', target: productApi/delete, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/getInventoryItem', method: '*', target: productApi/getInventoryItem, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/getLatestInventoryCountDate', method: '*', target: productApi/getLatestInventoryCountDate, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/getLotNumbersWithExpirationDate', method: '*', target: productApi/getLotNumbersWithExpirationDate, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/importCsv', method: '*', target: productApi/importCsv, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/list', method: '*', target: productApi/list, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/read', method: '*', target: productApi/read, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/save', method: '*', target: productApi/save, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/search', method: '*', target: productApi/search, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/update', method: '*', target: productApi/update, reason: *alias}
+- {kind: wildcard-alias, path: '/api/getResettingInstanceCommand', method: '*', target: api/getResettingInstanceCommand, reason: *alias}
+- {kind: wildcard-alias, path: '/api/getSupportLinks', method: '*', target: api/getSupportLinks, reason: *alias}
+
+# Methods a mapping does not list are not answered with 405: Grails dispatches them to the
+# controller's default action.
+- kind: method-fallthrough
+  path: '/api/attributes'
+  methods: [PUT, PATCH, DELETE]
+  target: attributeApi/list
+  reason: &fallthrough >-
+    Not in the mapping's method map; Grails sends it to the controller's default action instead of
+    answering 405. Not an intended endpoint.
+- {kind: method-fallthrough, path: '/api/combineShipments/{id}', methods: [PATCH], target: combineShipmentApi/read, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facilityId}/products/classifications', methods: [POST, PUT, PATCH, DELETE], target: productClassificationApi/list, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/inventory/record-stock/save', methods: [GET, PUT, PATCH, DELETE], target: recordStockApi/saveRecordStock, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/helpscout/configuration', methods: [POST, PUT, PATCH, DELETE], target: helpScoutApi/configuration, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/indicators', methods: [PUT, PATCH, DELETE], target: indicatorApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/indicators/{id}', methods: [PATCH], target: indicatorApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/prepaymentInvoices/{id}/invoiceItems', methods: [GET, PUT, PATCH, DELETE], target: prepaymentInvoiceApi/updateItems, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/productClassifications', methods: [PUT, PATCH, DELETE], target: productClassificationApi/list, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/productPackages', methods: [PUT, PATCH, DELETE], target: productPackageApi/create, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/productSupplierAttributes/batch', methods: [GET, PUT, PATCH, DELETE], target: productSupplierAttributeApi/updateAttributes, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/reports/indicators/inventoryAccuracy', methods: [POST, PUT, PATCH, DELETE], target: indicatorApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/reports/indicators/inventoryShrinkage', methods: [POST, PUT, PATCH, DELETE], target: indicatorApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/reports/indicators/productsInventoried', methods: [POST, PUT, PATCH, DELETE], target: indicatorApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/reports/inventory-transactions-summary', methods: [POST, PUT, PATCH, DELETE], target: inventoryTransactionSummaryApi/getInventoryTransactionsSummary, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/stockAdjustments', methods: [PUT, PATCH, DELETE], target: stockAdjustmentApi/create, reason: *fallthrough}
+
+# ---------------------------------------------------------------------------------------------------------------
+# OBAF (feature/obaf-integration) findings.
+
+# The spec documented POST /api/locations as locationApi/create; OBAF routes it to locationApi/upsert, so create is
+# reachable only through the "/api/locations/$id/$action" wildcard.
+- kind: wildcard-only
+  path: '/api/locations/{id}/create'
+  method: '*'
+  target: locationApi/create
+  reason: >-
+    Inherited BaseDomainApiController.create, reachable only through the "/api/locations/$id/$action" wildcard;
+    on OBAF locations are created with POST /api/locations (upsert).
+- {kind: wildcard-alias, path: '/api/locations/{id}/upsert', method: '*', target: locationApi/upsert, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/upsert', method: '*', target: productApi/upsert, reason: *alias}
+
+# OBAF's API defaults (no explicit method maps for these resources' remaining methods).
+- {kind: method-fallthrough, path: '/api/facilities/{facilityId}/inventory-items', methods: [POST, PUT, PATCH, DELETE], target: inventoryItemApi/listByActivity, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/pickTasks', methods: [PUT, PATCH, DELETE], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/pickTasks/{id}', methods: [PATCH], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/putawayTasks', methods: [PUT, PATCH, DELETE], target: putawayTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/putawayTasks/{id}', methods: [PATCH], target: putawayTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/reports/auto-issuance-transactions', methods: [POST, PUT, PATCH, DELETE], target: autoIssuanceTransactionReportApi/getAutoIssuanceTransactions, reason: *fallthrough}
+
+# OBAF PickUrlMappings / PutawayUrlMappings (task APIs): methods missing from their method maps.
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/inbound-items/{product}/routing-suggestions', methods: [POST, PUT, PATCH, DELETE], target: putawayTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks', methods: [POST, PUT, PATCH, DELETE], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/containers/{outboundContainerId}', methods: [GET, POST, PUT, DELETE], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/counts', methods: [POST, PUT, PATCH, DELETE], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/{id}', methods: [POST, PUT, DELETE], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/{id}/reallocate', methods: [GET, PUT, PATCH, DELETE], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks', methods: [PUT, PATCH, DELETE], target: putawayTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks/{id}', methods: [POST], target: putawayTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks/{id}/alternate-destinations', methods: [POST, PUT, PATCH, DELETE], target: putawayTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks/{id}/status', methods: [GET, POST, PUT, DELETE], target: putawayTaskApi/index, reason: *fallthrough}

@@ -765,6 +765,15 @@ class ShipmentService {
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
 
+            // Whether a bin is permitted to hold a negative quantity or is a shortfall location so it accepts
+            // quantities below 0. Orders that do not permit negative allocation keep the ordinary checks.
+            if (shipmentItem.shipment?.requisition?.negativeAllocationAllowed &&
+                    origin.isNegativeInventoryEnabled() &&
+                    (shipmentItem.binLocation?.isNegativeInventoryAllowed() ||
+                            shipmentItem.binLocation?.isNegativeInventoryFallbackLocation())) {
+                return true
+            }
+
             Integer quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(
                     origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
 

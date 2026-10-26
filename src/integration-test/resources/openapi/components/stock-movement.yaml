@@ -1,0 +1,438 @@
+# Shared schemas of stock movements (requests and shipments between locations) and their items.
+# Listed under components/schemas in openapi.yaml. Properties not listed here may appear in responses; the listed
+# ones are always there (required) or may be null (nullable), as the integration tests check against real responses.
+
+LocationSummary:
+  description: A location as a stock movement shows it (the inbound list gives the destination id only).
+  type: object
+  required:
+  - id
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+      nullable: true
+    locationNumber:
+      type: string
+      nullable: true
+    locationType:
+      type: object
+      nullable: true
+      additionalProperties: true
+    organizationName:
+      type: string
+      nullable: true
+    organizationCode:
+      type: string
+      nullable: true
+    supportedActivities:
+      type: array
+      items:
+        type: string
+  additionalProperties: true
+
+StockMovement:
+  description: 'A stock movement: a request or shipment of stock from an origin to a destination. Its line items
+
+    are the products moved; `associations` links the underlying requisition, shipment(s) and documents.
+
+    '
+  type: object
+  required:
+  - id
+  - name
+  - identifier
+  - statusCode
+  - origin
+  - destination
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    description:
+      type: string
+      nullable: true
+    identifier:
+      type: string
+      description: The short number people use (e.g. 267NNZ).
+    statusCode:
+      type: string
+      description: Workflow status (CREATED, REQUESTED, VALIDATED, PICKING, PICKED, PACKED, CHECKING, ISSUED, ...).
+    displayStatus:
+      type: object
+      nullable: true
+      properties:
+        name:
+          type: string
+          nullable: true
+        label:
+          type: string
+          nullable: true
+        variant:
+          type: string
+          nullable: true
+      additionalProperties: true
+    origin:
+      $ref: '#/LocationSummary'
+    destination:
+      $ref: '#/LocationSummary'
+    requestedBy:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      additionalProperties: true
+    dateRequested:
+      type: string
+      nullable: true
+      description: MM/dd/yyyy.
+    dateCreated:
+      type: string
+      nullable: true
+      description: MM/dd/yyyy.
+    dateShipped:
+      type: string
+      nullable: true
+      description: MM/dd/yyyy HH:mm Z.
+    expectedDeliveryDate:
+      type: string
+      nullable: true
+    lastUpdated:
+      type: string
+      nullable: true
+    currentStatus:
+      type: string
+      nullable: true
+      description: The shipment's status (PENDING, SHIPPED, PARTIALLY_RECEIVED, RECEIVED).
+    shipmentType:
+      type: object
+      nullable: true
+      additionalProperties: true
+    trackingNumber:
+      type: string
+      nullable: true
+    driverName:
+      type: string
+      nullable: true
+    comments:
+      type: string
+      nullable: true
+    lineItems:
+      type: array
+      items:
+        $ref: '#/StockMovementItem'
+      description: The line items (on read; lists leave them out).
+    lineItemCount:
+      type: integer
+      nullable: true
+    associations:
+      type: object
+      description: The requisition, shipment(s) and documents behind the movement.
+      additionalProperties: true
+    requestType:
+      nullable: true
+      description: 'The requisition type: an enum name, or an object with its name, depending on the response.'
+    sourceType:
+      nullable: true
+      description: 'The requisition source: an enum name, or an object with its name, depending on the response.'
+    isShipped:
+      type: boolean
+      nullable: true
+    isReceived:
+      type: boolean
+      nullable: true
+    isPending:
+      type: boolean
+      nullable: true
+    isReturn:
+      type: boolean
+      nullable: true
+    isFromOrder:
+      type: boolean
+      nullable: true
+  additionalProperties: true
+
+StockMovementItem:
+  description: One line of a stock movement - a product, the quantities requested, picked and shipped, and its lot.
+  type: object
+  required:
+  - id
+  - product
+  - quantityRequested
+  properties:
+    id:
+      type: string
+    version:
+      type: integer
+      nullable: true
+    productCode:
+      type: string
+      nullable: true
+    product:
+      $ref: catalog.yaml#/Product
+    lotNumber:
+      type: string
+      nullable: true
+    expirationDate:
+      type: string
+      nullable: true
+    statusCode:
+      type: string
+      description: The item's requisition status (PENDING, APPROVED, CHANGED, CANCELED, SUBSTITUTED, ...). Null for items
+        of shipment-based movements.
+      nullable: true
+    quantityRequested:
+      type: integer
+    quantityAllowed:
+      type: integer
+      nullable: true
+    quantityAvailable:
+      type: integer
+      nullable: true
+    quantityCanceled:
+      type: integer
+      nullable: true
+    quantityRevised:
+      type: integer
+      nullable: true
+    quantityPicked:
+      type: integer
+      nullable: true
+    quantityRequired:
+      type: integer
+      nullable: true
+    packsRequested:
+      type: integer
+      nullable: true
+    packSize:
+      type: integer
+      nullable: true
+    reasonCode:
+      type: string
+      nullable: true
+    comments:
+      type: string
+      nullable: true
+    palletName:
+      type: string
+      nullable: true
+    boxName:
+      type: string
+      nullable: true
+    sortOrder:
+      type: integer
+      nullable: true
+    substitutionItems:
+      type: array
+      items:
+        type: object
+        additionalProperties: true
+    inventoryItem:
+      type: object
+      nullable: true
+      additionalProperties: true
+  additionalProperties: true
+
+StockMovementInput:
+  description: 'The fields of a stock movement to create or change. References are objects with the record''s id; an
+
+    empty id (as the React app sends for an unset stock list) means none.
+
+    '
+  type: object
+  properties:
+    name:
+      type: string
+    description:
+      type: string
+    origin:
+      $ref: catalog.yaml#/RefInput
+    destination:
+      $ref: catalog.yaml#/RefInput
+    requestedBy:
+      $ref: catalog.yaml#/RefInput
+    stocklist:
+      $ref: '#/IdOrEmpty'
+    requestType:
+      type: string
+      description: STOCK, ADHOC, ... (RequisitionType).
+    dateRequested:
+      type: string
+      description: MM/dd/yyyy, or an ISO 8601 date-time.
+  additionalProperties: true
+
+StockMovementCreate:
+  description: The fields of a new stock movement (as StockMovementInput); origin, destination, requestedBy and dateRequested
+    are required.
+  type: object
+  required:
+  - origin
+  - destination
+  - requestedBy
+  - dateRequested
+  properties:
+    name:
+      type: string
+    description:
+      type: string
+    origin:
+      $ref: catalog.yaml#/RefInput
+    destination:
+      $ref: catalog.yaml#/RefInput
+    requestedBy:
+      $ref: catalog.yaml#/RefInput
+    stocklist:
+      $ref: '#/IdOrEmpty'
+    requestType:
+      type: string
+      description: STOCK, ADHOC, ... (RequisitionType).
+    dateRequested:
+      type: string
+      description: MM/dd/yyyy, or an ISO 8601 date-time.
+  additionalProperties: true
+
+IdOrEmpty:
+  description: A reference whose id may be empty or null for "none".
+  type: object
+  nullable: true
+  properties:
+    id:
+      type: string
+      nullable: true
+  additionalProperties: true
+
+LineItemsInput:
+  description: Line items to add, change or revise, each identified by id (existing) or product (new).
+  type: object
+  required:
+  - lineItems
+  properties:
+    lineItems:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: An existing line item to change.
+          product:
+            $ref: catalog.yaml#/RefInput
+          quantityRequested:
+            type: integer
+          quantityRevised:
+            type: integer
+          reasonCode:
+            type: string
+          lotNumber:
+            type: string
+          expirationDate:
+            type: string
+            description: MM/dd/yyyy.
+          sortOrder:
+            type: integer
+          comments:
+            type: string
+          recipient:
+            $ref: '#/IdOrEmpty'
+          palletName:
+            type: string
+          boxName:
+            type: string
+          quantityShipped:
+            type: integer
+          shipmentItemId:
+            type: string
+          delete:
+            type: boolean
+            description: Remove this line item.
+          revert:
+            type: boolean
+            description: Undo the changes to this line item.
+          cancel:
+            type: boolean
+            description: Cancel this line item (with reasonCode).
+          substitute:
+            type: boolean
+            description: Substitute this line item by newProduct / newQuantity.
+          newProduct:
+            $ref: catalog.yaml#/RefInput
+          newQuantity:
+            type: integer
+          splitLineItems:
+            type: array
+            items:
+              type: object
+              additionalProperties: true
+          inventoryItem:
+            $ref: '#/IdOrEmpty'
+          orderItemId:
+            type: string
+            description: The purchase order item this line ships (combined shipments).
+          quantityCounted:
+            type: integer
+        additionalProperties: true
+    removeEmptyItems:
+      type: boolean
+      description: 'updateItems only: delete line items whose quantity is 0.'
+  additionalProperties: true
+
+StockMovementDocument:
+  description: A document that can be generated for a stock movement (export, picklist, packing list, ...).
+  type: object
+  required:
+  - name
+  - documentType
+  - uri
+  properties:
+    name:
+      type: string
+    documentType:
+      type: string
+    contentType:
+      type: string
+      nullable: true
+    stepNumber:
+      type: integer
+      nullable: true
+    uri:
+      type: string
+    hidden:
+      type: boolean
+  additionalProperties: true
+
+SubstitutionCandidate:
+  description: A product that may replace a stock movement item, with its stock.
+  type: object
+  required:
+  - productId
+  - productCode
+  - productName
+  properties:
+    productId:
+      type: string
+    productCode:
+      type: string
+    productName:
+      type: string
+    product:
+      $ref: catalog.yaml#/Product
+    minExpirationDate:
+      type: string
+      nullable: true
+    quantityAvailable:
+      type: integer
+      nullable: true
+    quantityOnHand:
+      type: integer
+      nullable: true
+    availableItems:
+      type: array
+      items:
+        type: object
+        additionalProperties: true
+  additionalProperties: true

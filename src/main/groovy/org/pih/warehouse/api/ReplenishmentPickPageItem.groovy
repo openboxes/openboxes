@@ -72,11 +72,11 @@ class ReplenishmentPickPageItem {
     String getStatusCode() {
 
         if (quantityRequired == quantityPicked && quantityRemaining == 0) {
-            return "PICKED"
+            return PickStatusCode.PICKED.name()
         } else if (quantityPicked > 0 && quantityRemaining > 0) {
-            return "PARTIALLY_PICKED"
+            return PickStatusCode.PARTIALLY_PICKED.name()
         } else {
-            return "NOT_PICKED"
+            return PickStatusCode.NOT_PICKED.name()
         }
     }
 

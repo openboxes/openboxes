@@ -48,6 +48,8 @@
                 </div>
             </g:hasErrors>
 
+            <g:render template="duplicateInventoryLevelsWarning" model="[productInstance:productInstance]"/>
+
    			<g:if test="${productInstance?.id }">
 				<g:render template="summary" model="[productInstance:productInstance]"/>
 			</g:if>

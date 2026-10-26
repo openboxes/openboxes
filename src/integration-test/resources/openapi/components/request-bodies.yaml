@@ -1,0 +1,106 @@
+StubBody:
+  description: The request body of this operation is not documented yet.
+  required: false
+  content:
+    '*/*':
+      schema:
+        additionalProperties: true
+PackingListImport:
+  description: |
+    An outbound to create from an imported packing list. The lot and bin location of each row are looked up (or
+    inferred, when left out) in the stock of the row's origin.
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required: [fulfillmentDetails, sendingOptions, packingList]
+        properties:
+          fulfillmentDetails:
+            type: object
+            description: The request. Origin and destination must differ.
+            required: [origin, destination, requestedBy, dateRequested]
+            properties:
+              origin:
+                type: object
+                description: The origin location, by id.
+                required: [id]
+                properties:
+                  id:
+                    type: string
+                additionalProperties: true
+              destination:
+                type: object
+                description: The destination location, by id.
+                required: [id]
+                properties:
+                  id:
+                    type: string
+                additionalProperties: true
+              requestedBy:
+                type: object
+                description: The requesting person, by id.
+                required: [id]
+                properties:
+                  id:
+                    type: string
+                additionalProperties: true
+              dateRequested:
+                type: string
+                example: 09/30/2026
+              description:
+                type: string
+            additionalProperties: true
+          sendingOptions:
+            type: object
+            description: How it ships.
+            required: [expectedShippingDate, expectedDeliveryDate, shipmentType]
+            properties:
+              shipmentType:
+                type: object
+                description: The shipment type, by id.
+                required: [id]
+                properties:
+                  id:
+                    type: string
+                additionalProperties: true
+              expectedShippingDate:
+                type: string
+                description: MM/dd/yyyy HH:mm XXX; must not be after the expected delivery date.
+                example: 09/30/2026 10:00 +00:00
+              expectedDeliveryDate:
+                type: string
+                example: 10/02/2026
+              trackingNumber:
+                type: string
+            additionalProperties: true
+          packingList:
+            type: array
+            items:
+              type: object
+              required: [rowId, origin, product, quantityPicked]
+              properties:
+                rowId:
+                  type: string
+                origin:
+                  type: string
+                  description: Origin location id; the lot and bin lookups use its stock.
+                product:
+                  type: string
+                  description: Product code.
+                lotNumber:
+                  type: string
+                binLocation:
+                  type: string
+                  description: Bin location name.
+                quantityPicked:
+                  type: integer
+                recipient:
+                  type: string
+                  description: Person name or email.
+                palletName:
+                  type: string
+                boxName:
+                  type: string
+              additionalProperties: true
+        additionalProperties: true

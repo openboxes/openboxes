@@ -3,6 +3,7 @@ package org.pih.warehouse
 import grails.validation.ValidationException
 import org.apache.http.auth.AuthenticationException
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.picking.StagingLocationMismatchException
 import org.pih.warehouse.requisition.RequisitionSourceType
 
 import java.sql.SQLIntegrityConstraintViolationException
@@ -125,6 +126,11 @@ class UrlMappings {
         "/api/handlingRequirementsOptions" {
             controller = { "selectOptionsApi" }
             action = [GET: "handlingRequirementsOptions"]
+        }
+
+        "/api/priorityLevelOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "priorityLevelOptions"]
         }
 
         "/api/stockMovements/shipmentStatusCodes" {
@@ -829,6 +835,11 @@ class UrlMappings {
             action = [GET: "getDelayedShipments"]
         }
 
+        "/api/dashboard/readyToBeStaged"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getReadyToBeStaged"]
+        }
+
         "/api/dashboard/productWithNegativeInventory"(parseRequest: true) {
             controller = { "dashboardApi" }
             action = [GET: "getProductWithNegativeInventory"]
@@ -1026,7 +1037,7 @@ class UrlMappings {
 
         "/api/locations/$id/putawayCandidates" {
             controller = { "putawayItemApi" }
-            action = [GET: "list"]
+            action = [GET: "putawayCandidates"]
         }
 
         "/api/containers/$id/details"(parseRequest: true) {
@@ -1221,6 +1232,11 @@ class UrlMappings {
             action = [GET: "getInventoryTransactionsSummary"]
         }
 
+        "/api/reports/auto-issuance-transactions(.$format)?" {
+            controller = "autoIssuanceTransactionReportApi"
+            action = [GET: "getAutoIssuanceTransactions"]
+        }
+
         "/api/reports/indicators/productsInventoried" {
             controller = "indicatorApi"
             action = [GET: "getProductsInventoried"]
@@ -1287,6 +1303,10 @@ class UrlMappings {
         "500"(controller: "errors", action: "handleException")
         "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
         "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
+        // Must stay below the ValidationException mapping above: Grails dispatches on the
+        // reverse of file-declaration order and returns the first exception.isInstance() match,
+        // so a subclass mapping declared earlier in the file would never be reached.
+        "500"(controller: "errors", action: "handleStagingLocationMismatch", exception: StagingLocationMismatchException)
         "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
         "500"(controller: "errors", action: "handleConstraintViolation", exception: SQLIntegrityConstraintViolationException)
         "/"(controller: "dashboard", action: "index")

@@ -9,26 +9,25 @@
  **/
 package org.pih.warehouse.user
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.apache.http.auth.AuthenticationException
 
+import java.awt.Graphics2D
+import java.awt.Image as AWTImage
+import java.awt.image.BufferedImage
+
+import javax.imageio.ImageIO as IIO
+import javax.swing.*
+
+import org.apache.http.auth.AuthenticationException
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
-import org.pih.warehouse.core.LocationRoleDataService
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserDataService
-
-import javax.imageio.ImageIO as IIO
-import javax.swing.*
-import grails.gorm.transactions.Transactional
-
-import java.awt.Graphics2D
-import java.awt.Image as AWTImage
-import java.awt.image.BufferedImage
 
 class UserController {
 
@@ -37,7 +36,6 @@ class UserController {
     def userService
     def locationService
     LocalizationService localizationService
-    LocationRoleDataService locationRoleDataService
     UserDataService userGormService
 
     /**
@@ -126,6 +124,28 @@ class UserController {
      */
     def save() {
         log.info "attempt to save the user; show form with validation errors on failure"
+
+        /*
+         * Note that locationRoles is not currently exposed in the UI,
+         * so we can get away with ignoring requestedLocationRoles here.
+         *
+         * The main thing here is to pop all location role params out of
+         * the params map, even unsupported ones, so that GORM doesn't
+         * try to bind them to the User instance without first validating
+         * that the creating user has permissions to assign them.
+         */
+        def (requestedRoles, requestedLocationRoles) = popRoleParamsBeforeBinding(params)
+
+        /*
+         * It's a common pattern for controllers to create a new instance
+         * and the service to save them. We have to be careful in this
+         * pattern to not let GORM bind role parameters to the instance;
+         * that's why we pop them out of the params map and pass them
+         * separately to the service, which can validate them. This might
+         * overall be a bit cleaner if we just let the service create the
+         * instance, but that would break our coding conventions. It's
+         * probably most parsimonious to just be careful.
+         */
         User userInstance = new User(params)
 
         // Default value for active field on Person is set to True
@@ -138,12 +158,12 @@ class UserController {
         userInstance.password = params?.password?.encodeAsPassword()
         userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
 
-        User persistedUser = userService.saveUser(userInstance)
-
-        if (persistedUser) {
+        try {
+            userService.saveUser(userInstance, session.user.id, requestedRoles)
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
             redirect(action: "edit", id: userInstance.id)
-        } else {
+        } catch (ValidationException e) {
+            userInstance.errors = e.errors
             render(view: "create", model: [userInstance: userInstance])
         }
     }
@@ -247,8 +267,10 @@ class UserController {
                 }
             }
 
+            def (requestedRoles, requestedLocationRoles) = popRoleParamsBeforeBinding(params)
+
             try {
-                userInstance = userService.updateUser(params.id, session.user.id, params)
+                userInstance = userService.updateUser(params.id, session.user.id, requestedRoles, params)
                 // Update session data if the user is editing their own profile
                 if (session.user.id == userInstance?.id) {
                     session.user = User.get(userInstance?.id)
@@ -456,8 +478,14 @@ class UserController {
     }
 
     def deleteLocationRole() {
-        String userId = locationRoleDataService.deleteLocationRole(params.id)
-        redirect(action: "edit", id: userId)
+        LocationRole locationRole = LocationRole.get(params.id)
+        try {
+            String userId = userService.deleteLocationRole(locationRole, session.user.id)
+            redirect(action: "edit", id: userId)
+        } catch (ValidationException e) {
+            flash.message = e.message // the service localizes its messages for us
+            redirect(action: "edit", id: locationRole?.user?.id)
+        }
     }
 
     def saveLocationRole() {
@@ -466,7 +494,11 @@ class UserController {
         Location location = params.location?.id ? Location.get(params.location.id) : null
         List<Role> roles = params.list("role.id").collect { roleId -> Role.get(roleId) }
         LocationRole locationRole = LocationRole.get(params.id)
-        userService.saveLocationRole(location, locationRole, roles, user)
+        try {
+            userService.saveLocationRole(location, locationRole, roles, user, session.user.id)
+        } catch (ValidationException e) {
+            flash.message = e.message // the service localizes its messages for us
+        }
         redirect(action: "edit", id: params.user.id)
     }
 
@@ -566,5 +598,28 @@ class UserController {
         g2d.dispose()
 
         IIO.write(bi, 'JPEG', out)
+    }
+
+    /**
+     * Extract role values from params and remove all role-adjacent keys.
+     *
+     * Unlike other parameters, we do NOT want GORM to bind role params.
+     * Roles must be passed separately to the service for validation.
+     *
+     * After calling this method, new User(params) is safe to delegate
+     * to GORM.
+     *
+     * @return [roles, locationRoles] as lists
+     */
+    private static List popRoleParamsBeforeBinding(Map params) {
+        // our contract is that roles should be passed under the 'roles' key
+        List roles = params.list('roles')
+        // but GORM may try to bind things like `roles[0].id` if we aren't careful
+        params.keySet().removeAll { it?.toString()?.startsWith('roles') }
+
+        // and similarly for location roles
+        List locationRoles = params.list('locationRoles')
+        params.keySet().removeAll { it?.toString()?.startsWith('locationRoles') }
+        return [roles, locationRoles]
     }
 }

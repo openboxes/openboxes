@@ -16,7 +16,7 @@ import grails.plugins.csv.CSVWriter
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService
-import org.pih.warehouse.allocation.AllocationStrategy
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.api.InboundWorkflowState
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
@@ -182,6 +182,7 @@ class StockMovementController {
                     stockMovement: stockMovement,
                     currentLocation: currentLocation,
                     latestHistoryItem: latestHistoryItem,
+                    currentAssignee: pickTaskService.getCurrentAssignee(stockMovement?.requisition),
             ])
         }
     }
@@ -526,6 +527,10 @@ class StockMovementController {
     def uploadDocument(DocumentCommand command) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
+        if (!command.fileContents || command.fileContents.empty || !Document.isAllowedUpload(command.fileContents)) {
+            renderUploadNotAllowed()
+            return
+        }
         stockMovementService.saveDocument(command.fileContents, stockMovement)
 
         render([data: "Document was uploaded successfully"] as JSON)
@@ -534,9 +539,20 @@ class StockMovementController {
     def uploadDocuments(BulkDocumentCommand command) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
+        // Nothing is stored when any of the files is refused
+        if (!command.filesContents || command.filesContents.any { !it || it.empty || !Document.isAllowedUpload(it) }) {
+            renderUploadNotAllowed()
+            return
+        }
         stockMovementService.saveDocuments(command.filesContents, stockMovement)
 
         render([data: "Documents were uploaded successfully"] as JSON)
+    }
+
+    private void renderUploadNotAllowed() {
+        String message = g.message(code: 'document.uploadNotAllowed.message', args: [Document.allowedExtensions().join(', ')])
+        response.status = 400
+        render([errorCode: 400, errorMessage: message] as JSON)
     }
 
     def addDocument() {
@@ -725,9 +741,9 @@ class StockMovementController {
         try {
             Requisition requisition = Requisition.get(params.id)
 
-            List<AllocationStrategy> strategyList = [AllocationStrategy.WAREHOUSE_FIRST]
-            allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
-            stockMovementService.updateRequisitionStatus(params.id, RequisitionStatus.PICKING)
+            List<AllocationSourceStrategy> strategyList = [AllocationSourceStrategy.STORAGE_FIRST]
+            def result = allocationService.allocate(requisition, AllocationMode.AUTO, strategyList)
+            allocationService.completeAllocation(requisition, result?.any { it.suggestedItems || it.prepickItems })
 
             flash.message = "Successfully allocated stock movement"
             redirect(action: "show", id: params.id)

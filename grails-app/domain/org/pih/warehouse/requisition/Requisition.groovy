@@ -10,7 +10,9 @@
 package org.pih.warehouse.requisition
 
 import grails.util.Holders
+import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.allocation.AutomaticAllocationEvent
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.WebhookEventType
 import org.pih.warehouse.core.OrderTypeCode
@@ -24,12 +26,18 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.ReferenceDocument
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.history.EventLog
+import org.pih.warehouse.core.history.EventLogCode
+import org.pih.warehouse.core.history.Historizable
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.product.Product
 
-class Requisition implements Comparable<Requisition>, Serializable {
+import java.time.Instant
+
+class Requisition implements Comparable<Requisition>, Serializable, Historizable {
 
     def publishAutomaticAllocationEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new AutomaticAllocationEvent(this.id))
@@ -42,10 +50,29 @@ class Requisition implements Comparable<Requisition>, Serializable {
     def beforeInsert() {
         createdBy = AuthService.currentUser
         updatedBy = AuthService.currentUser
+
+        // The very first status assignment has no persisted old status to compare against -
+        // RequisitionStatusChangedEventService records this as a forward transition from null
+        // (see RequisitionEventManager#recordStatusChange). Guarded on status being
+        // set at all, since a null-to-null "transition" isn't a real one.
+        if (status) {
+            publishStatusChangedEvent(null, status)
+        }
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
+
+        // requisition.status is the one field whose changes drive the requisition lifecycle timeline (see
+        // RequisitionEventManager#recordStatusChange, invoked from RequisitionStatusChangedEventService).
+        // isDirty already means "differs from the persisted value", so no extra equality check is needed.
+        if (isDirty('status')) {
+            publishStatusChangedEvent(getPersistentValue('status'), status)
+        }
+    }
+
+    def publishStatusChangedEvent(RequisitionStatus oldStatus, RequisitionStatus newStatus) {
+        Holders.grailsApplication.mainContext.publishEvent(new RequisitionStatusChangedEvent(this, oldStatus, newStatus))
     }
 
     def afterInsert() {
@@ -148,11 +175,17 @@ class Requisition implements Comparable<Requisition>, Serializable {
     // Fulfillment properties
     Integer priority = 0
     DeliveryTypeCode deliveryTypeCode = DeliveryTypeCode.DEFAULT
+    Integer deliveryTypePriority
 
     // for controlling partial allocation and issuance
-    Boolean autoAllocationEnabled
+    Boolean autoAllocationRequested
     Boolean partialAllocationAllowed
     Boolean partialIssuanceAllowed
+    Boolean autoIssuanceRequested
+
+    Boolean negativeAllocationAllowed = Boolean.FALSE
+
+    AllocationSourceStrategy allocationSourceStrategy
 
     // Removed comments, documents, events for the time being.
     static transients = [
@@ -163,7 +196,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
             "shipment",
             "totalCost",
             "recentComment",
-            "mostRecentEvent"
+            "mostRecentEvent",
+            "allocationAttemptCount",
+            "issuanceAttemptCount",
+            "mostRecentErrorMessage",
+            "inErrorState",
     ]
     static hasOne = [picklist: Picklist]
     static hasMany = [
@@ -173,6 +210,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             comments: Comment,
             events: Event,
             approvers: Person,
+            eventLogs: EventLog,
     ]
     static mapping = {
         id generator: 'uuid'
@@ -183,8 +221,11 @@ class Requisition implements Comparable<Requisition>, Serializable {
         comments joinTable: [name: "requisition_comment", key: "requisition_id"], cascade: "all-delete-orphan"
         events joinTable: [name: "requisition_event", key: "requisition_id"]
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
+        eventLogs joinTable: [name: "requisition_event_log", key: "requisition_id", column: "event_log_id"], cascade: "all-delete-orphan"
         deliveryTypeCode enumType: "string"
+        deliveryTypePriority formula: DeliveryTypeCode.getPriorityFormula()
         orderTypeCode enumType: "string"
+        allocationSourceStrategy enumType: "string"
     }
 
     static constraints = {
@@ -241,11 +282,15 @@ class Requisition implements Comparable<Requisition>, Serializable {
         dateRejected(nullable: true)
         approvalRequired(nullable: true)
         deliveryTypeCode(nullable: true)
+        deliveryTypePriority(nullable: true)
         orderTypeCode(nullable: true)
         priority(nullable: true)
-        autoAllocationEnabled(nullable: true)
+        autoAllocationRequested(nullable: true)
         partialAllocationAllowed(nullable: true)
         partialIssuanceAllowed(nullable: true)
+        allocationSourceStrategy(nullable: true)
+        autoIssuanceRequested(nullable: true)
+        negativeAllocationAllowed(nullable: true)
     }
 
     Comment getRecentComment() {
@@ -463,15 +508,115 @@ class Requisition implements Comparable<Requisition>, Serializable {
             log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: status is ${status}, expected CREATED"
             return false
         }
-        if (!autoAllocationEnabled) {
-            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: autoAllocationEnabled is not set"
+        if (!autoAllocationRequested) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: autoAllocationRequested is not set"
             return false
         }
         if (!origin?.supports(ActivityCode.AUTOMATIC_ALLOCATION_ENABLED)) {
             log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: origin '${origin?.name}' does not support activity ${ActivityCode.AUTOMATIC_ALLOCATION_ENABLED}"
             return false
         }
+        if (!requisitionItems) {
+            log.info "Requisition ${requestNumber} (${id}) not eligible for automatic allocation: no Requisition Items configured"
+            return false
+        }
         return true
+    }
+
+    boolean isEligibleForCancellation() {
+        return status < RequisitionStatus.PICKING
+    }
+
+    /**
+     * Message based count of ERROR_OCCURRED "Allocation failed" event logs recorded since the requisition's
+     * most recent real transition, used as the allocation-attempt count for the retry cap. Only meaningful
+     * before the requisition has reached PICKING - once it has, allocation succeeded, so any earlier failures
+     * are a resolved past cycle rather than the current one.
+     * FIXME: stand-in for a proper classification subtype on EventLog (see EventLogCode#ERROR_OCCURRED).
+     */
+    Integer getAllocationAttemptCount() {
+        return getAttemptCount(Constants.ALLOCATION_FAILED, RequisitionStatus.PICKING)
+    }
+
+    /**
+     * Message based count of ERROR_OCCURRED "Issuance failed" event logs recorded since the requisition's most
+     * recent real transition, used as the issuance-attempt count for a retry cap. Only meaningful before the
+     * requisition has reached ISSUED - once it has, issuance succeeded, so any earlier failures are a resolved
+     * past cycle rather than the current one.
+     * FIXME: stand-in for a proper classification subtype on EventLog (see EventLogCode#ERROR_OCCURRED).
+     */
+    Integer getIssuanceAttemptCount() {
+        return getAttemptCount(Constants.ISSUANCE_FAILED, RequisitionStatus.ISSUED)
+    }
+
+    /**
+     * Counts ERROR_OCCURRED event logs whose message starts with messagePrefix, windowed to those recorded
+     * since the requisition's most recent real transition (Event) - so failures from a since-resolved earlier
+     * cycle aren't counted towards the current one. Short-circuits to 0 once the requisition has reached
+     * expectedStatus, since the failures being counted are no longer relevant past that point.
+     */
+    private Integer getAttemptCount(String messagePrefix, RequisitionStatus expectedStatus) {
+        Event mostRecentEvent = getMostRecentEvent()
+        RequisitionStatus mostRecentStatus = mostRecentEvent ? RequisitionEventManager.toRequisitionStatus(mostRecentEvent.eventType) : null
+        if (mostRecentStatus != null && mostRecentStatus.sortOrder >= expectedStatus.sortOrder) {
+            return 0
+        }
+
+        Instant since = mostRecentEvent?.dateCreated?.toInstant()
+        return eventLogs?.count {
+            it.eventLogCode == EventLogCode.ERROR_OCCURRED &&
+                    it.message?.startsWith(messagePrefix) &&
+                    (!since || it.dateCreated >= since)
+        } ?: 0
+    }
+
+    /**
+     * The most recent ERROR_OCCURRED message, for display - but only when the error is still the most recent
+     * thing that happened to the requisition. If a real transition (Event) has happened since, the requisition
+     * has moved on and the error is no longer the current problem.
+     */
+    String getMostRecentErrorMessage() {
+        EventLog mostRecentErrorLog = eventLogs?.findAll { it.eventLogCode == EventLogCode.ERROR_OCCURRED }
+                ?.max { it.dateCreated }
+        if (!mostRecentErrorLog) {
+            return null
+        }
+
+        Event mostRecentEvent = getMostRecentEvent()
+        if (mostRecentEvent?.dateCreated?.toInstant() > mostRecentErrorLog.dateCreated) {
+            return null
+        }
+
+        return mostRecentErrorLog.message
+    }
+
+    /**
+     * Whether the requisition needs manual intervention: its most recent EventLog - ignoring purely
+     * informational entries (e.g. INFO_OCCURRED audit notes like a picker reassignment), which must never mask
+     * an unresolved error just by being more recent - is an ERROR_OCCURRED. In practice this rests at CREATED
+     * (allocation failed, will retry) or PICKING (issuance failed, awaiting a person) - status itself keeps
+     * reflecting lifecycle state only, so this is derived rather than stored.
+     */
+    Boolean isInErrorState() {
+        if (!(status in [RequisitionStatus.CREATED, RequisitionStatus.PICKING])) {
+            return false
+        }
+        EventLog mostRecentEventLog = eventLogs?.findAll { it.eventLogCode != EventLogCode.INFO_OCCURRED }
+                ?.max { it.dateCreated }
+        return mostRecentEventLog?.eventLogCode == EventLogCode.ERROR_OCCURRED
+    }
+
+    @Override
+    ReferenceDocument getReferenceDocument() {
+        return new ReferenceDocument(
+                label: requestNumber,
+                url: "/openboxes/stockMovement/show/${id}",
+                id: id,
+                identifier: requestNumber,
+                description: description,
+                name: name,
+                source: "requisition.label",
+        )
     }
 
     DemandTypeCode getDemandTypeCode() {
@@ -504,9 +649,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 recipientProgram     : recipientProgram,
                 requisitionTemplate  : requisitionTemplate?.toJson(),
                 requisitionItems     : requisitionItems?.sort()?.collect { it?.toJson() },
-                autoAllocationEnabled   : autoAllocationEnabled,
+                autoAllocationRequested   : autoAllocationRequested,
                 partialAllocationAllowed: partialAllocationAllowed,
                 partialIssuanceAllowed  : partialIssuanceAllowed,
+                allocationSourceStrategy      : allocationSourceStrategy?.name(),
+                autoIssuanceRequested     : autoIssuanceRequested,
+                negativeAllocationAllowed: negativeAllocationAllowed,
         ]
     }
 
@@ -526,9 +674,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
             dateCreated: dateCreated?.format("MMM dd, yyyy"),
             lastUpdated: lastUpdated?.format("MMM dd, yyyy"),
             isPublished: isPublished,
-            autoAllocationEnabled: autoAllocationEnabled,
+            autoAllocationRequested: autoAllocationRequested,
             partialAllocationAllowed: partialAllocationAllowed,
             partialIssuanceAllowed: partialIssuanceAllowed,
+            allocationSourceStrategy: allocationSourceStrategy?.name(),
+            autoIssuanceRequested: autoIssuanceRequested,
+            negativeAllocationAllowed: negativeAllocationAllowed,
         ]
     }
 }

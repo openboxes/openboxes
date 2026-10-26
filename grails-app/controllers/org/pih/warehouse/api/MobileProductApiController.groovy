@@ -15,6 +15,8 @@ import grails.core.GrailsApplication
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.LabelPreviewDisabledException
+import org.pih.warehouse.core.LabelTemplateException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.core.User
@@ -58,15 +60,11 @@ class MobileProductApiController extends BaseDomainApiController {
 
         data.defaultBarcodeLabelUrl = documentService.getProductBarcodeLabel(product)
 
-        data.images = product?.images?.collect {
-            return [ id: it.id, name: it.filename, contentType: it.contentType, uri: it.fileUri?:it?.link ]
-        }
+        data.images = documentLinks(product?.images)
 
         data.defaultImageUrl = data.images ? data.images[0].uri : null
 
-        data.documents = product?.documents?.collect {
-            return [ id: it.id, name: it.filename, contentType: it.contentType, uri: it.fileUri?:it?.link ]
-        }
+        data.documents = documentLinks(product?.documents)
 
         data.attributes = product.attributes.collect { ProductAttribute productAttribute ->
             return [ id: productAttribute.id,
@@ -85,14 +83,46 @@ class MobileProductApiController extends BaseDomainApiController {
         render([data: data] as JSON)
     }
 
+    /**
+     * The documents as links for the app. A document whose link is not an http or https URL is left out.
+     */
+    static List<Map> documentLinks(Collection<Document> documents) {
+        return documents?.collect { Document document ->
+            [id: document.id, name: document.filename, contentType: document.contentType, uri: document.fileUri ?: document.link]
+        }?.findAll { Map link -> isWebUrl(link.uri as String) }
+    }
+
+    static boolean isWebUrl(String url) {
+        if (!url) {
+            return false
+        }
+        try {
+            URI uri = new URI(url)
+            return uri.scheme?.toLowerCase() in ['http', 'https'] && util.RedirectUtil.hostOf(uri)
+        } catch (URISyntaxException ignored) {
+            return false
+        }
+    }
+
     def renderLabel() {
         Product product = productService.getProduct(params.id)
         Document document = Document.get(params.documentId)
         if (!document) {
             throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
         }
+        InputStream image
+        try {
+            image = zebraService.renderDocument(document, [product:product])
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        } catch (LabelPreviewDisabledException e) {
+            response.status = 503
+            render([errorCode: 503, errorMessage: e.message] as JSON)
+            return
+        }
         response.contentType = "image/png"
-        response.outputStream << zebraService.renderDocument(document, [product:product])
+        response.outputStream << image
     }
 
     def printLabel() {
@@ -106,6 +136,8 @@ class MobileProductApiController extends BaseDomainApiController {
 
             render([data: "Product label has been printed"] as JSON)
             return
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
@@ -263,5 +295,11 @@ class MobileProductApiController extends BaseDomainApiController {
         } catch (Exception e) {
             log.error("Error while publishing ProductBarcodeUpdatedEvent for product ${product?.id}", e)
         }
+    }
+
+    private void renderLabelTemplateError(LabelTemplateException e) {
+        log.warn(e.message)
+        response.status = 400
+        render([errorCode: 400, errorMessage: e.message] as JSON)
     }
 }

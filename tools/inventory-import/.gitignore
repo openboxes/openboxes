@@ -1,0 +1,10 @@
+# Working data for specific imports is operator/site-specific and must not be committed:
+# the source CSV, your site-specific mapping config, and the generated batches all belong here.
+# Put each import under instances/<name>/ and it is ignored automatically - no per-instance rules.
+/instances/*
+!/instances/.gitkeep
+!/instances/README.md
+
+# Default output directory names, in case the transform is run from this folder.
+/inventory-output/
+/out/

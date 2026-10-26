@@ -37,6 +37,11 @@
 		.restricted {
 			background-color: #fff3cd !important;
 		}
+
+		.negative-quantity {
+			color: #d9534f;
+			font-weight: bold;
+		}
 	</style>
 </head>
 <body>
@@ -63,6 +68,8 @@
 				<g:renderErrors bean="${flash.errors}" as="list" />
 			</div>
 		</g:hasErrors>
+		<g:render template="/product/duplicateInventoryLevelsWarning" model="[productInstance:commandInstance?.product]"/>
+
 		<g:render template="/product/summary" model="[productInstance:commandInstance?.product,
 													  inventoryInstance:commandInstance?.inventory,
 													  inventoryLevelInstance: commandInstance?.inventoryLevel,

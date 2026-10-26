@@ -27,6 +27,7 @@ const usePutawayTaskListTableData = (filterParams) => {
   }) => {
     const {
       statusCategory, status, searchTerm, container, destination,
+      createdAfter, createdBefore,
     } = filterParams;
     return _.omitBy({
       offset: `${offset}`,
@@ -37,6 +38,8 @@ const usePutawayTaskListTableData = (filterParams) => {
       searchTerm,
       container: container?.id,
       destination: destination?.id,
+      createdAfter,
+      createdBefore,
     }, (value) => value === '' || value === undefined || value === null || (Array.isArray(value) && value.length === 0));
   };
 
@@ -75,13 +78,19 @@ const usePutawayTaskListTableData = (filterParams) => {
     }
   };
 
-  const rerunHandler = (id) => {
-    confirmAlert({
-      title: translate('react.default.areYouSure.label', 'Are you sure?'),
-      message: translate(
+  const rerunHandler = (id, status) => {
+    const confirmMessage = status === 'IN_PROGRESS'
+      ? translate(
+        'react.putawayTask.rerunStrategy.confirmInProgress.label',
+        'Are you sure you want to rerun the putaway strategy? The destination will be reassigned, but the putaway container will not change.',
+      )
+      : translate(
         'react.putawayTask.rerunStrategy.confirm.label',
         'Are you sure you want to rerun the putaway strategy? The current task will be replaced with new strategy results.',
-      ),
+      );
+    confirmAlert({
+      title: translate('react.default.areYouSure.label', 'Are you sure?'),
+      message: confirmMessage,
       buttons: [
         {
           label: translate('react.default.yes.label', 'Yes'),

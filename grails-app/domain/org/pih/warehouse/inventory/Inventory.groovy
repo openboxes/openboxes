@@ -29,6 +29,12 @@ class Inventory implements java.io.Serializable {
     // Show use warehouse name
     String toString() { return "${warehouse}" }
 
+    Map toBaseJson() {
+        return [
+                id: id,
+        ]
+    }
+
     static mapping = {
         id generator: 'uuid'
         cache true

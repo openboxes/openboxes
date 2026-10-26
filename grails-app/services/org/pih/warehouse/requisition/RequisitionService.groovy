@@ -17,16 +17,16 @@ import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.pih.warehouse.DateUtil
-import javassist.NotFoundException
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.core.Event
-import org.pih.warehouse.core.EventCode
-import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.history.EventLog
+import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.RequisitionEvent
@@ -40,8 +40,10 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.springframework.transaction.annotation.Propagation
 
 import java.text.SimpleDateFormat
+import java.time.Instant
 
 @Transactional
 class RequisitionService {
@@ -218,12 +220,22 @@ class RequisitionService {
     }
 
     /**
-     * Get all requisitions eligible for auto allocation.
+     * Get all requisitions eligible for auto allocation, ordered by priority (highest first),
+     * then by delivery type code priority (lowest value first, e.g. PICK_UP before DEFAULT;
+     * a null delivery type code sorts last, see DeliveryTypeCode.getPriorityFormula()),
+     * then by date created (oldest first) as a final tiebreaker.
      * @param origin
      * @return requisition list
      */
     List<Requisition> getRequisitionsPendingAutoAllocation(Location origin) {
-        return Requisition.findAllByOriginAndStatusAndAutoAllocationEnabled(origin, RequisitionStatus.CREATED, true)
+        return Requisition.createCriteria().list {
+            eq("origin", origin)
+            eq("status", RequisitionStatus.CREATED)
+            eq("autoAllocationRequested", true)
+            order("priority", "desc")
+            order("deliveryTypePriority", "asc")
+            order("dateCreated", "asc")
+        }
     }
 
     /**
@@ -844,44 +856,40 @@ class RequisitionService {
             """, ['location': location, 'startDate': startDate, 'endDate': endDate])[0] ?: 0
     }
 
-    Event createEvent(EventCode eventCode, Location eventLocation, Date eventDate, User currentUser) {
-        EventType eventType = EventType.findByEventCode(eventCode)
-        if (!eventType) {
-            throw new NotFoundException("No event type with code ${eventCode} has been found")
-        }
-        return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
-    }
-
-    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser, Comment comment = null) {
+    /**
+     * Sets the requisition's status - which creates the transition Event via Requisition#setStatus - and
+     * attaches the given comment to that Event, if any.
+     */
+    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, Comment comment = null) {
         requisition.status = requisitionStatus
-        Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
-        requisition.addToEvents(event)
 
         if (comment) {
-            event.comment = comment
+            requisition.mostRecentEvent?.comment = comment
             requisition.addToComments(comment)
         }
+
+        return requisition
     }
 
     void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus, Comment comment = null) {
         // OBPIH-5134 Request approval feature implements additional status transitions for a request
         switch(newStatus) {
             case RequisitionStatus.VERIFYING:
-                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
+                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING)
                 requisition.approvalRequired = false
                 break
             case RequisitionStatus.PENDING_APPROVAL:
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
+                transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL)
                 requisition.approvalRequired = true
                 break
             case RequisitionStatus.APPROVED:
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
+                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED)
                 requisition.dateApproved = new Date()
                 requisition.approvedBy = currentUser
                 break
@@ -889,7 +897,7 @@ class RequisitionService {
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser, comment)
+                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, comment)
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
                 break
@@ -936,6 +944,74 @@ class RequisitionService {
     void addCommentToRequisition(Comment comment, Requisition requisition) {
         requisition.addToComments(comment)
         requisition.save()
+    }
+
+    /**
+     * Writes a system comment in the caller's transaction, so that the comment and the work it describes
+     * stand or fall together. Use {@link #logRequisitionComment} instead when the caller is about to roll
+     * back and the comment still has to survive.
+     */
+    void addSystemComment(Requisition requisition, String message) {
+        boolean alreadyLogged = requisition.comments.any {
+            it.type == CommentType.SYSTEM && it.comment == message
+        }
+        if (!alreadyLogged) {
+            requisition.addToComments(new Comment(comment: message, sender: null))
+            requisition.save(failOnError: true)
+        }
+        log.warn("Requisition ${requisition.id}: ${message}")
+    }
+
+    /**
+     * Writes an EventLog in the caller's transaction. Use {@link #logRequisitionEvent} instead when the
+     * caller is about to roll back and the entry still has to survive.
+     */
+    void addSystemEventLog(Requisition requisition, String message, EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
+        // TODO: event_log.message is a VARCHAR(255) column; expand the column (and remove this cap) if longer
+        //  messages are needed.
+        String truncatedMessage = message?.length() > 255 ? message.take(255) : message
+
+        requisition.addToEventLogs(new EventLog(
+                eventLogCode: eventLogCode,
+                eventDate: Instant.now(),
+                message: truncatedMessage,
+        ))
+        requisition.save(failOnError: true)
+        if (eventLogCode == EventLogCode.ERROR_OCCURRED) {
+            log.warn("Requisition ${requisition.id}: ${message}")
+        } else {
+            log.info("Requisition ${requisition.id}: ${message}")
+        }
+    }
+
+    /**
+     * Records a system comment. Runs in its own transaction (REQUIRES_NEW) so the entry survives even
+     * though the caller is about to roll back and rethrow the triggering exception.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRequisitionComment(String requisitionId, String message) {
+        Requisition requisition = Requisition.get(requisitionId)
+        if (!requisition) {
+            log.warn("Unable to log requisition comment - requisition ${requisitionId} not found: ${message}")
+            return
+        }
+
+        addSystemComment(requisition, message)
+    }
+
+    /**
+     * Records an EventLog. Runs in its own transaction (REQUIRES_NEW) so the audit entry survives even
+     * though the caller is about to roll back and rethrow the triggering exception.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void logRequisitionEvent(String requisitionId, String message, EventLogCode eventLogCode = EventLogCode.ERROR_OCCURRED) {
+        Requisition requisition = Requisition.get(requisitionId)
+        if (!requisition) {
+            log.warn("Unable to log requisition error - requisition ${requisitionId} not found: ${message}")
+            return
+        }
+
+        addSystemEventLog(requisition, message, eventLogCode)
     }
 
     RequisitionItem buildRequisitionItem(Map params) {
@@ -1000,7 +1076,7 @@ class RequisitionService {
 
     boolean isDateOneWeekFromNow(def date) {
         LocalDate today = LocalDate.now()
-        LocalDate oneWeekFromNow = new LocalDate(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth()+7)
+        LocalDate oneWeekFromNow = today.plusDays(7)
         if(date > oneWeekFromNow) {
             return true
         }

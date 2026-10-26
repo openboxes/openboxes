@@ -14,7 +14,11 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.PutawayTypeCode
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
@@ -24,6 +28,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.putaway.discrepancy.PutawayDiscrepancyEvent
+import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class PutawayTaskService {
@@ -32,6 +37,7 @@ class PutawayTaskService {
     def inboundSortationService
     InventoryService inventoryService
     PutawayService putawayService
+    UserService userService
     def sessionFactory
 
 
@@ -57,6 +63,9 @@ class PutawayTaskService {
             statuses = statusesByStatusCategory
         }
 
+        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+
         // Search for putaway tasks based on user-provided search parameters
         List<PutawayTask> tasks = PutawayTask.createCriteria().list(max: max, offset: offset, sort: sort, order: sortOrder) {
             if (statuses) {
@@ -68,6 +77,9 @@ class PutawayTaskService {
             if (command.searchTerm) {
                 or {
                     ilike('identifier', "%${command.searchTerm}%")
+                    putawayOrder {
+                        ilike('orderNumber', "%${command.searchTerm}%")
+                    }
                     product {
                         or {
                             ilike('productCode', "${command.searchTerm}%")
@@ -88,6 +100,12 @@ class PutawayTaskService {
             }
             if (command.order) {
                 eq('putawayOrder', command.order)
+            }
+            if (createdAfter) {
+                ge('dateCreated', createdAfter)
+            }
+            if (createdBefore) {
+                le('dateCreated', createdBefore)
             }
         }
 
@@ -136,12 +154,26 @@ class PutawayTaskService {
     }
 
     /**
+     * The putaway task, if it belongs to the facility (the facility in the request URL); null otherwise.
+     */
+    PutawayTask read(String id, Location facility) {
+        PutawayTask task = read(id)
+        return task && facility && task.facility?.id == facility.id ? task : null
+    }
+
+    /**
      * Action router for state transitions and side-effects (transaction).
      * Supported actions include: start, scanToContainer, complete, cancel, rollback
+     * When a facility is given (the facility in the request URL), a task of another facility is not found.
+     * The signed-in user is recorded as the user who completed the task.
      * FIXME - this will eventually be replaced with a Spring Statemachine implementation.
      */
-    PutawayTask patch(String id, Map data = [:]) {
+    PutawayTask patch(String id, Map data = [:], Location facility = null) {
         PutawayTask task = get(id)
+        if (task && facility && task.facility?.id != facility.id) {
+            task.discard()
+            task = null
+        }
 
         if (!task) {
             throw new ObjectNotFoundException(id, "Putaway task ${id} was not found")
@@ -162,11 +194,11 @@ class PutawayTaskService {
                 break
 
             case 'load':
-                load(task, data.quantity as BigDecimal, data.container as String, data.override as Boolean)
+                task = load(task, data.quantity as BigDecimal, data.container as String, data.override as Boolean)
                 break
 
             case 'complete':
-                complete(task, data.destination as String, data.completedBy as String, data.isCancelRemaining as Boolean,
+                complete(task, data.destination as String, AuthService.currentUser?.id, data.isCancelRemaining as Boolean,
                         data.reasonCode as ReasonCode, data.isDirectPutaway as Boolean)
                 break
 
@@ -242,7 +274,8 @@ class PutawayTaskService {
 
 
     /**
-     * Assign task to a putaway container (if one hasn't already been assigned)
+     * Assign task to a putaway container (if one hasn't already been assigned) and, optionally, to a user.
+     * Assigning the task to a user other than the signed-in user needs the admin role at the task's facility.
      *
      * @param task
      * @param containerId
@@ -253,21 +286,37 @@ class PutawayTaskService {
             throw new IllegalStateException("Putaway container can only be assigned when the task is PENDING (current status: ${task.status}).")
         }
         Location container = containerId ? Location.get(containerId) : null
-        if (task.facility != container.parentLocation || !container.internalLocation) {
+        if (containerId && !container) {
+            throw new IllegalArgumentException("Putaway container ${containerId} was not found")
+        }
+        if (container && (task.facility != container.parentLocation || !container.internalLocation)) {
             throw new IllegalArgumentException("Putaway container ${container?.name} must be an internal location within facility ${task?.facility?.name}")
         }
 
-        if (task.container && container != task.container && !override) {
+        User currentUser = AuthService.currentUser
+        if (assigneeId && assigneeId != currentUser?.id &&
+                !userService.isUserInRoleAtLocation(currentUser, task.facility, RoleType.ROLE_ADMIN)) {
+            String message = "Only an administrator can assign putaway task ${task.identifier} to another user"
+            task.errors.reject("assignee", message)
+            throw new ValidationException(message, task.errors)
+        }
+        Person assignee = assigneeId ? Person.get(assigneeId) : null
+        if (assigneeId && !assignee) {
+            String message = "User ${assigneeId} was not found"
+            task.errors.reject("assignee", message)
+            throw new ValidationException(message, task.errors)
+        }
+
+        if (container && task.container && container != task.container && !override) {
             throw new IllegalArgumentException("Putaway container is already assigned: ${task?.container?.name}. Must override to re-assign it to putaway constainer ${container?.name}")
         }
-        if (task.container == container) {
+        if (container && task.container == container) {
             log.warn "Putaway container for task ${task.identifier} has already been set to ${container}"
         }
 
         if (container) task.container = container
 
         // Set the assignee if one is provided
-        Person assignee = assigneeId ? Person.get(assigneeId) : null
         if (assignee) task.assignee = assignee
         save(task)
     }
@@ -288,19 +337,31 @@ class PutawayTaskService {
      * Load the putaway item into the assigned putaway container. Also, allows you to force the item into
      * a different putaway container (i.e. as long as it's not the destination location).
      *
+     * If the quantity being loaded is less than the task's full quantity, the order item is split the same
+     * way {@link #partialComplete} splits it: the loaded quantity becomes its own task moving into the
+     * container, and the un-sorted remainder is left behind as a new PENDING task at the origin location.
+     *
      * @param task
      * @param containerNumberOrId
      * @param override
+     * @return the putaway task representing the quantity that was actually loaded into the container
      */
-    void load(PutawayTask task, BigDecimal quantity, String containerNumberOrId, Boolean override = false) {
+    PutawayTask load(PutawayTask task, BigDecimal quantity, String containerNumberOrId, Boolean override = false) {
         log.info "Loading item into putaway container ${containerNumberOrId}"
 
         if (quantity > task.quantity) {
             throw new IllegalArgumentException("Quantity provided is more than requested. Please re-enter quantity")
         }
 
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity provided must be greater than 0")
+        }
+
         // Validate the container location exists
-        Location container = Location.findByLocationNumberOrId(containerNumberOrId, containerNumberOrId)
+        Location container = containerNumberOrId ? Location.findByLocationNumberOrId(containerNumberOrId, containerNumberOrId) : null
+        if (container && container.parentLocation?.id != task.facility?.id) {
+            container = Location.findByLocationNumberAndParentLocation(containerNumberOrId, task.facility)
+        }
         if (!container) {
             throw new IllegalStateException("Container does not exist")
         }
@@ -324,7 +385,13 @@ class PutawayTaskService {
             task.container = container
         }
 
-        task.quantity = quantity
+        // Split off the unsorted remainder (if any) into its own PENDING task before loading the rest,
+        // instead of just overwriting task.quantity and losing track of what wasn't actually sorted.
+        if (quantity < task.quantity) {
+            task = splitTaskForLoad(task, quantity)
+        } else {
+            task.quantity = quantity
+        }
 
         // Execute state transition
         executeStateTransition(task, PutawayTaskStatus.IN_PROGRESS)
@@ -334,6 +401,52 @@ class PutawayTaskService {
         transferToContainer(task)
 
         save(task)
+
+        return task
+    }
+
+    /**
+     * Splits the task's order item into the piece being loaded into the container (quantity) and a PENDING
+     * remainder left behind, unsorted, at the origin location. Mirrors the split performed by
+     * {@link #partialComplete}, except neither piece is COMPLETED here since loading into a container is
+     * not the end of the putaway.
+     */
+    private PutawayTask splitTaskForLoad(PutawayTask task, BigDecimal quantity) {
+        BigDecimal quantityRemaining = task.quantity - quantity
+
+        task.discard()
+
+        OrderItem currentItem = OrderItem.get(task.putawayOrderItem.id)
+        def currentItemParent = currentItem.parentOrderItem
+        currentItem.parentOrderItem = null
+        Order order = currentItem.order
+
+        Putaway putaway = Putaway.createFromOrder(order)
+        if (!putaway.orderedBy) {
+            putaway.orderedBy = AuthService.currentUser
+        }
+        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == (currentItemParent?.id ?: currentItem.id) }
+
+        PutawayItem loadedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.PENDING, task.destination)
+        PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, task.destination)
+        // The remainder hasn't been sorted into a container yet
+        remainingSplitItem.containerLocation = null
+
+        itemToSplit?.splitItems?.addAll([loadedSplitItem, remainingSplitItem])
+        putawayService.savePutaway(putaway)
+
+        currentItem.parentOrderItem = currentItemParent
+        currentItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
+        currentItem.save(flush: true, failOnError: true)
+
+        OrderItem loadedOrderItem = order.orderItems.find {
+            it.parentOrderItem?.id == (currentItem.parentOrderItem?.id ?: currentItem.id) &&
+                    it.quantity == quantity &&
+                    it.containerLocation == task.container &&
+                    it.orderItemStatusCode == OrderItemStatusCode.PENDING
+        } as OrderItem
+
+        return PutawayTaskAdapter.toPutawayTask(loadedOrderItem)
     }
 
     void complete(PutawayTask task, String destinationId, String completedById, Boolean isCancelRemaining,
@@ -348,6 +461,7 @@ class PutawayTaskService {
         if (!destination) {
             task.errors.reject("destination", "Destination is required")
         }
+        validateInFacility(destination, task)
 
         if (task.hasErrors() || !task.validate()) {
             throw new ValidationException("Validation errors occurred during complete action", task.errors)
@@ -398,6 +512,7 @@ class PutawayTaskService {
         }
 
         Location alternativeDestination = Location.get(destinationId)
+        validateInFacility(alternativeDestination, task)
         if (!alternativeDestination) {
             def discrepancyLocation = findDiscrepancyLocation(task)
             if (!discrepancyLocation) {
@@ -423,14 +538,12 @@ class PutawayTaskService {
         if (!putaway.orderedBy) {
             putaway.orderedBy = AuthService.currentUser
         }
-        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == currentItem.id }
+        PutawayItem itemToSplit = putaway.putawayItems.find { it.id == (currentItemParent?.id ?: currentItem.id) }
 
         PutawayItem completedSplitItem = createSplitPutawayItem(task, quantity, PutawayStatus.COMPLETED, alternativeDestination)
         PutawayItem remainingSplitItem = createSplitPutawayItem(task, quantityRemaining, PutawayStatus.PENDING, alternativeDestination)
 
-        if (itemToSplit) {
-            itemToSplit.splitItems = [completedSplitItem, remainingSplitItem]
-        }
+        itemToSplit?.splitItems?.addAll([completedSplitItem, remainingSplitItem])
         putawayService.savePutaway(putaway)
 
         def taskToTransfer = PutawayTaskAdapter.toPutawayTask(completedSplitItem, order)
@@ -442,7 +555,7 @@ class PutawayTaskService {
         currentItem.save(flush: true, failOnError: true)
 
         OrderItem remainingOrderItem = order.orderItems.find {
-            it.parentOrderItem?.id == currentItem.id &&
+            it.parentOrderItem?.id == (currentItem.parentOrderItem?.id ?: currentItem.id) &&
                     it.quantity == quantityRemaining &&
                     it.orderItemStatusCode == OrderItemStatusCode.PENDING
         } as OrderItem
@@ -494,7 +607,13 @@ class PutawayTaskService {
         task.discard()
 
         // Create transaction
-        inventoryService.transferStock(command)
+        Transaction transaction = inventoryService.transferStock(command)
+        if (transaction?.hasErrors()) {
+            String errorMessage = transaction.errors.allErrors.collect { it.defaultMessage ?: it.code }.join('; ')
+            throw new ValidationException(
+                    "Unable to transfer stock for putaway task ${task?.identifier}: ${errorMessage}",
+                    transaction.errors)
+        }
 
         // Emit putawayTask.completed event which will refresh the product availability table
         grailsApplication.mainContext.publishEvent(new PutawayTaskCompletedEvent(task))
@@ -572,6 +691,15 @@ class PutawayTaskService {
         )
     }
 
+    /**
+     * A destination named in a request must be a location of the task's facility.
+     */
+    private static void validateInFacility(Location location, PutawayTask task) {
+        if (location && location.parentLocation?.id != task.facility?.id) {
+            throw new IllegalArgumentException("Location ${location.name} is not a location of facility ${task.facility?.name}")
+        }
+    }
+
     private Location findDiscrepancyLocation(PutawayTask task) {
         def discrepancyLocation = task.facility.internalLocations
                 .find { it.supports(ActivityCode.LOST_AND_FOUND) }
@@ -580,6 +708,31 @@ class PutawayTaskService {
         }
 
         return discrepancyLocation
+    }
+
+    /**
+     * Whether the shipment has cross-dock putaways and all of them have been completed. Allocation has to
+     * wait until then: before the putaway runs the stock is still in inbound sortation, and before the
+     * putaway exists the release would cover the order from ordinary stock instead of its own inbound.
+     */
+    @Transactional(readOnly = true)
+    boolean isCrossDockPutawayCompleted(Shipment shipment) {
+        if (!shipment) {
+            return false
+        }
+        List<PutawayTask> tasks = PutawayTask.createCriteria().list {
+            ne('status', PutawayTaskStatus.CANCELED)
+            putawayOrderItem {
+                receiptItem {
+                    shipmentItem {
+                        eq('shipment', shipment)
+                    }
+                }
+            }
+        } as List<PutawayTask>
+
+        List<PutawayTask> crossDockTasks = tasks.findAll { it.putawayTypeCode == PutawayTypeCode.CROSS_DOCK }
+        return crossDockTasks && crossDockTasks.every { it.status == PutawayTaskStatus.COMPLETED }
     }
 
     List<Location> getAlternateDestinations(PutawayTask task) {

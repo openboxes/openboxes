@@ -32,9 +32,16 @@ class ReferenceDocument implements Validateable {
 
     String name
 
+    /**
+     * A message code (see messages.properties) identifying the kind of entity this document represents (e.g.
+     * "requisition.label"), for a frontend to render a localized source label.
+     */
+    String source
+
     static constraints = {
         url(nullable: true)
         description(nullable: true)
         name(nullable: true)
+        source(nullable: true)
     }
 }

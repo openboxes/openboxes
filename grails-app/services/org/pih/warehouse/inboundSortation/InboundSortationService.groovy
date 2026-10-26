@@ -5,20 +5,28 @@ import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.api.PutawayTaskStatus
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.shipping.Shipment
+import org.springframework.context.i18n.LocaleContextHolder
 
 @Transactional
 class InboundSortationService {
 
     def orderIdentifierService
     def putawayService
-    def slottingService
+    def messageSource
+    UserService userService
+    PutawayStrategyService putawayStrategyService
 
     void createPutawayOrdersFromReceipt(Receipt receipt) {
         receipt.receiptItems.each { ReceiptItem receiptItem ->
@@ -29,7 +37,7 @@ class InboundSortationService {
             }
 
             PutawayContext putawayContext = createPutawayContext(receiptItem)
-            List<PutawayResult> results = slottingService.execute(putawayContext)
+            List<PutawayResult> results = putawayStrategyService.execute(putawayContext)
             results.each { PutawayResult result ->
                 if (result.quantity > 0) {
                     Putaway putaway = createPutaway(putawayContext, receipt.shipment?.createdBy)
@@ -40,16 +48,24 @@ class InboundSortationService {
                     putawayService.savePutaway(putaway)
                 }
             }
+            reportUnassignedQuantity(receipt.shipment, putawayContext, results)
+            reportCrossDockDeclined(receipt.shipment, putawayContext, results)
         }
     }
 
     void rerunPutawayStrategy(PutawayTask task) {
-        // 1. Validate PENDING only
-        if (task.status != PutawayTaskStatus.PENDING) {
-            throw new IllegalStateException("Can only rerun strategy on PENDING putaway tasks")
+        // 1. Validate PENDING or IN_PROGRESS only
+        if (task.status != PutawayTaskStatus.PENDING && task.status != PutawayTaskStatus.IN_PROGRESS) {
+            throw new IllegalStateException("Can only rerun strategy on PENDING or IN_PROGRESS putaway tasks")
         }
 
-        // 2. Build PutawayContext from existing task
+        // 2. Rerunning the strategy for an in-progress task (i.e. one already scanned into a
+        //    putaway container) is a superuser-only action since it can move the item's destination.
+        if (task.status == PutawayTaskStatus.IN_PROGRESS && !userService.isSuperuser(AuthService.currentUser)) {
+            throw new IllegalStateException("Only a superuser can rerun the putaway strategy for an in-progress putaway task")
+        }
+
+        // 3. Build PutawayContext from existing task
         PutawayContext context = new PutawayContext(
                 facility: task.facility,
                 product: task.product,
@@ -58,18 +74,25 @@ class InboundSortationService {
                 expirationDate: task.inventoryItem.expirationDate,
                 currentBinLocation: task.location,
                 preferredBin: task.product.getInventoryLevel(task.facility.id)?.preferredBinLocation,
+                internalLocation: task.product.getDefaultPutawayLocation(task.facility),
                 quantity: task.quantity.intValue(),
+                backorderReference: task.shipmentItem?.backorderReference,
+                backorderItem: task.shipmentItem?.backorderItem,
                 deliveryTypeCode: task.deliveryTypeCode,
         )
 
-        // 3. Execute strategy chain
-        List<PutawayResult> results = slottingService.execute(context)
+        // 4. Execute strategy chain
+        List<PutawayResult> results = putawayStrategyService.execute(context)
         PutawayResult result = results?.find { it.quantity > 0 }
 
-        // 4. Update existing order item with new strategy results
+        // 5. Update existing order item with new strategy results. For an in-progress task the
+        //    item has already been physically scanned into a container, so only the destination
+        //    is reassigned -- the container it's already sitting in must not change.
         OrderItem orderItem = OrderItem.get(task.putawayOrderItem.id)
         orderItem.destinationBinLocation = result?.destination
-        orderItem.containerLocation = result?.container
+        if (task.status == PutawayTaskStatus.PENDING) {
+            orderItem.containerLocation = result?.container
+        }
         orderItem.description = result?.comment
         orderItem.save(failOnError: true)
     }
@@ -84,7 +107,7 @@ class InboundSortationService {
                 expirationDate: receiptItem.inventoryItem.expirationDate,
                 currentBinLocation: receiptItem.binLocation,
                 preferredBin: receiptItem.product.getInventoryLevel(shipment.destination.id)?.preferredBinLocation,
-                internalLocation: receiptItem.product.getInventoryLevel(shipment.destination.id)?.internalLocation,
+                internalLocation: receiptItem.product.getDefaultPutawayLocation(shipment.destination),
                 quantity: receiptItem.quantityReceived,
                 backorderReference: receiptItem.shipmentItem.backorderReference,
                 backorderItem: receiptItem.shipmentItem.backorderItem,
@@ -114,5 +137,59 @@ class InboundSortationService {
                 putawayStatus: PutawayStatus.PENDING,
                 comment: task.comment
         )
+    }
+
+    /**
+     * Records the quantity that no strategy was able to place
+     */
+    private void reportUnassignedQuantity(Shipment shipment, PutawayContext context, List<PutawayResult> results) {
+        if (!shipment) {
+            return
+        }
+        int quantityAssigned = results ? results*.quantity.sum(0) as int : 0
+        int quantityUnassigned = (context.quantity ?: 0) - quantityAssigned
+        if (quantityUnassigned <= 0) {
+            return
+        }
+
+        String message = messageSource.getMessage(
+                "putaway.quantityNotAssigned.message",
+                [quantityUnassigned, context.product?.productCode] as Object[],
+                "Could not assign a putaway location for ${quantityUnassigned} of product ${context.product?.productCode}",
+                LocaleContextHolder.locale)
+
+        addSystemComment(shipment, message)
+    }
+
+    /**
+     * Records that an inbound item carrying a backorder link was not cross-docked
+     */
+    private void reportCrossDockDeclined(Shipment shipment, PutawayContext context, List<PutawayResult> results) {
+        if (!shipment || (!context.backorderReference && !context.backorderItem)) {
+            return
+        }
+        if (results?.any { it.destination?.supports(ActivityCode.CROSS_DOCKING) }) {
+            return
+        }
+
+        String backorderNumber = context.backorderReference ?: context.backorderItem?.requisition?.requestNumber
+        String message = messageSource.getMessage(
+                "putaway.crossDockDeclined.message",
+                [context.product?.productCode, backorderNumber] as Object[],
+                "Product ${context.product?.productCode} on backorder ${backorderNumber} was not cross-docked",
+                LocaleContextHolder.locale)
+
+        addSystemComment(shipment, message)
+    }
+
+    private void addSystemComment(Shipment shipment, String message) {
+        boolean alreadyLogged = shipment.comments.any {
+            it.type == CommentType.SYSTEM && it.comment == message
+        }
+        if (!alreadyLogged) {
+            shipment.addToComments(new Comment(comment: message, sender: null))
+            shipment.save(failOnError: true)
+        }
+        log.warn("Shipment ${shipment.id}: ${message}")
     }
 }

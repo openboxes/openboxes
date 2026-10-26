@@ -33,8 +33,10 @@ jobs:
       # underlying database and so running them against multiple databases is pointless), but matrix jobs are run
       # in parallel, so it wouldn't save us any running time to do that. Plus it would overcomplicate the flow.
       # The jacocoTestReport task dependsOn all tests, and so will run them before generating the report.
+      # The tests don't need the webpack bundle that processResources would build first (about 4 minutes); the
+      # frontend tests build and lint it (frontend-tests.yml).
       - name: Run All Tests (with coverage)
-        run: TEST_DATABASE=${{ matrix.testdatabase }} ./gradlew jacocoTestReport --no-daemon
+        run: TEST_DATABASE=${{ matrix.testdatabase }} ./gradlew jacocoTestReport -x npm_run_bundle --no-daemon
 
       # Tests are run for each database in the above matrix, but we only want to publish a code coverage report once.
       # "strategy.job-index" gives us the index of the current job in the matrix. Any index is fine. We use the first.

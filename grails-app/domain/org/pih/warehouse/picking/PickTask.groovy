@@ -1,6 +1,8 @@
 package org.pih.warehouse.picking
 
+import org.pih.warehouse.api.PickStatusCode
 import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -48,6 +50,17 @@ class PickTask {
     Date dateCreated
     Date lastUpdated
 
+    // Not backed by a column - set at query time by PickTaskService.search() for a PICKED-only
+    // search, since PickTask is a denormalized snapshot that can drift from the live stock ledger
+    // (see the pick_task DB view). Null/absent for any other search.
+    Boolean hasStockIssue
+
+    static transients = ["hasStockIssue"]
+    // Order level pick progress, aggregated across the whole requisition by the pick_task view.
+    Integer orderTotalTaskCount
+    Integer orderOpenTaskCount
+    PickStatusCode orderPickStatusCode
+
     static constraints = {
         requisition nullable: false
         requisitionNumber nullable: true
@@ -75,6 +88,9 @@ class PickTask {
         dateStaged nullable: true
         reasonCode nullable: true
         status nullable: false
+        orderTotalTaskCount nullable: true
+        orderOpenTaskCount nullable: true
+        orderPickStatusCode nullable: true
     }
 
     static mapping = {
@@ -91,6 +107,7 @@ class PickTask {
                 requisitionNumber : requisition?.requestNumber,
                 destination     : requisition?.destination?.name,
                 destinationLocationType : requisition?.destination?.locationType?.name,
+                destinationAddress : requisition?.destination?.address,
                 deliveryTypeCode: deliveryTypeCode?.name(),
                 orderTypeCode   : requisition?.orderTypeCode,
                 dateRequested   : dateRequested,
@@ -98,6 +115,7 @@ class PickTask {
                 requestedBy     : requestedBy?.name,
                 requisitionStatus: requisitionStatus,
                 facility        : facility?.toBaseJson(),
+                internalTransactionsEnabled: facility?.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS),
                 requisitionType : requisitionType?.name(),
                 product         : product?.toJson(),
                 location        : location?.toJson(location?.locationType?.locationTypeCode),
@@ -115,8 +133,12 @@ class PickTask {
                 dateStaged      : dateStaged,
                 reasonCode      : reasonCode,
                 status          : status?.name(),
+                orderTotalTaskCount: orderTotalTaskCount,
+                orderOpenTaskCount : orderOpenTaskCount,
+                orderPickStatusCode: orderPickStatusCode?.name(),
                 dateCreated     : dateCreated,
                 lastUpdated     : lastUpdated,
+                hasStockIssue   : hasStockIssue,
         ]
     }
 }

@@ -488,9 +488,12 @@ class BootStrap {
                 receivedBy       : requisition.receivedBy,
                 recipient        : requisition.recipient,
                 requisitionItems : requisition.requisitionItems,
-                autoAllocationEnabled: requisition.autoAllocationEnabled,
+                autoAllocationRequested: requisition.autoAllocationRequested,
                 partialAllocationAllowed: requisition.partialAllocationAllowed,
                 partialIssuanceAllowed: requisition.partialIssuanceAllowed,
+                allocationSourceStrategy: requisition.allocationSourceStrategy?.name(),
+                autoIssuanceRequested: requisition.autoIssuanceRequested,
+                negativeAllocationAllowed: requisition.negativeAllocationAllowed
             ]
         }
 
@@ -506,6 +509,8 @@ class BootStrap {
                 quantityCanceled: requisitionItem.quantityCanceled,
                 cancelReasonCode: requisitionItem.cancelReasonCode,
                 cancelComments  : requisitionItem.cancelComments,
+                quantityBackordered: requisitionItem.quantityBackordered,
+                backorderedReasonCode: requisitionItem.backorderedReasonCode,
                 orderIndex      : requisitionItem.orderIndex,
                 changes         : requisitionItem.change ? [requisitionItem.change] : [],
                 modification    : requisitionItem.modificationItem,

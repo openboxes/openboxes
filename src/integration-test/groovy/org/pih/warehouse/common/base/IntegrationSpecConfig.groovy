@@ -1,7 +1,12 @@
 package org.pih.warehouse.common.base
 
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.web.servlet.FilterRegistrationBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.core.Ordered
+
+import org.pih.warehouse.common.web.DeferResponseCloseFilter
 
 /**
  * Manages any integration test specific application configuration such as wiring up test components.
@@ -25,4 +30,18 @@ import org.springframework.context.annotation.ComponentScan
 @ComponentScan(["org.pih.warehouse.api.*", "org.pih.warehouse.slice.*", "org.pih.warehouse.smoke.*"])
 class IntegrationSpecConfig {
 
+    /**
+     * Keeps a response that the controller finished by closing the writer or stream from completing before the
+     * request has unwound, so that a spec's next request cannot overtake the previous request's transaction.
+     * See DeferResponseCloseFilter.
+     */
+    @Bean
+    FilterRegistrationBean deferResponseCloseFilterRegistration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean(new DeferResponseCloseFilter())
+        // Must run before Grails' grailsWebRequestFilter (HIGHEST_PRECEDENCE + 30): that filter builds the
+        // GrailsWebRequest from the response it receives and render() writes to that response, so it has to receive
+        // the wrapped one. Registered at the highest precedence so that filters added later cannot end up in front.
+        registration.order = Ordered.HIGHEST_PRECEDENCE
+        return registration
+    }
 }

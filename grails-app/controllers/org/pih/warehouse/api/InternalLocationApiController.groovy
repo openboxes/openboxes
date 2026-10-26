@@ -15,6 +15,8 @@ import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.LabelPreviewDisabledException
+import org.pih.warehouse.core.LabelTemplateException
 import org.pih.warehouse.core.InternalLocationSearchCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
@@ -93,8 +95,19 @@ class InternalLocationApiController {
         if (!document) {
             throw new ObjectNotFoundException(params.documentId, Document.class.simpleName)
         }
+        InputStream image
+        try {
+            image = zebraService.renderDocument(document, [internalLocation: internalLocation])
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
+            return
+        } catch (LabelPreviewDisabledException e) {
+            response.status = 503
+            render([errorCode: 503, errorMessage: e.message] as JSON)
+            return
+        }
         response.contentType = "image/png"
-        response.outputStream << zebraService.renderDocument(document, [internalLocation: internalLocation])
+        response.outputStream << image
     }
 
     def printLabel = {
@@ -109,9 +122,16 @@ class InternalLocationApiController {
 
             render([data: "Barcode label has been printed"] as JSON)
             return
+        } catch (LabelTemplateException e) {
+            renderLabelTemplateError(e)
         } catch (Exception e) {
             render([errorCode: 500, cause: e?.class, errorMessage: e?.message] as JSON)
         }
     }
 
+    private void renderLabelTemplateError(LabelTemplateException e) {
+        log.warn(e.message)
+        response.status = 400
+        render([errorCode: 400, errorMessage: e.message] as JSON)
+    }
 }

@@ -17,6 +17,7 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.history.HistoryContext
 import org.pih.warehouse.core.history.HistoryItem
 import org.pih.warehouse.outbound.OutboundHistoryProvider
+import org.pih.warehouse.requisition.PriorityLevel
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentType
@@ -110,6 +111,17 @@ class OutboundStockMovementService {
             }
             if (stockMovement.deliveryTypeCode) {
                 eq("deliveryTypeCode", stockMovement.deliveryTypeCode)
+            }
+            if (stockMovement.priorityLevels) {
+                or {
+                    stockMovement.priorityLevels.each { PriorityLevel priorityLevel ->
+                        between("priority", priorityLevel.minValue, priorityLevel.maxValue)
+                        // Missing priority is treated as NORMAL (see PriorityLevel.fromPriority)
+                        if (priorityLevel == PriorityLevel.NORMAL) {
+                            isNull("priority")
+                        }
+                    }
+                }
             }
             if (stockMovement.sourceType) {
                 eq ('sourceType', stockMovement.sourceType)

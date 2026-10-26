@@ -164,25 +164,34 @@
                 </g:if>
             </td>
             <td class="center" width="1%">
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-                    <div>
-                        <div class="tag tag-alert" data-testid="status-tag" style="margin: 0;">
+                <%
+                    String statusTagTooltip = "${g.message(code: 'stockMovement.status.label', default: 'Status')}: ${stockMovement?.displayStatus?.label}"
+                    if (stockMovement?.fulfillmentStatus) {
+                        statusTagTooltip += ", ${g.message(code: 'stockMovement.fulfillmentStatus.label', default: 'Fulfillment Status')}: ${stockMovement?.fulfillmentStatus?.label}"
+                    }
+                %>
+                <div class="status-tag-row">
+                    <g:if test="${stockMovement?.requisition?.inErrorState}">
+                        <i
+                                class="fa fa-exclamation-triangle requisition-error-icon"
+                                title="${stockMovement?.requisition?.mostRecentErrorMessage?.encodeAsHTML()}"
+                                data-testid="requisition-error-icon"
+                        ></i>
+                    </g:if>
+                    <div
+                            class="tag-pill"
+                            data-testid="status-tag"
+                            title="${statusTagTooltip.encodeAsHTML()}"
+                    >
+                        <div class="tag-pill-segment">
                             ${stockMovement?.displayStatus?.label}
                         </div>
-                        <div style="font-size: 0.8em; color: #666; text-align: right; padding-right: 4px;">
-                            <warehouse:message code="stockMovement.status.label" default="Status"/>
-                        </div>
-                    </div>
-                    <g:if test="${stockMovement?.fulfillmentStatus}">
-                        <div>
-                            <div class="tag tag-info" style="margin: 0; background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;">
+                        <g:if test="${stockMovement?.fulfillmentStatus}">
+                            <div class="tag-pill-segment tag-pill-segment-secondary">
                                 ${stockMovement?.fulfillmentStatus?.label}
                             </div>
-                            <div style="font-size: 0.8em; color: #666; text-align: right; padding-right: 4px;">
-                                <warehouse:message code="stockMovement.fulfillmentStatus.fulfillment" default="Fulfillment"/>
-                            </div>
-                        </div>
-                    </g:if>
+                        </g:if>
+                    </div>
                 </div>
             </td>
         </tr>
