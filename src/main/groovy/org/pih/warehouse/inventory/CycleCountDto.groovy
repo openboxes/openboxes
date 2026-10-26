@@ -51,7 +51,10 @@ class CycleCountDto implements DomainDto<CycleCount> {
         return cycleCountItems.toSorted { CycleCountItem a, CycleCountItem b ->
             a.countIndex <=> b.countIndex
                     ?: a.custom <=> b.custom
-                            ?: a.id <=> b.id
+                            ?: a.dateCreated <=> b.dateCreated
+                                // Hibernate generated ids use UUIDHexGenerator.
+                                // Newer ids are always > than previous ones
+                                ?: a.id <=> b.id
         }
     }
 
