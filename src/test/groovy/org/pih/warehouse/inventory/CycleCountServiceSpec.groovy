@@ -1450,6 +1450,32 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         assert rows[0]["Date Counted"] == ""
     }
 
+    void 'getCountFormXls should keep the rows in the order of the count items'() {
+        given: 'regular and custom items ordered by bin, so a custom item comes before the regular ones'
+        Location facility = createFacility()
+        Product product = createProduct("AB12")
+        InventoryItem lot = createInventoryItem(product, "LOT-1")
+        CycleCount cycleCount = new CycleCount(facility: facility, status: CycleCountStatus.COUNTING)
+        List<Map> items = [
+                [id: "0004", custom: true, binName: "A0"],
+                [id: "0001", custom: false, binName: "A1"],
+                [id: "0002", custom: false, binName: "B1"],
+                [id: "0003", custom: true, binName: "C1"],
+        ]
+        items.each { Map args ->
+            CycleCountItem item = buildItem(facility: facility, inventoryItem: lot,
+                    binLocation: new Location(name: args.binName), custom: args.custom)
+            item.id = args.id
+            cycleCount.addToCycleCountItems(item)
+        }
+
+        when:
+        List<Map> rows = cycleCountService.getCountFormXls([CycleCountDto.toDto(cycleCount)])
+
+        then: 'the rows follow the order of the count items, like the count page'
+        assert rows*."Bin Location" == ["A1", "B1", "C1", "A0"]
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Export: recount form XLS
     // ---------------------------------------------------------------------------------------------
@@ -1510,6 +1536,36 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         then:
         assert rows[0]["Quantity Counted"] == 5
         assert rows[0]["Difference"] == ""
+    }
+
+    void 'getRecountFormXls should keep the rows in the order of the count items'() {
+        given: 'a count with items created out of bin order and a recount item for each of them'
+        Location facility = createFacility()
+        Product product = createProduct("AB12")
+        InventoryItem lot = createInventoryItem(product, "LOT-1")
+        CycleCount cycleCount = new CycleCount(facility: facility, status: CycleCountStatus.INVESTIGATING)
+        List<Map> items = [
+                [id: "0001", countIndex: 0, binName: "C1"],
+                [id: "0002", countIndex: 0, binName: "A1"],
+                [id: "0003", countIndex: 0, binName: "B1"],
+                [id: "0004", countIndex: 0, binName: "D1"],
+                [id: "0005", countIndex: 1, binName: "A1"],
+                [id: "0006", countIndex: 1, binName: "B1"],
+                [id: "0007", countIndex: 1, binName: "C1"],
+                [id: "0008", countIndex: 1, binName: "D1"],
+        ]
+        items.each { Map args ->
+            CycleCountItem item = buildItem(facility: facility, inventoryItem: lot,
+                    binLocation: new Location(name: args.binName), countIndex: args.countIndex)
+            item.id = args.id
+            cycleCount.addToCycleCountItems(item)
+        }
+
+        when:
+        List<Map> rows = cycleCountService.getRecountFormXls([CycleCountDto.toDto(cycleCount)])
+
+        then: 'the rows follow the order of the count items, like the recount page'
+        assert rows*."Bin Location" == ["C1", "A1", "B1", "D1"]
     }
 
     void 'getRecountFormXls currently fails when an initial count item has no recount partner'() {
@@ -1590,5 +1646,63 @@ class CycleCountServiceSpec extends Specification implements DataTest {
         then:
         assert rows[0]["Quantity Counted"] == 0
         assert rows[0]["Quantity Recounted"] == 0
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // CycleCountDto
+    // ---------------------------------------------------------------------------------------------
+
+    void 'toDto should return the items in entry order with the custom items at the bottom'() {
+        given: 'regular and custom items that the domain keeps ordered by bin, but were created in a different order'
+        Location facility = createFacility()
+        Product product = createProduct("AB12")
+        InventoryItem inventoryItem = createInventoryItem(product)
+        CycleCount cycleCount = new CycleCount(facility: facility, status: CycleCountStatus.COUNTING)
+        List<Map> items = [
+                [id: "0004", custom: true, binName: "A0"],
+                [id: "0002", custom: false, binName: "A1"],
+                [id: "0001", custom: false, binName: "B1"],
+                [id: "0003", custom: true, binName: "C1"],
+        ]
+        items.each { Map args ->
+            CycleCountItem item = buildItem(facility: facility, inventoryItem: inventoryItem,
+                    binLocation: new Location(name: args.binName), custom: args.custom)
+            item.id = args.id
+            cycleCount.addToCycleCountItems(item)
+        }
+
+        when:
+        CycleCountDto dto = CycleCountDto.toDto(cycleCount)
+
+        then: 'the regular items come first, then the custom ones, each in the order they were created in'
+        assert dto.cycleCountItems*.id == ["0001", "0002", "0003", "0004"]
+    }
+
+    void 'toDto should return the items of the count before the items of the recount'() {
+        given: 'a count with custom items entered out of bin order and a recount of regular items with ids in bin order'
+        Location facility = createFacility()
+        Product product = createProduct("AB12")
+        InventoryItem inventoryItem = createInventoryItem(product)
+        CycleCount cycleCount = new CycleCount(facility: facility, status: CycleCountStatus.INVESTIGATING)
+        List<Map> items = [
+                [id: "0001", countIndex: 0, custom: false, binName: "A1"],
+                [id: "0004", countIndex: 1, custom: false, binName: "A1"],
+                [id: "0003", countIndex: 0, custom: true, binName: "B1"],
+                [id: "0005", countIndex: 1, custom: false, binName: "B1"],
+                [id: "0002", countIndex: 0, custom: true, binName: "C1"],
+                [id: "0006", countIndex: 1, custom: false, binName: "C1"],
+        ]
+        items.each { Map args ->
+            CycleCountItem item = buildItem(facility: facility, inventoryItem: inventoryItem,
+                    binLocation: new Location(name: args.binName), countIndex: args.countIndex, custom: args.custom)
+            item.id = args.id
+            cycleCount.addToCycleCountItems(item)
+        }
+
+        when:
+        CycleCountDto dto = CycleCountDto.toDto(cycleCount)
+
+        then: 'the count items, custom included, come first so that the recount takes its order from the count'
+        assert dto.cycleCountItems*.id == ["0001", "0002", "0003", "0004", "0005", "0006"]
     }
 }
