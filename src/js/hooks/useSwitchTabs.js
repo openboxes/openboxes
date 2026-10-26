@@ -10,21 +10,27 @@ const useSwitchTabs = ({ defaultTab }) => {
   const { pathname } = useLocation();
   const currentQueryParams = useQueryParams();
 
-  const switchTab = (tab, onSwitchTab) => {
+  const getTabLocation = (tab) => {
     const updatedQueryParams = {
       ...currentQueryParams,
       tab,
     };
     const stringifiedQueryParams = queryString.stringify(updatedQueryParams);
-    history.push({ pathname, search: stringifiedQueryParams });
+    return { pathname, search: stringifiedQueryParams };
+  };
+
+  const switchTab = (tab, onSwitchTab) => {
+    history.push(getTabLocation(tab));
     onSwitchTab?.();
   };
 
   useEffect(() => {
     // If we don't have tab query param,
-    // we want to display the default tab by default
+    // we want to display the default tab by default.
+    // It's a redirect, so it replaces the history entry instead of pushing a new one,
+    // otherwise the browser back button would land on the URL without the tab
     if (!currentQueryParams.tab) {
-      switchTab(defaultTab);
+      history.replace(getTabLocation(defaultTab));
     }
   }, []);
 

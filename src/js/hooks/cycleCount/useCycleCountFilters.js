@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +20,10 @@ import {
 } from 'utils/option-utils';
 
 const useCycleCountFilters = ({ filterFields }) => {
+  // Initializations can overlap (e.g. a tab is switched while the filters of the previous one
+  // are still loading), so only the most recent one is allowed to apply its values
+  // Example: start fetch of the table on To Count tab, and switch fast to All products tab
+  const latestInitializationRef = useRef(0);
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [dateLastCount] = useState(null);
@@ -64,7 +68,10 @@ const useCycleCountFilters = ({ filterFields }) => {
     });
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = history.location;
-    history.push({ pathname, search: queryFilterParams });
+    // Clearing the filters only resets the current view (e.g. right after a tab switch, which
+    // has already pushed its own history entry), so it shouldn't add another entry
+    // for the browser back button to go through
+    history.replace({ pathname, search: queryFilterParams });
   };
 
   const resetForm = () => {
@@ -85,6 +92,16 @@ const useCycleCountFilters = ({ filterFields }) => {
   };
 
   const initializeDefaultFilterValues = async () => {
+    // Increment the ref value if any overlapping call takes place when
+    // the first call is still "in progress"
+    // e.g. switching fast between To Count and All products tab
+    latestInitializationRef.current += 1;
+
+    // This is NOT a shallow copy of the ref value, so if the first call is
+    // still in progress, the initializationId from the first call will not be incremented
+    // so we can check later if initializationId (=1) = latestInitializationRef (which can be =2)
+    const initializationId = latestInitializationRef.current;
+    const isOutdated = () => initializationId !== latestInitializationRef.current;
     setIsLoading(true);
 
     try {
@@ -150,6 +167,10 @@ const useCycleCountFilters = ({ filterFields }) => {
         fetchBins(currentLocation?.id, [], 'sortOrder,locationType,name'),
       ]);
 
+      if (isOutdated()) {
+        return;
+      }
+
       setSelectOptions({
         categories: categoryList,
         catalogs: catalogList,
@@ -167,9 +188,14 @@ const useCycleCountFilters = ({ filterFields }) => {
       defaultValues.abcClasses = setDefaultValue(queryProps.abcClasses, classificationList);
 
       setDefaultFilterValues(defaultValues);
+      // The values have just been read from the URL, so they are applied directly instead of
+      // being pushed back to the browser history by the filter form
+      setFilterParams({ ...defaultValues });
       setFiltersInitialized(true);
     } finally {
-      setIsLoading(false);
+      if (!isOutdated()) {
+        setIsLoading(false);
+      }
     }
   };
 
