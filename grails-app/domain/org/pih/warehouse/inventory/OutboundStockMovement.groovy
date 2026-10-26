@@ -12,9 +12,7 @@ package org.pih.warehouse.inventory
 import grails.validation.Validateable
 import org.pih.warehouse.api.FulfillmentStatusResolver
 import org.pih.warehouse.api.FulfillmentStatusCode
-import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -252,7 +250,8 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
     }
 
     Boolean canGeneratePickList() {
-        return requisition?.status < RequisitionStatus.PICKING && lineItems.size() > 0
+        return requisition?.status < RequisitionStatus.PICKING &&
+                !getLineItems().every { StockMovementItem item -> item.requisitionItem && !item.requisitionItem.effectiveItems }
     }
 
     Boolean hasBeenStaged() {

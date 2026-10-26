@@ -1076,7 +1076,7 @@ class RequisitionService {
 
     boolean isDateOneWeekFromNow(def date) {
         LocalDate today = LocalDate.now()
-        LocalDate oneWeekFromNow = new LocalDate(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth()+7)
+        LocalDate oneWeekFromNow = today.plusDays(7)
         if(date > oneWeekFromNow) {
             return true
         }
