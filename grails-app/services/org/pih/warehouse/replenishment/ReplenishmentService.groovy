@@ -25,6 +25,7 @@ import org.pih.warehouse.core.identification.IdentifierGeneratorContext
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.ProductAndBinKey
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Requirement
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -152,10 +153,10 @@ class ReplenishmentService {
      * not already on an open replenishment.
      */
     List<Requirement> getRequirementsToReplenish(Location facility, ActivityCode[] targetActivityCodes) {
-        Set<String> binsOnOpenReplenishments = getBinsOnOpenReplenishments(facility)
+        Set<ProductAndBinKey> locationsWithOpenReplenishments = getLocationsWithOpenReplenishments(facility)
         return getRequirements(facility, InventoryLevelStatus.BELOW_MINIMUM).findAll { Requirement requirement ->
             isTargetLocation(requirement.binLocation, targetActivityCodes) &&
-                    !binsOnOpenReplenishments.contains(getProductBinKey(requirement.product?.id, requirement.binLocation?.id)) &&
+                    !locationsWithOpenReplenishments.contains(new ProductAndBinKey(requirement.product?.id, requirement.binLocation?.id)) &&
                     (requirement.quantityNeeded as Integer) > 0
         }
     }
@@ -168,13 +169,13 @@ class ReplenishmentService {
     private void allocateAutomaticReplenishment(Order order, List<Requirement> requirements, ActivityCode[] targetActivityCodes) {
         Map<String, List<AvailableItem>> sourceItemsByProduct = getSourceItemsByProduct(
                 order.origin, requirements.collect { it.product?.id }.unique(), targetActivityCodes)
-        Map<String, OrderItem> orderItemsByBin = order.orderItems.collectEntries { OrderItem orderItem ->
-            [(getProductBinKey(orderItem.product?.id, orderItem.destinationBinLocation?.id)): orderItem]
+        Map<ProductAndBinKey, OrderItem> orderItemsByProductAndBin = order.orderItems.collectEntries { OrderItem orderItem ->
+            [(new ProductAndBinKey(orderItem.product?.id, orderItem.destinationBinLocation?.id)): orderItem]
         }
 
         // Stable sort, equally full bins keep their zone and bin order
         requirements.sort(false) { Requirement a, Requirement b -> getFillRatio(a) <=> getFillRatio(b) }.each { Requirement requirement ->
-            OrderItem orderItem = orderItemsByBin[getProductBinKey(requirement.product?.id, requirement.binLocation?.id)]
+            OrderItem orderItem = orderItemsByProductAndBin[new ProductAndBinKey(requirement.product?.id, requirement.binLocation?.id)]
             List<AvailableItem> sourceItems = sourceItemsByProduct[requirement.product?.id] ?: []
 
             // The quantity and the picks come from the same available items, so they can't disagree
@@ -212,16 +213,16 @@ class ReplenishmentService {
     }
 
     /**
-     * Returns the product and destination bin pairs (see getProductBinKey) that are already on replenishments
-     * of the facility that have not been completed or canceled yet.
+     * Returns the product and destination bin pairs that are already on replenishments of the facility that have not
+     * been completed or canceled yet.
      *
      * Only replenishment lists (manual or automatic) count, told apart from regular stock transfers (also
      * TRANSFER_ORDER) by the replenishment number prefix: a pending stock transfer into a bin does not stop it
      * from being replenished. Open replenishments numbered with a previously configured prefix are not recognized.
      */
-    Set<String> getBinsOnOpenReplenishments(Location facility) {
-        List<Object[]> rows = OrderItem.executeQuery("""
-            select oi.product.id, oi.destinationBinLocation.id
+    Set<ProductAndBinKey> getLocationsWithOpenReplenishments(Location facility) {
+        List<ProductAndBinKey> productAndBinKeys = OrderItem.executeQuery("""
+            select new org.pih.warehouse.inventory.ProductAndBinKey(oi.product.id, oi.destinationBinLocation.id)
             from OrderItem oi
             where oi.order.orderType.code = :orderTypeCode
             and oi.order.origin = :facility
@@ -237,7 +238,7 @@ class ReplenishmentService {
                 replenishmentNumberPattern: replenishmentNumberPrefix + '%',
                 canceled                  : OrderItemStatusCode.CANCELED,
         ])
-        return rows.collect { Object[] row -> getProductBinKey(row[0] as String, row[1] as String) } as Set<String>
+        return productAndBinKeys as Set<ProductAndBinKey>
     }
 
     String getReplenishmentNumberPrefix() {
@@ -265,10 +266,6 @@ class ReplenishmentService {
         Integer quantityInBin = requirement.quantityInBin ?: 0
         Integer minQuantity = requirement.minQuantity ?: 0
         return minQuantity > 0 ? quantityInBin / minQuantity : quantityInBin as BigDecimal
-    }
-
-    private static String getProductBinKey(String productId, String binLocationId) {
-        return "${productId}:${binLocationId}"
     }
 
     Order createOrUpdateOrderFromReplenishment(Replenishment replenishment) {
