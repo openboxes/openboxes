@@ -20,6 +20,10 @@ import {
 } from 'utils/option-utils';
 
 const useCycleCountFilters = ({ filterFields }) => {
+  // Initializations can overlap (e.g. a tab is switched while the filters of the previous one
+  // are still loading), so only the most recent one is allowed to apply its values
+  // Example: start fetch of the table on To Count tab, and switch fast to All products tab
+  const latestInitializationRef = useRef(0);
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [dateLastCount] = useState(null);
@@ -87,13 +91,15 @@ const useCycleCountFilters = ({ filterFields }) => {
     return null;
   };
 
-  // Initializations can overlap (e.g. a tab is switched while the filters of the previous one
-  // are still loading), so only the most recent one is allowed to apply its values
-  // Example: start fetch of the table on To Count tab, and switch fast to All products tab
-  const latestInitializationRef = useRef(0);
-
   const initializeDefaultFilterValues = async () => {
+    // Increment the ref value if any overlapping call takes place when
+    // the first call is still "in progress"
+    // e.g. switching fast between To Count and All products tab
     latestInitializationRef.current += 1;
+
+    // This is NOT a shallow copy of the ref value, so if the first call is
+    // still in progress, the initializationId from the first call will not be incremented
+    // so we can check later if initializationId (=1) = latestInitializationRef (which can be =2)
     const initializationId = latestInitializationRef.current;
     const isOutdated = () => initializationId !== latestInitializationRef.current;
     setIsLoading(true);
