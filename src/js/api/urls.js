@@ -193,6 +193,7 @@ export const FULFILLMENT_VALIDATION = `${FULFILLMENT_API}/validate`;
 
 // SELECT OPTIONS
 export const HANDLING_REQUIREMENTS_OPTIONS = `${API}/handlingRequirementsOptions`;
+export const PRIORITY_LEVEL_OPTIONS = `${API}/priorityLevelOptions`;
 
 // INTERNAL LOCATIONS
 export const INTERNAL_LOCATIONS = `${API}/internalLocations`;

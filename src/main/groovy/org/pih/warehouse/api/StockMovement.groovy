@@ -69,6 +69,7 @@ class StockMovement implements Validateable, Historizable {
     ShipmentStatusCode receiptStatusCode
     List<ShipmentStatusCode> receiptStatusCodes // For filtering
     List<RequisitionStatus> requisitionStatusCodes // For filtering
+    List<PriorityLevel> priorityLevels // For filtering
     String trackingNumber
     String driverName
     String comments

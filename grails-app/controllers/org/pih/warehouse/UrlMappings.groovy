@@ -128,6 +128,11 @@ class UrlMappings {
             action = [GET: "handlingRequirementsOptions"]
         }
 
+        "/api/priorityLevelOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "priorityLevelOptions"]
+        }
+
         "/api/stockMovements/shipmentStatusCodes" {
             controller = { "selectOptionsApi" }
             action = [GET: "shipmentStatusCodesOptions"]

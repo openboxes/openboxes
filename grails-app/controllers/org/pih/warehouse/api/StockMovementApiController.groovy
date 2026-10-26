@@ -28,6 +28,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementService
 import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.PriorityLevel
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -75,6 +76,7 @@ class StockMovementApiController {
         stockMovement.sourceType = params.sourceType ? params.sourceType as RequisitionSourceType : null
         stockMovement.approvers = params.approver ? User.getAll(params.list("approver"))?.findAll{ it } : null
         stockMovement.deliveryTypeCode = params.deliveryTypeCode ? DeliveryTypeCode.valueOf(params.deliveryTypeCode) : null
+        stockMovement.priorityLevels = params.priorityLevel ? params.list("priorityLevel") as PriorityLevel[] : null
 
         if (params.q) {
             stockMovement.identifier = "%" + params.q + "%"
@@ -680,6 +682,7 @@ class StockMovementApiController {
             "Origin",
             "Destination",
             "Stocklist",
+            "Priority",
             "Requested by",
             "Date Requested",
             "Date Created",
@@ -695,6 +698,7 @@ class StockMovementApiController {
                 sm.origin?.name ?: "",
                 sm.destination?.name ?: "",
                 sm.stocklist?.name ?: "",
+                sm.priority ?: 0,
                 sm.requestedBy ?: warehouse.message(code: 'default.none.label'),
                 sm.dateRequested.format("MM-dd-yyyy") ?: "",
                 sm.dateCreated?.format("MM-dd-yyyy") ?: "",

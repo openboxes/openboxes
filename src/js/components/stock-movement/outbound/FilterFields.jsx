@@ -177,6 +177,21 @@ export default (isRequest) => ({
       showLabelTooltip: true,
     },
   },
+  priorityLevel: {
+    type: FilterSelectField,
+    attributes: {
+      multi: true,
+      filterElement: true,
+      placeholder: 'react.stockMovement.outbound.filters.priority.label',
+      defaultPlaceholder: 'Priority',
+      showLabelTooltip: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
+    },
+    getDynamicAttr: ({ priorityLevels }) => ({
+      options: priorityLevels,
+    }),
+  },
   createdAfter: {
     type: DateFilter,
     attributes: {
