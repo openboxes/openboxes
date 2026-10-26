@@ -129,52 +129,46 @@ class PicklistService {
     }
 
     void createPicklist(Order order) {
-        if (order) {
-            createPicklist(order, null)
-        }
-    }
-
-    /**
-     * Creates the picklist for every order item, suggesting picks only from the available items accepted
-     * by the given filter (or from all available items when no filter is given).
-     */
-    void createPicklist(Order order, Closure<Boolean> availableItemFilter) {
         order?.orderItems?.each { OrderItem orderItem ->
-            createPicklist(orderItem, availableItemFilter)
+            createPicklist(orderItem)
         }
     }
 
     void createPicklist(OrderItem orderItem) {
-        if (orderItem) {
-            createPicklist(orderItem, null)
-        }
-    }
-
-    void createPicklist(OrderItem orderItem, Closure<Boolean> availableItemFilter) {
         Location location = orderItem?.order?.origin
 
         if (orderItem?.quantity) {
             // Retrieve all available items and then calculate suggested
-            List<AvailableItem> availableItems = getAvailableItems(location, orderItem)
-            if (availableItemFilter) {
-                availableItems = availableItems.findAll(availableItemFilter)
-            }
-            log.info "Available items: ${availableItems}"
-            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, orderItem?.quantity, orderItem?.order?.destination)
-            log.info "Suggested items " + suggestedItems
-            clearPicklist(orderItem)
-            if (suggestedItems) {
-                for (SuggestedItem suggestedItem : suggestedItems) {
-                    createOrUpdatePicklistItem(
-                            orderItem,
-                            null,
-                            suggestedItem.inventoryItem,
-                            suggestedItem.binLocation,
-                            suggestedItem.quantityPicked.intValueExact()
-                    )
-                }
+            createPicklist(orderItem, getAvailableItems(location, orderItem))
+        }
+    }
+
+    /**
+     * Creates the picklist of the order item, suggesting picks from the given available items.
+     *
+     * @return the suggested items that were picked
+     */
+    List<SuggestedItem> createPicklist(OrderItem orderItem, List<AvailableItem> availableItems) {
+        if (!orderItem?.quantity) {
+            return []
+        }
+
+        log.info "Available items: ${availableItems}"
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, orderItem?.quantity, orderItem?.order?.destination)
+        log.info "Suggested items " + suggestedItems
+        clearPicklist(orderItem)
+        if (suggestedItems) {
+            for (SuggestedItem suggestedItem : suggestedItems) {
+                createOrUpdatePicklistItem(
+                        orderItem,
+                        null,
+                        suggestedItem.inventoryItem,
+                        suggestedItem.binLocation,
+                        suggestedItem.quantityPicked.intValueExact()
+                )
             }
         }
+        return suggestedItems ?: []
     }
 
     void createPicklistFromItem(Order order) {

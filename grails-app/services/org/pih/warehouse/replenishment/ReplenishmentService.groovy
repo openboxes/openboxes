@@ -85,8 +85,8 @@ class ReplenishmentService {
         }
 
         ActivityCode[] activityCodes = targetActivityCodes as ActivityCode[]
-        List<ReplenishmentItem> replenishmentItems = getAutomaticReplenishmentItems(facility, activityCodes)
-        if (!replenishmentItems) {
+        List<Requirement> requirements = getRequirementsToReplenish(facility, activityCodes)
+        if (!requirements) {
             log.info "No bins to replenish automatically in ${facility.name} for activities ${targetActivityCodes}"
             return null
         }
@@ -98,13 +98,19 @@ class ReplenishmentService {
                 status: ReplenishmentStatus.PENDING,
                 replenishmentNumber: generateReplenishmentNumber(),
                 description: Constants.AUTOMATIC_REPLENISHMENT_DESCRIPTION,
-                replenishmentItems: replenishmentItems,
+                replenishmentItems: requirements.collect { Requirement requirement ->
+                    new ReplenishmentItem(
+                            product: requirement.product,
+                            location: facility,
+                            binLocation: requirement.binLocation,
+                            // Provisional, set to what can be picked when allocating
+                            quantity: requirement.quantityNeeded as Integer,
+                    )
+                },
         )
 
         Order order = createOrUpdateOrderFromReplenishment(replenishment)
-
-        // Do not take stock from one target location to fill another
-        picklistService.createPicklist(order, sourceLocationFilter(activityCodes))
+        allocateAutomaticReplenishment(order, requirements, activityCodes)
 
         // Nobody reviews the picks of an automatic replenishment, so it must only ask for stock that was allocated
         if (!order.orderItems.any { OrderItem orderItem -> getQuantityAllocated(orderItem) > 0 }) {
@@ -141,49 +147,68 @@ class ReplenishmentService {
         return orderItem.picklistItems?.sum { PicklistItem picklistItem -> picklistItem.quantity } ?: 0
     }
 
-    List<ReplenishmentItem> getAutomaticReplenishmentItems(Location facility, ActivityCode[] targetActivityCodes) {
+    /**
+     * Returns the requirements of the facility's target bins that are below their minimum level, need stock and are
+     * not already on an open replenishment.
+     */
+    List<Requirement> getRequirementsToReplenish(Location facility, ActivityCode[] targetActivityCodes) {
         Set<String> binsOnOpenReplenishments = getBinsOnOpenReplenishments(facility)
-        List<Requirement> requirements = getRequirements(facility, InventoryLevelStatus.BELOW_MINIMUM).findAll { Requirement requirement ->
+        return getRequirements(facility, InventoryLevelStatus.BELOW_MINIMUM).findAll { Requirement requirement ->
             isTargetLocation(requirement.binLocation, targetActivityCodes) &&
-                    !binsOnOpenReplenishments.contains(getProductBinKey(requirement.product?.id, requirement.binLocation?.id))
+                    !binsOnOpenReplenishments.contains(getProductBinKey(requirement.product?.id, requirement.binLocation?.id)) &&
+                    (requirement.quantityNeeded as Integer) > 0
+        }
+    }
+
+    /**
+     * Sets the quantity of each line to what can be picked for it and creates its picks, from stock outside target
+     * locations. Bins of the same product share that stock, so the emptiest bins are allocated first and each line
+     * only sees what the lines before it left.
+     */
+    private void allocateAutomaticReplenishment(Order order, List<Requirement> requirements, ActivityCode[] targetActivityCodes) {
+        Map<String, List<AvailableItem>> sourceItemsByProduct = getSourceItemsByProduct(
+                order.origin, requirements.collect { it.product?.id }.unique(), targetActivityCodes)
+        Map<String, OrderItem> orderItemsByBin = order.orderItems.collectEntries { OrderItem orderItem ->
+            [(getProductBinKey(orderItem.product?.id, orderItem.destinationBinLocation?.id)): orderItem]
         }
 
-        Map<String, List<AvailableItem>> availableItemsByProduct = getAvailableItemsByProduct(
-                facility, requirements.collect { it.product?.id }.unique())
-        Closure<Boolean> sourceFilter = sourceLocationFilter(targetActivityCodes)
-        Map<String, Integer> quantityRemainingByProduct = [:]
+        // Stable sort, equally full bins keep their zone and bin order
+        requirements.sort(false) { Requirement a, Requirement b -> getFillRatio(a) <=> getFillRatio(b) }.each { Requirement requirement ->
+            OrderItem orderItem = orderItemsByBin[getProductBinKey(requirement.product?.id, requirement.binLocation?.id)]
+            List<AvailableItem> sourceItems = sourceItemsByProduct[requirement.product?.id] ?: []
 
-        // Bins of the same product share its reserve stock, so fill the emptiest bins first and deduct what they take
-        Integer[] quantities = new Integer[requirements.size()]
-        List<Integer> indexesByPriority = (0..<requirements.size()).sort(false) { Integer a, Integer b ->
-            getFillRatio(requirements[a]) <=> getFillRatio(requirements[b]) ?: a <=> b
-        }
-        indexesByPriority.each { Integer index ->
-            Requirement requirement = requirements[index]
-            String productId = requirement.product?.id
-            // The quantity that can be picked is the same for every bin of the product: target bins, the destination
-            // bin included, are never a source. So it only needs to be calculated for the product's first bin.
-            Integer quantityRemaining = quantityRemainingByProduct.containsKey(productId) ?
-                    quantityRemainingByProduct[productId] :
-                    getQuantityPickable(availableItemsByProduct[productId] ?: [], requirement, sourceFilter)
-            Integer quantity = Math.min(requirement.quantityNeeded as Integer, quantityRemaining)
-            quantityRemainingByProduct[productId] = quantityRemaining - quantity
-            quantities[index] = quantity
-        }
+            // The quantity and the picks come from the same available items, so they can't disagree
+            List<AvailableItem> availableItems = picklistService.filterAvailableItems(sourceItems, orderItem)
+            BigDecimal quantityPickable = picklistService.getAutoPickableItems(availableItems)
+                    .sum { AvailableItem availableItem -> availableItem.quantityAvailable } as BigDecimal
+            orderItem.quantity = Math.min(requirement.quantityNeeded as Integer, quantityPickable?.intValue() ?: 0)
 
-        // Keep the zone and bin order of the requirements
-        List<ReplenishmentItem> replenishmentItems = []
-        requirements.eachWithIndex { Requirement requirement, int index ->
-            if (quantities[index] > 0) {
-                replenishmentItems << new ReplenishmentItem(
-                        product: requirement.product,
-                        location: facility,
-                        binLocation: requirement.binLocation,
-                        quantity: quantities[index],
-                )
+            picklistService.createPicklist(orderItem, availableItems).each { SuggestedItem suggestedItem ->
+                AvailableItem sourceItem = sourceItems.find { AvailableItem availableItem ->
+                    availableItem.inventoryItem == suggestedItem.inventoryItem && availableItem.binLocation == suggestedItem.binLocation
+                }
+                if (sourceItem) {
+                    sourceItem.quantityAvailable -= suggestedItem.quantityPicked
+                }
             }
         }
-        return replenishmentItems
+    }
+
+    /**
+     * Returns, by product id, the stock that target locations can be replenished from: everything outside target
+     * locations, fetched in a single query.
+     */
+    private Map<String, List<AvailableItem>> getSourceItemsByProduct(Location facility, List<String> productIds, ActivityCode[] targetActivityCodes) {
+        // An empty list would return the availability of every product in the facility
+        if (!productIds) {
+            return [:]
+        }
+
+        return productAvailabilityService.getAvailableBinLocations(facility, productIds).findAll { AvailableItem availableItem ->
+            !isTargetLocation(availableItem.binLocation, targetActivityCodes)
+        }.groupBy { AvailableItem availableItem ->
+            availableItem.inventoryItem?.product?.id
+        } as Map<String, List<AvailableItem>>
     }
 
     /**
@@ -215,34 +240,6 @@ class ReplenishmentService {
         return rows.collect { Object[] row -> getProductBinKey(row[0] as String, row[1] as String) } as Set<String>
     }
 
-    /**
-     * Returns the available items of the given products by product id, fetched in a single query.
-     */
-    Map<String, List<AvailableItem>> getAvailableItemsByProduct(Location facility, List<String> productIds) {
-        // An empty list would return the availability of every product in the facility
-        if (!productIds) {
-            return [:]
-        }
-
-        return productAvailabilityService.getAvailableBinLocations(facility, productIds).groupBy { AvailableItem availableItem ->
-            availableItem.inventoryItem?.product?.id
-        } as Map<String, List<AvailableItem>>
-    }
-
-    /**
-     * Returns the quantity that can be picked to replenish the requirement's bin, using the same rules as
-     * PicklistService#createPicklist does for the replenishment line, so the line never asks for more than
-     * its picklist can be suggested from.
-     */
-    Integer getQuantityPickable(List<AvailableItem> productAvailableItems, Requirement requirement, Closure<Boolean> sourceFilter) {
-        // Not saved, so it has no picks that would be added to the (shared) available items
-        OrderItem orderItem = new OrderItem(product: requirement.product, destinationBinLocation: requirement.binLocation)
-        List<AvailableItem> availableItems = picklistService.filterAvailableItems(productAvailableItems, orderItem)
-        BigDecimal quantityPickable = picklistService.getAutoPickableItems(availableItems.findAll(sourceFilter))
-                .sum { AvailableItem availableItem -> availableItem.quantityAvailable } as BigDecimal
-        return quantityPickable?.intValue() ?: 0
-    }
-
     String getReplenishmentNumberPrefix() {
         return grailsApplication.config.getProperty(
                 "openboxes.stockTransfer.binReplenishment.prefix", String, Constants.REPLENISHMENT_PREFIX)
@@ -255,13 +252,6 @@ class ReplenishmentService {
             throw new IllegalStateException("Unable to generate a unique replenishment number")
         }
         return replenishmentNumber
-    }
-
-    /**
-     * Accepts the available items that an automatic replenishment can take stock from.
-     */
-    private static Closure<Boolean> sourceLocationFilter(ActivityCode[] targetActivityCodes) {
-        return { AvailableItem availableItem -> !isTargetLocation(availableItem.binLocation, targetActivityCodes) }
     }
 
     private static boolean isTargetLocation(Location binLocation, ActivityCode[] targetActivityCodes) {
