@@ -621,6 +621,15 @@ class ReceiptService {
     }
 
     Location findReceivingLocation(Shipment shipment) {
+        Location receivingLocation = shipment.receivingLocation
+        if (receivingLocation) {
+            if (receivingLocation.active && receivingLocation.parentLocation == shipment.destination) {
+                return receivingLocation
+            }
+            log.warn("Receiving location ${receivingLocation.locationNumber} of shipment ${shipment.shipmentNumber} " +
+                    "is inactive or does not belong to ${shipment.destination?.name}. Falling back to default receiving location.")
+        }
+
         // TODO: below code returns first matching internal location that supports inbound sortation
         //  In case of multiple such locations TBD how to handle it
         def inboundSortationLocation = shipment.destination.internalLocations

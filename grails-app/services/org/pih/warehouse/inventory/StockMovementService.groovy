@@ -2237,17 +2237,19 @@ class StockMovementService {
         return getAvailableItems(location, requisitionItem, calculateStatus, true)
     }
 
+    // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
+    private boolean isExcludedFromAllocation(Location binLocation) {
+        return binLocation?.isSortationLocation() ||
+                binLocation?.supports(ActivityCode.PUTAWAY_CART) ||
+                binLocation?.supports(ActivityCode.PREPICK_STOCK)
+    }
+
     List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus, Boolean releaseOwnAllocation) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
-        // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
-        availableItems = availableItems.findAll {
-            !it.binLocation?.supports(ActivityCode.INBOUND_SORTATION) &&
-                    !it.binLocation?.supports(ActivityCode.PUTAWAY_CART) &&
-                    !it.binLocation?.supports(ActivityCode.PREPICK_STOCK)
-        }
+        availableItems = availableItems.findAll { !isExcludedFromAllocation(it.binLocation) }
         if (releaseOwnAllocation) {
             availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
         }
