@@ -580,6 +580,7 @@ openboxes:
 
         automaticBackorderReallocationJob:
             enabled: true
+            delayInMilliseconds: 6000 # workaround to delay AutomaticBackorderReallocationJob after RefreshProductAvailabilityJob (delayed by 5000 ms); it needs product refresh to complete first, so keep it ~1 s longer
 
         automaticIssuanceJob:
             enabled: false

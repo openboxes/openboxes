@@ -28,8 +28,11 @@ class AutomaticBackorderAllocationEventService {
         }
 
         if (shipment.isFullyReceived()) {
-            log.info "Triggering backorder re-allocation job"
-            AutomaticBackorderReallocationJob.triggerNow([shipmentId: event.source])
+            // Delay the job so that the (delayed) RefreshProductAvailabilityJob completes before reallocation reads availability
+            def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticBackorderReallocationJob.delayInMilliseconds)
+            Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
+            log.info "Triggering backorder re-allocation job with ${delayInMilliseconds} ms delay"
+            AutomaticBackorderReallocationJob.schedule(runAt, [shipmentId: event.source])
         }
     }
 }

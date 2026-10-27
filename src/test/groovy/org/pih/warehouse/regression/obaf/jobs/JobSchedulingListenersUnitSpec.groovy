@@ -58,6 +58,7 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
         Holders.config.openboxes.jobs.automaticAllocationJob.enabled = true
         Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled = true
         Holders.config.openboxes.jobs.automaticIssuanceJob.delayInMilliseconds = 5000
+        Holders.config.openboxes.jobs.automaticBackorderReallocationJob.delayInMilliseconds = 6000
     }
 
     void cleanup() {
@@ -130,16 +131,20 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
         return s
     }
 
-    void 'AutomaticBackorderAllocationEventService triggers the reallocation job once the shipment is fully received'() {
+    void 'AutomaticBackorderAllocationEventService schedules the delayed reallocation job once the shipment is fully received'() {
         given:
         shipmentReceived(true)
-        List<Map> triggered = recordTriggerNow(AutomaticBackorderReallocationJob)
+        List<Map> scheduled = recordSchedule(AutomaticBackorderReallocationJob)
+        long before = now()
 
         when:
         backorderListener().onAutomaticBackorderReallocationEvent(new AutomaticBackorderReallocationEvent('ship-1'))
 
         then:
-        triggered == [[shipmentId: 'ship-1']]
+        scheduled.size() == 1
+        scheduled[0].params == [shipmentId: 'ship-1']
+        scheduled[0].runAt.time >= before + 6000
+        scheduled[0].runAt.time <= now() + 6000
     }
 
     @Unroll
@@ -147,13 +152,13 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
         given:
         shipmentReceived(fully)
         Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled = enabled
-        List<Map> triggered = recordTriggerNow(AutomaticBackorderReallocationJob)
+        List<Map> scheduled = recordSchedule(AutomaticBackorderReallocationJob)
 
         when:
         backorderListener().onAutomaticBackorderReallocationEvent(new AutomaticBackorderReallocationEvent(id))
 
         then:
-        triggered == []
+        scheduled == []
 
         cleanup:
         Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled = true
