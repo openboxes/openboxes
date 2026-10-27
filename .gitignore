@@ -49,3 +49,4 @@ docker/mysql
 docker/openboxes.war
 .gradle
 .~*#
+.claude/
