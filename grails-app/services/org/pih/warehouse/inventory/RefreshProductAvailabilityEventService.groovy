@@ -11,19 +11,17 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.transaction.event.TransactionPhase
-import org.springframework.transaction.event.TransactionalEventListener
+import org.springframework.context.ApplicationListener
 
 @Transactional
-class RefreshProductAvailabilityEventService {
+class RefreshProductAvailabilityEventService implements ApplicationListener<RefreshProductAvailabilityEvent> {
 
     def productAvailabilityService
 
     @Value('${openboxes.applicationEvents.refreshProductAvailability.alwaysSynchronous}')
     Boolean alwaysSynchronous
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
-    void onRefreshProductAvailabilityEvent(RefreshProductAvailabilityEvent event) {
+    void onApplicationEvent(RefreshProductAvailabilityEvent event) {
         if (alwaysSynchronous) {
             event.synchronousRequired = true
         }
