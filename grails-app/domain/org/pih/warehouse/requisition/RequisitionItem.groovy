@@ -862,6 +862,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return picklistItems.findAll { it.pickable }
     }
 
+    List<String> getPicklistReasonCodes() {
+        return picklistItems?.findResults { it.reasonCode }?.unique() ?: []
+    }
+
     /**
      * Sort by sort order, name
      *

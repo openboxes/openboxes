@@ -248,13 +248,11 @@
             </g:else>
         </td>
         <td class="middle center">
-            <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
-            <g:set var="reasonCodesOf" value="${{ items -> items?.findAll { it?.reasonCode }*.reasonCode?.unique()?.join(', ') }}"/>
-            <g:set var="picklistReasonCodes" value="${reasonCodesOf(requisitionItem?.modificationItem?.picklistItems) ?: reasonCodesOf(requisitionItem?.substitutionItem?.picklistItems) ?: reasonCodesOf(requisitionItem?.picklistItems)}"/>
-            <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode || picklistReasonCodes }">
-                <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
-${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}
-${picklistReasonCodes ? 'Mobile pick reason code: ' + picklistReasonCodes : ''}">
+            <g:set var="effectiveRequisitionItem" value="${requisitionItem?.modificationItem ?: requisitionItem?.substitutionItem ?: requisitionItem}"/>
+            <g:set var="reasonCodes" value="${([effectiveRequisitionItem?.pickReasonCode] + (effectiveRequisitionItem?.picklistReasonCodes ?: [])).findAll { it }.unique()}"/>
+            <g:if test="${requisitionItem?.cancelReasonCode || reasonCodes}">
+                <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode) : ''}
+${reasonCodes ? 'Picked item reason codes: ' + reasonCodes.collect { warehouse.message(code:'enum.ReasonCode.' + it) }.join(', ') : ''}">
                     <img src="${resource(dir:'images/icons/silk',file:'note.png')}" />
                 </div>
             </g:if>
