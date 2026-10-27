@@ -2,14 +2,14 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
-import withRouter from 'utils/withRouter';
 
 import { LOCATION_CONFIGURATION_URL, LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/locations-configuration/SuccessMessage.scss';
 
-const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) => (
+const SuccessMessage = ({ setShowSuccessMessage, navigate, successMessageOpen }) => (
   <Modal
     isOpen={successMessageOpen}
     className="location-modal"
@@ -53,7 +53,7 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
                 defaultMessage="View Location List"
               />
             </button>
-            <button type="button" className="btn btn-outline-primary" onClick={() => history.push(PRODUCT_CONFIGURATION_URL.index())}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => navigate(PRODUCT_CONFIGURATION_URL.index())}>
               <Translate
                 id="react.locationsConfiguration.success.createCategoriesAndProducts="
                 defaultMessage="Create Categories and Products"
@@ -68,9 +68,7 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
 
 SuccessMessage.propTypes = {
   setShowSuccessMessage: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   successMessageOpen: PropTypes.bool.isRequired,
 };
 

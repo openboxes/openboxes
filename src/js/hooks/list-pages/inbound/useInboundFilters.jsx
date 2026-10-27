@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { fetchShipmentStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
@@ -16,7 +16,8 @@ const useInboundFilters = () => {
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const {
     currentLocation,
@@ -44,9 +45,9 @@ const useInboundFilters = () => {
       .reduce((acc, key) => ({ ...acc, [key]: '' }), { direction: 'INBOUND' });
     const transformedParams = transformFilterParams(defaultValues, { direction: { name: 'direction' } });
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (queryFilterParams) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
   };
 
@@ -58,7 +59,7 @@ const useInboundFilters = () => {
     // SET STATIC DEFAULT VALUES
     defaultValues.direction = 'INBOUND';
 
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(window.location.search);
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.destination === undefined) {
       defaultValues.destination = {
@@ -123,7 +124,7 @@ const useInboundFilters = () => {
       requestedBy: currentUserValue.id,
       createdBy: currentUserValue.id,
     };
-    history.push({
+    navigate({
       pathname: STOCK_MOVEMENT_URL.list(),
       search: queryString.stringify(searchQuery),
     });
@@ -150,9 +151,9 @@ const useInboundFilters = () => {
 
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (queryFilterParams) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
@@ -49,7 +49,7 @@ const useToCountTab = ({
   const columnHelper = createColumnHelper();
   const translate = useTranslate();
   const spinner = useSpinner();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { tab } = useQueryParams();
 
   const currentLocale = useSelector(getCurrentLocale);
@@ -452,7 +452,7 @@ const useToCountTab = ({
     spinner.show();
     try {
       await dispatch(startCount(payload, currentLocation?.id));
-      history.push(CYCLE_COUNT.countStep());
+      navigate(CYCLE_COUNT.countStep());
     } finally {
       spinner.hide();
     }

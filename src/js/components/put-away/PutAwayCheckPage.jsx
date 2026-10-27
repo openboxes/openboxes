@@ -303,7 +303,7 @@ class PutAwayCheckPage extends Component {
   }
 
   goToFirstPage() {
-    this.props.history.push(PUTAWAY_URL.create());
+    this.props.navigate(PUTAWAY_URL.create());
     this.props.goToPage(1, null);
   }
 
@@ -518,9 +518,7 @@ PutAwayCheckPage.propTypes = {
   location: PropTypes.shape({
     id: PropTypes.string,
   }).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   previousPage: PropTypes.func.isRequired,
   goToPage: PropTypes.func.isRequired,

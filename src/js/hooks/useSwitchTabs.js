@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 
 import queryString from 'query-string';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import useQueryParams from 'hooks/useQueryParams';
 
 const useSwitchTabs = ({ defaultTab }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const currentQueryParams = useQueryParams();
 
@@ -16,7 +16,7 @@ const useSwitchTabs = ({ defaultTab }) => {
       tab,
     };
     const stringifiedQueryParams = queryString.stringify(updatedQueryParams);
-    history.push({ pathname, search: stringifiedQueryParams });
+    navigate({ pathname, search: stringifiedQueryParams });
     onSwitchTab?.();
   };
 

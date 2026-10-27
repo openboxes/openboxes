@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
 import { eraseDraft } from 'actions';
@@ -8,7 +8,7 @@ import { TO_COUNT_TAB } from 'consts/cycleCount';
 
 const useDraftInfoBar = (tab) => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { currentLocation } = useSelector((state) => ({
     currentLocation: getCurrentLocation(state),
   }));
@@ -18,7 +18,7 @@ const useDraftInfoBar = (tab) => {
   };
 
   const continueDraft = () => {
-    history.push(tab === TO_COUNT_TAB ? CYCLE_COUNT.countStep() : CYCLE_COUNT.resolveStep());
+    navigate(tab === TO_COUNT_TAB ? CYCLE_COUNT.countStep() : CYCLE_COUNT.resolveStep());
   };
 
   return {

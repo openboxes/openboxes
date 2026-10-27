@@ -50,7 +50,7 @@ const useProductFilters = () => {
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
-    const queryProps = queryString.parse(location.search);
+    const queryProps = queryString.parse(window.location.search);
 
     const {
       catalogId, tagId, categoryId, glAccountsId, productFamilyId, handlingRequirementId,

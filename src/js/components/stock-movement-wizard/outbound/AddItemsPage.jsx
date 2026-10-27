@@ -47,6 +47,7 @@ import requestsQueue from 'utils/requestsQueue';
 import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -1498,7 +1499,7 @@ class AddItemsPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() => {
-                      this.props.history(STOCK_MOVEMENT_URL.listOutbound());
+                      this.props.navigate(STOCK_MOVEMENT_URL.listOutbound());
                     }}
                     className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                   >
@@ -1630,7 +1631,7 @@ const mapDispatchToProps = {
   showInfoBar,
 };
 
-export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
 
 AddItemsPage.propTypes = {
   /** Initial component's data */
@@ -1689,9 +1690,7 @@ AddItemsPage.propTypes = {
   })).isRequired,
   showInfoBar: PropTypes.func.isRequired,
   hideInfoBar: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };
 
 AddItemsPage.defaultProps = {

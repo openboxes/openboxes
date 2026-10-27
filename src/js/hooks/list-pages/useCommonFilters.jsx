@@ -1,14 +1,15 @@
 import { useState } from 'react';
 
 import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const useCommonFilters = () => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   return {
@@ -18,7 +19,8 @@ const useCommonFilters = () => {
     setDefaultFilterValues,
     filtersInitialized,
     setFiltersInitialized,
-    history,
+    navigate,
+    location,
     dispatch,
   };
 };

@@ -16,6 +16,7 @@ import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-table/react-table.css';
 
@@ -635,9 +636,9 @@ const mapStateToProps = (state) => ({
   isUserAdmin: state.session.isUserAdmin,
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(StocklistManagement);
+})(StocklistManagement));
 
 StocklistManagement.propTypes = {
   /** React router's object which contains information about url varaiables and params */
