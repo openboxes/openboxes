@@ -84,16 +84,23 @@ template `docker/openboxes.yml`; its `@NAME@` placeholders take the profile's va
 |---|---|---|
 | Event delivery (`openboxes.n8n`) | off | on, to the webhook sink, header `X-Api-Key: e2e` |
 | Polling crons (state transition, receipt, backorder reallocation, allocation) | parked in 2099 | every 20 s |
-| Automatic issuance job | the app default (off) | `--issuance-job on\|off` (default `off`, the branch default) |
+| Automatic issuance job | the app default (off) | `--issuance-job on\|off` (default `off`, the branch default); `on` issues through the trigger scheduled after staging only: the job's bulk sweep of STAGED requisitions (the app's 5-minute cron) stays parked in 2099 |
 | Allocation job attempt limit | the app default (3) | `--allocation-max-attempts <n>` (default 3) |
+| Test projects (`--project`) | `mobile-api`, `flows`; `all` = both | `mobile-api`, `scenarios`; `all` = `scenarios`; `flows` is refused (its fixtures expect the polling crons parked) |
 | Compose project | `openboxes-e2e-<checkout>` | `openboxes-e2e-scenarios[-a<n>]-<checkout>` |
 | Ports (HTTP, DB, label stub, sink) | 18080, 13306, 18081, - | 38080, 33306, 38081, 38082 (48080, 43306, 48081, 48082 with a limit other than 3) |
 
 The default profile renders the same configuration as before the profiles existed. Each profile, and
 each attempt limit of `scenarios`, has its own compose project, ports and reports directory, so a
 default stack and scenario stacks with different attempt limits can run side by side (a third limit
-needs its own `E2E_*_PORT` values). `--project scenarios` needs `--profile scenarios`; the project
-itself does not exist yet, and the runner says so and stops.
+needs its own `E2E_*_PORT` values; `up.sh` checks the ports first and names the stack or process
+holding one). `--project scenarios` needs `--profile scenarios`; the project itself does not exist
+yet, and the runner says so and stops.
+
+The issuance switch is not part of a stack's identity: `on` and `off` share the project and ports, so
+starting one recreates the other. `up.sh` records the settings a stack runs with
+(`build/e2e/running-settings-<project>`); `run.sh --reuse` refuses a stack whose settings differ from
+the ones it asks for, and the run summary prints the recorded settings.
 
 The **webhook sink** (`docker/webhooksink.py`, scenarios only) sits on the sealed network as
 `webhooksink:8082` and receives the app's event deliveries; a second gateway publishes it on
@@ -102,6 +109,8 @@ The **webhook sink** (`docker/webhooksink.py`, scenarios only) sits on the seale
 - `GET /events?since=<n>`: the deliveries with `seq > n` (all without `since`), oldest first, each
   `{seq, time, path, headers, body, json}`;
 - `DELETE /events`: clears them (`seq` keeps counting).
+
+It keeps the last 10,000 deliveries (older ones drop off; `seq` still counts them).
 
 Event delivery also needs the requisition's origin to support the `ENABLE_WEBHOOKS` activity.
 

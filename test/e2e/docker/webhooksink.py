@@ -6,12 +6,14 @@
        GET /events?since=<n> = the recorded deliveries with seq > n (all of them without `since`),
        oldest first, as a JSON list of {seq, time, path, headers, body, json};
        DELETE /events clears the list (seq keeps counting, so a `since` taken before still works).
+Only the last MAX_EVENTS deliveries are kept, so a long --keep-up session cannot grow without limit.
 """
-import json, re, threading, time
+import collections, json, re, threading, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
-events, lock, counter = [], threading.Lock(), [0]
+MAX_EVENTS = 10000
+events, lock, counter = collections.deque(maxlen=MAX_EVENTS), threading.Lock(), 0
 DIGITS, HEX = re.compile(rb'[0-9]+'), re.compile(rb'[0-9A-Fa-f]+')
 
 
@@ -68,6 +70,7 @@ class Http(BaseHTTPRequestHandler):
         self._send(204)
 
     def do_POST(self):
+        global counter
         raw = self._body()
         if raw is None:
             self.close_connection = True
@@ -78,8 +81,8 @@ class Http(BaseHTTPRequestHandler):
         except ValueError:
             parsed = None
         with lock:
-            counter[0] += 1
-            events.append({'seq': counter[0], 'time': time.time(), 'path': self.path,
+            counter += 1
+            events.append({'seq': counter, 'time': time.time(), 'path': self.path,
                            'headers': dict(self.headers.items()), 'body': body, 'json': parsed})
         self._send(200, b'{}')
 

@@ -5,8 +5,9 @@
 #                        [--profile default|scenarios] [--issuance-job on|off]
 #                        [--allocation-max-attempts <n>] [--war <path>] [-- <extra playwright args>]
 #
-#   --project    mobile-api (the mobile API contract), flows (warehouse flows), scenarios (needs
-#                --profile scenarios; not there yet), all (default: mobile-api and flows)
+#   --project    mobile-api (the mobile API contract), flows (warehouse flows; default profile only),
+#                scenarios (needs --profile scenarios; not there yet), all (the default: mobile-api and
+#                flows on the default profile, scenarios on the scenarios profile)
 #   --keep-up    leave the stack running afterwards (test/e2e/down.sh stops it)
 #   --reuse      use a stack that is already up (skip build/up/seed; implies --keep-up)
 #   --known-gaps run every KNOWN-GAP (test.fixme) as a normal test: an open gap fails, a fixed one passes
@@ -26,18 +27,19 @@ set -euo pipefail
 E2E_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 PROJECT=all; KEEP=0; REUSE=0; GAPS=0; EXTRA=()
+need_value() { [[ $# -ge 2 ]] || { echo "$1 needs a value" >&2; exit 2; }; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --project) PROJECT="$2"; shift 2 ;;
+    --project) need_value "$@"; PROJECT="$2"; shift 2 ;;
     --keep-up) KEEP=1; shift ;;
     --reuse) REUSE=1; KEEP=1; shift ;;
     --known-gaps) GAPS=1; shift ;;
-    --profile) export E2E_PROFILE="$2"; shift 2 ;;
-    --issuance-job) export E2E_ISSUANCE_JOB="$2"; shift 2 ;;
-    --allocation-max-attempts) export E2E_ALLOCATION_MAX_ATTEMPTS="$2"; shift 2 ;;
-    --war) export E2E_WAR="$2"; shift 2 ;;
+    --profile) need_value "$@"; export E2E_PROFILE="$2"; shift 2 ;;
+    --issuance-job) need_value "$@"; export E2E_ISSUANCE_JOB="$2"; shift 2 ;;
+    --allocation-max-attempts) need_value "$@"; export E2E_ALLOCATION_MAX_ATTEMPTS="$2"; shift 2 ;;
+    --war) need_value "$@"; export E2E_WAR="$2"; shift 2 ;;
     --) shift; EXTRA=("$@"); break ;;
-    -h|--help) sed -n '2,24p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,25p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -45,6 +47,12 @@ done
 # shellcheck source=lib/common.sh
 source "$E2E_DIR/lib/common.sh"
 case "$PROJECT" in mobile-api|flows|scenarios|all) ;; *) echo "--project must be mobile-api|flows|scenarios|all" >&2; exit 2 ;; esac
+# The flows' fixtures rely on the parked polling crons of the default profile: on the scenarios
+# profile `all` is the scenarios project, and flows is refused (mobile-api runs on both).
+if [[ $E2E_PROFILE == scenarios ]]; then
+  [[ $PROJECT != all ]] || PROJECT=scenarios
+  [[ $PROJECT != flows ]] || { echo "--project flows needs the default profile (its fixtures expect the polling crons parked)" >&2; exit 2; }
+fi
 if [[ $PROJECT == scenarios ]]; then
   [[ $E2E_PROFILE == scenarios ]] || { echo "--project scenarios needs --profile scenarios" >&2; exit 2; }
   if [[ ! -d "$E2E_DIR/tests/scenarios" ]]; then log "no scenarios project yet (test/e2e/tests/scenarios): nothing to run"; exit 0; fi
@@ -84,7 +92,7 @@ status=0
 end=$(date +%s)
 
 {
-  echo "OpenBoxes $(cat "$E2E_WORK/running-sha-$E2E_PROJECT" 2>/dev/null || head_sha)  profile=$E2E_PROFILE${E2E_ISSUANCE_JOB:+ issuance-job=$E2E_ISSUANCE_JOB}${E2E_ALLOCATION_MAX_ATTEMPTS:+ allocation-max-attempts=$E2E_ALLOCATION_MAX_ATTEMPTS}  project=$PROJECT  known-gaps=$GAPS  exit=$status"
+  echo "OpenBoxes $(cat "$E2E_WORK/running-sha-$E2E_PROJECT" 2>/dev/null || head_sha)  $(cat "$(running_settings_file)" 2>/dev/null || stack_settings)  project=$PROJECT  known-gaps=$GAPS  exit=$status"
   echo "stack ready in $(( ready - start )) s, tests $(( end - ready )) s, total $(( end - start )) s (teardown not included)"
   python3 - "$REPORTS/junit.xml" <<'PY' || true
 import sys, xml.etree.ElementTree as ET

@@ -80,8 +80,10 @@ openboxes:
             cronExpression: "@E2E_CRON_POLLING@"
             maxAttempts: @E2E_ALLOCATION_MAX_ATTEMPTS@
         #@ scenarios: the four polling crons above every 20 s; the issuance job off (the branch
-        #@ default) or on (--issuance-job on), the attempt limit from --allocation-max-attempts
-        automaticIssuanceJob: {enabled: @E2E_ISSUANCE_JOB@}
+        #@ default) or on (--issuance-job on), the attempt limit from --allocation-max-attempts.
+        #@ With the job on, only the trigger scheduled after staging issues: its bulk sweep of every
+        #@ STAGED requisition (the app's 5-minute cron) stays parked in 2099.
+        automaticIssuanceJob: {enabled: @E2E_ISSUANCE_JOB@, cronExpression: "0 0 0 1 1 ? 2099"}
         dataCleaningJob:
             cronExpression: "0 0 0 1 1 ? 2099"
         assignIdentifierJob:

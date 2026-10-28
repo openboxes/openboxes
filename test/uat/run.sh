@@ -23,6 +23,11 @@ UAT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 E2E_DIR="$(cd "$UAT_DIR/../e2e" && pwd)"
 # the UAT stack runs on the default profile of test/e2e (lib/common.sh), whatever the environment says
 # and builds its WAR from this checkout (an E2E_WAR in the environment is not used)
+for v in E2E_PROFILE E2E_ISSUANCE_JOB E2E_ALLOCATION_MAX_ATTEMPTS E2E_WAR; do
+  if [[ -n "${!v:-}" && "$v=${!v}" != E2E_PROFILE=default ]]; then
+    echo "[uat] ignoring $v=${!v}: the UAT stack runs on the default profile with a WAR built from this checkout" >&2
+  fi
+done
 export E2E_PROFILE=default; unset E2E_ISSUANCE_JOB E2E_ALLOCATION_MAX_ATTEMPTS E2E_WAR
 export E2E_PROJECT="${E2E_PROJECT:-openboxes-uat-web-$(printf '%s' "$UAT_DIR" | cksum | cut -c1-6)}"
 export E2E_HTTP_PORT="${E2E_HTTP_PORT:-28080}" E2E_DB_PORT="${E2E_DB_PORT:-23306}" E2E_LABEL_PORT="${E2E_LABEL_PORT:-28081}"
@@ -31,11 +36,12 @@ source "$E2E_DIR/lib/common.sh"
 ulog() { echo "[uat] $*" >&2; }
 
 MODE=web; TAG=""; DB_IMAGE="${E2E_DB_IMAGE:-mariadb:11.4}"; GAPS=0; HEADED=0; KEEP=0; REUSE=0; EXTRA=()
+need_value() { [[ $# -ge 2 ]] || { echo "$1 needs a value" >&2; exit 2; }; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --unit) MODE=unit; shift ;;
-    --tag) TAG="$2"; shift 2 ;;
-    --db) DB_IMAGE="$2"; shift 2 ;;
+    --tag) need_value "$@"; TAG="$2"; shift 2 ;;
+    --db) need_value "$@"; DB_IMAGE="$2"; shift 2 ;;
     --known-gaps) GAPS=1; shift ;;
     --headed) HEADED=1; shift ;;
     --keep-up) KEEP=1; shift ;;
@@ -79,7 +85,7 @@ if [[ $REUSE -eq 0 ]]; then
   trap teardown EXIT
   "$E2E_DIR/up.sh"
 else
-  curl -fsS -o /dev/null "$E2E_BASE_URL/api/status" || { echo "--reuse: no stack answers at $E2E_BASE_URL" >&2; exit 1; }
+  require_running_stack
   trap teardown EXIT
   ulog "reusing the running stack $E2E_PROJECT (OpenBoxes $(cat "$E2E_WORK/running-sha-$E2E_PROJECT" 2>/dev/null || echo '?'))"
 fi

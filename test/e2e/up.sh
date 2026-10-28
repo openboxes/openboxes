@@ -24,13 +24,14 @@ set -euo pipefail
 E2E_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SEED=1
+need_value() { [[ $# -ge 2 ]] || { echo "$1 needs a value" >&2; exit 2; }; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-seed) SEED=0; shift ;;
-    --profile) export E2E_PROFILE="$2"; shift 2 ;;
-    --issuance-job) export E2E_ISSUANCE_JOB="$2"; shift 2 ;;
-    --allocation-max-attempts) export E2E_ALLOCATION_MAX_ATTEMPTS="$2"; shift 2 ;;
-    --war) export E2E_WAR="$2"; shift 2 ;;
+    --profile) need_value "$@"; export E2E_PROFILE="$2"; shift 2 ;;
+    --issuance-job) need_value "$@"; export E2E_ISSUANCE_JOB="$2"; shift 2 ;;
+    --allocation-max-attempts) need_value "$@"; export E2E_ALLOCATION_MAX_ATTEMPTS="$2"; shift 2 ;;
+    --war) need_value "$@"; export E2E_WAR="$2"; shift 2 ;;
     -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
@@ -55,6 +56,7 @@ render_app_config() { # $1 = template, $2 = output, then NAME=value pairs
 }
 
 MY_CNF="$(my_cnf)"
+require_free_ports
 if [[ -n "${E2E_WAR:-}" ]]; then
   [[ -f "$E2E_WAR" ]] || { echo "--war / E2E_WAR: no file at $E2E_WAR" >&2; exit 2; }
   WAR="$(cd "$(dirname "$E2E_WAR")" && pwd)/$(basename "$E2E_WAR")"
@@ -72,9 +74,18 @@ render_app_config "$E2E_DIR/docker/openboxes.yml" "$E2E_WORK/openboxes-$E2E_HTTP
 export E2E_WAR="$WAR" E2E_APP_CONFIG="$E2E_WORK/openboxes-$E2E_HTTP_PORT.yml" E2E_MY_CNF="$MY_CNF"
 
 start=$(date +%s)
-log "starting $E2E_PROJECT (profile $E2E_PROFILE, OpenBoxes $FULL) on 127.0.0.1:$E2E_HTTP_PORT"
+SETTINGS="$(stack_settings)"
+previous="$(cat "$(running_settings_file)" 2>/dev/null || true)"
+if [[ -n "$previous" && "$previous" != "$SETTINGS" ]]; then
+  log "recreating $E2E_PROJECT: it ran with $previous"
+fi
+log "starting $E2E_PROJECT ($SETTINGS, OpenBoxes $FULL) on 127.0.0.1:$E2E_HTTP_PORT"
+# no record of the old stack survives a failed start, and --reuse refuses a start that did not finish
+rm -f "$E2E_WORK/running-sha-$E2E_PROJECT"
+echo "an unfinished up.sh start" > "$(running_settings_file)"
 compose up -d --force-recreate --renew-anon-volumes >&2
 echo "$FULL" > "$E2E_WORK/running-sha-$E2E_PROJECT"
+echo "$SETTINGS" > "$(running_settings_file)"
 
 log "waiting for OpenBoxes (Liquibase runs ~1000 changesets on the empty database)"
 deadline=$(( $(date +%s) + ${E2E_BOOT_TIMEOUT:-900} ))

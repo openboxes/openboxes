@@ -124,15 +124,70 @@ down_hint() {
   echo "${env}test/e2e/down.sh"
 }
 
-# --reuse: this project's app and gateway must be running (another stack may answer on the same port).
+# The settings a stack runs with: up.sh records them next to running-sha-$E2E_PROJECT, --reuse checks
+# them and the run summary prints them. The issuance switch is not part of the stack's identity (same
+# project and ports), so this record is what tells an `on` stack from an `off` one.
+stack_settings() {
+  if [[ $E2E_PROFILE == default ]]; then echo "profile=default db=${E2E_DB_IMAGE:-mariadb:11.4}"
+  else echo "profile=$E2E_PROFILE issuance-job=$E2E_ISSUANCE_JOB allocation-max-attempts=$E2E_ALLOCATION_MAX_ATTEMPTS db=${E2E_DB_IMAGE:-mariadb:11.4}"; fi
+}
+running_settings_file() {
+  echo "$E2E_WORK/running-settings-$E2E_PROJECT"
+}
+
+# --reuse: this project's app and gateway must be running (another stack may answer on the same port)
+# with the settings this command asks for.
 require_running_stack() {
-  local svc
+  local svc running published mapping cport hport
   for svc in app gateway; do
     if [[ -z "$(compose_running ps -q --status running "$svc" 2>/dev/null)" ]]; then
       echo "--reuse: no running stack of $E2E_PROJECT (profile $E2E_PROFILE; $svc is not running)" >&2; return 1
     fi
   done
+  # every port the tests use must be this project's (service, container port, host port)
+  local mappings=("gateway 8080 $E2E_HTTP_PORT" "gateway 3306 $E2E_DB_PORT" "gateway 8081 $E2E_LABEL_PORT")
+  [[ $E2E_PROFILE == default ]] || mappings+=("sinkgateway 8082 $E2E_SINK_PORT")
+  for mapping in "${mappings[@]}"; do
+    read -r svc cport hport <<< "$mapping"
+    published="$(compose_running port "$svc" "$cport" 2>/dev/null || true)"
+    if [[ $'\n'"$published"$'\n' != *$'\n'"127.0.0.1:$hport"$'\n'* ]]; then
+      echo "--reuse: $E2E_PROJECT publishes $svc:$cport on ${published:-no port}, not 127.0.0.1:$hport" >&2; return 1
+    fi
+  done
   curl -fsS -o /dev/null "$E2E_BASE_URL/api/status" || { echo "--reuse: no stack answers at $E2E_BASE_URL" >&2; return 1; }
+  if [[ ! -f "$(running_settings_file)" && $E2E_PROFILE == default ]]; then
+    # a default stack started before the settings were recorded: only its database image is unknown
+    log "--reuse: no settings record for $E2E_PROJECT (started before they were recorded); assuming $(stack_settings)"
+    return 0
+  fi
+  running="$(cat "$(running_settings_file)" 2>/dev/null || echo unknown)"
+  if [[ "$running" != "$(stack_settings)" ]]; then
+    echo "--reuse: $E2E_PROJECT runs with $running, this command asks for $(stack_settings): pass the same switches, or restart it with up.sh" >&2
+    return 1
+  fi
+}
+
+# up.sh: the stack's loopback ports must be free or already this project's (it is recreated); else
+# name what holds them, instead of Docker's bind failure.
+require_free_ports() {
+  local port holder project ports=("$E2E_HTTP_PORT" "$E2E_DB_PORT" "$E2E_LABEL_PORT")
+  [[ $E2E_PROFILE == default ]] || ports+=("$E2E_SINK_PORT")
+  for port in "${ports[@]}"; do
+    # "<compose project>|<container>" of a running container publishing $port on the loopback or all addresses
+    holder="$(docker ps --format '{{.Label "com.docker.compose.project"}}|{{.Names}}|{{.Ports}}' | awk -F'|' -v p="$port" '
+      { n = split($3, a, /, */)
+        for (i = 1; i <= n; i++) if (a[i] ~ ("^(127[.]0[.]0[.]1|0[.]0[.]0[.]0|[[]::[]]|::):" p "->") && h == "") h = $1 "|" $2 }
+      END { if (h != "") print h }')"
+    [[ "${holder%%|*}" == "$E2E_PROJECT" ]] && continue
+    if [[ -n "$holder" ]]; then
+      project="${holder%%|*}"
+      echo "port $port is taken by ${project:+the compose project $project, }container ${holder#*|}: stop it, or set this stack's E2E_*_PORT values" >&2
+      return 1
+    fi
+    if (exec 3<>"/dev/tcp/127.0.0.1/$port") 2>/dev/null; then
+      echo "port $port on 127.0.0.1 is taken by another process: free it, or set this stack's E2E_*_PORT values" >&2; return 1
+    fi
+  done
 }
 
 node_major() {
