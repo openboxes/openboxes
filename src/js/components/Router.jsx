@@ -3,7 +3,7 @@ import React, { lazy, Suspense, useMemo } from 'react';
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
 import {
-  BrowserRouter, Navigate, Route, Routes,
+  BrowserRouter, Navigate, Route, Routes, useLocation,
 } from 'react-router-dom';
 import { ClimbingBoxLoader } from 'react-spinners';
 import { ToastContainer } from 'react-toastify';
@@ -15,7 +15,7 @@ import {
 
 import MainLayout from 'components/Layout/v2/MainLayout';
 import ActivityCode from 'consts/activityCode';
-import { DASHBOARD_URL } from 'consts/applicationUrls';
+import { CONTEXT_PATH, DASHBOARD_URL } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
 
@@ -99,18 +99,16 @@ const AsyncReorderReport = lazy(() => import('components/reporting/reorderReport
 
 const AsyncExpirationHistoryReport = lazy(() => import('components/reporting/expirationHistoryReport/ExpirationHistoryReport'));
 
-const StockMovementList = (props) => {
-  const parsedSearchQuery = queryString.parse(props?.location?.search);
+const StockMovementList = () => {
+  const location = useLocation();
+  const parsedSearchQuery = queryString.parse(location.search);
   const direction = parsedSearchQuery?.direction?.toUpperCase();
   switch (direction) {
     case 'INBOUND':
-      return <AsyncStockMovementInboundList {...props} />;
+      return <AsyncStockMovementInboundList />;
     case 'OUTBOUND': {
       return (
-        <AsyncStockMovementOutboundList
-          {...props}
-          sourceType={parsedSearchQuery?.sourceType?.toUpperCase()}
-        />
+        <AsyncStockMovementOutboundList sourceType={parsedSearchQuery?.sourceType?.toUpperCase()} />
       );
     }
     default:
@@ -136,52 +134,52 @@ const Router = () => {
 
   return (
     <div>
-      <BrowserRouter basename={window.CONTEXT_PATH || '/openboxes'}>
+      <BrowserRouter>
         <FlashScopeListenerWrapper>
           <Suspense fallback={<div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>}>
             <Routes>
               <Route element={<MainLayout />}>
-                <Route path="/purchaseOrder/list" element={<AsyncPurchaseOrderList />} />
-                <Route path="/requisitionTemplate/list" element={<AsyncStockList />} />
-                <Route path="/product/list" element={<AsyncProductsList />} />
-                <Route path="/stockTransfer/list" element={<AsyncStockTransferList />} />
-                <Route path="/productSupplier/list" element={<AsyncProductSupplierList />} />
-                <Route path="/productSupplier/create/:productSupplierId?" element={<AsyncProductSupplierCreatePage />} />
-                <Route path="/dashboard/:configId?" element={<Dashboard />} />
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/putAway/create/:putAwayId?" element={<AsyncPutAwayMainPage />} />
-                <Route path="/stockMovement/list" element={<StockMovementList />} />
-                <Route path="/stockMovement/createOutbound/:stockMovementId?" element={<AsyncStockMovement />} />
-                <Route path="/stockMovement/importOutboundStockMovement" element={<AsyncOutboundImport />} />
-                <Route path="/report/expirationHistoryReport" element={<AsyncExpirationHistoryReport />} />
-                <Route path="/inventory/reorderReport" element={<AsyncReorderReport />} />
-                <Route path="/inventory/cycleCount/count" element={<AsyncCycleCountCountStep />} />
-                <Route path="/inventory/cycleCount/resolve" element={<AsyncCycleCountResolveStep />} />
-                <Route path="/inventory/cycleCount/reporting" element={<AsyncCycleCountReporting />} />
-                <Route path="/inventory/cycleCount" element={<AsyncCycleCount />} />
-                <Route path="/stockMovement/createInbound/:stockMovementId?" element={<AsyncStockMovementInbound />} />
-                <Route path="/stockMovement/createCombinedShipments/:stockMovementId?" element={<AsyncStockMovementCombinedShipments />} />
-                <Route path="/stockMovement/createRequest/:stockMovementId?" element={<AsyncStockMovementRequest />} />
-                <Route path="/stockMovement/verifyRequest/:stockMovementId?" element={<AsyncStockMovementVerifyRequest />} />
-                <Route path="/stockMovement/create/:stockMovementId?" element={<AsyncStockMovement />} />
-                <Route path="/receiving/create/:shipmentId" element={<AsyncReceiving />} />
+                <Route path={`${CONTEXT_PATH}/purchaseOrder/list`} element={<AsyncPurchaseOrderList />} />
+                <Route path={`${CONTEXT_PATH}/requisitionTemplate/list`} element={<AsyncStockList />} />
+                <Route path={`${CONTEXT_PATH}/product/list`} element={<AsyncProductsList />} />
+                <Route path={`${CONTEXT_PATH}/stockTransfer/list`} element={<AsyncStockTransferList />} />
+                <Route path={`${CONTEXT_PATH}/productSupplier/list`} element={<AsyncProductSupplierList />} />
+                <Route path={`${CONTEXT_PATH}/productSupplier/create/:productSupplierId?`} element={<AsyncProductSupplierCreatePage />} />
+                <Route path={`${CONTEXT_PATH}/dashboard/:configId?`} element={<Dashboard />} />
+                <Route path={`${CONTEXT_PATH}/putAway/create/:putAwayId?`} element={<AsyncPutAwayMainPage />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/list`} element={<StockMovementList />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/createOutbound/:stockMovementId?`} element={<AsyncStockMovement />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/importOutboundStockMovement`} element={<AsyncOutboundImport />} />
+                <Route path={`${CONTEXT_PATH}/report/expirationHistoryReport`} element={<AsyncExpirationHistoryReport />} />
+                <Route path={`${CONTEXT_PATH}/inventory/reorderReport`} element={<AsyncReorderReport />} />
+                <Route path={`${CONTEXT_PATH}/inventory/cycleCount/count`} element={<AsyncCycleCountCountStep />} />
+                <Route path={`${CONTEXT_PATH}/inventory/cycleCount/resolve`} element={<AsyncCycleCountResolveStep />} />
+                <Route path={`${CONTEXT_PATH}/inventory/cycleCount/reporting`} element={<AsyncCycleCountReporting />} />
+                <Route path={`${CONTEXT_PATH}/inventory/cycleCount`} element={<AsyncCycleCount />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/createInbound/:stockMovementId?`} element={<AsyncStockMovementInbound />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/createCombinedShipments/:stockMovementId?`} element={<AsyncStockMovementCombinedShipments />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/createRequest/:stockMovementId?`} element={<AsyncStockMovementRequest />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/verifyRequest/:stockMovementId?`} element={<AsyncStockMovementVerifyRequest />} />
+                <Route path={`${CONTEXT_PATH}/stockMovement/create/:stockMovementId?`} element={<AsyncStockMovement />} />
+                <Route path={`${CONTEXT_PATH}/receiving/create/:shipmentId`} element={<AsyncReceiving />} />
                 {/* TODO: Remove this route once the new receiving refactor is complete
                 (legacy PartialReceivingPage) */}
-                <Route path="/partialReceiving/create/:shipmentId" element={<AsyncReceivingPage />} />
-                <Route path="/stocklistManagement/index/:productId?" element={<AsyncManagement />} />
-                <Route path="/invoice/create/:invoiceId?" element={<AsyncInvoice />} />
-                <Route path="/invoice/list" element={<AsyncInvoiceList />} />
-                <Route path="/stockTransfer/create/:stockTransferId?" element={<AsyncStockTransfer />} />
-                <Route path="/stockTransfer/createOutboundReturn/:outboundReturnId?" element={<AsyncOutboundReturns />} />
-                <Route path="/stockTransfer/createInboundReturn/:inboundReturnId?" element={<AsyncInboundReturns />} />
-                <Route path="/replenishment/create/:replenishmentId?" element={<AsyncReplenishment />} />
-                <Route path="/productsConfiguration/index" element={<AsyncProductsConfiguration />} />
-                <Route path="/locationsConfiguration/create/:locationId?" element={<AsyncLocationsConfiguration />} />
-                <Route path="/locationsConfiguration/upload" element={<AsyncImportLocations />} />
+                <Route path={`${CONTEXT_PATH}/partialReceiving/create/:shipmentId`} element={<AsyncReceivingPage />} />
+                <Route path={`${CONTEXT_PATH}/stocklistManagement/index/:productId?`} element={<AsyncManagement />} />
+                <Route path={`${CONTEXT_PATH}/invoice/create/:invoiceId?`} element={<AsyncInvoice />} />
+                <Route path={`${CONTEXT_PATH}/invoice/list`} element={<AsyncInvoiceList />} />
+                <Route path={`${CONTEXT_PATH}/stockTransfer/create/:stockTransferId?`} element={<AsyncStockTransfer />} />
+                <Route path={`${CONTEXT_PATH}/stockTransfer/createOutboundReturn/:outboundReturnId?`} element={<AsyncOutboundReturns />} />
+                <Route path={`${CONTEXT_PATH}/stockTransfer/createInboundReturn/:inboundReturnId?`} element={<AsyncInboundReturns />} />
+                <Route path={`${CONTEXT_PATH}/replenishment/create/:replenishmentId?`} element={<AsyncReplenishment />} />
+                <Route path={`${CONTEXT_PATH}/productsConfiguration/index`} element={<AsyncProductsConfiguration />} />
+                <Route path={`${CONTEXT_PATH}/locationsConfiguration/create/:locationId?`} element={<AsyncLocationsConfiguration />} />
+                <Route path={`${CONTEXT_PATH}/locationsConfiguration/upload`} element={<AsyncImportLocations />} />
+                <Route path="*" element={<Dashboard />} />
               </Route>
-              <Route path="/locationsConfiguration/index" element={<AsyncWelcomePage />} />
-              <Route path="/loadData/index" element={<AsyncLoadDataPage />} />
-              <Route path="/resettingInstanceInfo/index" element={<AsyncResetInstancePage />} />
+              <Route path={`${CONTEXT_PATH}/locationsConfiguration/index`} element={<AsyncWelcomePage />} />
+              <Route path={`${CONTEXT_PATH}/loadData/index`} element={<AsyncLoadDataPage />} />
+              <Route path={`${CONTEXT_PATH}/resettingInstanceInfo/index`} element={<AsyncResetInstancePage />} />
             </Routes>
           </Suspense>
         </FlashScopeListenerWrapper>

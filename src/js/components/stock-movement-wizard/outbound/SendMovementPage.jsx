@@ -10,7 +10,6 @@ import Dropzone from 'react-dropzone';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
@@ -36,6 +35,7 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation, { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -976,7 +976,7 @@ class SendMovementPage extends Component {
                       <button
                         type="button"
                         onClick={() => {
-                          this.props.history.push(STOCK_MOVEMENT_URL.listOutbound());
+                          this.props.navigate(STOCK_MOVEMENT_URL.listOutbound());
                         }}
                         className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                       >
@@ -1103,8 +1103,6 @@ SendMovementPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
 };

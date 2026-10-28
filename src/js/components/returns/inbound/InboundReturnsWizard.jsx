@@ -11,6 +11,7 @@ import SendInboundReturn from 'components/returns/inbound/SendInboundReturn';
 import Wizard from 'components/wizard/Wizard';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -143,7 +144,7 @@ class InboundReturns extends Component {
   render() {
     const { values, currentPage } = this.state;
     const pageList = [CreateInboundReturn, AddItemsPage, SendInboundReturn];
-    const { location, history, match } = this.props;
+    const { location, navigate, match } = this.props;
     const locationId = location.id;
 
     return (
@@ -155,7 +156,7 @@ class InboundReturns extends Component {
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         additionalProps={{
-          locationId, location, history, match,
+          locationId, location, navigate, match,
         }}
         updateWizardValues={this.updateWizardValues}
       />
@@ -170,9 +171,9 @@ const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(InboundReturns);
+})(InboundReturns));
 
 InboundReturns.propTypes = {
   match: PropTypes.shape({
@@ -187,9 +188,7 @@ InboundReturns.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   location: PropTypes.shape({
     name: PropTypes.string,
     id: PropTypes.string,

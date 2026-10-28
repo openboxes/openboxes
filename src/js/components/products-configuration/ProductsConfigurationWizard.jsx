@@ -10,6 +10,7 @@ import ConfigureProducts from 'components/products-configuration/ConfigureProduc
 import ReviewCategories from 'components/products-configuration/ReviewCategories';
 import Wizard from 'components/wizard/Wizard';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -57,7 +58,7 @@ class ProductsConfigurationWizard extends Component {
   render() {
     const { values, currentPage } = this.state;
     const pageList = [ConfigureProductCategories, ReviewCategories, ConfigureProducts];
-    const { location, history } = this.props;
+    const { location, navigate } = this.props;
     const locationId = location.id;
 
     return (
@@ -68,7 +69,7 @@ class ProductsConfigurationWizard extends Component {
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         additionalProps={{
-          locationId, location, history,
+          locationId, location, navigate,
         }}
         updateWizardValues={this.updateWizardValues}
         showStepNumber
@@ -83,9 +84,9 @@ const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   fetchTranslations,
-})(ProductsConfigurationWizard);
+})(ProductsConfigurationWizard));
 
 ProductsConfigurationWizard.propTypes = {
   locale: PropTypes.string.isRequired,
@@ -94,9 +95,7 @@ ProductsConfigurationWizard.propTypes = {
   initialValues: PropTypes.shape({
     categoriesImported: PropTypes.bool,
   }),
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   location: PropTypes.shape({
     name: PropTypes.string,
     id: PropTypes.string,

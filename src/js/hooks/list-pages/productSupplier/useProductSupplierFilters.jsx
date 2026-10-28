@@ -19,7 +19,8 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     setDefaultFilterValues,
     filtersInitialized,
     setFiltersInitialized,
-    history,
+    navigate,
+    location,
     dispatch,
   } = useCommonFilters();
 
@@ -45,10 +46,10 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
   }, []);
 
   const clearFilterValues = () => {
-    const { pathname, search } = history.location;
+    const { pathname, search } = location;
     const queryParams = queryString.parse(search);
     const clearedParams = clearQueryParams({ fieldsToIgnore: ignoreClearFilters, queryParams });
-    history.push({ pathname, search: clearedParams });
+    navigate({ pathname, search: clearedParams });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -62,7 +63,7 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     if (!defaultValues.tab) {
       defaultValues.tab = DETAILS_TAB;
     }
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(window.location.search);
 
     if (queryProps.searchTerm) {
       defaultValues.searchTerm = queryProps.searchTerm;
@@ -112,9 +113,9 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

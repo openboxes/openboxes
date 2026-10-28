@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { fetchStockTransferStatuses } from 'actions';
 import filterFields from 'components/stock-transfer/list/FilterFields';
@@ -15,7 +15,8 @@ const useStockTransferFilters = () => {
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     statuses,
     currentUser,
@@ -30,8 +31,8 @@ const useStockTransferFilters = () => {
   const dispatch = useDispatch();
 
   const clearFilterValues = () => {
-    const { pathname } = history.location;
-    history.push({ pathname });
+    const { pathname } = location;
+    navigate({ pathname });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -39,7 +40,7 @@ const useStockTransferFilters = () => {
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(window.location.search);
 
     // SET STATIC DEFAULT VALUES
     if (queryProps.status) {
@@ -80,9 +81,9 @@ const useStockTransferFilters = () => {
 
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams({ ...values });
   };

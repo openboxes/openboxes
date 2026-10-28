@@ -4,7 +4,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { STOCK_TRANSFER_API, STOCK_TRANSFER_BY_ID } from 'api/urls';
@@ -15,6 +14,7 @@ import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -186,7 +186,7 @@ class CreateOutboundReturn extends Component {
           if (response.data) {
             const resp = parseResponse(response.data.data);
             this.setState({ values: resp }, () => {
-              this.props.history.push(STOCK_TRANSFER_URL.editOutbound(this.state.values.id));
+              this.props.navigate(STOCK_TRANSFER_URL.editOutbound(this.state.values.id));
               this.props.nextPage(this.state.values);
             });
           }
@@ -266,9 +266,7 @@ CreateOutboundReturn.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   location: PropTypes.shape({
     name: PropTypes.string,
     id: PropTypes.string,

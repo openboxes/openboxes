@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 
 import { fetchTranslations } from 'actions';
 import { DASHBOARD_URL, LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 class WelcomePage extends Component {
   componentDidMount() {
@@ -21,15 +21,15 @@ class WelcomePage extends Component {
   }
 
   skipConfiguration() {
-    this.props.history.push(DASHBOARD_URL.base);
+    this.props.navigate(DASHBOARD_URL.base);
   }
 
   createLocation() {
-    this.props.history.push(LOCATION_CONFIGURATION_URL.create());
+    this.props.navigate(LOCATION_CONFIGURATION_URL.create());
   }
 
   importLocations() {
-    this.props.history.push(LOCATION_CONFIGURATION_URL.upload());
+    this.props.navigate(LOCATION_CONFIGURATION_URL.upload());
   }
 
   render() {
@@ -99,5 +99,5 @@ export default withRouter(connect(mapStateToProps, { fetchTranslations })(Welcom
 WelcomePage.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

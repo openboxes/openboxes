@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 
 import queryString from 'query-string';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import useQueryParams from 'hooks/useQueryParams';
 
 const useSwitchTabs = ({ defaultTab }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const currentQueryParams = useQueryParams();
 
@@ -20,7 +20,7 @@ const useSwitchTabs = ({ defaultTab }) => {
   };
 
   const switchTab = (tab, onSwitchTab) => {
-    history.push(getTabLocation(tab));
+    navigate(getTabLocation(tab));
     onSwitchTab?.();
   };
 
@@ -30,7 +30,7 @@ const useSwitchTabs = ({ defaultTab }) => {
     // It's a redirect, so it replaces the history entry instead of pushing a new one,
     // otherwise the browser back button would land on the URL without the tab
     if (!currentQueryParams.tab) {
-      history.replace(getTabLocation(defaultTab));
+      navigate(getTabLocation(defaultTab), { replace: true });
     }
   }, []);
 
