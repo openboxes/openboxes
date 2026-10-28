@@ -867,6 +867,16 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return ([pickReasonCode] + reasonCodes).findAll { it }.unique()
     }
 
+    List<RequisitionItem> getEffectiveRequisitionItems() {
+        if (modificationItem) {
+            return [modificationItem]
+        }
+        if (substitutionItems) {
+            return substitutionItems as List
+        }
+        return [this]
+    }
+
     /**
      * Sort by sort order, name
      *
