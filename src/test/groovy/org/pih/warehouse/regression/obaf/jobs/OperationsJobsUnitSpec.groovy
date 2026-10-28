@@ -54,7 +54,6 @@ class OperationsJobsUnitSpec extends Specification implements DataTest, JobUnitS
         LiquibaseUtil.metaClass.static.isRunningMigrations = { -> false }
         ['automaticPutawayGenerationJob', 'automaticReceiptJob', 'automaticStateTransitionJob',
          'automaticStateTransitionPollingJob', 'putawayLocationReassignmentJob'].each { jobs(it).enabled = true }
-        jobs('automaticReceiptJob').bulkShipmentAutoReceipt = true
     }
 
     void cleanup() {
@@ -188,15 +187,12 @@ class OperationsJobsUnitSpec extends Specification implements DataTest, JobUnitS
         0 * authService.withSystemUser(_)
     }
 
-    void 'AutomaticReceiptJob cron pass is off with bulkShipmentAutoReceipt=false'() {
-        given:
-        jobs('automaticReceiptJob').bulkShipmentAutoReceipt = false
-
+    void 'AutomaticReceiptJob: no facility has the activity: the cron run is inert'() {
         when:
         receiptJob().execute(context())
 
         then:
-        0 * locationService._
+        1 * locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING]) >> []
         0 * receiptService._
     }
 

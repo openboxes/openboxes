@@ -65,7 +65,6 @@ class AllocationJobsUnitSpec extends Specification implements DataTest, JobUnitS
         jobs('automaticAllocationJob').enabled = true
         jobs('automaticBackorderReallocationJob').enabled = true
         jobs('automaticIssuanceJob').enabled = true
-        jobs('automaticIssuanceJob').bulkAutomaticIssuance = true
     }
 
     void cleanup() {
@@ -91,7 +90,7 @@ class AllocationJobsUnitSpec extends Specification implements DataTest, JobUnitS
 
     AutomaticIssuanceJob issuanceJob() {
         return new AutomaticIssuanceJob(stockMovementService: stockMovementService, requisitionService: requisitionService,
-                authService: authService)
+                authService: authService, locationService: locationService)
     }
 
     void 'the config the jobs read is the config this spec writes (sanity)'() {
@@ -402,8 +401,9 @@ class AllocationJobsUnitSpec extends Specification implements DataTest, JobUnitS
         0 * stockMovementService.issueRequisition(_)
     }
 
-    void 'AutomaticIssuanceJob bulk mode issues every STAGED requisition, and one failure does not stop the batch'() {
+    void 'AutomaticIssuanceJob bulk mode issues every STAGED requisition of AUTOMATIC_ISSUANCE_ENABLED facilities, and one failure does not stop the batch'() {
         given:
+        Location f = facility('AI-1')
         Requisition a = staged(deliveryTypeCode: DeliveryTypeCode.PICK_UP)
         Requisition b = staged(deliveryTypeCode: DeliveryTypeCode.PICK_UP)
         Requisition c = staged(deliveryTypeCode: DeliveryTypeCode.PICK_UP)
@@ -413,21 +413,20 @@ class AllocationJobsUnitSpec extends Specification implements DataTest, JobUnitS
         issuanceJob().execute(context())
 
         then:
-        1 * requisitionService.findStagedRequisitionIds() >> [a.id, b.id, c.id]
+        1 * locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ISSUANCE_ENABLED]) >> [f]
+        1 * requisitionService.findStagedRequisitionIds([f]) >> [a.id, b.id, c.id]
         1 * stockMovementService.issueRequisition(a)
         1 * stockMovementService.issueRequisition(b) >> { throw new IllegalStateException('cannot issue') }
         1 * stockMovementService.issueRequisition(c)
         notThrown(Exception)
     }
 
-    void 'AutomaticIssuanceJob with bulk mode off ignores the cron run'() {
-        given:
-        jobs('automaticIssuanceJob').bulkAutomaticIssuance = false
-
+    void 'AutomaticIssuanceJob: no facility has the activity: the cron run is inert'() {
         when:
         issuanceJob().execute(context())
 
         then:
+        1 * locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ISSUANCE_ENABLED]) >> []
         0 * requisitionService._
         0 * stockMovementService._
     }

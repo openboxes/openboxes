@@ -302,7 +302,7 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
     void 'AutomaticIssuanceJob bulk pass issues STAGED orders of the allowed delivery types only'() {
         given:
         config.set('openboxes.jobs.automaticIssuanceJob.enabled', true)
-        String dc = depot('JOB-AIB')
+        String dc = depot('JOB-AIB', [ActivityCode.AUTOMATIC_ISSUANCE_ENABLED])
         String b1 = bin(dc, 'B1')
         String p = product('AIB')
         stock(dc, p, [[b1, 10, 'L', SOON]])
