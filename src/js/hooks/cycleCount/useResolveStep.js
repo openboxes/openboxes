@@ -12,7 +12,7 @@ import {
 import _ from 'lodash';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
@@ -59,7 +59,7 @@ const useResolveStep = () => {
   const dateRecounted = useRef({});
   const [isStepEditable, setIsStepEditable] = useState(true);
   const { show, hide } = useSpinner();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
   const [sortByProductName, setSortByProductName] = useState(false);
   // Here we store cycle count IDs that were updated,
@@ -411,7 +411,7 @@ const useResolveStep = () => {
       });
       // If we've canceled every product in the batch, there's no reason to stay on this screen.
       if (tableData.current.length === 0) {
-        history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
+        navigate(CYCLE_COUNT.list(TO_RESOLVE_TAB));
       }
     } finally {
       hide();
@@ -780,7 +780,7 @@ const useResolveStep = () => {
         return;
       }
       dispatch(eraseDraft(currentLocation?.id, TO_RESOLVE_TAB));
-      history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
+      navigate(CYCLE_COUNT.list(TO_RESOLVE_TAB));
     } finally {
       hide();
     }

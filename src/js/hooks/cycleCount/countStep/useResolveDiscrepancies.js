@@ -4,7 +4,7 @@ import { useCallback, useRef } from 'react';
 
 import queryString from 'query-string';
 import { useDispatch, useStore } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { clearCountWorkflow, eraseDraft, startResolution } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
@@ -29,7 +29,7 @@ const useResolveDiscrepancies = ({
   const requestIdsWithDiscrepancies = requestIdsWithDiscrepanciesRef || internalRef;
   const dispatch = useDispatch();
   const store = useStore();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { show, hide } = useSpinner();
   const translate = useTranslate();
 
@@ -87,12 +87,12 @@ const useResolveDiscrepancies = ({
       });
 
       if (data.totalCount > 0) {
-        history.push(CYCLE_COUNT.list(tab));
+        navigate(CYCLE_COUNT.list(tab));
         return;
       }
     }
-    history.push(CYCLE_COUNT.list(ALL_PRODUCTS_TAB));
-  }, [currentLocationId, history]);
+    navigate(CYCLE_COUNT.list(ALL_PRODUCTS_TAB));
+  }, [currentLocationId, navigate]);
 
   const modalLabels = useCallback((count) => ({
     title: { label: 'react.cycleCount.modal.resolveDiscrepanciesTitle.label', default: 'Resolve discrepancies?' },
@@ -116,7 +116,7 @@ const useResolveDiscrepancies = ({
           dispatch(clearCountWorkflow);
           hide();
           onClose?.();
-          history.push(CYCLE_COUNT.list(TO_RESOLVE_TAB));
+          navigate(CYCLE_COUNT.list(TO_RESOLVE_TAB));
         },
       },
       {

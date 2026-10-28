@@ -271,7 +271,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(STOCK_MOVEMENT_URL.editInbound(resp.id));
+            this.props.navigate(STOCK_MOVEMENT_URL.editInbound(resp.id));
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,
@@ -404,10 +404,8 @@ CreateStockMovement.propTypes = {
    * is fired from within the form component.
    */
   nextPage: PropTypes.func.isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
   /** Current location */
   location: PropTypes.shape({
     name: PropTypes.string,

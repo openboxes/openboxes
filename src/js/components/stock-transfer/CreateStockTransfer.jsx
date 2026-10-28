@@ -217,7 +217,7 @@ class CreateStockTransfer extends Component {
         const stockTransfer = parseResponse(response.data.data);
         this.props.hideSpinner();
 
-        this.props.history.push(STOCK_TRANSFER_URL.createById(stockTransfer.id));
+        this.props.navigate(STOCK_TRANSFER_URL.createById(stockTransfer.id));
         this.props.nextPage({ stockTransfer });
       })
       .catch(() => this.props.hideSpinner());
@@ -408,8 +408,8 @@ CreateStockTransfer.propTypes = {
   nextPage: PropTypes.func.isRequired,
   /** Location ID (currently chosen). To be used in stock transfer requests. */
   locationId: PropTypes.string.isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
   stockTransferTranslationsFetched: PropTypes.bool.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
   hideInfoBar: PropTypes.func.isRequired,

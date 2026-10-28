@@ -4,7 +4,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import PutAwayCheckPage from 'components/put-away/PutAwayCheckPage';
@@ -13,6 +12,7 @@ import PutAwaySecondPage from 'components/put-away/PutAwaySecondPage';
 import Wizard from 'components/wizard/Wizard';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/put-away/PutAway.scss';
 
@@ -108,7 +108,7 @@ class PutAwayMainPage extends Component {
 
   render() {
     const { page, putAway } = this.state;
-    const { location, history, match } = this.props;
+    const { location, navigate, match } = this.props;
     const locationId = location.id;
     const pageList = [PutAwayPage, PutAwaySecondPage, PutAwayCheckPage];
 
@@ -123,7 +123,7 @@ class PutAwayMainPage extends Component {
           prevPage={page === 1 ? 1 : page - 1}
           updateWizardValues={this.updateWizardValues}
           additionalProps={{
-            locationId, location, history, match,
+            locationId, location, navigate, match,
           }}
         />
       );
@@ -160,6 +160,6 @@ PutAwayMainPage.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({ putAwayId: PropTypes.string }),
   }).isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
 };

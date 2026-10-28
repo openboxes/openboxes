@@ -10,7 +10,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import { toast } from 'react-toastify';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
@@ -32,6 +31,7 @@ import { renderFormField } from 'utils/form-utils';
 import { matchesProductCodeOrName } from 'utils/form-values-utils';
 import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -1299,9 +1299,9 @@ class AddItemsPage extends Component {
                     'Request was successfully deleted',
                   ), { timeout: 3000 });
                   if (this.state.isRequestFromWard) {
-                    this.props.history.push(DASHBOARD_URL.base);
+                    this.props.navigate(DASHBOARD_URL.base);
                   } else {
-                    this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                    this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
                   }
                 }
               })
@@ -1327,9 +1327,9 @@ class AddItemsPage extends Component {
       return this.saveRequisitionItemsInCurrentStep(lineItems)
         .then(() => {
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-            this.props.history.push(DASHBOARD_URL.base);
+            this.props.navigate(DASHBOARD_URL.base);
           } else {
-            this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+            this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
           }
         })
         .catch(() => {
@@ -1353,9 +1353,9 @@ class AddItemsPage extends Component {
             label: this.props.translate('react.default.yes.label', 'Yes'),
             onClick: () => {
               if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                this.props.history.push(DASHBOARD_URL.base);
+                this.props.navigate(DASHBOARD_URL.base);
               } else {
-                this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
               }
             },
           },
@@ -1463,9 +1463,9 @@ class AddItemsPage extends Component {
       'Thank you for submitting your request. You can check the status of your request using stock movement number',
     );
     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-      this.props.history.push(DASHBOARD_URL.base);
+      this.props.navigate(DASHBOARD_URL.base);
     } else {
-      this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+      this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
     }
     toast.success(`${translatedSubmitMessage} ${movementNumber}`);
     return Promise.resolve();
@@ -1814,7 +1814,5 @@ AddItemsPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
   currentLocationId: PropTypes.string.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

@@ -305,7 +305,7 @@ class CreateReplenishment extends Component {
     apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         this.props.hideSpinner();
-        this.props.history.push(REPLENISHMENT_URL.edit(response.data?.data?.id));
+        this.props.navigate(REPLENISHMENT_URL.edit(response.data?.data?.id));
         this.props.nextPage(response.data?.data);
       })
       .catch(() => this.props.hideSpinner());
@@ -431,7 +431,7 @@ CreateReplenishment.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
   locationId: PropTypes.string.isRequired,
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
   replenishmentTranslationsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
 };

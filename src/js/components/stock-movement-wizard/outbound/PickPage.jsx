@@ -37,6 +37,7 @@ import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -1026,7 +1027,7 @@ class PickPage extends Component {
               : (
                 <button
                   type="button"
-                  onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listRequest())}
+                  onClick={() => this.props.navigate(STOCK_MOVEMENT_URL.listRequest())}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
                   <span>
@@ -1094,7 +1095,9 @@ const mapStateToProps = (state) => ({
   formatLocalizedDate: formatDate(state.localize),
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
+export default withRouter(connect(mapStateToProps, {
+  showSpinner, hideSpinner, fetchReasonCodes,
+})(PickPage));
 
 PickPage.propTypes = {
   /** Initial component's data */
@@ -1124,8 +1127,6 @@ PickPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   currentLocale: PropTypes.string.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
 };

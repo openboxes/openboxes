@@ -5,7 +5,7 @@ import { parse } from 'date-fns';
 import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
@@ -43,7 +43,7 @@ const useInboundSendForm = ({ previous }) => {
   const debounceTime = useSelector(getDebounceTime);
   const minSearchLength = useSelector(getMinSearchLength);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const debouncedDestinationLocationsFetch = useMemo(
     () => debounceLocationsFetch(
@@ -209,7 +209,7 @@ const useInboundSendForm = ({ previous }) => {
       // Any error during fetching means we cannot continue the edit flow.
       // In that case, redirect the user to the create inbound flow.
       dispatch(updateWorkflowHeader([], null));
-      history.push({
+      navigate({
         pathname: '/openboxes/stockMovement/createInbound',
         search: queryString.stringify({ direction: 'INBOUND' }),
       });
