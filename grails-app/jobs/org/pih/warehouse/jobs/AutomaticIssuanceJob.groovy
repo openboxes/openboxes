@@ -39,7 +39,7 @@ class AutomaticIssuanceJob {
             return
         }
 
-        List<Location> facilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ISSUANCE_BULK])
+        List<Location> facilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ISSUANCE_ENABLED])
         if (facilities) {
             List<String> requisitionIds = requisitionService.findStagedRequisitionIds(facilities)
             log.info "Found ${requisitionIds.size()} outbound STAGED requisitions to automatic issue"

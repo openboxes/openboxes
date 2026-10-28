@@ -50,7 +50,7 @@ class AutomaticReceiptJob {
         // FIXME This probably shouldn't be run during the same execution as the above code as it has the potential
         //  to create a race condition or duplicate receipts
         // Fallback in case the auto receipt job was not triggered for a specific shipment
-        List<Location> autoReceiptFacilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING_BULK]) as List<Location>
+        List<Location> autoReceiptFacilities = locationService.getLocationsSupportingActivities([ActivityCode.AUTO_RECEIVING]) as List<Location>
         if (autoReceiptFacilities) {
             log.info "Running automatic receipt job for all shipped shipments... "
             autoReceiptFacilities.each { Location facility ->

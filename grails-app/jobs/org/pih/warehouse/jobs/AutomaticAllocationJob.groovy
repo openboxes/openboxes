@@ -43,7 +43,7 @@ class AutomaticAllocationJob {
         }
 
         List<Location> facilities =
-                locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ALLOCATION_BULK])
+                locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ALLOCATION_ENABLED])
         if (facilities) {
             log.info "Running automatic allocation job for all pending requisitions... "
             facilities.each { Location facility ->
