@@ -472,8 +472,10 @@ export function addToIndicators(widgetConfig, locationId, userId = '') {
   };
 }
 
-export function reorderIndicators({ oldIndex, newIndex }, e, type) {
-  if (e.target.id === 'archive') {
+export function reorderIndicators({
+  oldIndex, newIndex, type, archive,
+}) {
+  if (archive) {
     return {
       type: REMOVE_FROM_INDICATORS,
       payload: { index: oldIndex, type },
