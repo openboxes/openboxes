@@ -7,6 +7,7 @@ import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
+import org.springframework.transaction.event.TransactionalEventListenerFactory
 import org.springframework.transaction.support.AbstractPlatformTransactionManager
 import org.springframework.transaction.support.DefaultTransactionStatus
 import org.springframework.transaction.support.TransactionTemplate
@@ -54,6 +55,8 @@ class TransactionalEventListenerPhaseSpec extends Specification {
 
     void setupSpec() {
         context = new AnnotationConfigApplicationContext()
+        // Normally registered by @EnableTransactionManagement; without it @TransactionalEventListener runs as a plain @EventListener
+        context.register(TransactionalEventListenerFactory)
         listener = new RecordingListener()
         context.beanFactory.registerSingleton('listener', listener)
         context.refresh()
@@ -100,9 +103,9 @@ class TransactionalEventListenerPhaseSpec extends Specification {
     }
 
     @Unroll
-    void '#listener.simpleName.#method is declared AFTER_COMMIT with fallbackExecution'() {
+    void '#listenerClass.simpleName.#method is declared AFTER_COMMIT with fallbackExecution'() {
         when:
-        TransactionalEventListener annotation = listener.declaredMethods.find { it.name == method }
+        TransactionalEventListener annotation = listenerClass.declaredMethods.find { it.name == method }
                 ?.getAnnotation(TransactionalEventListener)
 
         then:
@@ -111,7 +114,7 @@ class TransactionalEventListenerPhaseSpec extends Specification {
         annotation.fallbackExecution()
 
         where:
-        listener                                  | method
+        listenerClass                             | method
         AutomaticAllocationEventService           | 'onAutomaticAllocationEvent'
         AutomaticBackorderAllocationEventService  | 'onAutomaticBackorderReallocationEvent'
         RequisitionEventService                   | 'onRequisitionEvent'
