@@ -753,6 +753,11 @@ div.crossed-out .table-inner-row:before {
   z-index: 9999 !important;
 }
 
+// react-datepicker v9 points the arrow at the middle of the input, keep the position from v1.8
+.force-on-top .react-datepicker__triangle {
+  left: 43px !important;
+}
+
 .react-select__loading-zone {
   display: none !important;
 }

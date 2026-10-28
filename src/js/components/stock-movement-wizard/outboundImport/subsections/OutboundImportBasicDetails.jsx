@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
@@ -122,14 +122,14 @@ const OutboundImportBasicDetails = ({ control, errors }) => {
             name="dateRequested"
             control={control}
             render={({ field }) => (
-              <DateField
+              <DateFieldDateFns
                 title={{
                   id: 'react.outboundImport.form.dateRequested.title',
                   defaultMessage: 'Date Requested',
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  default: 'Select a date',
+                  defaultMessage: 'Select a date',
                 }}
                 errorMessage={errors.dateRequested?.message}
                 required
