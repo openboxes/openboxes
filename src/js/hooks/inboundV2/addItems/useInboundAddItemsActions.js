@@ -4,7 +4,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useFieldArray } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { updateWorkflowHeader } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
@@ -46,7 +46,7 @@ const useInboundAddItemsActions = ({
   const spinner = useSpinner();
   const translate = useTranslate();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { stockMovementId } = useParams();
   const { scrollToBottom } = useScrollbar({ selector: '.rt-tbody-v2' });
   const {
@@ -517,7 +517,7 @@ const useInboundAddItemsActions = ({
       // Any error during fetching means we cannot continue the edit flow.
       // In that case, redirect the user to the create inbound flow.
       dispatch(updateWorkflowHeader([], null));
-      history.push({
+      navigate({
         pathname: '/openboxes/stockMovement/createInbound',
         search: queryString.stringify({ direction: 'INBOUND' }),
       });

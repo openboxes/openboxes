@@ -1,14 +1,14 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import withRouter from 'utils/withRouter';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/locations-configuration/SuccessMessage.scss';
 
-const LoadDemoDataErrorMessage = ({ history, supportLinks }) => (
+const LoadDemoDataErrorMessage = ({ navigate, supportLinks }) => (
   <div className="success-wrapper">
     <div className="success-content">
       <i className="fa fa-exclamation-circle error-icon" aria-hidden="true" />
@@ -30,7 +30,7 @@ const LoadDemoDataErrorMessage = ({ history, supportLinks }) => (
         </a>
       </p>
       <div className="success-buttons-section d-flex flex-column w-50">
-        <button type="button" className="btn btn-outline-primary" onClick={() => history.push(DASHBOARD_URL.base)}>Back to dashboard</button>
+        <button type="button" className="btn btn-outline-primary" onClick={() => navigate(DASHBOARD_URL.base)}>Back to dashboard</button>
       </div>
     </div>
   </div>
@@ -39,7 +39,7 @@ const LoadDemoDataErrorMessage = ({ history, supportLinks }) => (
 export default withRouter(LoadDemoDataErrorMessage);
 
 LoadDemoDataErrorMessage.propTypes = {
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
   supportLinks: PropTypes.shape({
     discussionForum: PropTypes.string.isRequired,
   }).isRequired,

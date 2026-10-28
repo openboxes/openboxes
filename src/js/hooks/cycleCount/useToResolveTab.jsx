@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   getCurrentLocale,
   getCurrentLocation,
@@ -67,7 +67,7 @@ const useToResolveTab = ({
 
   const dispatch = useDispatch();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const {
     dateLastCount,
@@ -445,7 +445,7 @@ const useToResolveTab = ({
     spinner.show();
     try {
       await dispatch(startResolution(checkedCheckboxes, currentLocation?.id));
-      history.push(CYCLE_COUNT.resolveStep());
+      navigate(CYCLE_COUNT.resolveStep());
     } finally {
       spinner.hide();
     }

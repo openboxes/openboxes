@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
@@ -17,6 +16,7 @@ import Filter from 'utils/Filter';
 import Select from 'utils/Select';
 import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-table/react-table.css';
 
@@ -233,7 +233,7 @@ class PutAwayPage extends Component {
           _.forEach(this.state.putawayItems, (item, index) => { expanded[index] = true; });
         }
 
-        this.props.history.push(PUTAWAY_URL.edit(putAway.id));
+        this.props.navigate(PUTAWAY_URL.edit(putAway.id));
         this.props.nextPage({
           putAway,
           pivotBy: this.state.pivotBy,
@@ -540,8 +540,8 @@ PutAwayPage.propTypes = {
   nextPage: PropTypes.func.isRequired,
   /** Location ID (currently chosen). To be used in putaways requests. */
   locationId: PropTypes.string.isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
 };

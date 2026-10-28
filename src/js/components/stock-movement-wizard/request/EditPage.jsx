@@ -9,7 +9,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import { toast } from 'react-toastify';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
@@ -30,6 +29,7 @@ import { formatProductDisplayName, showOutboundEditValidationErrors } from 'util
 import canEditRequest from 'utils/permissionUtils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -1620,9 +1620,9 @@ class EditItemsPage extends Component {
                   type="button"
                   onClick={() => {
                     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                      this.props.history.push(DASHBOARD_URL.base);
+                      this.props.navigate(DASHBOARD_URL.base);
                     } else {
-                      this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                      this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
                     }
                   }}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
@@ -1666,8 +1666,8 @@ class EditItemsPage extends Component {
                     defaultLabel="Edit request items"
                     variant="primary-outline"
                     onClick={() => {
-                      const { history } = this.props;
-                      history.push(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id));
+                      const { navigate } = this.props;
+                      navigate(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id));
                     }}
                   />
                   )}
@@ -1736,9 +1736,7 @@ EditItemsPage.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,

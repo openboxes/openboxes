@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import { toast } from 'react-toastify';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
@@ -25,6 +24,7 @@ import { renderFormField } from 'utils/form-utils';
 import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationDetails.scss';
@@ -272,7 +272,7 @@ class LocationDetails extends Component {
     apiClient.get(url).then((response) => {
       const location = response.data.data;
       if (!location) {
-        this.props.history.push(LOCATION_CONFIGURATION_URL.create());
+        this.props.navigate(LOCATION_CONFIGURATION_URL.create());
         return;
       }
       this.setState((prev) => ({
@@ -373,7 +373,7 @@ class LocationDetails extends Component {
           this.props.hideSpinner();
           toast.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
-          this.props.history.push(LOCATION_CONFIGURATION_URL.edit(resp.id));
+          this.props.navigate(LOCATION_CONFIGURATION_URL.edit(resp.id));
           this.props.nextPage({
             ...values,
             locationId: resp.id,
@@ -606,7 +606,5 @@ LocationDetails.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({ locationId: PropTypes.string }),
   }).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

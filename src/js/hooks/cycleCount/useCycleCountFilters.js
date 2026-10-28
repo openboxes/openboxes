@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { setShouldRebuildFilterParams } from 'actions';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
@@ -56,22 +56,23 @@ const useCycleCountFilters = ({ filterFields }) => {
 
   const dispatch = useDispatch();
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const translate = useTranslate();
 
   const clearFilterValues = () => {
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(location.search);
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), { tab: queryProps.tab });
     const transformedParams = transformFilterParams(defaultValues, {
       tab: { name: 'tab' },
     });
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     // Clearing the filters only resets the current view (e.g. right after a tab switch, which
     // has already pushed its own history entry), so it shouldn't add another entry
     // for the browser back button to go through
-    history.replace({ pathname, search: queryFilterParams });
+    navigate({ pathname, search: queryFilterParams }, { replace: true });
   };
 
   const resetForm = () => {
@@ -105,7 +106,7 @@ const useCycleCountFilters = ({ filterFields }) => {
     setIsLoading(true);
 
     try {
-      const queryProps = queryString.parse(history.location.search);
+      const queryProps = queryString.parse(window.location.search);
       const defaultValues = Object.keys(filterFields)
         .reduce((acc, key) => ({ ...acc, [key]: '' }), { tab: queryProps.tab });
 
@@ -223,9 +224,9 @@ const useCycleCountFilters = ({ filterFields }) => {
 
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

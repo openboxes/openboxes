@@ -8,7 +8,7 @@ import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useDraftInfoBar from 'hooks/cycleCount/useDraftInfoBar';
 
 const mockDispatch = jest.fn();
-const mockPush = jest.fn();
+const mockNavigate = jest.fn();
 const eraseDraftSpy = jest.spyOn(actions, 'eraseDraft');
 
 jest.mock('react-redux', () => ({
@@ -17,7 +17,7 @@ jest.mock('react-redux', () => ({
   connect: jest.fn(() => (Component) => Component),
 }));
 jest.mock('react-router-dom', () => ({
-  useHistory: jest.fn(() => ({ push: mockPush })),
+  useNavigate: jest.fn(() => mockNavigate),
 }));
 jest.mock('selectors', () => ({
   getCurrentLocation: jest.fn(),
@@ -49,15 +49,15 @@ describe('useDraftInfoBar', () => {
   it('navigates correctly based on tab', () => {
     const { result: countTabResult } = renderUseDraftInfoBar(TO_COUNT_TAB);
     act(() => countTabResult.current.continueDraft());
-    expect(mockPush).toHaveBeenCalledWith(CYCLE_COUNT.countStep());
+    expect(mockNavigate).toHaveBeenCalledWith(CYCLE_COUNT.countStep());
 
     const { result: resoleTabResult } = renderUseDraftInfoBar(TO_RESOLVE_TAB);
     act(() => resoleTabResult.current.continueDraft());
-    expect(mockPush).toHaveBeenCalledWith(CYCLE_COUNT.resolveStep());
+    expect(mockNavigate).toHaveBeenCalledWith(CYCLE_COUNT.resolveStep());
 
     const { result: otherTabResult } = renderUseDraftInfoBar('RANDOM_TAB');
     act(() => otherTabResult.current.continueDraft());
-    expect(mockPush).toHaveBeenCalledWith(CYCLE_COUNT.resolveStep());
+    expect(mockNavigate).toHaveBeenCalledWith(CYCLE_COUNT.resolveStep());
   });
 
   it('handles missing currentLocation safely when discarding', () => {

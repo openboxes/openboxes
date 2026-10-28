@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 
 import { fetchTranslations } from 'actions';
 import LoadDemoDataInfo from 'components/load-demo-data/LoadDemoDataInfo';
@@ -11,6 +10,7 @@ import LoadDemoDataWelcome from 'components/load-demo-data/LoadDemoDataWelcome';
 import { DASHBOARD_URL, LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
 import LOAD_DATA_STEPS from 'consts/loadDataStep';
 import apiClient from 'utils/apiClient';
+import withRouter from 'utils/withRouter';
 
 class LoadDemoDataPage extends Component {
   constructor(props) {
@@ -41,13 +41,13 @@ class LoadDemoDataPage extends Component {
   }
 
   skipConfiguration() {
-    this.props.history.push(DASHBOARD_URL.base);
+    this.props.navigate(DASHBOARD_URL.base);
   }
 
   stepHandler(step) {
     switch (step) {
       case LOAD_DATA_STEPS.createFirstLocation:
-        this.props.history.push(LOCATION_CONFIGURATION_URL.create());
+        this.props.navigate(LOCATION_CONFIGURATION_URL.create());
         break;
       default:
         this.setState({ currentStep: step });
@@ -103,7 +103,7 @@ const mapStateToProps = (state) => ({
 LoadDemoDataPage.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };
 
 export default withRouter(connect(mapStateToProps, {

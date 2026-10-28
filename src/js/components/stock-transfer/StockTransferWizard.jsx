@@ -109,7 +109,7 @@ class StockTransferWizard extends Component {
 
   render() {
     const { page, stockTransfer } = this.state;
-    const { location, history, match } = this.props;
+    const { location, navigate, match } = this.props;
     const locationId = location.id;
     const additionalTitle = null;
     const pageList = [CreateStockTransfer, StockTransferSecondPage, StockTransferCheckPage];
@@ -126,7 +126,7 @@ class StockTransferWizard extends Component {
           prevPage={page === 1 ? 1 : page - 1}
           updateWizardValues={this.updateWizardValues}
           additionalProps={{
-            locationId, location, history, match,
+            locationId, location, navigate, match,
           }}
         />
       );
@@ -163,6 +163,6 @@ StockTransferWizard.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({ stockTransferId: PropTypes.string }),
   }).isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
 };

@@ -8,7 +8,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import { toast } from 'react-toastify';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
@@ -26,6 +25,7 @@ import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -934,7 +934,7 @@ class EditItemsPage extends Component {
                 <button
                   type="button"
                   onClick={() => {
-                    this.props.history.push(STOCK_MOVEMENT_URL.listOutbound());
+                    this.props.navigate(STOCK_MOVEMENT_URL.listOutbound());
                   }}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
@@ -1036,7 +1036,5 @@ EditItemsPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   currentLocale: PropTypes.string.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

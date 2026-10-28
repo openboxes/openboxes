@@ -16,6 +16,7 @@ import apiClient from 'utils/apiClient';
 import canEditRequest from 'utils/permissionUtils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -265,9 +266,9 @@ const mapStateToProps = (state) => ({
   formatLocalizedDate: formatDate(state.localize),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(StockMovementVerifyRequest);
+})(StockMovementVerifyRequest));
 
 StockMovementVerifyRequest.propTypes = {
   /** React router's object which contains information about url variables and params */

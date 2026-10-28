@@ -48,7 +48,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
       if (!acc[key]) return { ...acc, [key]: '' };
       return acc;
     }, {});
-    const queryProps = queryString.parse(location.search);
+    const queryProps = queryString.parse(window.location.search);
 
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.status) {
