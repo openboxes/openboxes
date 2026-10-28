@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { RiStickyNoteFill } from 'react-icons/ri';
 import { connect } from 'react-redux';
@@ -14,6 +13,7 @@ import apiClient from 'utils/apiClient';
 import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 import { getCurrentEventComment } from 'utils/list-utils';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-table/react-table.css';
 import './StockRequestDashboard.scss';
@@ -44,15 +44,9 @@ const getColumns = ({ currentLocale }) => [
             {row.original.displayStatus?.label}
           </span>
           {comment && (
-          // <Tippy
-          //   content={comment}
-          //   theme="transparent"
-          //   delay="150"
-          //   duration="250"
-          //   hideDelay="50"
-          // >
-          <RiStickyNoteFill className="text-warning mr-1" />
-          // </Tippy>
+            <CustomTooltip content={comment}>
+              <RiStickyNoteFill className="text-warning mr-1" />
+            </CustomTooltip>
           )}
         </span>
       );

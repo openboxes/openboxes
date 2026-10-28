@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import _ from 'lodash';
@@ -30,6 +29,7 @@ import canEditRequest from 'utils/permissionUtils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import withRouter from 'utils/withRouter';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -102,19 +102,18 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Product name',
         attributes: {
           formatValue: (value) => (
-            // <Tippy
-            //   content={<div className="text-truncate">{value.name}</div>}
-            //   theme="dark"
-            //   disabled={!value.displayNames?.default}
-            //   position="top-start"
-            // >
+            <CustomTooltip
+              content={<div className="text-truncate">{value.name}</div>}
+              show={!!value.displayNames?.default}
+              place="top-start"
+            >
               <span className="d-flex align-items-center">
                 <span className="text-truncate">
                   {value.displayNames?.default ?? value.name}
                 </span>
                 {renderHandlingIcons(value ? value.handlingIcons : null)}
               </span>
-            // </Tippy>
+            </CustomTooltip>
           ),
         },
         getDynamicAttr: ({ fieldValue, subfield }) => ({
@@ -154,15 +153,9 @@ const AD_HOCK_FIELDS = {
                 <div className="d-flex align-items-center">
                   {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
                   <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
-                  {/* <Tippy */}
-                  {/*   content={rowValues.comments} */}
-                  {/*   theme="transparent" */}
-                  {/*   delay="150" */}
-                  {/*   duration="250" */}
-                  {/*   hideDelay="50" */}
-                  {/* > */}
+                  <CustomTooltip content={rowValues.comments}>
                     <i className="fa fa-sticky-note pr-2" />
-                  {/* </Tippy> */}
+                  </CustomTooltip>
                 </div>
               );
             }
@@ -454,15 +447,9 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
                 <div className="d-flex align-items-center">
                   {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
                   <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
-                  {/* <Tippy */}
-                  {/*   content={rowValues.comments} */}
-                  {/*   theme="transparent" */}
-                  {/*   delay="150" */}
-                  {/*   duration="250" */}
-                  {/*   hideDelay="50" */}
-                  {/* > */}
+                  <CustomTooltip content={rowValues.comments}>
                     <i className="fa fa-sticky-note pr-2" />
-                  {/* </Tippy> */}
+                  </CustomTooltip>
                 </div>
               );
             }
@@ -754,15 +741,9 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
                 <div className="d-flex align-items-center">
                   {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
                   <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
-                  {/* <Tippy */}
-                  {/*   content={rowValues.comments} */}
-                  {/*   theme="transparent" */}
-                  {/*   delay="150" */}
-                  {/*   duration="250" */}
-                  {/*   hideDelay="50" */}
-                  {/* > */}
+                  <CustomTooltip content={rowValues.comments}>
                     <i className="fa fa-sticky-note pr-2" />
-                  {/* </Tippy> */}
+                  </CustomTooltip>
                 </div>
               );
             }
@@ -1335,7 +1316,7 @@ class EditItemsPage extends Component {
         }
 
         this.props.hideSpinner();
-        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }

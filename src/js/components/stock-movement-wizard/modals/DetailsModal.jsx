@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
@@ -14,6 +13,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const FIELDS = {
   pendingRequisitionDetails: {
@@ -155,18 +155,17 @@ class DetailsModal extends Component {
         initialValues={formValues}
       >
         <div className="mb-2">
-          {/* <Tippy */}
-          {/*   content={<div className="text-truncate">{productName}</div>} */}
-          {/*   theme="dark" */}
-          {/*   disabled={!displayName} */}
-          {/*   position="top-start" */}
-          {/* > */}
+          <CustomTooltip
+            content={<div className="text-truncate">{productName}</div>}
+            show={!!displayName}
+            place="top-start"
+          >
             <h5>
               {productCode}
               {' '}
               {displayName ?? productName}
             </h5>
-          {/* </Tippy> */}
+          </CustomTooltip>
           <div>
             <span className="font-weight-bold">
               <Translate id="react.stockMovement.requested.label" defaultMessage="Requested" />
@@ -195,18 +194,13 @@ class DetailsModal extends Component {
             </span>
             {averageMonthlyDemand ? (averageMonthlyDemand.toLocaleString('en-US')) : averageMonthlyDemand}
           </div>
-          {/* <Tippy */}
-          {/*   content={this.props.translate( */}
-          {/*     'react.stockMovement.requestedInOtherRequests.label', */}
-          {/*     'This is the quantity requested in other requests but not yet picked. Picked quantities have already been removed from the available quantity', */}
-          {/*   )} */}
-          {/*   theme="transparent" */}
-          {/*   position="top-start" */}
-          {/*   arrow="true" */}
-          {/*   delay="150" */}
-          {/*   duration="250" */}
-          {/*   hideDelay="50" */}
-          {/* > */}
+          <CustomTooltip
+            content={this.props.translate(
+              'react.stockMovement.requestedInOtherRequests.label',
+              'This is the quantity requested in other requests but not yet picked. Picked quantities have already been removed from the available quantity',
+            )}
+            place="top-start"
+          >
             <div>
               <span className="font-weight-bold">
                 <Translate id="react.stockMovement.totalQuantityRequested.label" defaultMessage="Total Qty Requested" />
@@ -221,7 +215,7 @@ class DetailsModal extends Component {
               </span>
               {totalQtyPicked ? (totalQtyPicked.toLocaleString('en-US')) : totalQtyPicked}
             </div>
-          {/* </Tippy> */}
+          </CustomTooltip>
         </div>
       </ModalWrapper>
     );

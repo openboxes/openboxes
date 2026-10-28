@@ -6,10 +6,10 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tooltip';
 
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
+import PortalTooltip from 'wrappers/PortalTooltip';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
@@ -52,7 +52,7 @@ export const renderFormFields = ({
         <div data-tooltip-id={`arrayField-${tooltipId}`} className={className} data-testid="form-field" aria-label={fieldAriaLabel}>
           {renderInput(input, otherAttr)}
         </div>
-        <Tooltip id={!error || !(touched || fieldTouched) ? undefined : `arrayField-${tooltipId}`} content={translate(error)} />
+        <PortalTooltip id={!error || !(touched || fieldTouched) ? undefined : `arrayField-${tooltipId}`} content={translate(error)} />
       </>
     );
   }
@@ -72,7 +72,7 @@ export const renderFormFields = ({
                         &nbsp;
                         <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />
                       </span>
-                      <Tooltip
+                      <PortalTooltip
                         id={tooltipId}
                         clickable
                         events={trigger === 'click' ? ['click'] : ['hover']}
@@ -81,7 +81,7 @@ export const renderFormFields = ({
                         {injectionData
                           ? parse(translate(tooltip, tooltip, injectionData))
                           : translate(tooltip, tooltip)}
-                      </Tooltip>
+                      </PortalTooltip>
                     </>
                   )}
               </label>

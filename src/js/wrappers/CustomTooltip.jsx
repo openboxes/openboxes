@@ -1,15 +1,18 @@
 import React, { useId } from 'react';
 
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tooltip';
+
+import PortalTooltip from 'wrappers/PortalTooltip';
 
 const CustomTooltip = ({
   children,
   content,
   className,
-  show,
+  show = true,
   disabled = false,
   icon: Icon,
+  place = 'top',
+  delayShow = 150,
 }) => {
   const tooltipId = useId();
   return show ? (
@@ -21,18 +24,20 @@ const CustomTooltip = ({
         {Icon && <Icon className="mr-2" />}
         {children}
       </div>
-      <Tooltip
+      <PortalTooltip
         id={tooltipId}
-        delayShow={150}
+        delayShow={delayShow}
         delayHide={50}
         hidden={disabled}
-        className="w-100"
-        place="top"
+        className="custom-tooltip-popup"
+        place={place}
+        opacity={1}
+        noArrow
       >
         <div className={`p-2 tooltip-dark-blue ${!content ? 'd-none' : ''}`}>
           {content}
         </div>
-      </Tooltip>
+      </PortalTooltip>
     </div>
   ) : children;
 };
@@ -63,6 +68,8 @@ CustomTooltip.propTypes = {
    */
   disabled: PropTypes.bool,
   icon: PropTypes.elementType,
+  place: PropTypes.string,
+  delayShow: PropTypes.number,
 };
 
 CustomTooltip.defaultProps = {
@@ -70,4 +77,6 @@ CustomTooltip.defaultProps = {
   icon: null,
   show: true,
   disabled: false,
+  place: 'top',
+  delayShow: 150,
 };

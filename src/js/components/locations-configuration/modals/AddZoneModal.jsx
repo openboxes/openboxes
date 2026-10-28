@@ -27,7 +27,7 @@ class AddZoneModal extends Component {
     apiClient.post('/api/locations/', { ...values, parentLocation: { id: this.props.locationId }, locationType: { id: values.locationType.id } })
       .then(() => {
         this.props.hideSpinner();
-        toast.success(this.props.translate('react.locationsConfiguration.addZone.success.label', 'Zone location has been created successfully!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.locationsConfiguration.addZone.success.label', 'Zone location has been created successfully!'), { autoClose: 3000 });
         this.props.addZoneLocation();
       })
       .catch(() => {

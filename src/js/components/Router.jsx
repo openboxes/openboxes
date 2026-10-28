@@ -6,20 +6,15 @@ import {
   BrowserRouter, Navigate, Route, Routes, useLocation,
 } from 'react-router-dom';
 import { ClimbingBoxLoader } from 'react-spinners';
-import { ToastContainer } from 'react-toastify';
-import {
-  getCurrentLocationSupportedActivities,
-  getNotificationAutohideDelay,
-  getSpinner,
-} from 'selectors';
+import { getCurrentLocationSupportedActivities, getSpinner } from 'selectors';
 
+import NotificationContainer from 'components/Layout/notifications/NotificationContainer';
 import MainLayout from 'components/Layout/v2/MainLayout';
 import ActivityCode from 'consts/activityCode';
 import { CONTEXT_PATH, DASHBOARD_URL } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
 
-import 'react-toastify/dist/ReactToastify.css';
 // TODO: Fix entering Inbound SM from list
 
 const AsyncStockMovement = lazy(() => import('components/stock-movement-wizard/StockMovement'));
@@ -123,7 +118,6 @@ const Router = () => {
 
   const spinner = useSelector(getSpinner);
   const supportedActivities = useSelector(getCurrentLocationSupportedActivities);
-  const notificationAutohideDelay = useSelector(getNotificationAutohideDelay);
 
   const Dashboard = useMemo(
     () => (!supportedActivities?.includes(ActivityCode.MANAGE_INVENTORY)
@@ -191,12 +185,7 @@ const Router = () => {
           style={{ top: '40%', left: '50%' }}
         />
       </div>
-      {/* <ToastContainer */}
-      {/*   autoClose={notificationAutohideDelay} */}
-      {/*   limit={3} */}
-      {/*   position="top-right" */}
-      {/*   hideProgressBar */}
-      {/* /> */}
+      <NotificationContainer />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
@@ -9,6 +8,7 @@ import { makeGetCycleCountItem } from 'selectors';
 import { TableCell } from 'components/DataTable';
 import { NEW_ROW } from 'consts/cycleCount';
 import useTranslate from 'hooks/useTranslate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ActionsCell = ({
   id,
@@ -27,19 +27,15 @@ const ActionsCell = ({
 
   return (
     <TableCell className="rt-td d-flex justify-content-center count-step-actions">
-      {/* <Tippy */}
-      {/*   arrow="true" */}
-      {/*   delay="150" */}
-      {/*   duration="250" */}
-      {/*   hideDelay="50" */}
-      {/*   className="text-overflow-ellipsis" */}
-      {/*   content={( */}
-      {/*     <span className="p-2"> */}
-      {/*       {translate('react.default.button.delete.label', 'Delete')} */}
-      {/*     </span> */}
-      {/*   )} */}
-      {/*   disabled={id} */}
-      {/* > */}
+      <CustomTooltip
+        className="text-overflow-ellipsis"
+        content={(
+          <span className="p-2">
+            {translate('react.default.button.delete.label', 'Delete')}
+          </span>
+        )}
+        show={!id}
+      >
         {(id?.includes(NEW_ROW) || custom) && isStepEditable && (
           <RiDeleteBinLine
             className={isFormDisabled ? 'disabled-icon' : 'cursor-pointer'}
@@ -47,7 +43,7 @@ const ActionsCell = ({
             size={22}
           />
         )}
-      {/* </Tippy> */}
+      </CustomTooltip>
     </TableCell>
   );
 };

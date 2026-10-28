@@ -1327,7 +1327,7 @@ class AddItemsPage extends Component {
                   toast.success(this.props.translate(
                     'react.stockMovement.request.successfullyDeleted.label',
                     'Request was successfully deleted',
-                  ), { timeout: 3000 });
+                  ), { autoClose: 3000 });
                   if (this.state.isRequestFromWard) {
                     this.props.navigate(DASHBOARD_URL.base);
                   } else {
@@ -1407,7 +1407,7 @@ class AddItemsPage extends Component {
     return this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
-        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => {
         this.props.hideSpinner();

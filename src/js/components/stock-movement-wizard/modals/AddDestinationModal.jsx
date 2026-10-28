@@ -6,7 +6,6 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import Modal from 'react-modal';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import { toast } from 'react-toastify';
 
 import {
@@ -19,6 +18,7 @@ import ActivityCode from 'consts/activityCode';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'components/locations-configuration/modals/ConfigurationModal.scss';
 import './AddDestinationModal.scss';
@@ -128,7 +128,7 @@ class AddDestinationModal extends Component {
       { useDefaultActivities: true, assignCurrentLocationGroup: true },
     )
       .then((response) => {
-        toast.success(this.props.translate('react.stockMovement.success.createDestination.label', 'Destination was successfully created!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.success.createDestination.label', 'Destination was successfully created!'), { autoClose: 3000 });
         return response.data.data;
       })
       .then((destination) => {
