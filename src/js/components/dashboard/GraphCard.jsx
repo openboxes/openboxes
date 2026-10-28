@@ -209,6 +209,8 @@ const GraphCard = (({
   size = null,
   translate,
   hideDraghandle,
+  sortableRef,
+  handleRef,
 }) => {
   let graph;
   // eslint-disable-next-line no-template-curly-in-string
@@ -267,7 +269,7 @@ const GraphCard = (({
   }
 
   return (
-    <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
+    <div ref={sortableRef} className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ? (
           <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
@@ -292,7 +294,7 @@ const GraphCard = (({
             )
             : null
 }
-        {!hideDraghandle && <DragHandle />}
+        {!hideDraghandle && <DragHandle handleRef={handleRef} />}
       </div>
       <div className="content-card">
 
@@ -329,6 +331,13 @@ GraphCard.propTypes = {
   cardInfo: PropTypes.string.isRequired,
   loadIndicator: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  sortableRef: PropTypes.func,
+  handleRef: PropTypes.func,
+};
+
+GraphCard.defaultProps = {
+  sortableRef: null,
+  handleRef: null,
 };
 
 FilterComponent.defaultProps = {

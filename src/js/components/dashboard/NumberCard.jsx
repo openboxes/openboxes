@@ -54,6 +54,7 @@ const ZERO = 0;
 
 const NumberSparklineCard = ({
   cardTitle, cardInfo, color, value, goalDifference, sparklineData, translate, cardInfoDefaultValue,
+  handleRef,
 }) => (
   <div className="number-div">
     <div className="number-body">
@@ -87,7 +88,7 @@ const NumberSparklineCard = ({
         <i className="fa fa-info-circle" />
       </CustomTooltip>
     </div>
-    <DragHandle />
+    <DragHandle handleRef={handleRef} />
   </div>
 );
 
@@ -110,6 +111,8 @@ const NumberCard = (({
   showPercentSign,
   infoIcon,
   disableSubtitleEllipsis,
+  sortableRef,
+  handleRef,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -162,7 +165,7 @@ const NumberCard = (({
             )
             : null
 }
-      {!hideDraghandle && <DragHandle />}
+      {!hideDraghandle && <DragHandle handleRef={handleRef} />}
     </div>
   // </Tippy>
   )
@@ -176,11 +179,18 @@ const NumberCard = (({
         goalDifference={sparklineData.colorNumber.value2}
         sparklineData={sparklineData}
         translate={translate}
+        handleRef={handleRef}
       />
     );
 
   return (
-    cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">{card}</a> : <div className="number-card">{card}</div>
+    cardLink
+      ? (
+        <a ref={sortableRef} target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">
+          {card}
+        </a>
+      )
+      : <div ref={sortableRef} className="number-card">{card}</div>
   );
 });
 
@@ -192,6 +202,8 @@ const mapStateToProps = (state) => ({
 export default (connect(mapStateToProps)(NumberCard));
 
 NumberCard.defaultProps = {
+  sortableRef: null,
+  handleRef: null,
   cardTitleDefaultValue: '',
   cardSubtitle: '',
   cardSubtitleDefaultValue: '',
@@ -219,6 +231,8 @@ NumberCard.propTypes = {
   showPercentSign: PropTypes.bool,
   infoIcon: PropTypes.node,
   disableSubtitleEllipsis: PropTypes.bool,
+  sortableRef: PropTypes.func,
+  handleRef: PropTypes.func,
 };
 
 NumberSparklineCard.propTypes = {
@@ -230,8 +244,10 @@ NumberSparklineCard.propTypes = {
   goalDifference: PropTypes.string.isRequired,
   sparklineData: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
+  handleRef: PropTypes.func,
 };
 
 NumberSparklineCard.defaultProps = {
   cardInfoDefaultValue: '',
+  handleRef: null,
 };

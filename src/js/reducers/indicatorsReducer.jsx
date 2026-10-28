@@ -7,6 +7,7 @@ import {
   FETCH_GRAPHS,
   FETCH_NUMBERS,
   REMOVE_FROM_INDICATORS,
+  REORDER_INDICATORS,
   RESET_INDICATORS, SET_ACTIVE_CONFIG,
 } from 'actions/types';
 import { loadNumbersOptions } from 'consts/dataFormat/customGraphConfig';
@@ -21,6 +22,13 @@ function arrayArchive(array = [], index) {
 
     return { ...value, id: value.id - 1 };
   });
+  return newArray;
+}
+
+function arrayMove(array = [], oldIndex, newIndex) {
+  const newArray = [...array];
+  const [movedItem] = newArray.splice(oldIndex, 1);
+  newArray.splice(newIndex, 0, movedItem);
   return newArray;
 }
 
@@ -85,17 +93,33 @@ export default function (state = initialState, action) {
         data: [],
         numberData: [],
       };
+    case REORDER_INDICATORS: {
+      const { oldIndex, newIndex, type } = action.payload;
+      if (type === 'graph') {
+        return {
+          ...state,
+          data: arrayMove(_.compact(state.data), oldIndex, newIndex),
+        };
+      }
+      if (type === 'number') {
+        return {
+          ...state,
+          numberData: arrayMove(_.compact(state.numberData), oldIndex, newIndex),
+        };
+      }
+      return state;
+    }
     case REMOVE_FROM_INDICATORS: {
       if (action.payload.type === 'graph') {
         return {
           ...state,
-          data: arrayArchive(state.data, action.payload.index),
+          data: arrayArchive(_.compact(state.data), action.payload.index),
         };
       }
       if (action.payload.type === 'number') {
         return {
           ...state,
-          numberData: arrayArchive(state.numberData, action.payload.index),
+          numberData: arrayArchive(_.compact(state.numberData), action.payload.index),
         };
       }
       return state;
