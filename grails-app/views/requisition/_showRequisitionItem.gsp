@@ -249,7 +249,7 @@
         </td>
         <td class="middle center">
             <g:set var="effectiveRequisitionItem" value="${requisitionItem?.modificationItem ?: requisitionItem?.substitutionItem ?: requisitionItem}"/>
-            <g:set var="reasonCodes" value="${([effectiveRequisitionItem?.pickReasonCode] + (effectiveRequisitionItem?.picklistReasonCodes ?: [])).findAll { it }.unique()}"/>
+            <g:set var="reasonCodes" value="${effectiveRequisitionItem?.picklistReasonCodes ?: []}"/>
             <g:if test="${requisitionItem?.cancelReasonCode || reasonCodes}">
                 <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.cancelReasonCode) : ''}
 ${reasonCodes ? 'Picked item reason codes: ' + reasonCodes.collect { warehouse.message(code:'enum.ReasonCode.' + it) }.join(', ') : ''}">
