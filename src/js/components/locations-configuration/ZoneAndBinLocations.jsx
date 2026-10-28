@@ -206,12 +206,12 @@ class ZoneAndBinLocations extends Component {
   }
 
   zoneEditCallback() {
-    toast.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { timeout: 3000 });
+    toast.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { autoClose: 3000 });
     this.refZoneTable.current.fireFetchData();
   }
 
   binEditCallback() {
-    toast.success(this.props.translate('react.locationsConfiguration.editBin.success.label', 'Bin location has been edited successfully!'), { timeout: 3000 });
+    toast.success(this.props.translate('react.locationsConfiguration.editBin.success.label', 'Bin location has been edited successfully!'), { autoClose: 3000 });
     this.refBinTable.current.fireFetchData();
   }
 
@@ -275,7 +275,7 @@ class ZoneAndBinLocations extends Component {
         'react.locationsConfiguration.alert.configurationCompleted.label',
         'Location configuration completed!',
       ),
-      { timeout: 3000 },
+      { autoClose: 3000 },
     );
     this.setState({ showSuccessMessage: true });
   }

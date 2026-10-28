@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tooltip';
+
+import PortalTooltip from 'wrappers/PortalTooltip';
 
 const NavbarIcon = ({ tooltip, component, name }) => {
   const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
@@ -17,7 +18,7 @@ const NavbarIcon = ({ tooltip, component, name }) => {
       >
         {component({ setIsTooltipDisabled })}
       </div>
-      <Tooltip
+      <PortalTooltip
         id={tooltipId}
         content={tooltip}
         className="custom-tooltip"

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
@@ -22,6 +21,7 @@ import { OutboundWorkflowState } from 'consts/StockMovementState';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const FIELDS = {
   reasonCode: {
@@ -333,19 +333,18 @@ class EditPickModal extends Component {
             {this.state.formValues.productCode}
           </div>
           <div className="font-weight-bold">
-            {/* <Tippy */}
-            {/*   content={<div className="text-truncate">{this.state.formValues.productName}</div>} */}
-            {/*   theme="dark" */}
-            {/*   disabled={!this.state.formValues.displayName} */}
-            {/*   position="top-start" */}
-            {/* > */}
+            <CustomTooltip
+              content={<div className="text-truncate">{this.state.formValues.productName}</div>}
+              show={!!this.state.formValues.displayName}
+              place="top-start"
+            >
               <span className="d-flex">
                 <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />
                 :
                 {' '}
                 {this.state.formValues.displayName ?? this.state.formValues.productName}
               </span>
-            {/* </Tippy> */}
+            </CustomTooltip>
           </div>
           <div className="font-weight-bold">
             <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />

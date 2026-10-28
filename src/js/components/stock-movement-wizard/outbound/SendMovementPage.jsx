@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
 import moment from 'moment';
@@ -36,6 +35,7 @@ import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation, { formatDate } from 'utils/translation-utils';
 import withRouter from 'utils/withRouter';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -174,16 +174,12 @@ const FIELDS = {
           if (fieldValue) {
             return (
               <div className="d-flex align-items-center justify-content-center">
-                {/* <Tippy */}
-                {/*   content={params.translate('react.stockMovement.recalledLot.message', 'This lot has been recalled')} */}
-                {/*   theme="transparent" */}
-                {/*   delay="150" */}
-                {/*   duration="250" */}
-                {/*   hideDelay="50" */}
-                {/* > */}
+                <CustomTooltip
+                  content={params.translate('react.stockMovement.recalledLot.message', 'This lot has been recalled')}
+                >
                   {/* &#x24C7; = hexadecimal circled letter R */}
                   <b>&#x24C7;</b>
-                {/* </Tippy> */}
+                </CustomTooltip>
               </div>
             );
           }
@@ -352,7 +348,7 @@ class SendMovementPage extends Component {
         if (values.statusCode === 'DISPATCHED') {
           this.fetchStockMovementData();
         }
-        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -582,7 +578,7 @@ class SendMovementPage extends Component {
       if (files.length > 1) {
         this.sendFiles(files)
           .then(() => {
-            toast.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
+            toast.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { autoClose: 3000 });
             this.removeFiles(_.map(files, (file) => file.name));
             this.prepareRequestAndSubmitStockMovement(values);
           })
@@ -591,7 +587,7 @@ class SendMovementPage extends Component {
       } else if (files.length === 1) {
         this.sendFile(files[0])
           .then(() => {
-            toast.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
+            toast.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { autoClose: 3000 });
             this.removeFile(files[0].name);
             this.prepareRequestAndSubmitStockMovement(values);
           })

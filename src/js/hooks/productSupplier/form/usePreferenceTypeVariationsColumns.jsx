@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
@@ -13,6 +12,7 @@ import TextInput from 'components/form-elements/v2/TextInput';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const usePreferenceTypeVariationsColumns = ({
   errors,
@@ -236,24 +236,24 @@ const usePreferenceTypeVariationsColumns = ({
       headerClassName: 'justify-content-center',
       className: 'd-flex justify-content-center align-items-center',
       Cell: (row) => (
-        // <Tippy
-        //   className="d-flex align-items-center"
-        //   content={(
-        //     <span className="p-1">
-        //       <Translate
-        //         id="react.productSupplier.form.delete"
-        //         defaultMessage="Delete"
-        //       />
-        //     </span>
-        //   )}
-        // >
+        <CustomTooltip
+          className="d-flex align-items-center"
+          content={(
+            <span className="p-1">
+              <Translate
+                id="react.productSupplier.form.delete"
+                defaultMessage="Delete"
+              />
+            </span>
+          )}
+        >
           <RiDeleteBinLine
             onClick={() => {
               setSelectedRowIndex(row.index);
             }}
             className="preference-type-bin"
           />
-        // </Tippy>
+        </CustomTooltip>
       ),
     },
   ], [errors, buyers, preferenceTypes]);

@@ -254,6 +254,7 @@ class SendMovementPage extends Component {
     }
   }
 
+  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
@@ -285,7 +286,7 @@ class SendMovementPage extends Component {
         if (values.statusCode === 'DISPATCHED') {
           this.fetchStockMovementData();
         }
-        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -520,7 +521,7 @@ class SendMovementPage extends Component {
       if (files.length > 1) {
         this.sendFiles(files)
           .then(() => {
-            toast.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { timeout: 3000 });
+            toast.success(this.props.translate('react.stockMovement.alert.filesSuccess.label', 'Files uploaded successfuly!'), { autoClose: 3000 });
             this.removeFiles(_.map(files, (file) => file.name));
             this.prepareRequestAndSubmitStockMovement(values);
           })
@@ -529,7 +530,7 @@ class SendMovementPage extends Component {
       } else if (files.length === 1) {
         this.sendFile(files[0])
           .then(() => {
-            toast.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { timeout: 3000 });
+            toast.success(this.props.translate('react.stockMovement.alert.fileSuccess.label', 'File uploaded successfuly!'), { autoClose: 3000 });
             this.removeFile(files[0].name);
             this.prepareRequestAndSubmitStockMovement(values);
           })

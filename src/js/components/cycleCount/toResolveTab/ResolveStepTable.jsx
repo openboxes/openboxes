@@ -1,6 +1,5 @@
 import React from 'react';
 
-// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { useSelector } from 'react-redux';
@@ -180,14 +179,14 @@ const ResolveStepTable = ({
         className={`ml-4 mb-3 d-flex ${isStepEditable ? '' : 'pt-3'}`}
       >
         {isStepEditable && (
-        // <Tippy
-        //   className="d-flex align-items-center"
-        //   content={(
-        //     <span className="p-1">
-        //       {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
-        //     </span>
-        //   )}
-        // >
+        <CustomTooltip
+          className="d-flex align-items-center"
+          content={(
+            <span className="p-1">
+              {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
+            </span>
+          )}
+        >
           <Button
             onClick={() => {
               addEmptyRow(product?.id, id);
@@ -198,7 +197,7 @@ const ResolveStepTable = ({
             StartIcon={<RiAddCircleLine size={18} />}
             disabled={isFormDisabled}
           />
-        // </Tippy>
+        </CustomTooltip>
         )}
       </div>
     </div>

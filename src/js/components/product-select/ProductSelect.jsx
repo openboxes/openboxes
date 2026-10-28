@@ -1,30 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const productOptionLabel = ({
   productCode, displayName, displayNames, name,
 }) => (`${productCode} - ${displayName || displayNames?.default || name}`);
 
 const Option = (option) => (
-  // <Tippy
-  //   content={<div className="text-truncate">{option.name}</div>}
-  //   theme="transparent"
-  //   disabled={!(option.displayName || option.displayNames?.default)}
-  //   position="top-start"
-  // >
+  <CustomTooltip
+    content={<div className="text-truncate">{option.name}</div>}
+    show={Boolean(option.displayName || option.displayNames?.default)}
+    place="top-start"
+  >
     <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
       {option.label || productOptionLabel(option)}
         &nbsp;
       {renderHandlingIcons(option.handlingIcons)}
     </strong>
-  // </Tippy>
+  </CustomTooltip>
 );
 
 const SelectedValue = (option) => (

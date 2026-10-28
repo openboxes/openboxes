@@ -6,7 +6,6 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import Modal from 'react-modal';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
@@ -14,6 +13,7 @@ import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/locations-configuration/modals/ConfigurationModal.scss';
 
@@ -54,7 +54,7 @@ class AddLocationGroupModal extends Component {
       apiClient.post(locationUrl, payload)
         .then((response) => {
           this.props.hideSpinner();
-          toast.success(this.props.translate('react.locationsConfiguration.alert.locationGroupSaveCompleted.label', 'Location group was successfully saved!'), { timeout: 3000 });
+          toast.success(this.props.translate('react.locationsConfiguration.alert.locationGroupSaveCompleted.label', 'Location group was successfully saved!'), { autoClose: 3000 });
           const resp = response.data.data;
           this.props.onResponse({ id: resp.id, name: values.name });
           this.props.onClose();

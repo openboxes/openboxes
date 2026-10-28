@@ -30,7 +30,7 @@ class AddBinModal extends Component {
     })
       .then(() => {
         this.props.hideSpinner();
-        toast.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { autoClose: 3000 });
         this.props.addBinLocation();
       })
       .catch(() => {

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -14,6 +13,7 @@ import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -206,19 +206,15 @@ class SplitLineModal extends Component {
             <div>
               <h3 className="font-weight-bold">
                 <span>{this.props.putawayItem.product.productCode}</span>
-                {/* <Tippy */}
-                {/*   arrow="true" */}
-                {/*   delay="150" */}
-                {/*   duration="250" */}
-                {/*   hideDelay="50" */}
-                {/*   className="text-overflow-ellipsis" */}
-                {/*   disabled={this.props.putawayItem.product?.name */}
-                {/*     === this.props.putawayItem.product?.displayNameOrDefaultName} */}
-                {/*   content={this.props.putawayItem.product?.name} */}
-                {/* > */}
+                <CustomTooltip
+                  className="text-overflow-ellipsis"
+                  show={this.props.putawayItem.product?.name
+                    !== this.props.putawayItem.product?.displayNameOrDefaultName}
+                  content={this.props.putawayItem.product?.name}
+                >
                   {' '}
                   {this.props.putawayItem.product.displayNameOrDefaultName}
-                {/* </Tippy> */}
+                </CustomTooltip>
               </h3>
               <div className="font-weight-bold" data-testid="expiration-date">
                 <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />
@@ -297,17 +293,10 @@ class SplitLineModal extends Component {
                         />
                       </td>
                       <td className="py-1 align-middle">
-                        {/* <Tippy */}
-                        {/*   content={this.getErrorMessage()} */}
-                        {/*   disabled={ */}
-                        {/*     !this.isQuantityGreaterThanOriginalPutaway() && item.quantity > 0 */}
-                        {/*   } */}
-                        {/*   theme="transparent" */}
-                        {/*   arrow="true" */}
-                        {/*   delay="150" */}
-                        {/*   duration="250" */}
-                        {/*   hideDelay="50" */}
-                        {/* > */}
+                        <CustomTooltip
+                          content={this.getErrorMessage()}
+                          show={this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0}
+                        >
                           <div
                             className={
                               this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0
@@ -326,7 +315,7 @@ class SplitLineModal extends Component {
                               }))}
                             />
                           </div>
-                        {/* </Tippy> */}
+                        </CustomTooltip>
                       </td>
                       <td width="120px" className="py-1">
                         <button

@@ -2,11 +2,11 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiQuestionLine } from 'react-icons/ri';
-import { Tooltip } from 'react-tooltip';
 
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
+import PortalTooltip from 'wrappers/PortalTooltip';
 
 import 'wrappers/style.scss';
 
@@ -48,11 +48,11 @@ const InputWrapper = ({
                 <RiQuestionLine className="ml-1" />
               </span>
 
-              <Tooltip id={`tooltip-${tooltip.id}`} place="top" className="custom-tooltip">
+              <PortalTooltip id={`tooltip-${tooltip.id}`} place="top" className="custom-tooltip">
                 <span className="p-1">
                   <Translate id={tooltip.id} defaultMessage={tooltip.defaultMessage} />
                 </span>
-              </Tooltip>
+              </PortalTooltip>
             </>
           )}
           {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}

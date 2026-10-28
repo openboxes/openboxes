@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -21,6 +20,7 @@ import Filter from 'utils/Filter';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-table/react-table.css';
 
@@ -221,15 +221,7 @@ class StockTransferSecondPage extends Component {
         }
 
         return (
-          // <Tippy
-          //   content={disabledMessage}
-          //   disabled={!disabled}
-          //   theme="transparent"
-          //   arrow="true"
-          //   delay="150"
-          //   duration="250"
-          //   hideDelay="50"
-          // >
+          <CustomTooltip content={disabledMessage} show={!!disabled}>
             <div className={disabled && props.original.status !== StockTransferStatus.CANCELED ? 'has-error' : ''}>
               <input
                 type="number"
@@ -244,7 +236,7 @@ class StockTransferSecondPage extends Component {
                 }}
               />
             </div>
-          // </Tippy>
+          </CustomTooltip>
         );
       },
       Filter,

@@ -371,7 +371,7 @@ class LocationDetails extends Component {
       apiClient.post(locationUrl, payload)
         .then((response) => {
           this.props.hideSpinner();
-          toast.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
+          toast.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { autoClose: 3000 });
           const resp = response.data.data;
           this.props.navigate(LOCATION_CONFIGURATION_URL.edit(resp.id));
           this.props.nextPage({

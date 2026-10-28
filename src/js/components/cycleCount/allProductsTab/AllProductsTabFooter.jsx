@@ -1,18 +1,15 @@
 import React from 'react';
 
-import Tippy from '@tippyjs/react';
-
 import Button from 'components/form-elements/Button';
 import useTranslate from 'hooks/useTranslate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const AllProductsTabFooter = () => {
   const translate = useTranslate();
 
   return (
     <div className="d-flex gap-12 pl-4 p-1 all-products-tab-footer">
-      <Tippy
-        theme="transparent"
-        duration="250"
+      <CustomTooltip
         content={(
           <div className="custom-tooltip">
             {translate(
@@ -28,7 +25,7 @@ const AllProductsTabFooter = () => {
           defaultLabel="Refresh suggestion"
           label="react.cycleCount.table.refreshSuggestion"
         />
-      </Tippy>
+      </CustomTooltip>
       <p>
         {translate('react.cycleCount.table.lastRefresh', 'Last refresh')}
         {' '}

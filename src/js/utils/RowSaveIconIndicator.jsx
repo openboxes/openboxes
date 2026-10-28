@@ -1,6 +1,5 @@
 import React from 'react';
 
-// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
@@ -8,6 +7,7 @@ import { useSelector } from 'react-redux';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import SaveStatusIcons from 'consts/saveStatusIcons';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const RowSaveIconIndicator = ({ lineItemSaveStatus }) => {
   const { icon, id, defaultMessage } = SaveStatusIcons[lineItemSaveStatus];
@@ -15,9 +15,9 @@ const RowSaveIconIndicator = ({ lineItemSaveStatus }) => {
     translateWithDefaultMessage(getTranslate(state.localize)));
 
   return (
-    // <Tippy content={<span className="p-1">{translate(id, defaultMessage)}</span>} delay="150" duration="250">
+    <CustomTooltip content={<span className="p-1">{translate(id, defaultMessage)}</span>}>
       <div className={`${lineItemSaveStatus?.toLowerCase()} line-item-icon-save-indicator`}>{icon}</div>
-    // </Tippy>
+    </CustomTooltip>
   );
 };
 

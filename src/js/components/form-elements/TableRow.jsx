@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import { renderFormField } from 'utils/form-utils';
 import RowSaveIndicator from 'utils/RowSaveIndicator';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 class TableRow extends Component {
   shouldComponentUpdate(nextProps) {
@@ -87,22 +87,16 @@ class TableRow extends Component {
     return (
       <div {...dynamicRowAttr} className={className} role="row">
         {tooltip && (
-        // <Tippy
-        //   content={tooltip}
-        //   theme="transparent"
-        //   delay="150"
-        //   duration="250"
-        //   hideDelay="50"
-        // >
-        <div className="d-flex flex-row border-bottom table-inner-row">
-          {properties.isAutosaveEnabled
+          <CustomTooltip content={tooltip}>
+            <div className="d-flex flex-row border-bottom table-inner-row">
+              {properties.isAutosaveEnabled
                 && <RowSaveIndicator lineItemSaveStatus={rowValues.rowSaveStatus} />}
-          {this.rowRender(
-            properties, fieldsConfig, focusFieldMap, field, addRow,
-            removeRow, index, rowValues, rowRef,
-          )}
-        </div>
-        // </Tippy>
+              {this.rowRender(
+                properties, fieldsConfig, focusFieldMap, field, addRow,
+                removeRow, index, rowValues, rowRef,
+              )}
+            </div>
+          </CustomTooltip>
         )}
         {!tooltip && (
           <div className="d-flex flex-row border-bottom table-inner-row">

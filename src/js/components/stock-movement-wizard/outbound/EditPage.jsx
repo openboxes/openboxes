@@ -649,7 +649,7 @@ class EditItemsPage extends Component {
         }
 
         this.props.hideSpinner();
-        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
