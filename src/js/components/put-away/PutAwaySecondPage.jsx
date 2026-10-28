@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
@@ -24,6 +23,7 @@ import showLocationChangedAlert from 'utils/location-change-alert';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-table/react-table.css';
 
@@ -184,48 +184,32 @@ class PutAwaySecondPage extends Component {
 
         if (edit) {
           return (
-          // <Tippy
-          //   content={disabledMessage}
-          //   disabled={!disabledMessage}
-          //   theme="transparent"
-          //   arrow="true"
-          //   delay="150"
-          //   duration="250"
-          //   hideDelay="50"
-          // >
-            <div className={hasValidationError(props?.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
-              <input
-                type="number"
-                className="form-control form-control-xs"
-                data-testid="quantity-input"
-                value={props.value}
-                onChange={(event) => {
-                  const putAway = update(this.state.putAway, {
-                    putawayItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
-                  });
+            <CustomTooltip content={disabledMessage} show={!!disabledMessage}>
+              <div className={hasValidationError(props?.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
+                <input
+                  type="number"
+                  className="form-control form-control-xs"
+                  data-testid="quantity-input"
+                  value={props.value}
+                  onChange={(event) => {
+                    const putAway = update(this.state.putAway, {
+                      putawayItems: { [itemIndex]: { quantity: { $set: event.target.value } } },
+                    });
 
-                  this.changePutAway(putAway);
-                }}
-              />
-            </div>
-          // </Tippy>
+                    this.changePutAway(putAway);
+                  }}
+                />
+              </div>
+            </CustomTooltip>
           );
         }
 
         return (
-        // <Tippy
-        //   content={disabledMessage}
-        //   disabled={!disabledMessage}
-        //   theme="transparent"
-        //   arrow="true"
-        //   delay="150"
-        //   duration="250"
-        //   hideDelay="50"
-        // >
-          <div className={hasValidationError(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
-            <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
-          </div>
-        // </Tippy>
+          <CustomTooltip content={disabledMessage} show={!!disabledMessage}>
+            <div className={hasValidationError(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
+              <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
+            </div>
+          </CustomTooltip>
         );
       },
       Filter,

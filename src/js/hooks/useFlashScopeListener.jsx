@@ -30,7 +30,7 @@ const useFlashScopeListener = () => {
       notification(NotificationType.SUCCESS)({ message });
     }
     if (error) {
-      notification(NotificationType.ERROR)({ error });
+      notification(NotificationType.ERROR)({ message: error });
     }
     clearQuerySearch('flash');
   }, []);

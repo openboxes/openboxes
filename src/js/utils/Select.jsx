@@ -1,6 +1,5 @@
 import React, { Component, isValidElement } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
@@ -12,6 +11,7 @@ import Creatable from 'react-select/creatable';
 
 import { selectNullOption } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const Dropdown = ({ children, style, width }) => (
   <div
@@ -319,18 +319,11 @@ class Select extends Component {
         : (this.props.value.label ? this.props.value.label : this.props.value);
       return (
         <div id={`${this.state.id}-container`}>
-          {/* <Tippy */}
-          {/*   content={this.props.value.label} */}
-          {/*   disabled={!showValueTooltip} */}
-          {/*   theme="transparent" */}
-          {/*   delay="150" */}
-          {/*   duration="250" */}
-          {/*   hideDelay="50" */}
-          {/* > */}
+          <CustomTooltip content={this.props.value.label} show={!!showValueTooltip}>
             <div title="" className={`font-size-xs text-truncate ${className}`}>
               {formattedValue}
             </div>
-          {/* </Tippy> */}
+          </CustomTooltip>
         </div>
       );
     }
@@ -380,17 +373,7 @@ class Select extends Component {
 
     return (
       <div id={`${this.state.id}-container`} data-testid={attributes?.dataTestId ?? 'custom-select-element'}>
-        {/* <Tippy */}
-        {/*   content={this.getTooltipHtml()} */}
-        {/*   disabled={isTooltipDisabled()} */}
-        {/*   theme="transparent" */}
-        {/*   arrow="true" */}
-        {/*   delay="150" */}
-        {/*   duration="250" */}
-        {/*   hideDelay="50" */}
-        {/*   title=" " */}
-        {/*   classes="" */}
-        {/* > */}
+        <CustomTooltip content={this.getTooltipHtml()} show={!isTooltipDisabled()}>
           <SelectType
             {...attributes}
             closeMenuOnScroll={closeMenuOnScroll}
@@ -470,7 +453,7 @@ class Select extends Component {
             id={this.state.id}
             optionRenderer={optionRenderer}
           />
-        {/* </Tippy> */}
+        </CustomTooltip>
       </div>
     );
   }
