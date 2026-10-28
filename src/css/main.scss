@@ -640,18 +640,64 @@ tr.crossed-out td:before {
   white-space: normal;
 }
 
-.spinner-container>div {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  z-index: 110;
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  animation: page-loader-fade-in 0.3s ease 0.2s both;
 }
 
-.spinner-container>div>div {
-  top: 40%;
+@keyframes page-loader-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.chunk-load-error {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 16px;
+  text-align: center;
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    color: var(--color-red);
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+    color: var(--gray-600);
+  }
+
+  &__description {
+    max-width: 420px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--gray-500);
+  }
+}
+
+.global-spinner {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 110;
 }
 
 .ReactTable .-pagination .-btn {
@@ -1898,5 +1944,10 @@ div.search-input:focus-within {
     flex: 1;
     display: flex;
     flex-direction: column;
+
+    .page-loader {
+      flex: 1;
+      height: auto;
+    }
   }
 }

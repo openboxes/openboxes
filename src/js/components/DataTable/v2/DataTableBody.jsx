@@ -118,7 +118,7 @@ const DataTableBody = ({
             return (
               <CustomTooltip
                 content={isRowDisabled && translate(label, defaultMessage)}
-                show={isRowDisabled}
+                show={Boolean(isRowDisabled)}
               >
                 <div
                   key={rowData.id}
