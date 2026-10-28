@@ -877,6 +877,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return [this]
     }
 
+    String getEffectiveCancelReasonCode() {
+        return cancelReasonCode?.contains("(") ? cancelReasonCode.split("\\(", 2)[1].replace(")", "") : cancelReasonCode
+    }
+
     /**
      * Sort by sort order, name
      *
