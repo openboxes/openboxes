@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-// import Tippy from '@tippyjs/react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
@@ -9,6 +8,7 @@ import { connect } from 'react-redux';
 import TableBody from 'components/form-elements/TableBody';
 import TableBodyVirtualized from 'components/form-elements/TableBodyVirtualized';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 class FieldArrayComponent extends Component {
   constructor(props) {
@@ -116,24 +116,19 @@ class FieldArrayComponent extends Component {
                       textAlign: config.headerAlign ? config.headerAlign : 'center',
                     }}
                   >
-                    {/* <Tippy */}
-                    {/*   content={config.headerTooltip ? ( */}
-                    {/*     <div> */}
-                    {/*       {this.props.translate(config.headerTooltip, config.headerDefaultTooltip)} */}
-                    {/*     </div> */}
-                    {/*   ) : (headerLabel */}
-                    {/*     && ( */}
-                    {/*     <div> */}
-                    {/*       {this.props.translate(headerLabel, headerDefaultMessage)} */}
-                    {/*     </div> */}
-                    {/*     ) */}
-                    {/*   )} */}
-                    {/*   theme="transparent" */}
-                    {/*   arrow="true" */}
-                    {/*   delay="150" */}
-                    {/*   duration="250" */}
-                    {/*   hideDelay="50" */}
-                    {/* > */}
+                    <CustomTooltip
+                      content={config.headerTooltip ? (
+                        <div>
+                          {this.props.translate(config.headerTooltip, config.headerDefaultTooltip)}
+                        </div>
+                      ) : (headerLabel
+                        && (
+                        <div>
+                          {this.props.translate(headerLabel, headerDefaultMessage)}
+                        </div>
+                        )
+                      )}
+                    >
                       <div
                         className={`mx-2 ${config.multilineHeader ? '' : 'text-truncate'} ${config.required ? 'arrayfield-header-required' : ''}`}
                         style={{
@@ -144,7 +139,7 @@ class FieldArrayComponent extends Component {
                         { headerLabel && !headerHtml
                           && <Translate id={headerLabel} defaultMessage={headerDefaultMessage} />}
                       </div>
-                    {/* </Tippy> */}
+                    </CustomTooltip>
                   </div>
                 );
               }

@@ -1,6 +1,5 @@
 import React from 'react';
 
-// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { Controller, useWatch } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
@@ -13,6 +12,7 @@ import Subsection from 'components/Layout/v2/Subsection';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
 import { FormErrorPropType } from 'utils/propTypes';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const DefaultPreferenceType = ({
   control,
@@ -161,22 +161,22 @@ const DefaultPreferenceType = ({
           />
         </div>
         <div className="p-2 d-flex align-items-center">
-          {/* <Tippy */}
-          {/*   className="d-flex align-items-center" */}
-          {/*   content={( */}
-          {/*     <span className="p-1"> */}
-          {/*       <Translate */}
-          {/*         id="react.productSupplier.form.deleteGlobalPreference" */}
-          {/*         defaultMessage="Delete global preference" */}
-          {/*       /> */}
-          {/*     </span> */}
-          {/*   )} */}
-          {/* > */}
+          <CustomTooltip
+            className="d-flex align-items-center"
+            content={(
+              <span className="p-1">
+                <Translate
+                  id="react.productSupplier.form.deleteGlobalPreference"
+                  defaultMessage="Delete global preference"
+                />
+              </span>
+            )}
+          >
             <RiDeleteBinLine
               onClick={() => !isPreferenceTypeEmpty && openConfirmationModal()}
               className={`preference-type-bin ${isPreferenceTypeEmpty ? 'disabled' : 'active'}`}
             />
-          {/* </Tippy> */}
+          </CustomTooltip>
         </div>
       </div>
     </Subsection>

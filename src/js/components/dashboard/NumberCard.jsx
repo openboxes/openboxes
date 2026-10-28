@@ -1,6 +1,5 @@
 import React from 'react';
 
-// import Tippy from '@tippyjs/react';
 import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
@@ -122,35 +121,33 @@ const NumberCard = (({
   }
   const cardNumberLocale = cardNumber ? cardNumber.toLocaleString() : ZERO.toLocaleString();
   const card = !isSparkline ? (
-  //     <Tippy
-  //       content={(
-  //         <p style={{ whiteSpace: 'pre' }}>
-  //           {' '}
-  //           {cardDataTooltip}
-  //           {' '}
-  //         </p>
-  // )}
-  //       theme="transparent"
-  //       arrow="true"
-  //       disabled={!cardDataTooltip}
-  //     >
-    <div className="number-div">
-      <div className="number-body">
-        <span className="title-card">
-          {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
-        </span>
-        <span className="result-card">
+    <CustomTooltip
+      content={(
+        <p style={{ whiteSpace: 'pre' }}>
           {' '}
-          {cardNumberType === 'number' ? `${cardNumberLocale}${showPercentSign ? '%' : ''}` : `${cardNumberLocale} ${currencyCode}`}
+          {cardDataTooltip}
           {' '}
-        </span>
-        <span className={`subtitle-card ${disableSubtitleEllipsis ? '' : ' text-overflow-ellipsis text-nowrap'}`}>
-          {cardSubtitleValue}
-          {' '}
-          {translate(cardSubtitle, cardSubtitleDefaultValue || cardSubtitle)}
-        </span>
-      </div>
-      {
+        </p>
+      )}
+      show={Boolean(cardDataTooltip)}
+    >
+      <div className="number-div">
+        <div className="number-body">
+          <span className="title-card">
+            {translate(cardTitle, cardTitleDefaultValue || cardTitle)}
+          </span>
+          <span className="result-card">
+            {' '}
+            {cardNumberType === 'number' ? `${cardNumberLocale}${showPercentSign ? '%' : ''}` : `${cardNumberLocale} ${currencyCode}`}
+            {' '}
+          </span>
+          <span className={`subtitle-card ${disableSubtitleEllipsis ? '' : ' text-overflow-ellipsis text-nowrap'}`}>
+            {cardSubtitleValue}
+            {' '}
+            {translate(cardSubtitle, cardSubtitleDefaultValue || cardSubtitle)}
+          </span>
+        </div>
+        {
           cardInfo
             ? (
               <div className="number-infos">
@@ -165,9 +162,9 @@ const NumberCard = (({
             )
             : null
 }
-      {!hideDraghandle && <DragHandle handleRef={handleRef} />}
-    </div>
-  // </Tippy>
+        {!hideDraghandle && <DragHandle handleRef={handleRef} />}
+      </div>
+    </CustomTooltip>
   )
     : (
       <NumberSparklineCard

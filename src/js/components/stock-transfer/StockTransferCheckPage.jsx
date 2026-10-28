@@ -189,7 +189,7 @@ class StockTransferSecondPage extends Component {
     return apiClient.put(url, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
-        toast.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { autoClose: 3000 });
         window.location = STOCK_TRANSFER_URL.show(this.state.stockTransfer.id);
       })
       .catch(() => this.props.hideSpinner());
