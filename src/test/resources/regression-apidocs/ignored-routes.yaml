@@ -87,6 +87,7 @@
 - {kind: wildcard-alias, path: '/api/locations/{id}/update', method: '*', target: locationApi/update, reason: *alias}
 - {kind: wildcard-alias, path: '/api/products/{id}/availableItems', method: '*', target: productApi/availableItems, reason: *alias}
 - {kind: wildcard-alias, path: '/api/products/{id}/delete', method: '*', target: productApi/delete, reason: *alias}
+- {kind: wildcard-alias, path: '/api/products/{id}/getAvailabilityInAllDepots', method: '*', target: productApi/getAvailabilityInAllDepots, reason: *alias}
 - {kind: wildcard-alias, path: '/api/products/{id}/getInventoryItem', method: '*', target: productApi/getInventoryItem, reason: *alias}
 - {kind: wildcard-alias, path: '/api/products/{id}/getLatestInventoryCountDate', method: '*', target: productApi/getLatestInventoryCountDate, reason: *alias}
 - {kind: wildcard-alias, path: '/api/products/{id}/getLotNumbersWithExpirationDate', method: '*', target: productApi/getLotNumbersWithExpirationDate, reason: *alias}
@@ -108,6 +109,7 @@
   reason: &fallthrough >-
     Not in the mapping's method map; Grails sends it to the controller's default action instead of
     answering 405. Not an intended endpoint.
+- {kind: method-fallthrough, path: '/api/bulkData/import', methods: [GET, PUT, PATCH, DELETE], target: importApi/importData, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/combineShipments/{id}', methods: [PATCH], target: combineShipmentApi/read, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facilityId}/products/classifications', methods: [POST, PUT, PATCH, DELETE], target: productClassificationApi/list, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/inventory/record-stock/save', methods: [GET, PUT, PATCH, DELETE], target: recordStockApi/saveRecordStock, reason: *fallthrough}
@@ -123,6 +125,7 @@
 - {kind: method-fallthrough, path: '/api/reports/indicators/productsInventoried', methods: [POST, PUT, PATCH, DELETE], target: indicatorApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/reports/inventory-transactions-summary', methods: [POST, PUT, PATCH, DELETE], target: inventoryTransactionSummaryApi/getInventoryTransactionsSummary, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/stockAdjustments', methods: [PUT, PATCH, DELETE], target: stockAdjustmentApi/create, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/users/{userId}/roles', methods: [POST, PUT, PATCH, DELETE], target: userRoleApi/getUserRoles, reason: *fallthrough}
 
 # ---------------------------------------------------------------------------------------------------------------
 # OBAF (feature/obaf-integration) findings.

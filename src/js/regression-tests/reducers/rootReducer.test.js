@@ -5,8 +5,6 @@ import rootReducer from 'reducers';
 // reducer: loading it from here would close that import cycle half way. No request is made.
 jest.mock('utils/apiClient', () => ({ __esModule: true, default: {} }));
 
-// Adapted for OBAF (OBAF lacks the code): no partialReceiving slice.
-
 describe('rootReducer', () => {
   it('combines every slice of the store', () => {
     const state = rootReducer(undefined, { type: 'UNKNOWN' });
@@ -14,7 +12,7 @@ describe('rootReducer', () => {
     expect(Object.keys(state).sort()).toEqual([
       'approvers', 'connection', 'countWorkflow', 'cycleCount', 'errors', 'filterForm', 'inbound',
       'indicators', 'infoBar', 'infoBarVisibility', 'invoices', 'localize', 'location', 'lotNumbers',
-      'organizations', 'outboundImport', 'productSupplier', 'purchaseOrder',
+      'organizations', 'outboundImport', 'partialReceiving', 'productSupplier', 'purchaseOrder',
       'reasonCodes', 'requisitionStatuses', 'session', 'shipmentStatuses', 'spinner', 'stockMovementCommon',
       'stockMovementDraft', 'stockTransfer', 'unitOfMeasure', 'users',
     ]);

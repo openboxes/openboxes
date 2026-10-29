@@ -14,7 +14,7 @@ import { extractNonCanceledItems } from 'components/stock-transfer/utils';
 import ActivityCode from 'consts/activityCode';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -199,7 +199,7 @@ class StockTransferSecondPage extends Component {
       status: COMPLETED,
     };
 
-    return apiClient.put(url, flattenRequest(payload))
+    return apiClient.put(url, payload)
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
@@ -267,7 +267,7 @@ class StockTransferSecondPage extends Component {
       stockTransferItems: this.state.originalItems,
     };
 
-    return apiClient.put(url, flattenRequest(payload))
+    return apiClient.put(url, payload)
       .then(() => {
         this.props.hideSpinner();
         this.props.previousPage({ stockTransfer: this.state.stockTransfer });

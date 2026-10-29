@@ -70,7 +70,7 @@ const BinLocationCell = ({
         cycleCountId,
         rowId: id,
         field: cycleCountColumn.BIN_LOCATION,
-        value: { id: selected?.id, name: selected?.name },
+        value: selected ? { id: selected.id, name: selected.name } : null,
       }),
     );
     onBlurValidationHandler();

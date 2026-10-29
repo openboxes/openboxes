@@ -2021,6 +2021,34 @@
         $ref: ../components/responses.yaml#/Conflict
       default:
         $ref: ../components/responses.yaml#/Error
+/api/facilities/{facility}/cycle-counts/{cycleCountId}:
+  delete:
+    operationId: cycleCountApi_deleteCycleCount
+    summary: cycleCountApi.deleteCycleCount
+    tags:
+    - Cycle Count
+    x-doc-status: stub
+    x-openboxes-controller: cycleCountApi
+    x-openboxes-action: deleteCycleCount
+    x-openboxes-source: explicit
+    parameters:
+    - name: facility
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: cycleCountId
+      in: path
+      required: true
+      schema:
+        type: string
+    responses:
+      '200':
+        $ref: ../components/responses.yaml#/StubSuccess
+      '204':
+        $ref: ../components/responses.yaml#/StubNoContent
+      default:
+        $ref: ../components/responses.yaml#/Error
 /api/facilities/{facility}/cycle-counts/{cycleCountId}/count:
   post:
     operationId: cycleCountApi_submitCount

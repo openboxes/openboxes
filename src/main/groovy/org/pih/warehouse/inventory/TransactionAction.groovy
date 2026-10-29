@@ -5,6 +5,7 @@ enum TransactionAction {
     RECORD_STOCK,
     INVENTORY_IMPORT,
     INVENTORY_ADJUSTMENT,
+    RECEIPT,
     PICK_TASK
 
     @Override

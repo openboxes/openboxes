@@ -171,6 +171,7 @@ const useResolveDiscrepancies = ({
         return;
       }
       showSuccessNotification(submittedCounts.length);
+      dispatch(clearCountWorkflow);
       await redirectToNextTab();
     } finally {
       setIsSaveDisabled(false);

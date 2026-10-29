@@ -55,15 +55,15 @@ describe('countWorkflowReducer', () => {
         payload: [{
           id: 'cc1',
           cycleCountItems: [
-            item('custom', { custom: true, dateCreated: '2026-01-02' }),
-            item('recount', { countIndex: 1 }),
             item('first', { dateCounted: '2026-01-01', assignee: { id: 'u1' } }),
+            item('recount', { countIndex: 1 }),
+            item('custom', { custom: true, dateCreated: '2026-01-02' }),
           ],
         }],
       });
 
-      // Only the first count (countIndex 0) is kept, custom rows go to the bottom, and the
-      // previously loaded entities are replaced.
+      // Only the first count (countIndex 0) is kept, in the order the API sends (it sorts the
+      // items), and the previously loaded entities are replaced.
       expect(Object.keys(next.entities)).toEqual(['cc1']);
       expect(next.entities.cc1.cycleCountItems.map((i) => i.id)).toEqual(['first', 'custom']);
       expect(next.dateCounted).toEqual({ cc1: '2026-01-01' });

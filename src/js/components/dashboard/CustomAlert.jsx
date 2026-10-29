@@ -27,7 +27,12 @@ const CustomAlert = ({
   };
 
   return (
-    <div className={`${classNames} ${!customFields?.details ? 'no-details' : ''}`} id={id} style={styles}>
+    <div
+      className={`${classNames} ${!customFields?.details ? 'no-details' : ''}`}
+      id={id}
+      style={styles}
+      data-testid="notification"
+    >
       <div className="s-alert-box-inner">
         <div className="alert-start-icon">
           {getIcon()}

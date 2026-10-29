@@ -125,6 +125,27 @@
         $ref: ../components/responses.yaml#/StubNoContent
       default:
         $ref: ../components/responses.yaml#/Error
+/api/facilities/{facilityId}/inventory-levels/preferred-bin-locations:
+  get:
+    operationId: inventoryLevelApi_getPreferredBinLocations
+    summary: inventoryLevelApi.getPreferredBinLocations
+    tags:
+    - Inventory Level
+    x-doc-status: stub
+    x-openboxes-controller: inventoryLevelApi
+    x-openboxes-action: getPreferredBinLocations
+    x-openboxes-source: explicit
+    parameters:
+    - name: facilityId
+      in: path
+      required: true
+      schema:
+        type: string
+    responses:
+      '200':
+        $ref: ../components/responses.yaml#/StubSuccess
+      default:
+        $ref: ../components/responses.yaml#/Error
 /api/facilities/{facilityId}/inventory-levels/{identifier}:
   put:
     operationId: inventoryLevelApi_upsert

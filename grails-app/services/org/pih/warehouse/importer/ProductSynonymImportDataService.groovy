@@ -57,7 +57,7 @@ class ProductSynonymImportDataService implements ImportDataService {
             }
 
             if (params['locale']) {
-                List<String> supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
+                List<String> supportedLocales = LocalizationUtil.supportedLocaleCodes
                 String foundLocale = supportedLocales.find {
                     it.toLowerCase() == params['locale']?.toLowerCase() || LocalizationUtil.getLocale(it).displayName?.toLowerCase() == params['locale']?.toLowerCase()
                 }

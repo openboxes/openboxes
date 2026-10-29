@@ -2,9 +2,6 @@ import { renderHook } from '@testing-library/react-hooks';
 
 import useTableColumnMeta from 'hooks/useTableColumnMeta';
 
-// Adapted for OBAF (OBAF lacks the code): OBAF's column meta has no
-// arrowNavigable, so it is left out of the expected meta.
-
 const metaOf = (column) => renderHook(() => useTableColumnMeta(column)).result.current;
 
 describe('useTableColumnMeta', () => {
@@ -20,13 +17,14 @@ describe('useTableColumnMeta', () => {
     })).toEqual({
       hide: true,
       flexWidth: 120,
+      arrowNavigable: true,
       className: 'text-right',
     });
   });
 
   it('falls back to defaults for a column without meta', () => {
     const expected = {
-      hide: false, flexWidth: undefined, className: '',
+      hide: false, flexWidth: undefined, arrowNavigable: false, className: '',
     };
 
     expect(metaOf({ columnDef: {} })).toEqual(expected);

@@ -485,6 +485,27 @@
         $ref: ../components/responses.yaml#/StubNoContent
       default:
         $ref: ../components/responses.yaml#/Error
+/api/products/inventoryItems/getAvailabilityInAllDepots:
+  post:
+    operationId: productApi_getAvailabilityInAllDepots
+    summary: productApi.getAvailabilityInAllDepots
+    tags:
+    - Product
+    x-doc-status: stub
+    x-openboxes-controller: productApi
+    x-openboxes-action: getAvailabilityInAllDepots
+    x-openboxes-source: explicit
+    requestBody:
+      $ref: ../components/request-bodies.yaml#/StubBody
+    responses:
+      '200':
+        $ref: ../components/responses.yaml#/StubSuccess
+      '201':
+        $ref: ../components/responses.yaml#/StubCreated
+      '204':
+        $ref: ../components/responses.yaml#/StubNoContent
+      default:
+        $ref: ../components/responses.yaml#/Error
 /api/products/inventoryItems/lotNumbersWithExpirationDate:
   get:
     operationId: productApi_getLotNumbersWithExpirationDate

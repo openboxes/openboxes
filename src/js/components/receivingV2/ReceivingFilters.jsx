@@ -1,0 +1,178 @@
+import React, { useCallback, useMemo } from 'react';
+
+import PropTypes from 'prop-types';
+import {
+  RiArrowDownSLine,
+  RiLogoutBoxRLine,
+  RiMagicLine,
+  RiRefreshLine,
+} from 'react-icons/ri';
+import { useSelector } from 'react-redux';
+import { getHasBinLocationSupport, getReceivingTranslationsFetched } from 'selectors';
+
+import FilterForm from 'components/Filter/FilterForm';
+import Button from 'components/form-elements/Button';
+import SlidingButtonGroup from 'components/form-elements/v2/SlidingButtonGroup';
+import Switch from 'components/form-elements/v2/Switch';
+import filterFields from 'components/receivingV2/FilterFields';
+import { AutosaveStatus } from 'consts/autosaveStatuses';
+import receivingViewOptions, { ReceivingView } from 'consts/receivingViewOptions';
+import useTranslate from 'hooks/useTranslate';
+import AutosaveIndicator from 'utils/AutosaveIndicator';
+
+/**
+ * Filters bar rendered above the receiving table. The filter (search and
+ * receipt status) are rendered through FilterForm from the FilterFields config.
+ */
+const ReceivingFilters = ({
+  view,
+  onViewChange,
+  putawayEnabled,
+  onPutawayChange,
+  onAutofillQuantities,
+  onSaveAndExit,
+  autosaveStatus,
+  onResetSort,
+  updateFilterParams,
+  clearFilterParams,
+  packingListViewEnabled,
+}) => {
+  const translate = useTranslate();
+  // Add loading for filters section. Loading will display before the translations are fetched.
+  // It fixes the issue of untranslated labels in the filters.
+  const translationsFetched = useSelector(getReceivingTranslationsFetched);
+  const hasBinLocationSupport = useSelector(getHasBinLocationSupport);
+  // Recomputed whenever translations change, so that the field configs hold
+  // already translated labels.
+  const fields = useMemo(() => filterFields(translate), [translate]);
+
+  const viewOptions = useMemo(() => receivingViewOptions.map((option) => {
+    // If the shipment has no pack levels, disable the packing list view.
+    const disabled = option.value === ReceivingView.PACKING_LIST && !packingListViewEnabled;
+
+    return {
+      ...option,
+      disabled,
+    };
+  }), [packingListViewEnabled, translate]);
+
+  // Clearing the filters is not a submit, so the snapshot of matching rows has to be
+  // dropped here as well - otherwise the table would keep showing the previously
+  // filtered rows until the next search.
+  const onClear = useCallback((form) => {
+    form.reset({});
+    clearFilterParams();
+  }, [clearFilterParams]);
+
+  return (
+    <div className="receiving-filters" data-testid="receiving-filters">
+      <div className="receiving-filters__row d-flex justify-content-between align-items-center">
+        <SlidingButtonGroup
+          options={viewOptions}
+          defaultOption={view}
+          onChange={onViewChange}
+        />
+        <div className="receiving-filters__autosave-slot" data-testid="receiving-autosave-status">
+          <AutosaveIndicator status={autosaveStatus} />
+        </div>
+      </div>
+      <FilterForm
+        searchFieldId="q"
+        searchFieldPlaceholder="react.receiving.search.placeholder.label"
+        searchFieldDefaultPlaceholder="Search..."
+        filterFields={fields}
+        updateFilterParams={updateFilterParams}
+        onClear={onClear}
+        disableAutoUpdateFilterParams
+        allowEmptySubmit
+        hidden={false}
+        showFilterVisibilityToggler={false}
+        alignButtonsToFilters
+        isLoading={!translationsFetched}
+        autoSubmit
+      />
+      <div className="receiving-filters__row receiving-filters__actions d-flex flex-wrap justify-content-end align-items-center">
+        {hasBinLocationSupport && (
+          <div data-testid="show-putaway-switch">
+            <Switch
+              className="receiving-filters__switch"
+              value={putawayEnabled}
+              onChange={onPutawayChange}
+              titles={{
+                checked: {
+                  id: 'react.receiving.showPutaway.label',
+                  defaultMessage: 'Show Putaway',
+                  tooltipLabel: 'react.receiving.showPutaway.checked.tooltip.label',
+                  defaultTooltipLabel: 'Click to hide the bin location field. All updates to the values in the field will still be saved.',
+                },
+                unchecked: {
+                  id: 'react.receiving.showPutaway.label',
+                  defaultMessage: 'Show Putaway',
+                  tooltipLabel: 'react.receiving.showPutaway.unchecked.tooltip.label',
+                  defaultTooltipLabel: 'Click to reveal the bin location field, enabling users to receive directly into non-receiving bins.',
+                },
+              }}
+            />
+          </div>
+        )}
+        {view !== ReceivingView.PACKING_LIST && (
+          <Button
+            label="react.receiving.resetSorting.label"
+            defaultLabel="Reset sorting"
+            tooltipLabel="react.receiving.resetSorting.tooltip.label"
+            defaultTooltipLabel="Revert the list to the order of the original shipment"
+            variant="secondary"
+            onClick={onResetSort}
+            EndIcon={<RiRefreshLine size={16} />}
+          />
+        )}
+        <Button
+          label="react.receiving.autofillQuantities.label"
+          defaultLabel="Autofill quantities"
+          tooltipLabel="react.receiving.autofillQuantities.tooltip.label"
+          defaultTooltipLabel='Fills the "receiving now" field with the quantity remaining to receive from the packing list. Use if the receipt perfectly matches the shipment.'
+          variant="secondary"
+          onClick={onAutofillQuantities}
+          EndIcon={<RiMagicLine size={16} />}
+        />
+
+        {/* TODO: Re-enable this button once import support is added in 0.9.10. */}
+        {false && (
+        <Button
+          label="react.receiving.import.label"
+          defaultLabel="Import"
+          variant="secondary"
+          isDropdown
+          EndIcon={<RiArrowDownSLine size={16} />}
+        />
+        )}
+
+        <Button
+          label="react.receiving.saveAndExit.label"
+          defaultLabel="Save & Exit"
+          tooltipLabel="react.receiving.saveAndExit.tooltip.label"
+          defaultTooltipLabel="Save and exit without completing the receipt"
+          variant="secondary"
+          onClick={onSaveAndExit}
+          EndIcon={<RiLogoutBoxRLine size={16} />}
+        />
+      </div>
+    </div>
+  );
+};
+
+ReceivingFilters.propTypes = {
+  view: PropTypes.string.isRequired,
+  onViewChange: PropTypes.func.isRequired,
+  putawayEnabled: PropTypes.bool.isRequired,
+  onPutawayChange: PropTypes.func.isRequired,
+  onAutofillQuantities: PropTypes.func.isRequired,
+  onSaveAndExit: PropTypes.func.isRequired,
+  autosaveStatus: PropTypes.oneOf(Object.values(AutosaveStatus)).isRequired,
+  onResetSort: PropTypes.func.isRequired,
+  updateFilterParams: PropTypes.func.isRequired,
+  clearFilterParams: PropTypes.func.isRequired,
+  packingListViewEnabled: PropTypes.bool.isRequired,
+};
+
+export default ReceivingFilters;

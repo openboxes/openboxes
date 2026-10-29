@@ -101,6 +101,10 @@
             <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
                 <g:set var="userHasRequestApproverRole" value="${true}"/>
             </g:isUserInAllRoles>
+            <g:set var="isSuperuser" value="${false}"/>
+            <g:isSuperuser>
+                <g:set var="isSuperuser" value="${true}"/>
+            </g:isSuperuser>
             <g:set var="isApprovalRequired" value="${stockMovement?.isApprovalRequired()}"/>
             <g:if test="${!isApprovalRequired}">
                 <g:if test="${stockMovement?.order}">
@@ -119,7 +123,7 @@
                 </g:else>
 
                 <g:if test="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}">
-                    <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                    <g:link uri="/receiving/create/${stockMovement?.shipment?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                         <warehouse:message code="default.button.receive.label" />
                     </g:link>
@@ -140,10 +144,12 @@
 
                 <g:isUserAdmin>
                     <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
-                        <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
-                            <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
-                        </g:link>
+                        <g:if test="${isSuperuser}">
+                            <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                                <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                            </g:link>
+                        </g:if>
                     </g:if>
                     <g:elseif test="${stockMovement?.hasBeenIssued() || stockMovement?.hasBeenShipped()
                             || (stockMovement?.hasBeenPartiallyReceived() && stockMovement?.isFromOrder)}">
@@ -277,7 +283,7 @@
                         </g:if>
                 </g:isUserAdmin>
 
-                <g:isSuperuser>
+                <g:if test="${isSuperuser}">
                     <a href="javascript:void(0);" class="button btn-show-dialog"
                         data-height="600" data-width="1000"
                        data-title="${warehouse.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
@@ -285,7 +291,7 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
                         <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
                     </a>
-                </g:isSuperuser>
+                </g:if>
             </g:if>
             <g:if test="${isApprovalRequired}">
                 <g:if test="${stockMovement?.canUserEdit(session?.user?.id, currentLocation)}">
@@ -534,7 +540,7 @@
                                 </td>
                             </tr>
                         </g:if>
-                        <g:isSuperuser>
+                        <g:if test="${isSuperuser}">
                             <g:if test="${stockMovement.requisition}">
                                 <tr class="prop">
                                     <td class="name">
@@ -595,7 +601,7 @@
                                     </td>
                                 </tr>
                             </g:if>
-                        </g:isSuperuser>
+                        </g:if>
                     </table>
                 </div>
             </aside>

@@ -79,12 +79,9 @@ const item = (id, overrides = {}) => ({
   ...overrides,
 });
 
-// Adapted for OBAF: OBAF's API (no Jackson serialization yet) sends a reason code as
-// { name } and OBAF's useResolveStep reads rootCause.name (upstream switched both to a plain
-// string, e1fec5bae + e7814b528). The fixture uses OBAF's wire shape, and
-// submitRecount, which sends the row's code back as it came, is expected to echo that shape.
 // Cycle count with: a count+recount pair, two custom rows added on the recount
 // and a count-only row whose inventory was removed in the meantime.
+// The API returns the items already in display order, which the hook keeps.
 const buildCycleCount = () => ({
   id: 'cc-1',
   requestId: 'req-1',
@@ -92,15 +89,7 @@ const buildCycleCount = () => ({
     item('item-count', {
       countIndex: 0, quantityCounted: 4, comment: 'shelf was messy', assignee: USER_A, dateCounted: COUNT_DATE,
     }),
-    item('item-recount', { quantityOnHand: 6, quantityCounted: 6, discrepancyReasonCode: { name: 'DAMAGED' } }),
-    item('item-custom-late', {
-      custom: true,
-      dateCreated: '2026-09-02T12:00:00Z',
-      binLocation: { id: 'bin-2', name: 'Bin 2' },
-      inventoryItem: { lotNumber: 'LOT-B', expirationDate: null },
-      quantityOnHand: 3,
-      quantityCounted: 3,
-    }),
+    item('item-recount', { quantityOnHand: 6, quantityCounted: 6, discrepancyReasonCode: 'DAMAGED' }),
     item('item-custom-early', {
       custom: true,
       dateCreated: '2026-09-02T09:00:00Z',
@@ -108,6 +97,14 @@ const buildCycleCount = () => ({
       inventoryItem: { lotNumber: 'LOT-C', expirationDate: null },
       quantityOnHand: 2,
       quantityCounted: 2,
+    }),
+    item('item-custom-late', {
+      custom: true,
+      dateCreated: '2026-09-02T12:00:00Z',
+      binLocation: { id: 'bin-2', name: 'Bin 2' },
+      inventoryItem: { lotNumber: 'LOT-B', expirationDate: null },
+      quantityOnHand: 3,
+      quantityCounted: 3,
     }),
     item('item-gone', {
       countIndex: 0, assignee: USER_A, inventoryItem: { lotNumber: 'LOT-D', expirationDate: null },
@@ -133,6 +130,8 @@ const buildEmptyCycleCount = () => ({
 describe('useResolveStep', () => {
   let state;
   let serverCycleCounts;
+
+  const serverItem = (id) => serverCycleCounts[0].cycleCountItems.find((row) => row.id === id);
 
   const getRequests = () => apiClient.get.mock.calls.map(([url]) => url);
 
@@ -316,7 +315,7 @@ describe('useResolveStep', () => {
 
   describe('save', () => {
     it('updates edited and unassigned rows and creates new rows', async () => {
-      serverCycleCounts[0].cycleCountItems[3].assignee = null;
+      serverItem('item-custom-early').assignee = null;
       const { result } = await renderUseResolveStep();
       act(() => result.current.addEmptyRow('prod-1', 'cc-1'));
       const newRowId = result.current.tableData[0].cycleCountItems[3].id;
@@ -370,7 +369,7 @@ describe('useResolveStep', () => {
     });
 
     it('falls back to the current user as assignee when requested', async () => {
-      serverCycleCounts[0].cycleCountItems[3].assignee = null;
+      serverItem('item-custom-early').assignee = null;
       const { result } = await renderUseResolveStep();
       result.current.assignRecountedBy('cc-1')(null);
 
@@ -431,8 +430,8 @@ describe('useResolveStep', () => {
 
     it('warns once about missing root causes, then saves and locks the step', async () => {
       // A recount difference without a root cause
-      serverCycleCounts[0].cycleCountItems[3].quantityCounted = 1;
-      serverCycleCounts[0].cycleCountItems[3].assignee = null;
+      serverItem('item-custom-early').quantityCounted = 1;
+      serverItem('item-custom-early').assignee = null;
       const { result } = await renderUseResolveStep();
 
       await result.current.next();
@@ -449,7 +448,7 @@ describe('useResolveStep', () => {
     });
 
     it('saves with the default assignee and locks the step when everything is valid', async () => {
-      serverCycleCounts[0].cycleCountItems[3].assignee = null;
+      serverItem('item-custom-early').assignee = null;
       const { result } = await renderUseResolveStep();
 
       await result.current.next();
@@ -540,7 +539,7 @@ describe('useResolveStep', () => {
         comment: '',
         countIndex: 1,
         dateCounted: RECOUNT_DATE,
-        discrepancyReasonCode: { name: 'DAMAGED' },
+        discrepancyReasonCode: 'DAMAGED',
         facility: 'loc-1',
         id: 'item-recount',
         inventoryItem: { lotNumber: 'LOT-A', expirationDate: null },

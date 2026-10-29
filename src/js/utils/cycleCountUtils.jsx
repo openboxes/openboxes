@@ -24,12 +24,6 @@ export const filterCountItems = (cycleCounts) =>
     cycleCountItems: cc.cycleCountItems.filter((item) => item.countIndex === 0),
   }));
 
-export const moveCustomItemsToTheBottom = (cycleCountItems) => {
-  const { false: originalItems = [], true: customItems = [] } = _.groupBy(cycleCountItems, 'custom');
-  const customItemsSortedByCreationDate = _.sortBy(customItems, 'dateCreated');
-  return [...originalItems, ...customItemsSortedByCreationDate];
-};
-
 export const buildMetadataMaps = (cycleCounts) => {
   const dateCounted = {};
   const countedBy = {};
@@ -46,10 +40,7 @@ export const buildMetadataMaps = (cycleCounts) => {
 };
 
 export const normalizeCycleCounts = (cycleCounts) => {
-  const filtered = filterCountItems(cycleCounts).map((cc) => ({
-    ...cc,
-    cycleCountItems: moveCustomItemsToTheBottom(cc.cycleCountItems),
-  }));
+  const filtered = filterCountItems(cycleCounts);
 
   const { dateCounted, countedBy } = buildMetadataMaps(filtered);
 

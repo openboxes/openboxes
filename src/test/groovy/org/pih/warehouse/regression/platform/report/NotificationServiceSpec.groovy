@@ -16,7 +16,6 @@ import spock.lang.Unroll
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
@@ -28,6 +27,8 @@ import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.data.FileGenerationService
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.receiving.GoodsReceiptNoteDto
+import org.pih.warehouse.receiving.GoodsReceiptNoteService
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
@@ -47,6 +48,7 @@ class NotificationServiceSpec extends Specification implements DataTest {
     UserService userService = Mock()
     MailService mailService = Mock()
     FileGenerationService fileGenerationService = Mock()
+    GoodsReceiptNoteService goodsReceiptNoteService = Mock()
     MessageLocalizer messageLocalizer = Mock()
     MessageSource messageSource = Mock()
 
@@ -64,6 +66,7 @@ class NotificationServiceSpec extends Specification implements DataTest {
         service.userService = userService
         service.mailService = mailService
         service.fileGenerationService = fileGenerationService
+        service.goodsReceiptNoteService = goodsReceiptNoteService
         service.messageLocalizer = messageLocalizer
         service.messageSource = messageSource
         service.grailsApplication = grailsApplication
@@ -264,13 +267,11 @@ class NotificationServiceSpec extends Specification implements DataTest {
 
     void 'partial receipt notification mails each valid recipient a goods receipt note and removes the barcode file'() {
         given:
-        Location currentLocation = new Location(name: 'Current')
-        GroovyMock(AuthService, global: true)
-        AuthService.currentLocation >> currentLocation
-
         Person receiver = new Person(firstName: 'Rita', lastName: 'R', email: 'rita@example.org')
         Person alice = new Person(firstName: 'Alice', lastName: 'A', email: 'alice@example.org')
         Shipment shipment = new Shipment(shipmentNumber: 'S-9', destination: new Location(name: 'Clinic'))
+        shipment.id = 'shipment-9'
+        GoodsReceiptNoteDto goodsReceiptNote = new GoodsReceiptNoteDto(shipmentNumber: 'S-9')
         PartialReceiptItem aliceItem = new PartialReceiptItem(recipient: alice)
         PartialReceiptItem anonymousItem = new PartialReceiptItem()
         PartialReceipt partialReceipt = new PartialReceipt(shipment: shipment, recipient: receiver,
@@ -287,6 +288,7 @@ class NotificationServiceSpec extends Specification implements DataTest {
         service.sendReceiptNotifications(partialReceipt)
 
         then:
+        1 * goodsReceiptNoteService.buildGoodsReceiptNote('shipment-9') >> goodsReceiptNote
         1 * messageLocalizer.localize('email.yourItemReceived.message', *_) >> { arguments ->
             localizedArgs = arguments.drop(1).flatten()
             'Items received'
@@ -296,7 +298,7 @@ class NotificationServiceSpec extends Specification implements DataTest {
         1 * fileGenerationService.generateBarcodeFile('S-9') >> barcodeFile
         1 * fileGenerationService.getFileUri(barcodeFile) >> 'file:///barcode.png'
         1 * fileGenerationService.generatePdfFromTemplate('/email/goodsDeliveryNote',
-                [shipment: shipment, currentLocation: currentLocation, barcodeFileUri: 'file:///barcode.png']) >> pdf
+                [goodsReceiptNote: goodsReceiptNote, barcodeFileUri: 'file:///barcode.png']) >> pdf
         1 * mailService.sendHtmlMailWithAttachment('alice@example.org', 'Items received', 'html', pdf,
                 'GoodsReceiptNote-S-9.pdf', 'application/pdf')
         0 * mailService._

@@ -1,0 +1,14 @@
+package org.pih.warehouse.receiving
+
+import org.pih.warehouse.requisition.Requisition
+
+class ReceiptRequisitionDto {
+    String id
+
+    static ReceiptRequisitionDto toDto(Requisition requisition) {
+        if (!requisition) {
+            return null
+        }
+        return new ReceiptRequisitionDto(id: requisition.id)
+    }
+}

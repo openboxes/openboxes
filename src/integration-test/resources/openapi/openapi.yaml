@@ -48,6 +48,8 @@ paths:
     $ref: 'paths/bin-location.yaml#/~1api~1binLocations'
   '/api/binLocations/{id}':
     $ref: 'paths/bin-location.yaml#/~1api~1binLocations~1{id}'
+  '/api/bulkData/import':
+    $ref: 'paths/import.yaml#/~1api~1bulkData~1import'
   '/api/catalogOptions':
     $ref: 'paths/select-options.yaml#/~1api~1catalogOptions'
   '/api/categories':
@@ -182,6 +184,8 @@ paths:
     $ref: 'paths/inventory-item.yaml#/~1api~1facilities~1{facilityId}~1inventory-items'
   '/api/facilities/{facilityId}/inventory-levels':
     $ref: 'paths/inventory-level.yaml#/~1api~1facilities~1{facilityId}~1inventory-levels'
+  '/api/facilities/{facilityId}/inventory-levels/preferred-bin-locations':
+    $ref: 'paths/inventory-level.yaml#/~1api~1facilities~1{facilityId}~1inventory-levels~1preferred-bin-locations'
   '/api/facilities/{facilityId}/inventory-levels/{identifier}':
     $ref: 'paths/inventory-level.yaml#/~1api~1facilities~1{facilityId}~1inventory-levels~1{identifier}'
   '/api/facilities/{facilityId}/products/classifications':
@@ -200,6 +204,8 @@ paths:
     $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1recount~1start~1batch'
   '/api/facilities/{facility}/cycle-counts/start/batch':
     $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1start~1batch'
+  '/api/facilities/{facility}/cycle-counts/{cycleCountId}':
+    $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1{cycleCountId}'
   '/api/facilities/{facility}/cycle-counts/{cycleCountId}/count':
     $ref: 'paths/cycle-count.yaml#/~1api~1facilities~1{facility}~1cycle-counts~1{cycleCountId}~1count'
   '/api/facilities/{facility}/cycle-counts/{cycleCountId}/items':
@@ -440,6 +446,8 @@ paths:
     $ref: 'paths/product.yaml#/~1api~1products~1getLatestInventoryCountDate'
   '/api/products/import':
     $ref: 'paths/product.yaml#/~1api~1products~1import'
+  '/api/products/inventoryItems/getAvailabilityInAllDepots':
+    $ref: 'paths/product.yaml#/~1api~1products~1inventoryItems~1getAvailabilityInAllDepots'
   '/api/products/inventoryItems/lotNumbersWithExpirationDate':
     $ref: 'paths/product.yaml#/~1api~1products~1inventoryItems~1lotNumbersWithExpirationDate'
   '/api/products/search':
@@ -512,6 +520,22 @@ paths:
     $ref: 'paths/reason-code.yaml#/~1api~1reasonCodes'
   '/api/reasonCodes/{id}':
     $ref: 'paths/reason-code.yaml#/~1api~1reasonCodes~1{id}'
+  '/api/receipts/v2/receiptItems/{receiptItemId}/comments':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1receiptItems~1{receiptItemId}~1comments'
+  '/api/receipts/v2/shipment/{shipmentId}':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1shipment~1{shipmentId}'
+  '/api/receipts/v2/shipment/{shipmentId}/start':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1shipment~1{shipmentId}~1start'
+  '/api/receipts/v2/shipment/{shipmentId}/summary':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1shipment~1{shipmentId}~1summary'
+  '/api/receipts/v2/shipment/{shipmentId}/sync':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1shipment~1{shipmentId}~1sync'
+  '/api/receipts/v2/{receiptId}/complete':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1{receiptId}~1complete'
+  '/api/receipts/v2/{receiptId}/items/batch':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1{receiptId}~1items~1batch'
+  '/api/receipts/v2/{receiptId}/shipmentItems/{shipmentItemId}/receiptItems':
+    $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1{receiptId}~1shipmentItems~1{shipmentItemId}~1receiptItems'
   '/api/replenishments':
     $ref: 'paths/replenishment.yaml#/~1api~1replenishments'
   '/api/replenishments/statusOptions':
@@ -696,6 +720,8 @@ paths:
     $ref: 'paths/unit-of-measure.yaml#/~1api~1unitOfMeasures~1{id}'
   '/api/users':
     $ref: 'paths/select-options.yaml#/~1api~1users'
+  '/api/users/{userId}/roles':
+    $ref: 'paths/user-role.yaml#/~1api~1users~1{userId}~1roles'
   # END GENERATED PATHS
 components:
   securitySchemes:

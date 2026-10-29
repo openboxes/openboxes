@@ -7,7 +7,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
-import apiClient, { flattenRequest } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 class AddBinModal extends Component {
@@ -22,12 +22,12 @@ class AddBinModal extends Component {
 
   handleSubmit(values) {
     this.props.showSpinner();
-    apiClient.post('/api/locations/', flattenRequest({
+    apiClient.post('/api/locations/', {
       ...values,
       parentLocation: { id: this.props.locationId },
       locationType: { id: values.locationType.id },
       zone: values.zoneLocation && { id: values.zoneLocation.id },
-    }))
+    })
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.addBin.success.label', 'Bin location has been created successfully!'), { timeout: 3000 });

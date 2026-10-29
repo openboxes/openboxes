@@ -26,7 +26,7 @@ import DateFormat from 'consts/dateFormat';
 import NotificationType from 'consts/notificationTypes';
 import requisitionStatus from 'consts/requisitionStatus';
 import StockTransferStatus from 'consts/stockTransferStatus';
-import { flattenRequest, parseResponse } from 'utils/apiClient';
+import { parseResponse } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -385,7 +385,7 @@ class AddItemsPage extends Component {
       this.props.showSpinner();
       return stockTransferApi.updateStockTransfer(
         this.props.match.params.inboundReturnId,
-        flattenRequest(payload),
+        payload,
       )
         .then(() => this.fetchInboundReturn())
         .catch(() => Promise.reject(new Error(this.props.translate('react.inboundReturns.error.saveOrderItems.label', 'Could not save order items'))))

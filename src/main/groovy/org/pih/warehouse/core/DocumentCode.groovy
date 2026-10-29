@@ -17,6 +17,7 @@ enum DocumentCode {
     PURCHASE_ORDER_TEMPLATE,
     SHIPPING_DOCUMENT,
     SHIPPING_TEMPLATE,
+    SHIPPING_XLS_TEMPLATE,
     ZEBRA_TEMPLATE,
     EMAIL_TEMPLATE,
     DATA_EXPORT,
@@ -30,6 +31,7 @@ enum DocumentCode {
                 PURCHASE_ORDER_TEMPLATE,
                 SHIPPING_DOCUMENT,
                 SHIPPING_TEMPLATE,
+                SHIPPING_XLS_TEMPLATE,
                 ZEBRA_TEMPLATE,
                 EMAIL_TEMPLATE,
                 DATA_EXPORT,
@@ -42,6 +44,7 @@ enum DocumentCode {
         [
                 PURCHASE_ORDER_TEMPLATE,
                 SHIPPING_TEMPLATE,
+                SHIPPING_XLS_TEMPLATE,
                 ZEBRA_TEMPLATE,
                 EMAIL_TEMPLATE,
                 INVOICE_TEMPLATE,
@@ -49,5 +52,11 @@ enum DocumentCode {
         ]
     }
 
+    static shipmentWorkflowTemplateList() {
+        [
+                SHIPPING_TEMPLATE,
+                SHIPPING_XLS_TEMPLATE,
+                INVOICE_TEMPLATE,
+        ]
+    }
 }
-

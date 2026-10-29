@@ -17,20 +17,17 @@ class ObjectValidationResult {
 
     List<ObjectError> errors = []
 
-    ObjectValidationResult(ObjectError error) {
-        addError(error)
-    }
-
-    ObjectValidationResult(Collection<ObjectError> errors) {
-        addErrors(errors)
-    }
-
-    ObjectValidationResult(ObjectError... errors) {
-        addErrors(errors)
-    }
-
-    ObjectValidationResult(Collection<ObjectError>... errors) {
-        addErrors(errors?.flatten())
+    /**
+     * @param errors Any number of {@link ObjectError}s or collections of them. Nulls are ignored.
+     */
+    ObjectValidationResult(Object... errors) {
+        List flattenedErrors = errors?.flatten() ?: []
+        Object invalidObject = flattenedErrors.find { it != null && !(it instanceof ObjectError) }
+        if (invalidObject != null) {
+            throw new IllegalArgumentException(
+                    "Expected ObjectError or Collection<ObjectError> but got ${invalidObject.getClass().name}")
+        }
+        addErrors(flattenedErrors as Collection<ObjectError>)
     }
 
     void addError(ObjectError error) {

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 
 import CycleCountAllProducts from 'components/cycleCount/allProductsTab/CycleCountAllProducts';
 import cycleCountFilterFields from 'components/cycleCount/CycleCountFilterFields';
@@ -14,6 +14,7 @@ import {
 } from 'consts/cycleCount';
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
 import useCycleCountPagination from 'hooks/useCycleCountPagination';
+import useOnBackForwardNavigation from 'hooks/useOnBackForwardNavigation';
 import useQueryParams from 'hooks/useQueryParams';
 import useScrollbar from 'hooks/useScrollbar';
 import useSwitchTabs from 'hooks/useSwitchTabs';
@@ -154,4 +155,13 @@ const CycleCount = () => {
   );
 };
 
-export default CycleCount;
+const CycleCountPage = () => {
+  // The list builds its state (tab, filters, table data) from the URL only when it mounts,
+  // so remount it when the user comes back to it with the browser's back/forward buttons
+  const [listKey, setListKey] = useState(0);
+  useOnBackForwardNavigation(() => setListKey((key) => key + 1));
+
+  return <CycleCount key={listKey} />;
+};
+
+export default CycleCountPage;

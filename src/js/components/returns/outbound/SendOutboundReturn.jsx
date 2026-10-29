@@ -19,7 +19,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import DocumentsDropdown from 'utils/DocumentsDropdown';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
@@ -314,7 +314,7 @@ class SendMovementPage extends Component {
 
       this.saveValues(payload)
         .then(() => {
-          apiClient.post(url, flattenRequest(payload))
+          apiClient.post(url, payload)
             .then(() => {
               window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId);
             })
@@ -420,7 +420,7 @@ class SendMovementPage extends Component {
       expectedDeliveryDate: values.expectedDeliveryDate || '',
     };
 
-    return apiClient.put(url, flattenRequest(payload));
+    return apiClient.put(url, payload);
   }
 
   previousPage(values, invalid) {

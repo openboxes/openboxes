@@ -21,7 +21,11 @@ jest.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
   useSelector: (selector) => selector(mockState),
 }));
-const mockHistory = { location: { pathname: '/cycleCount', search: '' }, push: jest.fn() };
+const mockHistory = {
+  location: { pathname: '/cycleCount', search: '' },
+  push: jest.fn(),
+  replace: jest.fn(),
+};
 jest.mock('react-router-dom', () => ({
   useHistory: () => mockHistory,
 }));
@@ -64,6 +68,9 @@ const buildState = ({ locationId = 'loc-1', shouldRebuildParams = true } = {}) =
 });
 
 const pushedQuery = (call = 0) => queryString.parse(mockHistory.push.mock.calls[call][0].search);
+// Clearing the filters replaces the current entry instead of pushing a new one
+const replacedQuery = (call = 0) =>
+  queryString.parse(mockHistory.replace.mock.calls[call][0].search);
 
 describe('useCycleCountFilters', () => {
   beforeEach(() => {
@@ -223,7 +230,8 @@ describe('useCycleCountFilters', () => {
 
     result.current.resetForm();
 
-    expect(pushedQuery()).toEqual({ tab: 'TO_RESOLVE' });
+    expect(mockHistory.push).not.toHaveBeenCalled();
+    expect(replacedQuery()).toEqual({ tab: 'TO_RESOLVE' });
     expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_SHOULD_REBUILD', flag: true });
   });
 
@@ -234,6 +242,7 @@ describe('useCycleCountFilters', () => {
     );
     await flushPromises();
     expect(mockHistory.push).not.toHaveBeenCalled();
+    expect(mockHistory.replace).not.toHaveBeenCalled();
 
     mockState = buildState({ shouldRebuildParams: false });
     rerender();
@@ -241,7 +250,7 @@ describe('useCycleCountFilters', () => {
     rerender();
     await flushPromises();
 
-    expect(pushedQuery()).toEqual({ tab: 'ALL' });
+    expect(replacedQuery()).toEqual({ tab: 'ALL' });
     expect(fetchBins).toHaveBeenCalledTimes(2);
     expect(result.current.isLoading).toBe(false);
   });

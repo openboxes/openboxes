@@ -3,6 +3,7 @@ package org.pih.warehouse.core.validation
 import grails.util.Holders
 import grails.validation.ValidationException
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
 import javax.validation.ConstraintViolation
 import javax.validation.Valid
@@ -14,7 +15,11 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.pih.warehouse.core.AppUtil
 
 /**
- * Marks a class as able to be validated by a Validator class.
+ * Hooks our custom validation logic into the validation flow of a Grails framework-aware class (such as a domain
+ * entity or request DTO).
+ *
+ * Validators that do not rely on framework behaviour (such as {@link PlainObjectValidator}) do not need their objects
+ * to implement this trait.
  *
  * There are three supported validation methods:
  * 1) Via javax.validation.constraints.* annotations: for simple validations
@@ -24,10 +29,8 @@ import org.pih.warehouse.core.AppUtil
  * When X.validate() is called, constraints defined in any/all of the above approaches will be triggered. As such,
  * you can rely on more than one of the above validation solutions at the same time.
  *
- * This also allows us to use the @Valid annotation on controller action method params. Any controller action
- * method param that is annotated with @Valid will automatically throw an exception if any of its fields are invalid.
- *
- * For example: def someAction(@Valid XCommand requestBody) { ... }
+ * @param <V> Optional. The {@link Validator} component containing additional validation to perform on this object.
+ *            If not provided, will only validate via Grails constraints and Javax annotations.
  */
 trait Validatable<V extends Validator> {
 
@@ -48,7 +51,15 @@ trait Validatable<V extends Validator> {
         boolean javaxValid = performJavaxValidation(fieldsToValidate as Set<String>)
 
         V validator = validator()
-        boolean validatorValid = validator ? validator.validate(this) : true
+
+        /*
+         * The Validator adds all of its errors to an Errors object. For all Validatable implementations,
+         * this Errors object will be the "errors" field of the Validatable. This means we don't need to parse
+         * the ObjectValidationResult here because the errors will be already attached to the object.
+         *
+         * We set errorOnFailure to false because we will throw our own exception later in this method.
+         */
+        boolean validatorValid = validator ? validator.validate(this, false).valid : true
 
         // The object is only considered valid if all of the validation steps return valid
         boolean validOverall = grailsValidationResult && javaxValid && validatorValid
@@ -109,9 +120,12 @@ trait Validatable<V extends Validator> {
     private V validator() {
         // Determines (statically but at runtime) the class type of the validator and uses that to fetch the bean.
         Class validatorClass = GenericTypeResolver.resolveTypeArgument(getClass(), Validatable.class)
-        // If no validator was specified in the class-level generic declaration, the base Validator type is what the
-        // generic will resolve to. In that case return null because it means there is no custom validator.
-        return (!validatorClass || validatorClass == Validator) ? null : AppUtil.getBean((Class<V>) validatorClass)
+        // If the validator generic is omitted in the extends clause of the Validatable (ie "X extends Validatable"
+        // instead of "X extends Validatable<XValidator>"), the generic will resolve to a non-concrete Validator
+        // implementation. In that case, return null because it means there is no custom validator to use.
+        return (!validatorClass || Modifier.isAbstract(validatorClass.modifiers)) ?
+                null :
+                AppUtil.getBean((Class<V>) validatorClass)
     }
 
     /**
@@ -139,13 +153,18 @@ trait Validatable<V extends Validator> {
             return false
         }
 
-        Method actionMethod = controllerClass.methods.find { it.name == webRequest.actionName }
-        if (!actionMethod) {
+        // Grails compiles every action with parameters into two methods: the original one and a generated
+        // no-arg wrapper. Class.getMethods() returns them in no particular order, so to reliably find the
+        // annotated parameter we need to check all of the same-named overloads, not just the first match.
+        List<Method> actionMethods = controllerClass.methods.findAll { it.name == webRequest.actionName }
+        if (!actionMethods) {
             return false
         }
 
-        return actionMethod.parameters.any { Parameter param ->
-            param.type.isAssignableFrom(this.class) && param.isAnnotationPresent(Valid)
+        return actionMethods.any { Method actionMethod ->
+            actionMethod.parameters.any { Parameter param ->
+                param.type.isAssignableFrom(this.class) && param.isAnnotationPresent(Valid)
+            }
         }
     }
 }

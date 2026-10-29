@@ -66,21 +66,19 @@ jest.mock('components/form-elements/v2/DateFieldDateFns', () => ({
 ));
 const mockProduct = { id: 'p-9', label: 'P9 - Gauze', productCode: 'P9' };
 const mockRecipient = { id: 'u-2', label: 'John', name: 'John' };
-// OBAF has no v2 ProductSelectField: the product cell is the v2
-// SelectField with `productSelect`, so the select stand-in renders the product controls for it.
+// The product cell is the v2 ProductSelectField: its stand-in exposes the product controls.
+jest.mock('components/form-elements/v2/ProductSelectField', () => ({
+  onChange, value, ariaLabel, onBlur, onExactProductSelected, locationId,
+}) => (
+  <div>
+    <input aria-label={ariaLabel.defaultMessage} readOnly value={value?.label ?? ''} data-location={locationId} onBlur={onBlur} />
+    <button type="button" onClick={() => onChange(mockProduct)}>pick product</button>
+    <button type="button" onClick={() => onExactProductSelected({ product: mockProduct })}>scan product</button>
+  </div>
+));
 jest.mock('components/form-elements/v2/SelectField', () => ({
-  onChange, value, ariaLabel, placeholder, loadOptions, onBlur, productSelect,
-  onExactProductSelected, locationId,
+  onChange, value, ariaLabel, placeholder, loadOptions, onBlur,
 }) => {
-  if (productSelect) {
-    return (
-      <div>
-        <input aria-label={ariaLabel.defaultMessage} readOnly value={value?.label ?? ''} data-location={locationId} onBlur={onBlur} />
-        <button type="button" onClick={() => onChange(mockProduct)}>pick product</button>
-        <button type="button" onClick={() => onExactProductSelected({ product: mockProduct })}>scan product</button>
-      </div>
-    );
-  }
   const name = ariaLabel?.defaultMessage ?? `header ${placeholder}`;
   return (
     <div>

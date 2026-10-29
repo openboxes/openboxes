@@ -12,7 +12,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
-import apiClient, { flattenRequest } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -210,7 +210,7 @@ class ReplenishmentSecondPage extends Component {
       this.props.showSpinner();
       const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = { status: 'COMPLETED' };
-      apiClient.post(url, flattenRequest(payload))
+      apiClient.post(url, payload)
         .then(() => {
           window.location = STOCK_TRANSFER_URL.show(this.props.match.params.replenishmentId);
           this.props.hideSpinner();

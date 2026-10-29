@@ -20,6 +20,7 @@ import org.pih.warehouse.core.CommentType
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
+import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -28,8 +29,10 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.ShipmentEvent
 import org.pih.warehouse.core.WebhookEventType
+import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -57,9 +60,13 @@ class ReceiptService {
     InventoryService inventoryService
     LocationService locationService
     ReceiptIdentifierService receiptIdentifierService
+    ReceiptV2Service receiptV2Service
+    ReceiptTransactionManager receiptTransactionManager
     TransactionIdentifierService transactionIdentifierService
     GrailsApplication grailsApplication
     ProductAvailabilityService productAvailabilityService
+    ShipmentForReceiptValidator shipmentForReceiptValidator
+    MessageLocalizer messageLocalizer
     BackorderService backorderService
     MessageSource messageSource
 
@@ -433,6 +440,8 @@ class ReceiptService {
         rollbackInboundTransactions(shipment)
 
         if (shipment.receipts) {
+            receiptV2Service.deleteMarkersForReceipts(shipment.receipts)
+            receiptTransactionManager.deleteTransactionSourcesForReceipts(shipment.receipts)
             shipment.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
                 receipt.delete()
@@ -442,6 +451,16 @@ class ReceiptService {
 
         deleteEvent(shipment, EventCode.RECEIVED)
         deleteEvent(shipment, EventCode.PARTIALLY_RECEIVED)
+    }
+
+    /**
+     * Returns the localized reason why the last receipt of the shipment cannot be rolled back from the current
+     * location, or null when it can.
+     */
+    String getRollbackBlockedReason(Shipment shipment) {
+        ObjectValidationResult result = shipmentForReceiptValidator.validateForReceiptRollback(shipment)
+
+        return result.valid ? null : result.errors.collect { messageLocalizer.localize(it) }.join(" ")
     }
 
     void rollbackLastReceipt(Shipment shipment) {
@@ -467,6 +486,8 @@ class ReceiptService {
                 shipment.removeFromIncomingTransactions(transaction)
                 transaction.delete()
             }
+            receiptV2Service.deleteMarkerForReceipt(lastReceipt)
+            receiptTransactionManager.deleteTransactionSourceForReceipt(lastReceipt)
             shipment.removeFromReceipts(lastReceipt)
             lastReceipt.delete()
 
@@ -497,6 +518,10 @@ class ReceiptService {
         }
     }
 
+    /**
+     * @return the receiving bin of the shipment, or null when the destination does not track bin locations or the
+     * creation of receiving bins is disabled by config.
+     */
     Location createTemporaryReceivingBin(Shipment shipment) {
         // Create temporary receiving area for the Partial Receipt process
         if (Holders.grailsApplication.config.openboxes.receiving.createReceivingLocation.enabled && shipment?.destination?.hasBinLocationSupport()) {

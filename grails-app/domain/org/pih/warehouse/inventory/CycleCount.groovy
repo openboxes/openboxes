@@ -34,7 +34,9 @@ class CycleCount {
         status = recomputeStatus()
     }
 
-    SortedSet<CycleCountItem> cycleCountItems
+    // OBPIH-7933: Make sure to initialize set so that it is non-null for instances that are not yet GORM-initialized.
+    // Otherwise, calling new CycleCount().save() can cause null pointers if you try to access the cycleCountItems.
+    SortedSet<CycleCountItem> cycleCountItems = [] as SortedSet<CycleCountItem>
 
     static hasMany = [
             /*
@@ -139,18 +141,5 @@ class CycleCount {
                     it.location == binLocation &&
                     it.inventoryItem == inventoryItem &&
                     it.countIndex == countIndex }
-    }
-
-    Map toJson() {
-        return [
-                id: id,
-                facility: facility,
-                dateLastRefreshed: dateLastRefreshed,
-                status: status,
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated,
-                createdBy: createdBy,
-                updatedBy: updatedBy
-        ]
     }
 }

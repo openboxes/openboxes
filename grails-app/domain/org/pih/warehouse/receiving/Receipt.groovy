@@ -76,15 +76,4 @@ class Receipt implements Serializable, Comparable<Receipt> {
                 lastUpdated <=> otherReceipt?.lastUpdated ?:
                         id <=> otherReceipt?.id
     }
-
-    List<ReceiptItem> sortReceiptItemsBySortOrder() {
-        def receiptItemsComparator = { a, b ->
-            return a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
-                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                            a?.sortOrder <=> b?.sortOrder ?:
-                                    a?.inventoryItem?.product?.name <=>  b?.inventoryItem?.product?.name
-        }
-
-        return receiptItems?.sort(receiptItemsComparator)
-    }
 }

@@ -16,6 +16,7 @@ import locationReducer from 'reducers/locationReducer';
 import lotNumbersReducer from 'reducers/lotNumbersReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
 import outboundImportReducer from 'reducers/outboundImportReducer';
+import partialReceivingReducer from 'reducers/partialReceivingReducer';
 import productSupplierReducer from 'reducers/productSupplierReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
@@ -58,6 +59,7 @@ const rootReducer = combineReducers({
   errors: errorsReducer,
   inbound: inboundReducer,
   lotNumbers: lotNumbersReducer,
+  partialReceiving: partialReceivingReducer,
 });
 
 export default rootReducer;

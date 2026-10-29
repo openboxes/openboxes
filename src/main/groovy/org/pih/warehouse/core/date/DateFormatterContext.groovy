@@ -2,11 +2,13 @@ package org.pih.warehouse.core.date
 
 import java.time.ZoneId
 
+import org.pih.warehouse.core.formatter.FormatterContext
+
 /**
  * Context object containing the configuration fields for formatting dates.
  * For a majority of cases the default settings can be used and so this context object will not be required.
  */
-class DateFormatterContext {
+class DateFormatterContext extends FormatterContext {
 
     /**
      * Overrides the locale to use when formatting the date.
@@ -37,11 +39,6 @@ class DateFormatterContext {
      * If patternOverride is also set, it will take priority over this field.
      */
     DateDisplayStyle displayStyleOverride
-
-    /**
-     * The default value to return if the given date object is null.
-     */
-    String defaultValue
 
     static DateFormatterContextBuilder builder() {
         return new DateFormatterContextBuilder()

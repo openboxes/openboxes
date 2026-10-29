@@ -7,14 +7,13 @@
         </td>
         <td>
             <div class="header">
-                <div style="font-size: 25px; margin-bottom: 10px; font-weight: bold;">
-                    <g:message code="enum.ShipmentStatusCode.${shipment?.status?.code?.name}" default="${shipment?.status?.code?.name}" />
+                <div class="header-title">
+                    ${goodsReceiptNote.shipmentNumber}<g:if test="${goodsReceiptNote.description}"> - ${goodsReceiptNote.description}</g:if>
                 </div>
-                <h1>${title}</h1>
-                <h3>${shipment?.shipmentNumber} - ${shipment?.name }</h3>
-                <g:if test="${shipment.shipmentNumber}">
+                <g:render template="/goodsReceiptNote/shipmentStatus" model="[goodsReceiptNote: goodsReceiptNote]"/>
+                <g:if test="${goodsReceiptNote.shipmentNumber}">
                     <div class="barcode">
-                        <img src="${createLink(controller: 'product', action: 'barcode', params: [data: shipment?.shipmentNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
+                        <img src="${createLink(controller: 'product', action: 'barcode', params: [data: goodsReceiptNote.shipmentNumber, width: 100, height: 30, format: 'CODE_128'])}"/>
                     </div>
                 </g:if>
             </div>
@@ -26,7 +25,7 @@
                         <label><warehouse:message code="shipping.origin.label"/>:</label>
                     </td>
                     <td>
-                        ${shipment?.origin?.name}
+                        ${goodsReceiptNote.originName}
                     </td>
                 </tr>
                 <tr>
@@ -34,7 +33,7 @@
                         <label><warehouse:message code="shipping.destination.label"/>:</label>
                     </td>
                     <td>
-                        ${shipment?.destination?.name}
+                        ${goodsReceiptNote.destinationName}
                     </td>
                 </tr>
                 <tr>
@@ -42,7 +41,7 @@
                         <label><warehouse:message code="shipping.dateShipped.label"/>:</label>
                     </td>
                     <td>
-                        <g:formatDate date="${shipment?.actualShippingDate}" format="d MMMMM yyyy hh:mma"/>
+                        <g:formatDate date="${goodsReceiptNote.dateShipped}" format="d MMMMM yyyy hh:mma"/>
                     </td>
                 </tr>
                 <tr>
@@ -58,7 +57,7 @@
                         <label><warehouse:message code="default.lastReceipt.label" default="Last receipt"/>:</label>
                     </td>
                     <td>
-                        <g:formatDate date="${shipment?.receipts?.last()?.actualDeliveryDate}" format="d MMMMM yyyy hh:mma"/>
+                        <g:formatDate date="${goodsReceiptNote.lastReceiptDate}" format="d MMMMM yyyy hh:mma"/>
                     </td>
                 </tr>
 

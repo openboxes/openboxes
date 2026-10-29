@@ -14,7 +14,7 @@ import org.pih.warehouse.shipping.ShipmentService
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
 @Component
-class ProductValidator implements DomainValidator<Product> {
+class ProductValidator extends DomainValidator<Product> {
 
     private static String ACTIVE_FIELD_NAME = "active"
 
@@ -28,7 +28,7 @@ class ProductValidator implements DomainValidator<Product> {
     ShipmentService shipmentService
 
     @Override
-    ObjectValidationResult doValidate(Product product) {
+    protected ObjectValidationResult doValidate(Product product) {
         return new ObjectValidationResult(
                 validateActive(product),
         )
@@ -51,7 +51,7 @@ class ProductValidator implements DomainValidator<Product> {
                 product, ActivityCode.MANAGE_INVENTORY)
 
         return locations ?
-                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inStock", locations) :
+                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inStock", [locations]) :
                 null
     }
 
@@ -62,7 +62,7 @@ class ProductValidator implements DomainValidator<Product> {
                 [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED])
 
         return locations ?
-                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inShipment", locations) :
+                rejectField(ACTIVE_FIELD_NAME, product.active, "product.active.invalid.inShipment", [locations]) :
                 null
     }
 

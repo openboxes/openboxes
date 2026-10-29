@@ -25,6 +25,16 @@ class InventoryLevelService {
 
     GrailsApplication grailsApplication
 
+    PreferredBinLocationsDto getPreferredBinLocations(PreferredBinLocationsCommand command) {
+        List<InventoryLevel> inventoryLevels = InventoryLevel.createCriteria().list {
+            eq("inventory", command.facility.inventory)
+            "in"("product", command.products)
+            isNotNull("preferredBinLocation")
+        }
+
+        return PreferredBinLocationsDto.from(inventoryLevels)
+    }
+
     // Associations are resolved explicitly (by id or natural key) rather than via data binding, so we don't
     // expose the raw domain bindings; everything else is bound.
     private static final List<String> NON_BINDABLE_FIELDS = [

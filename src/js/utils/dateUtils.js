@@ -33,50 +33,65 @@ const dateWithoutTimeZone = ({
   return parsedDate.format(outputDateFormat);
 };
 
-export const parseDateAndStripTimezone = (date, providedFormat) => {
-  const dateWithoutOffset = date.replace(/([+-]\d{2}:\d{2}|Z)$/, '');
-  const formatWithoutOffset = providedFormat.replace('XXX', '');
-  return parse(dateWithoutOffset, formatWithoutOffset, new Date());
-};
+/**
+ * Removes the timezone offset from both a date string and its format
+ * .
+ * For example: ('01/Jan/2000 00:00:00+07:00', 'dd/MMM/yyyy HH:mm:ssXXX') becomes
+ *              ('01/Jan/2000 00:00:00',       'dd/MMM/yyyy HH:mm:ss')
+ *
+ * @param {string} date - The date string to strip.
+ * @param {string} dateFormat - The format of the date string.
+ * @return {[string, string]} the date string and format, both without the timezone offset
+ */
+const stripTimezoneOffset = (date, dateFormat) => [
+  date.replace(/\s*([+-]\d{2}:?\d{2}|Z)$/, ''),
+  dateFormat.replace(/\s*X+$/, ''),
+];
 
 /**
- * Converts an ISO date string to a Date object or a date-only Date without timezone information
- * @param {Object} params
- * @param {Object} params.options
- * @param {string} params.date - ISO date string (e.g. '2025-09-18' or '2025-09-18T14:30:00')
- * @param {Boolean} params.dateOnly - if true, returns the full date-time; if false, returns
- * date with time zeroed
- * @param {String} params.options.providedFormat - format of the passed date
+ * Converts a date string to a Date object.
+ *
+ * If dateOnly is true, will strip any time and zone information from the string. This functionality
+ * exists due to a desync between the frontend and the backend. Some old fields that still use
+ * java.util.Date on the backend treat what should be date-only fields as full date + time + zone
+ * objects. To avoid off-by-one-day errors when comparing or displaying date-only dates, we strip
+ * time and zone from the string.
+ *
+ * If you're parsing a string from an API response, use {@link #parseApiDate} instead since it
+ * more gracefully handles ISO strings.
+ *
+ * @param params
+ * @param {string} params.date - The date string to convert
+ * @param {string} params.currentDateFormat - the format the given string is in currently
+ * @param {boolean} [params.dateOnly=false] - if true, time + zone will be stripped from the string
  * @returns {Date | null}
  */
 export const parseStringToDate = ({
   date,
+  currentDateFormat,
   dateOnly = false,
-  options = {
-    providedDateFormat: DateFormatDateFns.MMM_DD_YYYY,
-  },
 }) => {
-  if (!date) {
+  if (typeof date !== 'string' || !date) {
     return null;
   }
 
-  if (dateOnly && !options.providedDateFormat) {
-    throw new Error('ProvidedDateFormat is required when dateOnly is set to true');
+  if (!currentDateFormat) {
+    throw new Error('currentDateFormat is required');
   }
 
-  // If dateOnly is set to true, we are converting the date to the date object with the appropriate
-  // timezone. In another case, we need to pass the provided date format and strip the timezone
-  // information to avoid unexpected date changes.
-  const parsedDate = dateOnly
-    ? parseDateAndStripTimezone(date, options.providedDateFormat)
-    : parseISO(date);
+  // Conditionally strip out timezone offset. See the docstring for details.
+  const [dateToParse, formatToParse] = dateOnly
+    ? stripTimezoneOffset(date, currentDateFormat)
+    : [date, currentDateFormat];
+
+  const parsedDate = parse(dateToParse, formatToParse, new Date());
 
   if (!isValid(parsedDate)) {
-    throw new Error('Invalid ISO date string or provided format');
+    throw new Error('Invalid date string or provided format');
   }
 
-  // Date object is automatically converted to the user's browser timezone, so the user doesn't have
-  // to set it on their own
+  // And also conditionally strip out time. We do this after creating the Date object because it
+  // is less error-prone than stripping the characters from the given string.
   return dateOnly
     ? new Date(
       parsedDate.getFullYear(),
@@ -84,6 +99,21 @@ export const parseStringToDate = ({
       parsedDate.getDate(),
     )
     : parsedDate;
+};
+
+/**
+ * Resolves a date-fns locale object for the given locale code.
+ * `enUS` is a fallback when the locale is missing or unsupported — the 'ar' locale
+ * crashes the date picker, so it is intentionally fallback.
+ * @param {String} localeCode - locale code
+ * @returns {Locale} date-fns locale object
+ */
+export const getDateFnsLocale = (localeCode) => {
+  if (!localeCode || ['en', 'ar'].includes(localeCode)) {
+    return locales.enUS;
+  }
+
+  return locales[localeCode] ?? locales.enUS;
 };
 
 /**
@@ -121,6 +151,35 @@ export const formatDateToZonedDateTimeString = (date) => formatDateToString({
 });
 
 /**
+ * Converts a date string into an ISO-formatted datetime string, which is the format that APIs
+ * binding a java.time.Instant expect.
+ *
+ * @param {string} date - the date string to convert
+ * @param {string} currentDateFormat - the format the given string is in currently
+ * @returns {string|null} An ISO-formatted datetime + zone string. Ex: '2000-01-01T00:00:00Z'
+ */
+export const formatStringToInstant = (date, currentDateFormat) => {
+  const parsedDate = parseStringToDate({ date, currentDateFormat, dateOnly: false });
+  return !parsedDate ? null : parsedDate.toISOString();
+};
+
+/**
+ * Converts a date string into an ISO-formatted date-only string, which is the format that APIs
+ * binding a java.time.LocalDate expect.
+ *
+ * @param {string} date - the date string to convert
+ * @param {string} currentDateFormat - the format the given string is in currently
+ * @returns {string|null} An ISO-formatted date-only string. Ex: '2000-01-01'
+ */
+export const formatStringToLocalDate = (date, currentDateFormat) => {
+  const parsedDate = parseStringToDate({ date, currentDateFormat, dateOnly: true });
+  return !parsedDate ? null : formatDateToString({
+    date: parsedDate,
+    dateFormat: DateFormatDateFns.YYYY_MM_DD,
+  });
+};
+
+/**
  * A method for converting Date to a localized date string for display (shifted time by timezone
  * differences)
  */
@@ -155,6 +214,36 @@ export const formatDateToDateOnlyString = (date, locale = locales.enUS) => {
  * A method for formating ISO date string to date in another format
  */
 export const formatISODate = (date, dateFormat) => format(parseISO(date), dateFormat);
+
+/**
+ * A method for parsing a date-only string as APIs send it (e.g. '2026-09-19') to a Date.
+ * @param {String} date - date-only string in the yyyy-MM-dd format
+ * @returns {Date|null} the parsed date, or null when the value is empty or not a valid date
+ */
+export const parseApiDate = (date) => {
+  if (typeof date !== 'string' || !date) {
+    return null;
+  }
+
+  const parsedDate = parseISO(date);
+  return isValid(parsedDate) ? parsedDate : null;
+};
+
+/**
+ * A method for converting a date-only string as APIs send it (e.g. '2026-09-19') to a string in
+ * the given format, without the timezone shift formatting the string directly would introduce.
+ * @param {Object} params
+ * @param {String} params.date - date-only string in the yyyy-MM-dd format
+ * @param {String} params.dateFormat - output date format
+ * @param {Object} params.options
+ * @param {Locale} params.options.locale - output locale
+ * @returns {String|null}
+ */
+export const formatApiDateToString = ({ date, dateFormat, options }) => formatDateToString({
+  date: parseApiDate(date),
+  dateFormat,
+  options,
+});
 
 /**
  * Get timezone offset, defaulting to the user's timezone offset
