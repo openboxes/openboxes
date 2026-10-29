@@ -12,10 +12,10 @@ import { getFormatLocalizedDate, makeGetCycleCountItem } from 'selectors';
 
 import { updateFieldValue } from 'actions';
 import { TableCell } from 'components/DataTable';
-import DatePicker from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import { NEW_ROW } from 'consts/cycleCount';
 import cycleCountColumn from 'consts/cycleCountColumn';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useCellValidation from 'hooks/cycleCount/useCellValidation';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
@@ -134,9 +134,10 @@ const ExpirationDateCell = ({
     <TableCell
       className="rt-td rt-td-count-step"
     >
-      <DatePicker
+      <DateFieldDateFns
         value={value}
-        customDateFormat={DateFormat.DD_MMM_YYYY}
+        customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+        outputDateFormat={DateFormatDateFns.MMM_DD_YYYY}
         hasErrors={showError}
         onChange={onChange}
         onBlur={onBlurValidationHandler}

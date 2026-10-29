@@ -1,30 +1,21 @@
-/* eslint-disable react/jsx-closing-tag-location */
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { BeatLoader } from 'react-spinners';
 
-const LoadingNumbers = ({ numberOfLoadingCards }) => {
-  const loadingNumbers = [];
-  for (let i = 0; i < numberOfLoadingCards; i += 1) {
-    loadingNumbers.push(<div className="number-card" key={i}>
-      <div className="loader-div">
-        <div style={{
-          textAlign: 'center',
-          padding: '50px',
-        }}
-        >
-          Loading...
+import { getRandomColor } from 'consts/dataFormat/colorMapping';
+
+const LoadingNumbers = ({ numberOfLoadingCards = 4 }) => (
+  <div className="card-component">
+    {Array.from({ length: numberOfLoadingCards }, (_, index) => (
+      <div className="number-card" key={index}>
+        <div className="loader-div">
+          <BeatLoader color={getRandomColor()} size={20} margin={5} />
         </div>
       </div>
-    </div>);
-  }
-
-  return (
-    <div className="card-component">
-      {loadingNumbers}
-    </div>
-  );
-};
+    ))}
+  </div>
+);
 
 LoadingNumbers.propTypes = {
   numberOfLoadingCards: PropTypes.number,
