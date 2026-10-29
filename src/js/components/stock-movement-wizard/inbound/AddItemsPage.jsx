@@ -208,7 +208,6 @@ const VENDOR_FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
-          openOnClick: false,
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -261,6 +260,7 @@ class AddItemsPage extends Component {
     }
   }
 
+  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;

@@ -64,12 +64,8 @@ const SHIPMENT_FIELDS = {
           required: true,
           async: true,
           showValueTooltip: true,
-          openOnClick: false,
-          autoload: false,
           loadOptions: debouncedLocationsFetch,
-          cache: false,
           options: [],
-          filterOptions: (options) => options,
         };
       }
       return { formatValue: (fieldValue) => _.get(fieldValue, 'name') };

@@ -154,7 +154,6 @@ const FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
-          openOnClick: false,
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,
