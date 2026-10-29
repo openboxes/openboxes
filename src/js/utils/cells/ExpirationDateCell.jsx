@@ -15,7 +15,7 @@ import getExpiryStatus from 'utils/expirationStatus';
  * it also highlights the date and shows an "expiring"/"expired" badge.
  */
 const ExpirationDateCell = React.memo(({
-  value, localeKey, label, defaultLabel, showExpiryStatus, className,
+  value, localeKey, label, defaultLabel, showExpiryStatus = false, className = '',
 }) => {
   const translate = useTranslate();
 

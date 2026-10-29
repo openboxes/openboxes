@@ -823,7 +823,7 @@ class AddItemsPage extends Component {
     })
       .then(() => {
         this.props.hideSpinner();
-        toast(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }

@@ -10,7 +10,7 @@ import 'utils/ItemDetails.scss';
  * Generic component for displaying item details
  */
 const ItemDetails = ({
-  badge, fields, className, children,
+  badge = null, fields, className = '', children = null,
 }) => (
   <div className={`item-details ${className}`}>
     {badge && (

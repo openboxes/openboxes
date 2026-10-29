@@ -17,8 +17,8 @@ import CustomTooltip from 'wrappers/CustomTooltip';
  * @param param.children The child object that the tooltip wraps
  */
 const TooltipWrapper = ({
-  tooltipLabel,
-  defaultTooltipLabel,
+  tooltipLabel = null,
+  defaultTooltipLabel = '',
   children,
 }) => {
   const translate = useTranslate();

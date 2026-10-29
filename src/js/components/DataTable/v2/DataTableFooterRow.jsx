@@ -12,7 +12,7 @@ import getCommonPinningStyles from 'utils/getCommonPinningStyles';
  */
 const DataTableFooterRow = ({
   footerGroups,
-  tableWithPinnedColumns,
+  tableWithPinnedColumns = false,
   isScreenWiderThanTable,
 }) => (
   <div

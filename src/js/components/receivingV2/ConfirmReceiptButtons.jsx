@@ -4,7 +4,11 @@ import PropTypes from 'prop-types';
 
 import Button from 'components/form-elements/Button';
 
-const ConfirmReceiptButtons = ({ onBackToReceive, onCompleteReceipt, isCompleteDisabled }) => (
+const ConfirmReceiptButtons = ({
+  onBackToReceive = () => {},
+  onCompleteReceipt = () => {},
+  isCompleteDisabled = false,
+}) => (
   <div className="d-flex gap-8">
     <Button
       label="react.receiving.backToReceive.label"

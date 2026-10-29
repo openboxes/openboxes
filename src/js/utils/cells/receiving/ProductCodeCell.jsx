@@ -13,7 +13,7 @@ import ValueCell from 'utils/cells/ValueCell';
  * and the green arrow of split item rows.
  */
 const ProductCodeCell = React.memo(({
-  item, isPackingListView, isExpanded, onToggle, className,
+  item = null, isPackingListView = false, isExpanded = false, onToggle, className = '',
 }) => {
   // The changes toggle lives in the first pinned column: Code in table view,
   // the pack level group column in packing list view.

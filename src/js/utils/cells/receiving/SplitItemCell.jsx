@@ -9,7 +9,7 @@ import { TableCell } from 'components/DataTable';
  * Green arrow and/or product code, shown only on the first split item row of a product.
  */
 const SplitItemCell = React.memo(({
-  isFirstSplitItem, productCode, withArrow, className,
+  isFirstSplitItem = false, productCode = null, withArrow = false, className = '',
 }) => (
   <TableCell
     className={`rt-td ${className}`}

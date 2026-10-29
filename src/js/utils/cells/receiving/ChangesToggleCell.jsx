@@ -11,7 +11,7 @@ import useTranslate from 'hooks/useTranslate';
  * The cell of a toggle row - a chevron + label button expanding/collapsing
  * the split items of the row.
  */
-const ChangesToggleCell = React.memo(({ isExpanded, onToggle, changeCount }) => {
+const ChangesToggleCell = React.memo(({ isExpanded = false, onToggle, changeCount = null }) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
 

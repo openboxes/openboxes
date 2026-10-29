@@ -10,7 +10,7 @@ import useTranslate from 'hooks/useTranslate';
  * (two by default) with the full value displayed on a tooltip.
  */
 const MultilineCell = React.memo(({
-  value, label, defaultLabel, maxLines, className,
+  value, label, defaultLabel, maxLines = 2, className = '',
 }) => {
   const translate = useTranslate();
 
