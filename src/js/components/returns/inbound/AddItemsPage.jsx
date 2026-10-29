@@ -9,7 +9,6 @@ import { Form } from 'react-final-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ProductApi from 'api/services/ProductApi';
@@ -30,6 +29,7 @@ import { parseResponse } from 'utils/apiClient';
 import { renderFormField, setColumnValue } from 'utils/form-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -42,20 +42,15 @@ const DELETE_BUTTON_FIELD = {
     fieldValue, removeItem, removeRow, translate, onDelete,
   }) => (
     <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
-      <Tooltip
-        html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
-        theme="transparent"
-        arrow="true"
-        delay="150"
-        duration="250"
-        hideDelay="50"
+      <CustomTooltip
+        content={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
       >
         <RiDeleteBinLine
           className="delete-icon"
           onClick={() => onDelete(fieldValue, removeItem, removeRow)}
           disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
         />
-      </Tooltip>
+      </CustomTooltip>
     </div>
   ),
 };

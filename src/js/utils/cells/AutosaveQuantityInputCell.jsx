@@ -18,7 +18,7 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  * enough rows accumulate.
  */
 const AutosaveQuantityInputCell = React.memo(({
-  value, onCommit, label, defaultLabel, disabled, errorMessage, className,
+  value = null, onCommit, label, defaultLabel, disabled = false, errorMessage = null, className = '',
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   // Last value handed to onCommit. The `value` prop lags one render behind the store, so

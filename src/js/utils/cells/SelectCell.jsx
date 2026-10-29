@@ -10,22 +10,22 @@ import useTranslate from 'hooks/useTranslate';
  * Memoized cell rendering a dropdown.
  */
 const SelectCell = React.memo(({
-  options,
-  value,
+  options = [],
+  value = null,
   onChange,
   label,
   defaultLabel,
-  placeholder,
-  disabled,
-  selectFieldComponent: SelectFieldComponent,
-  labelKey,
-  locationId,
-  async,
-  loadOptions,
-  showValueTooltip,
+  placeholder = '',
+  disabled = false,
+  selectFieldComponent: SelectFieldComponent = SelectField,
+  labelKey = 'name',
+  locationId = null,
+  async = false,
+  loadOptions = () => [],
+  showValueTooltip = true,
   onBlur,
-  clearable,
-  errorMessage,
+  clearable = true,
+  errorMessage = null,
 }) => {
   const translate = useTranslate();
 

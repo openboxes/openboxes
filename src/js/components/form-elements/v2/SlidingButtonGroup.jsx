@@ -9,7 +9,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 import 'components/form-elements/v2/style.scss';
 
 const SlidingButtonGroup = ({
-  options, defaultOption, onChange, className, style,
+  options, defaultOption, onChange = () => {}, className = '', style = {},
 }) => {
   const translate = useTranslate();
   const [activeOption, setActiveOption] = useState(defaultOption);

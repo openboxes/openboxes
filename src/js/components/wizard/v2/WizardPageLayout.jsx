@@ -31,9 +31,9 @@ const WizardPageLayout = ({
     previous,
     next,
   } = {},
-  topSection,
-  className,
-  children,
+  topSection = null,
+  className = '',
+  children = null,
 }) => (
   <PageWrapper className={`mb-3 ${className}`}>
     <Section showTitle={false} className="mt-4 wizard-page-section">
