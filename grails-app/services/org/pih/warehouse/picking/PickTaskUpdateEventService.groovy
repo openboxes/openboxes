@@ -1,15 +1,16 @@
 package org.pih.warehouse.picking
 
 import grails.gorm.transactions.Transactional
-import org.springframework.context.ApplicationListener
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Transactional
-class PickTaskUpdateEventService implements ApplicationListener<PickTaskUpdateEvent> {
+class PickTaskUpdateEventService {
 
     def productAvailabilityService
 
-    @Override
-    void onApplicationEvent(PickTaskUpdateEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onPickTaskUpdateEvent(PickTaskUpdateEvent event) {
         PickTask task = (PickTask) event.source
         productAvailabilityService.triggerRefreshProductAvailability(task?.facility?.id, [task?.product?.id], event?.forceRefresh)
     }
