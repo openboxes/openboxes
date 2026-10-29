@@ -149,6 +149,17 @@
 		border-top: 2px solid #ccc;
 		background-color: #f0f0f2;
 	}
+
+	/* DataTables keeps an empty copy of the footer in the scrolling body to size the columns. Hide the parentheses
+	   that the debit style would add to it. */
+	#transactionReport_wrapper .dataTables_scrollBody tfoot th:before,
+	#transactionReport_wrapper .dataTables_scrollBody tfoot th:after {
+		content: none;
+	}
+
+	#transactionReport_wrapper .dataTables_scrollBody tfoot th {
+		border: 0;
+	}
 	</style>
 </head>
 <body>
