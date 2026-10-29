@@ -97,12 +97,8 @@ const FIELDS = {
           async: true,
           required: true,
           showValueTooltip: true,
-          openOnClick: false,
-          autoload: false,
-          cache: false,
           options: [],
           labelKey: 'name',
-          filterOptions: (options) => options,
         },
         getDynamicAttr: (props) => ({
           loadOptions: props.debouncedPeopleFetch,

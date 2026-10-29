@@ -148,9 +148,6 @@ const ProductSelect = ({
 
 ProductSelect.defaultProps = {
   className: 'text-left',
-  openOnClick: true,
-  autoload: true,
-  cache: false,
   showValueTooltip: true,
   onExactProductSelected: undefined,
   fieldRef: undefined,
@@ -160,9 +157,6 @@ ProductSelect.defaultProps = {
 
 ProductSelect.propTypes = {
   className: PropTypes.string,
-  openOnClick: PropTypes.bool,
-  autoload: PropTypes.bool,
-  cache: PropTypes.bool,
   showValueTooltip: PropTypes.bool,
   locationId: PropTypes.string.isRequired,
   onExactProductSelected: PropTypes.func,

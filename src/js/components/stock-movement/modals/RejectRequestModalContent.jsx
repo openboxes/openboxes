@@ -22,7 +22,6 @@ const FIELDS = {
       labelKey: 'name',
       className: 'request-modal-select text-capitalize',
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedPeopleFetch }) => ({
       loadOptions: debouncedPeopleFetch,

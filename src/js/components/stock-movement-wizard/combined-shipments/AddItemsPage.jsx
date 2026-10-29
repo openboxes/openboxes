@@ -287,7 +287,6 @@ const FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
-          openOnClick: false,
           showValueTooltip: true,
         },
       },
