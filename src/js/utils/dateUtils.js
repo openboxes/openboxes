@@ -188,6 +188,17 @@ export const displayTimezoneOffset = (timezoneOffset = new Date().getTimezoneOff
  */
 export const getFilenameDateString = () => format(new Date(), DateFormatDateFns.YYYYMMDD_HHMMSS);
 
+/**
+ * Converts moment.js format to date-fns format, e.g. 'MM/DD/YYYY' -> 'MM/dd/yyyy'.
+ * Only the day of month, year and timezone tokens used in the app differ between the libraries.
+ * @param {string} momentFormat
+ * @returns {string}
+ */
+export const convertMomentFormatToDateFns = (momentFormat) => momentFormat
+  ?.replace('DD', 'dd')
+  .replace('YYYY', 'yyyy')
+  .replace('Z', 'xxx');
+
 export default dateWithoutTimeZone;
 
 export const validateFutureDateFns = (date) => {

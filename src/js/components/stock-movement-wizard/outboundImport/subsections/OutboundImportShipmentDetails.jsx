@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
@@ -99,7 +99,7 @@ const OutboundImportShipmentDetails = ({ control, errors }) => (
           name="dateShipped"
           control={control}
           render={({ field }) => (
-            <DateField
+            <DateFieldDateFns
               {...field}
               disabled
               title={{
@@ -108,7 +108,7 @@ const OutboundImportShipmentDetails = ({ control, errors }) => (
               }}
               placeholder={{
                 id: 'react.default.dateInput.placeholder.label',
-                default: 'Select a date',
+                defaultMessage: 'Select a date',
               }}
               showTimeSelect
               errorMessage={errors.dateShipped?.message}
@@ -121,7 +121,7 @@ const OutboundImportShipmentDetails = ({ control, errors }) => (
           name="expectedDeliveryDate"
           control={control}
           render={({ field }) => (
-            <DateField
+            <DateFieldDateFns
               {...field}
               disabled
               title={{
