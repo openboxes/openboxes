@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import * as locales from 'date-fns/locale';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import _ from 'lodash';
@@ -21,6 +22,7 @@ import DateFormat from 'consts/dateFormat';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
+import { convertMomentFormatToDateFns } from 'utils/dateUtils';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
@@ -500,16 +502,18 @@ class AddItemsPage extends Component {
                   className="form-control"
                   selected={moment(selectedExpirationDate, 'MM/DD/YYYY').isValid() ? moment(selectedExpirationDate, 'MM/DD/YYYY') : null}
                   highlightDates={[!moment(selectedExpirationDate, 'MM/DD/YYYY').isValid()
-                    ? moment(new Date(), 'MM/DD/YYYY') : {}]}
+                    ? new Date() : {}]}
                   onChange={(date) => this.setSelectedExpirationDate(date)}
                   popperClassName="force-on-top"
+                  popperPlacement="bottom-start"
                   showYearDropdown
                   scrollableYearDropdown
-                  dateFormat={this.props.dateFormat(DateFormat.COMMON)}
+                  dateFormat={
+                    convertMomentFormatToDateFns(this.props.dateFormat(DateFormat.COMMON))
+                  }
                   yearDropdownItemNumber={3}
-                  utcOffset={0}
                   placeholderText={this.props.translate('react.outboundReturns.selectExpirationDate.label', 'Select expiration date...')}
-                  locale={this.props.localeCode}
+                  locale={locales[this.props.localeCode]}
                 />
               </div>
               &nbsp;

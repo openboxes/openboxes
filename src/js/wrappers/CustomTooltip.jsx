@@ -17,7 +17,7 @@ const CustomTooltip = ({
   return show ? (
     <div className={className} role="tooltip">
       <div
-        className="flex items-center"
+        className="flex items-center w-100"
         data-tooltip-id={tooltipId}
       >
         {Icon && <Icon className="mr-2" />}
