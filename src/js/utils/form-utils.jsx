@@ -52,7 +52,7 @@ export const renderFormFields = ({
         <div data-tooltip-id={`arrayField-${tooltipId}`} className={className} data-testid="form-field" aria-label={fieldAriaLabel}>
           {renderInput(input, otherAttr)}
         </div>
-        <PortalTooltip id={!error || !(touched || fieldTouched) ? undefined : `arrayField-${tooltipId}`} content={translate(error)} />
+        <PortalTooltip id={!error || !(touched || fieldTouched) ? undefined : `arrayField-${tooltipId}`} content={error ? translate(`${error}`) : undefined} />
       </>
     );
   }
