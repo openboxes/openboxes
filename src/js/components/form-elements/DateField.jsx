@@ -63,11 +63,7 @@ class DateField extends Component {
     };
 
     const onChange = (date) => {
-      // react-datepicker v1.8 with utcOffset={0} returned UTC only for the first date picked
-      // when the field had no value, v9 does not support utcOffset so it is done here
-      // to keep the same behavior
-      const pickedDate = value ? moment(date) : moment(date).utcOffset(0, true);
-      const val = !date || typeof date === 'string' ? date : pickedDate.format(dateFormat);
+      const val = !date || typeof date === 'string' ? date : moment(date).format(dateFormat);
       attributes.onChange(val);
     };
 
