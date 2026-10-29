@@ -320,7 +320,6 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
 
     // ------------------------------------------------------------------ AutomaticPutawayGenerationJob
 
-    @PendingFeature(reason = 'PutawayService.groovy:80 generatePutaways logs new JSONObject(candidate.toJson()) eagerly; PutawayItem.toJson -> Product.getDisplayName -> LocalizationUtil.getCurrentLocale needs a web request, so on the Quartz thread the job throws IllegalStateException (No thread-bound request) for any candidate: it can never generate a putaway')
     void 'AutomaticPutawayGenerationJob creates a putaway order from the receiving bin to the static slot'() {
         given:
         config.set('openboxes.jobs.automaticPutawayGenerationJob.enabled', true)
@@ -343,7 +342,7 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
         tx { putawayOrders(dc)*.orderedBy*.id.every { it } }
     }
 
-    @PendingFeature(reason = 'PutawayService.groovy:84-86 generatePutaways RETURNS (not continue) on the first candidate without a putaway location, so every later candidate at the facility is skipped (currently masked by the PutawayService.groovy:80 web-request failure)')
+    @PendingFeature(reason = 'PutawayService.groovy:84-86 generatePutaways RETURNS (not continue) on the first candidate without a putaway location, so every later candidate at the facility is skipped')
     void 'AutomaticPutawayGenerationJob: a product without a slot does not stop the others getting one'() {
         given:
         config.set('openboxes.jobs.automaticPutawayGenerationJob.enabled', true)

@@ -27,7 +27,7 @@ import org.pih.warehouse.product.ProductAvailability
 abstract class CycleCountSpec extends RegressionApiSpec {
 
     @Autowired
-    CycleCountApi cycleCountApi
+    CycleCountApi regressionCycleCountApi
 
     @Autowired
     ProductAvailabilityService productAvailabilityService
@@ -115,7 +115,7 @@ abstract class CycleCountSpec extends RegressionApiSpec {
 
     /** Requests a count of the product; returns the request id. */
     String requestCount(Product product) {
-        Response created = cycleCountApi.createRequests(facility.id, new JSONObject()
+        Response created = regressionCycleCountApi.createRequests(facility.id, new JSONObject()
                 .put('requests', new JSONArray().put(new JSONObject()
                         .put('product', product.id)
                         .put('blindCount', false)))
@@ -125,7 +125,7 @@ abstract class CycleCountSpec extends RegressionApiSpec {
 
     /** Starts the count of the request; returns the count as JSON (id, status, cycleCountItems). */
     Map startCount(String requestId) {
-        Response started = cycleCountApi.start(facility.id, startBody(requestId), null, responseSpecUtil.OK_RESPONSE_SPEC)
+        Response started = regressionCycleCountApi.start(facility.id, startBody(requestId), null, responseSpecUtil.OK_RESPONSE_SPEC)
         return started.jsonPath().getMap('data[0]')
     }
 
@@ -145,7 +145,7 @@ abstract class CycleCountSpec extends RegressionApiSpec {
 
     /** Records a counted quantity on an item of the initial count (or of the recount). */
     void recordCount(String itemId, int quantity, boolean recount = false) {
-        cycleCountApi.updateItem(facility.id, itemId, new JSONObject()
+        regressionCycleCountApi.updateItem(facility.id, itemId, new JSONObject()
                 // the item id goes in the body as well, as the web app sends it
                 .put('id', itemId)
                 .put('quantityCounted', quantity)

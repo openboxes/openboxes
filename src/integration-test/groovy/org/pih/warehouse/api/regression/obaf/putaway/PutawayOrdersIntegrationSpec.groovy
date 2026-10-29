@@ -174,7 +174,7 @@ class PutawayOrdersIntegrationSpec extends ObafTaskIntegrationSpec {
         preferredLocation(dc, pb, slotB)
         putawayOrder(dc, pb, 'B', 2, recv, slotB)
 
-        when: 'run with a web request bound (without one it fails, see ObafJobsIntegrationSpec)'
+        when: 'run with a web request bound (the job runs it without one, see ObafJobsIntegrationSpec)'
         withWebRequest { tx { putawayService.generatePutaways(Location.get(dc), User.findByUsername('admin')) } }
         List<List> orders = tx {
             Order.findAllByOriginAndOrderType(Location.get(dc), OrderType.findByCode(Constants.PUTAWAY_ORDER)).collectMany { Order o ->

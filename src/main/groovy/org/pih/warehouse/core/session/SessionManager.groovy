@@ -74,24 +74,33 @@ class SessionManager {
     }
 
     /**
-     * @return HttpSession Fetch the session of the user associated with the current request.
+     * @return HttpSession Fetch the session of the user associated with the current request, or null when the
+     * current thread is not handling an HTTP request.
      */
     HttpSession getSession() {
-        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes()
-        if (!requestAttributes instanceof ServletRequestAttributes) {
-            throw new UnsupportedOperationException(
-                    "Cannot get request attributes of type: ${requestAttributes?.getClass()}")
-        }
         // Return without error if there's no active session, which can happen if we're not in the context
-        // of an HTTP request. Ex: unit tests or running console commands
+        // of an HTTP request. Ex: unit tests, running console commands, jobs or event listeners
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes()
+        if (requestAttributes == null) {
+            return null
+        }
+        if (!(requestAttributes instanceof ServletRequestAttributes)) {
+            throw new UnsupportedOperationException(
+                    "Cannot get request attributes of type: ${requestAttributes.getClass()}")
+        }
         return (requestAttributes as ServletRequestAttributes).request?.session
     }
 
     private Object getAttribute(SessionAttribute attribute) {
-        return session.getAttribute(attribute.attributeName)
+        // Without a session nothing is set, so callers fall back to their defaults (ex: LocaleManager)
+        return session?.getAttribute(attribute.attributeName)
     }
 
     private void setAttribute(SessionAttribute attribute, Object value) {
-        session.setAttribute(attribute.attributeName, value)
+        HttpSession currentSession = session
+        if (!currentSession) {
+            throw new IllegalStateException("Cannot set ${attribute} outside of an HTTP request")
+        }
+        currentSession.setAttribute(attribute.attributeName, value)
     }
 }

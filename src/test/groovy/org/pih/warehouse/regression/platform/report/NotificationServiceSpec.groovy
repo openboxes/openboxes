@@ -309,6 +309,25 @@ class NotificationServiceSpec extends Specification implements DataTest {
         barcodeFile?.delete()
     }
 
+    void 'partial receipt notification builds no goods receipt note when no recipient has a valid email'() {
+        given: 'a receipt like an automatic one, received outside of a web request'
+        Person receiver = new Person(firstName: 'Rita', lastName: 'R', email: 'rita@example.org')
+        Shipment shipment = new Shipment(shipmentNumber: 'S-10', destination: new Location(name: 'Clinic'))
+        shipment.id = 'shipment-10'
+        PartialReceiptItem invalidEmailItem = new PartialReceiptItem(recipient: new Person(firstName: 'Bob', lastName: 'B', email: 'not-an-email'))
+        PartialReceiptItem anonymousItem = new PartialReceiptItem()
+        PartialReceipt partialReceipt = new PartialReceipt(shipment: shipment, recipient: receiver,
+                partialReceiptContainers: [new PartialReceiptContainer(partialReceiptItems: [invalidEmailItem, anonymousItem])])
+
+        when:
+        service.sendReceiptNotifications(partialReceipt)
+
+        then:
+        0 * goodsReceiptNoteService._
+        0 * fileGenerationService._
+        0 * mailService._
+    }
+
     @Unroll
     void 'application errors are not mailed for #description locations'() {
         given:

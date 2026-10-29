@@ -40,6 +40,8 @@ import org.pih.warehouse.product.ProductSupplierDetailsCommand
 import org.pih.warehouse.product.ProductSupplierImportCommand
 import org.pih.warehouse.product.ProductSupplierPreference
 import org.pih.warehouse.product.ProductSupplierPreferenceService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 
 @Transactional
 class ProductSupplierService {
@@ -50,6 +52,10 @@ class ProductSupplierService {
 
     ProductSupplierIdentifierService productSupplierIdentifierService
     def dataSource
+    // DataServices compile before the Spring context is initialized, so we lazy load them to avoid null pointers
+    // when one exists down the chain from a Spring component (even when there's a Grails component in between).
+    @Autowired
+    @Lazy
     ProductSupplierDataService productSupplierGormService
     ProductPackageService productPackageService
     ProductSupplierPreferenceService productSupplierPreferenceService

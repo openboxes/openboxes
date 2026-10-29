@@ -24,21 +24,21 @@ import org.pih.warehouse.product.Product
 class ProductOptionsApiSpec extends ProductSourceSpec {
 
     @Autowired
-    SelectOptionsApi selectOptionsApi
+    SelectOptionsApi regressionSelectOptionsApi
 
     @Autowired
     RegressionProductClassificationApi regressionProductClassificationApi
 
     void 'preference type options list the preference types, with Multiple and None when asked'() {
         expect:
-        selectOptionsApi.options('/preferenceTypeOptions', [:], new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options('/preferenceTypeOptions', [:], new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.hasItem(preferred.id))
                 .expectBody('data.id', Matchers.not(Matchers.hasItems('MULTIPLE')))
                 .expectBody('data.id', Matchers.not(Matchers.hasItems('NONE')))
                 .expectBody("data.find { it.id == '${preferred.id}' }.label".toString(), Matchers.equalTo(preferred.name))
                 .build())
-        selectOptionsApi.options('/preferenceTypeOptions', [includeMultiple: true, includeNone: true], new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options('/preferenceTypeOptions', [includeMultiple: true, includeNone: true], new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data[0].id', Matchers.equalTo('MULTIPLE'))
                 .expectBody('data[1].id', Matchers.equalTo('NONE'))
@@ -48,7 +48,7 @@ class ProductOptionsApiSpec extends ProductSourceSpec {
 
     void 'rating type options list every rating'() {
         expect:
-        selectOptionsApi.options('/ratingTypeCodeOptions', [:], new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options('/ratingTypeCodeOptions', [:], new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.contains(*RatingTypeCode.list()*.name()))
                 .expectBody('data.value', Matchers.contains(*RatingTypeCode.list()*.name()))

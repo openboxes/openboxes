@@ -102,7 +102,6 @@ class LocationWriteApiSpec extends RegressionApiSpec {
         }
     }
 
-    @PendingFeature(reason = 'a location create without a name is not refused with a 400 in the error shape (200)')
     void 'create refuses a location without a name: 400'() {
         expect:
         locationApi.create(JsonOutput.toJson([locationType: [id: DEPOT_TYPE_ID]]), [:], new ResponseSpecBuilder()

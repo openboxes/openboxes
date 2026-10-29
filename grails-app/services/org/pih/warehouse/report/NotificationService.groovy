@@ -213,31 +213,37 @@ class NotificationService {
 
     private void sendReceiptNotificationEmails(Shipment shipment, Person receivedBy, Map<Person, List> recipientItems) {
         EmailValidator emailValidator = EmailValidator.getInstance()
+        Map<Person, List> mailedRecipientItems = recipientItems.findAll { Person recipient, List items ->
+            emailValidator.isValid(recipient?.email)
+        }
+        if (!mailedRecipientItems) {
+            return
+        }
+
+        // Shared by every email, so it is built once, and only when there is someone to send it to
         GoodsReceiptNoteDto goodsReceiptNote = goodsReceiptNoteService.buildGoodsReceiptNote(shipment.id)
-        recipientItems.each { Person recipient, List items ->
-            if (emailValidator.isValid(recipient?.email)) {
-                String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
-                GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: receivedBy])}"
+        mailedRecipientItems.each { Person recipient, List items ->
+            String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
+            GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: receivedBy])}"
 
-                File barcodeFile = fileGenerationService.generateBarcodeFile(shipment.shipmentNumber)
-                String barcodeFileUri = fileGenerationService.getFileUri(barcodeFile)
-                String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
+            File barcodeFile = fileGenerationService.generateBarcodeFile(shipment.shipmentNumber)
+            String barcodeFileUri = fileGenerationService.getFileUri(barcodeFile)
+            String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
 
-                byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
-                        goodsReceiptNote: goodsReceiptNote,
-                        barcodeFileUri: barcodeFileUri
-                ])
+            byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
+                    goodsReceiptNote: goodsReceiptNote,
+                    barcodeFileUri: barcodeFileUri
+            ])
 
-                barcodeFile.delete()
-                mailService.sendHtmlMailWithAttachment(
-                        recipient.email,
-                        subject,
-                        body.toString(),
-                        goodsDeliveryNotePdf,
-                        fileName,
-                        MediaType.APPLICATION_PDF_VALUE
-                )
-            }
+            barcodeFile.delete()
+            mailService.sendHtmlMailWithAttachment(
+                    recipient.email,
+                    subject,
+                    body.toString(),
+                    goodsDeliveryNotePdf,
+                    fileName,
+                    MediaType.APPLICATION_PDF_VALUE
+            )
         }
     }
 
