@@ -146,7 +146,7 @@ const DataTableBody = ({
               <CustomTooltip
                 key={rowData.id}
                 content={isRowDisabled && translate(label, defaultMessage)}
-                show={isRowDisabled}
+                show={Boolean(isRowDisabled)}
               >
                 <div
                   className={`rt-tr-group cell-wrapper ${rowData.original?.className || ''} ${mergeWithNextRow ? 'rt-tr-group-merged' : ''} ${isLastSubRow ? 'rt-tr-group-last-subrow' : ''}`}

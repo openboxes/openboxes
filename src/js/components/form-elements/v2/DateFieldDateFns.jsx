@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-import { format, parse } from 'date-fns';
+import { format, isValid, parse } from 'date-fns';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import { useSelector } from 'react-redux';
@@ -18,7 +18,7 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import 'components/form-elements/v2/style.scss';
-// import 'react-datepicker/dist/react-datepicker.css';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const DateFieldDateFns = ({
   title,
@@ -34,6 +34,7 @@ const DateFieldDateFns = ({
   showTimeSelect,
   hideErrorMessageWrapper,
   customDateFormat,
+  outputDateFormat,
   onChangeRaw,
   clearable,
   wrapperClassName,
@@ -63,14 +64,17 @@ const DateFieldDateFns = ({
       return null;
     }
 
+    // Values in other formats (e.g. ISO strings from the API or Date objects) fall back to the
+    // default parsing, the same way as in the old v2/DateField component (based on moment.js)
     try {
-      return parse(
+      const parsedDate = parse(
         dateToFormat,
         getDateFormat(),
         new Date(),
       );
+      return isValid(parsedDate) ? parsedDate : new Date(dateToFormat);
     } catch (e) {
-      return null;
+      return new Date(dateToFormat);
     }
   };
 
@@ -89,7 +93,7 @@ const DateFieldDateFns = ({
       return;
     }
 
-    const formatted = format(date, getDateFormat());
+    const formatted = format(date, outputDateFormat || getDateFormat());
     onChange(formatted);
   };
 
@@ -188,6 +192,8 @@ DateFieldDateFns.propTypes = {
   showTimeSelect: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
   customDateFormat: PropTypes.string,
+  // Format of the value passed to onChange, used when it should differ from the displayed format
+  outputDateFormat: PropTypes.string,
   focusProps: PropTypes.shape({
     fieldIndex: PropTypes.string,
     fieldId: PropTypes.string,
@@ -221,6 +227,7 @@ DateFieldDateFns.defaultProps = {
   showTimeSelect: false,
   hideErrorMessageWrapper: false,
   customDateFormat: null,
+  outputDateFormat: null,
   focusProps: {},
   onChangeRaw: null,
   clearable: true,

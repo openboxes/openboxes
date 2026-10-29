@@ -21,7 +21,7 @@ const InputWrapper = ({
   inputId,
   labelPosition,
   hideErrorMessageWrapper,
-  customTooltip,
+  customTooltip = false,
   value,
   ariaLabel,
   hasErrors,

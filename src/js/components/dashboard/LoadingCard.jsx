@@ -1,14 +1,12 @@
 import React from 'react';
 
+import { BeatLoader } from 'react-spinners';
+
+import { getRandomColor } from 'consts/dataFormat/colorMapping';
+
 const LoadingCard = () => (
   <div className="loader-div">
-    <div style={{
-      textAlign: 'center',
-      padding: '50px',
-    }}
-    >
-      Loading...
-    </div>
+    <BeatLoader color={getRandomColor()} size={30} margin={8} />
   </div>
 );
 

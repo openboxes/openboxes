@@ -6,7 +6,7 @@ import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchBuyers } from 'actions';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
@@ -171,7 +171,7 @@ const usePreferenceTypeVariationsColumns = ({
           control={control}
           key={row.original.id}
           render={({ field }) => (
-            <DateField
+            <DateFieldDateFns
               errorMessage={errors?.[row.index]?.validityStartDate?.message}
               {...field}
               onChange={(val) => {
@@ -194,7 +194,7 @@ const usePreferenceTypeVariationsColumns = ({
           control={control}
           key={row.original.id}
           render={({ field }) => (
-            <DateField
+            <DateFieldDateFns
               errorMessage={errors?.[row.index]?.validityEndDate?.message}
               {...field}
               onChange={(val) => {

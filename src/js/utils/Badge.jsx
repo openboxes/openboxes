@@ -7,7 +7,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 import './utils.scss';
 
 const Badge = ({
-  label, variant, tooltip, clickable,
+  label, variant, tooltip = false, clickable = true,
 }) => {
   if (!label) {
     return null;

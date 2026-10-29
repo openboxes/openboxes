@@ -82,7 +82,7 @@ const NumberSparklineCard = ({
     <div className="number-infos">
       <CustomTooltip
         content={translate(cardInfo, cardInfoDefaultValue || cardInfo)}
-        show={cardInfo}
+        show={Boolean(cardInfo)}
       >
         <i className="fa fa-info-circle" />
       </CustomTooltip>

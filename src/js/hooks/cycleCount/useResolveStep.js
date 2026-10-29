@@ -520,7 +520,7 @@ const useResolveStep = () => {
     }
     dateRecounted.current = {
       ...dateRecounted.current,
-      [cycleCountId]: date ? date.format() : null,
+      [cycleCountId]: date ? moment(date).format() : null,
     };
   };
 

@@ -88,6 +88,7 @@
     "react-datepicker": "9.1.0",
     "react-dom": "19.2.4",
     "react-dropzone": "14.2.3",
+    "react-error-boundary": "6.1.6",
     "react-final-form": "7.0.0",
     "react-final-form-arrays": "4.0.0",
     "react-helmet-async": "3.0.0",

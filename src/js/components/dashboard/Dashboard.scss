@@ -299,6 +299,14 @@
     width: 100%;
   }
 
+  .loader-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 84px;
+    margin: auto;
+  }
+
   .number-body {
     display: flex;
     flex-direction: column;
@@ -345,10 +353,6 @@
     i {
       color:#999;
     }
-  }
-
-  .loader-div {
-    margin: auto;
   }
 
   .drag-handler {
