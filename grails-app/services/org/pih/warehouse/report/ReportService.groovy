@@ -1673,9 +1673,24 @@ class ReportService implements ApplicationContextAware {
             ]
         ]
 
+        // Sort the entries in the order that quantity on hand is calculated in: by transaction date, then by date
+        // created. The query only sorts by transaction date, so transactions with the same date could be in any order.
+        transactionEntriesWithinDateRange = transactionEntriesWithinDateRange.sort(false) { TransactionEntry a, TransactionEntry b ->
+            a.transaction <=> b.transaction ?: a.transaction.id <=> b.transaction.id
+        }
+
         // Add transaction entries to the list that took place within selected time range
+        Transaction productInventoryTransaction = null
         transactionEntriesWithinDateRange.each { TransactionEntry it ->
-            if (it.transaction.transactionType.transactionCode != TransactionCode.PRODUCT_INVENTORY) {
+            if (it.transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY) {
+                // A product inventory transaction (e.g. an inventory baseline) sets the quantity on hand of the product
+                // to the quantity of its entries, so the balance starts over from its first entry.
+                if (productInventoryTransaction != it.transaction) {
+                    productInventoryTransaction = it.transaction
+                    openingBalance = 0
+                }
+                openingBalance += it.quantity
+            } else {
                 openingBalance = isTransactionEntryDebit(it)
                         ? openingBalance - Math.abs(it.quantity)
                         : openingBalance + Math.abs(it.quantity)
