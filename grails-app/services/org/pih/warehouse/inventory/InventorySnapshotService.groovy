@@ -41,7 +41,7 @@ class InventorySnapshotService {
     def triggerRefreshInventorySnapshot(String locationId, List<String> productIds, Boolean forceRefresh) {
         productIds?.unique()?.each { String productId ->
             log.info "Triggering refresh inventory snapshot for location ${locationId}, product ${productId}"
-            RefreshInventorySnapshotJob.schedule(new Date(),
+            RefreshInventorySnapshotJob.triggerNow(
                 [locationId: locationId, productId: productId, forceRefresh: forceRefresh])
         }
     }

@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import grails.validation.ValidationException
 import groovy.sql.GroovyRowResult
 import groovy.sql.Sql
@@ -38,6 +39,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryTransactionMigrationService
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.ProductInventoryTransactionMigrationService
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
@@ -527,7 +529,7 @@ class MigrationService {
             }
 
             // Refresh PA for all products that were migrated
-            productAvailabilityService.triggerRefreshProductAvailability(location.id, allProducts?.id, true)
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(location, (List<String>) allProducts?.id, true))
 
             createCSVMigrationReportForResults(location, results)
         }

@@ -62,7 +62,7 @@ class InventoryLevelService {
 
                 if (!deferRefresh && inventoryLevel.product?.id) {
                     grailsApplication.mainContext.publishEvent(
-                        new InventoryLevelUpdatedEvent(inventoryLevel, facility.id, inventoryLevel.product.id, true))
+                        new InventoryLevelUpdatedEvent(inventoryLevel, facility.id, [inventoryLevel.product.id], true))
                 }
 
                 return UpsertResult.ok(isNew, inventoryLevel.id, inventoryLevel.product?.id)

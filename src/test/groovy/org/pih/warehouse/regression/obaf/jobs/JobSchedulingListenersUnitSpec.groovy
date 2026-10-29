@@ -57,9 +57,8 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
     void setup() {
         Holders.config.openboxes.jobs.automaticAllocationJob.enabled = true
         Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled = true
-        Holders.config.openboxes.jobs.automaticBackorderReallocationJob.delayInMilliseconds = 10000
-        Holders.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 5000
-        Holders.config.openboxes.jobs.automaticStateTransitionJob.delayInMilliseconds = 1000
+        Holders.config.openboxes.jobs.automaticIssuanceJob.delayInMilliseconds = 5000
+        Holders.config.openboxes.jobs.automaticBackorderReallocationJob.delayInMilliseconds = 6000
     }
 
     void cleanup() {
@@ -132,32 +131,31 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
         return s
     }
 
-    void 'AutomaticBackorderAllocationEventService schedules the reallocation job after the configured delay once the shipment is fully received'() {
+    void 'AutomaticBackorderAllocationEventService schedules the delayed reallocation job once the shipment is fully received'() {
         given:
-        grailsApplication.config.openboxes.jobs.automaticBackorderReallocationJob.delayInMilliseconds = 10000
         shipmentReceived(true)
         List<Map> scheduled = recordSchedule(AutomaticBackorderReallocationJob)
         long before = now()
 
         when:
-        backorderListener().onApplicationEvent(new AutomaticBackorderReallocationEvent('ship-1'))
+        backorderListener().onAutomaticBackorderReallocationEvent(new AutomaticBackorderReallocationEvent('ship-1'))
 
         then:
         scheduled.size() == 1
         scheduled[0].params == [shipmentId: 'ship-1']
-        scheduled[0].runAt.time >= before + 10000
-        scheduled[0].runAt.time <= now() + 10000
+        scheduled[0].runAt.time >= before + 6000
+        scheduled[0].runAt.time <= now() + 6000
     }
 
     @Unroll
-    void 'AutomaticBackorderAllocationEventService does not schedule when #why'() {
+    void 'AutomaticBackorderAllocationEventService does not trigger when #why'() {
         given:
         shipmentReceived(fully)
         Holders.config.openboxes.jobs.automaticBackorderReallocationJob.enabled = enabled
         List<Map> scheduled = recordSchedule(AutomaticBackorderReallocationJob)
 
         when:
-        backorderListener().onApplicationEvent(new AutomaticBackorderReallocationEvent(id))
+        backorderListener().onAutomaticBackorderReallocationEvent(new AutomaticBackorderReallocationEvent(id))
 
         then:
         scheduled == []
@@ -181,10 +179,10 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
         return s
     }
 
-    void 'RequisitionEventService: STAGED schedules the issuance job 1 s after the availability refresh delay and publishes the webhook'() {
+    void 'RequisitionEventService: STAGED schedules the issuance job after the issuance delay and publishes the webhook'() {
         given:
         Requisition r = eligibleRequisition()
-        grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 5000
+        grailsApplication.config.openboxes.jobs.automaticIssuanceJob.delayInMilliseconds = 5000
         WebhookPublisherService webhooks = Mock()
         List<Map> scheduled = recordSchedule(AutomaticIssuanceJob)
         long before = now()
@@ -196,8 +194,8 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
         1 * webhooks.publishRequisitionEvent(r, WebhookEventType.REQUISITION_STAGED)
         scheduled.size() == 1
         scheduled[0].params == [requisitionId: 'r1']
-        scheduled[0].runAt.time >= before + 6000
-        scheduled[0].runAt.time <= now() + 6000
+        scheduled[0].runAt.time >= before + 5000
+        scheduled[0].runAt.time <= now() + 5000
     }
 
     void 'RequisitionEventService schedules issuance on STAGED even while the issuance job is disabled (the job then no-ops)'() {
@@ -233,20 +231,15 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
 
     // ------------------------------------------------------------------ RefreshPicklistStatusEventService
 
-    void 'RefreshPicklistStatusEventService schedules the state transition job after its delay'() {
+    void 'RefreshPicklistStatusEventService triggers the state transition job'() {
         given:
-        grailsApplication.config.openboxes.jobs.automaticStateTransitionJob.delayInMilliseconds = 1000
-        RefreshPicklistStatusEventService s = new RefreshPicklistStatusEventService(grailsApplication: grailsApplication)
-        List<Map> scheduled = recordSchedule(AutomaticStateTransitionJob)
-        long before = now()
+        List<Map> triggered = recordTriggerNow(AutomaticStateTransitionJob)
 
         when:
-        s.onApplicationEvent(new RefreshPicklistStatusEvent('r1'))
+        new RefreshPicklistStatusEventService().onRefreshPicklistStatusEvent(new RefreshPicklistStatusEvent('r1'))
 
         then:
-        scheduled.size() == 1
-        scheduled[0].params == [id: 'r1']
-        scheduled[0].runAt.time >= before + 1000
+        triggered == [[id: 'r1']]
     }
 
     // ------------------------------------------------------------------ InventoryLevelUpdatedEventService
@@ -260,7 +253,7 @@ class JobSchedulingListenersUnitSpec extends Specification implements DataTest, 
         List<Map> triggered = recordTriggerNow(PutawayLocationReassignmentJob)
 
         when:
-        s.onInventoryLevelUpdated(new InventoryLevelUpdatedEvent(level, 'fac-1', 'prod-1', true))
+        s.onInventoryLevelUpdated(new InventoryLevelUpdatedEvent(level, 'fac-1', ['prod-1'], true))
 
         then:
         1 * pa.triggerRefreshProductAvailability('fac-1', ['prod-1'], true)

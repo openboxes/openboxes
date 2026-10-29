@@ -22,8 +22,9 @@ class RequisitionEventService {
         // TODO: Should be moved to the RequisitionStatusChangedEventService and should be tied to state transition
         switch (event.eventType) {
             case WebhookEventType.REQUISITION_STAGED:
-                // workaround to delay AutomaticIssuanceJob 1 second after RefreshProductAvailabilityJob; it needs product refresh to complete first
-                def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) + 1000 ?: 0
+                // workaround to delay AutomaticIssuanceJob after RefreshProductAvailabilityJob; it needs product refresh to complete first
+                // RefreshProductAvailabilityJob is triggered with 5000 ms delay and AutomaticIssuanceJob by default 6000 ms delay
+                def delayInMilliseconds = Integer.valueOf(grailsApplication.config.openboxes.jobs.automaticIssuanceJob.delayInMilliseconds)
                 Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
                 log.info "Triggering automaticIssuanceJob job with ${delayInMilliseconds} ms delay"
                 AutomaticIssuanceJob.schedule(runAt, [requisitionId: requisition.id])
