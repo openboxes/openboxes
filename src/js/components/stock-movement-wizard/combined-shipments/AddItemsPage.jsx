@@ -255,7 +255,6 @@ const FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
-          openOnClick: false,
         },
       },
       split: {

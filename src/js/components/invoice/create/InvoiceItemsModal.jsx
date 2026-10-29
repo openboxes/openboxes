@@ -431,8 +431,6 @@ class InvoiceItemsModal extends Component {
             options={orderNumberOptions}
             showValueTooltip
             onChange={(value) => this.setSelectedOrders(value)}
-            classes=""
-            cache={false}
           />
           &nbsp;
           <Select
@@ -443,8 +441,6 @@ class InvoiceItemsModal extends Component {
             options={shipmentNumberOptions}
             showValueTooltip
             onChange={(value) => this.setSelectedShipments(value)}
-            classes=""
-            cache={false}
           />
         </div>
         <div>

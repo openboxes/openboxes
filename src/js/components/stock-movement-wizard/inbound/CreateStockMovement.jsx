@@ -64,11 +64,7 @@ const FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
@@ -87,11 +83,7 @@ const FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
@@ -123,12 +115,8 @@ const FIELDS = {
       async: true,
       required: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedPeopleFetch,
@@ -174,6 +162,7 @@ class CreateStockMovement extends Component {
     }
   }
 
+  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.props.match.params.stockMovementId && this.state.setInitialValues
       && nextProps.location.id) {

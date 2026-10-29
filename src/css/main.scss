@@ -363,7 +363,6 @@ body {
     }
 
     .react-select__value-container, .react-select__indicators {
-      display: flex;
       align-items: center;
       height: inherit;
 
@@ -383,14 +382,7 @@ body {
     }
 
     .react-select__input {
-      display: flex !important;
-      align-items: center;
-      height: 24px;
-
-      input {
-        padding: 0;
-        line-height: 26px;
-      }
+      height: auto !important;
     }
   }
 
@@ -756,10 +748,6 @@ div.crossed-out .table-inner-row:before {
 // react-datepicker v9 points the arrow at the middle of the input, keep the position from v1.8
 .force-on-top .react-datepicker__triangle {
   left: 43px !important;
-}
-
-.react-select__loading-zone {
-  display: none !important;
 }
 
 .dropzone {

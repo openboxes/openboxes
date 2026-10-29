@@ -52,11 +52,7 @@ const FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedOriginLocationsFetch,
@@ -71,11 +67,7 @@ const FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedDestinationLocationsFetch,
