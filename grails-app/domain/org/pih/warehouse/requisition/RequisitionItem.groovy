@@ -867,16 +867,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return ([pickReasonCode] + reasonCodes).findAll { it }.unique()
     }
 
-    List<RequisitionItem> getEffectiveRequisitionItems() {
-        if (modificationItem) {
-            return [modificationItem]
-        }
-        if (substitutionItems) {
-            return substitutionItems as List
-        }
-        return [this]
-    }
-
     String getEffectiveCancelReasonCode() {
         return cancelReasonCode?.contains("(") ? cancelReasonCode.split("\\(", 2)[1].replace(")", "") : cancelReasonCode
     }
