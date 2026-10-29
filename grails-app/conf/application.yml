@@ -576,7 +576,6 @@ openboxes:
         automaticReceiptJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
-            bulkShipmentAutoReceipt: true
 
         automaticBackorderReallocationJob:
             enabled: true
@@ -586,7 +585,6 @@ openboxes:
             enabled: false
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 6000 # workaround to delay AutomaticIssuanceJob after RefreshProductAvailabilityJob (delayed by 5000 ms); it needs product refresh to complete first, so keep it ~1 s longer
-            bulkAutomaticIssuance: true
 
         automaticAllocationJob:
             enabled: true
