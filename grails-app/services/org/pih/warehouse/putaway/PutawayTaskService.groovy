@@ -571,6 +571,11 @@ class PutawayTaskService {
     }
 
     void transferToContainer(PutawayTask task) {
+        if (!tracksInternalTransactions(task)) {
+            log.warn("Skipping transfer to putaway container: Facility does not support TRACK_INTERNAL_TRANSACTIONS activity")
+            return
+        }
+
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
         command.binLocation = task.location
@@ -585,6 +590,11 @@ class PutawayTaskService {
     }
 
     void transferFromContainerToOrigin(PutawayTask task, Integer quantity) {
+        if (!tracksInternalTransactions(task)) {
+            log.warn("Skipping transfer from putaway container: Facility does not support TRACK_INTERNAL_TRANSACTIONS activity")
+            return
+        }
+
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
         command.binLocation = task.container
@@ -604,7 +614,8 @@ class PutawayTaskService {
      * the container it was loaded into during sortation.
      */
     Integer getQuantityRemainingInContainer(PutawayTask task) {
-        if (task.status != PutawayTaskStatus.PENDING || !task.container || !task.putawayOrderItem?.parentOrderItem) {
+        if (!tracksInternalTransactions(task) || task.status != PutawayTaskStatus.PENDING || !task.container
+                || !task.putawayOrderItem?.parentOrderItem) {
             return 0
         }
 
@@ -629,8 +640,9 @@ class PutawayTaskService {
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
 
-        // If direct putaway then we transfer from origin to destination
-        if (isDirectPutaway) {
+        // If direct putaway, or stock was never moved into the container because internal transactions are not
+        // tracked, then we transfer from origin to destination
+        if (isDirectPutaway || !tracksInternalTransactions(task)) {
             command.binLocation = task.location
         } else {
             // otherwise if we're performing a two-step putaway, we'll transfer from container destination
@@ -645,6 +657,10 @@ class PutawayTaskService {
         command.transferOut = Boolean.TRUE
         command.disableRefresh = Boolean.TRUE
         transfer(task, command)
+    }
+
+    private boolean tracksInternalTransactions(PutawayTask task) {
+        return task.facility?.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)
     }
 
     void transfer(PutawayTask task, TransferStockCommand command) {
