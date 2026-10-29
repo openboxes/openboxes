@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 
+import { Portal } from '@restart/ui';
 import * as locales from 'date-fns/locale';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
-// import { Portal } from 'react-overlays';
 import { connect } from 'react-redux';
 
 import BaseField from 'components/form-elements/BaseField';
@@ -18,9 +18,9 @@ const CalendarContainer = ({ children }) => {
   const el = document.getElementById('root');
 
   return (
-    // <Portal container={el}>
-    children
-    // </Portal>
+    <Portal container={el}>
+      {children}
+    </Portal>
   );
 };
 
