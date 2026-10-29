@@ -36,6 +36,7 @@ import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
 import org.quartz.Scheduler
+import org.springframework.jdbc.datasource.DelegatingDataSource
 import util.LiquibaseUtil
 
 import org.pih.warehouse.api.AvailableItem
@@ -108,6 +109,8 @@ class BootStrap {
     MapperComponentResolver mapperComponentResolver
 
     def init = { servletContext ->
+        logDataSourceSettings()
+
         log.info("Registering JSON marshallers ...")
         registerJsonMarshallers()
 
@@ -123,6 +126,36 @@ class BootStrap {
         uploadService.findOrCreateUploadsDirectory()
 
         refreshAnalyticsData()
+    }
+
+    /**
+     * Logs the settings that the connection pool is actually using. Pool settings that can't be converted (for
+     * example "10 * 60000" for a number) are silently ignored when the pool is configured, so the configuration
+     * files can't be trusted on their own (see #6201).
+     */
+    void logDataSourceSettings() {
+        DataSource target = dataSource
+        while (target instanceof DelegatingDataSource) {
+            target = ((DelegatingDataSource) target).targetDataSource
+        }
+        if (!(target instanceof org.apache.tomcat.jdbc.pool.DataSource)) {
+            log.info("Data source: ${target?.class?.name}")
+            return
+        }
+
+        org.apache.tomcat.jdbc.pool.DataSource pool = (org.apache.tomcat.jdbc.pool.DataSource) target
+        log.info("Data source: url=${pool.url?.replaceAll(/(?i)(password=)[^&;]*/, '\$1****')}, " +
+                "username=${pool.username}, driverClassName=${pool.driverClassName}")
+        log.info("Data source pool: initialSize=${pool.initialSize}, maxActive=${pool.maxActive}, " +
+                "minIdle=${pool.minIdle}, maxIdle=${pool.maxIdle}, maxWait=${pool.maxWait}, maxAge=${pool.maxAge}, " +
+                "testOnBorrow=${pool.testOnBorrow}, testWhileIdle=${pool.testWhileIdle}, " +
+                "testOnReturn=${pool.testOnReturn}, validationQuery=${pool.validationQuery}, " +
+                "validationQueryTimeout=${pool.validationQueryTimeout}, validationInterval=${pool.validationInterval}, " +
+                "timeBetweenEvictionRunsMillis=${pool.timeBetweenEvictionRunsMillis}, " +
+                "minEvictableIdleTimeMillis=${pool.minEvictableIdleTimeMillis}, " +
+                "removeAbandoned=${pool.removeAbandoned}, removeAbandonedTimeout=${pool.removeAbandonedTimeout}, " +
+                "defaultTransactionIsolation=${pool.defaultTransactionIsolation}, " +
+                "jdbcInterceptors=${pool.jdbcInterceptors}")
     }
 
     void refreshAnalyticsData() {

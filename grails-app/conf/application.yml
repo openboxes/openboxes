@@ -278,13 +278,17 @@ dataSource:
         minIdle: 5
         maxIdle: 25
         maxWait: 10000
-        maxAge: 10 * 60000
+        # Values are bound to the pool without being evaluated, and a value that can't be converted is silently
+        # ignored, so these must be literals (e.g. 600000, not 10 * 60000).
+        maxAge: 600000  # 10 minutes
         timeBetweenEvictionRunsMillis: 5000
         minEvictableIdleTimeMillis: 60000
         validationQuery: SELECT 1
         validationQueryTimeout: 3
         validationInterval: 15000
-        testOnBorrow: false
+        # Validate connections when they're borrowed (at most once per validationInterval) so that a connection the
+        # database has dropped isn't handed to a request (see #6201).
+        testOnBorrow: true
         testWhileIdle: true
         testOnReturn: false
         # https://tomcat.apache.org/tomcat-8.5-doc/jdbc-pool.html#JDBC_interceptors
