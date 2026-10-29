@@ -341,6 +341,10 @@ body {
   line-height: 1.5;
 }
 
+.react-select__value-container {
+  text-align: left;
+}
+
 .select-xs {
   font-size: .875rem;
   border-radius: .2rem;
@@ -420,29 +424,24 @@ body {
 
   .react-select__control {
     height: 32px;
+    min-height: 32px;
 
     .react-select__value-container {
-      line-height: 32px !important;
+      padding: 0 8px;
+    }
+
+    .react-select__input-container {
+      margin: 0;
+      padding: 0;
     }
 
     .react-select__indicators {
-      line-height: 32px;
-
       .react-select__indicator {
         padding: 0 !important;
         cursor: pointer;
       }
       .react-select__indicator:last-child {
         padding-right: 5px !important;
-      }
-    }
-
-    .react-select__input {
-      height: 30px;
-
-      input {
-        padding: 0;
-        line-height: 32px;
       }
     }
   }
