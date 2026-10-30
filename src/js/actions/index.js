@@ -89,6 +89,7 @@ import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import unitOfMeasureApi from 'api/services/UnitOfMeasureApi';
 import userApi from 'api/services/UserApi';
 import { ORGANIZATION_API } from 'api/urls';
+import { setSentryLocation, setSentryUser } from 'config/sentry';
 import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
@@ -203,6 +204,10 @@ export const fetchAvailableApprovers = () => async (dispatch) => {
 export async function fetchSessionInfo() {
   const url = '/api/getAppContext';
   const res = await apiClient.get(url);
+  const { user, location } = _.get(res, 'data.data', {});
+
+  setSentryUser(user);
+  setSentryLocation(location);
 
   return (dispatch) => {
     dispatch({
@@ -229,6 +234,7 @@ export function changeCurrentLocation(location) {
     const url = `/api/chooseLocation/${location.id}`;
 
     return apiClient.put(url).then(() => {
+      setSentryLocation(location);
       dispatch({
         type: CHANGE_CURRENT_LOCATION,
         payload: location,

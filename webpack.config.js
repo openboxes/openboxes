@@ -15,7 +15,6 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
-const webpack = require('webpack');
 
 module.exports = {
     cache: {
@@ -91,19 +90,12 @@ module.exports = {
         templateParameters: (compilation) => ({
           // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
           contextPath: '\${util.ConfigHelper.contextPath}',
+          // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
+          sentryConfig: '\${raw(util.ConfigHelper.sentryWebConfigJson)}',
           jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
           receivingIfStatement: '',
         }),
-      }),
-      // We need to explicitly define our environment variables here so that they can be referenced
-      // in the frontend.
-      new webpack.DefinePlugin({
-        'process.env.REACT_APP_WEB_SENTRY_DSN': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_DSN),
-        'process.env.REACT_APP_SENTRY_ENVIRONMENT': JSON.stringify(process.env.REACT_APP_SENTRY_ENVIRONMENT),
-        'process.env.REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE),
-        'process.env.REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE),
-        'process.env.REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE': JSON.stringify(process.env.REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE),
       }),
       new HtmlWebpackPlugin({
         filename: `${RECEIVING_VIEW}/create.gsp`,
@@ -112,6 +104,8 @@ module.exports = {
         templateParameters: (compilation) => ({
           // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
           contextPath: '\${util.ConfigHelper.contextPath}',
+          // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
+          sentryConfig: '\${raw(util.ConfigHelper.sentryWebConfigJson)}',
           jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
           receivingIfStatement:
