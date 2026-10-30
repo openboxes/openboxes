@@ -23,7 +23,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 
-import javax.xml.bind.ValidationException
+import jakarta.xml.bind.ValidationException
 import java.text.SimpleDateFormat
 
 @Transactional

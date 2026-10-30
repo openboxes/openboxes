@@ -22,7 +22,7 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import javax.xml.bind.ValidationException
+import jakarta.xml.bind.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 
 class CombinedShipmentItemApiController {

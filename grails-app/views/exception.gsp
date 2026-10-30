@@ -47,10 +47,10 @@
 
     <h2>Error Details</h2>
   	<div class="message" role="status" aria-label="message">
-		<strong>Error ${request?.'javax.servlet.error.status_code'}:</strong>
-    		${request?.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
-		<strong>Servlet:</strong> ${request?.'javax.servlet.error.servlet_name'}<br/>
-		<strong>URI:</strong> ${request?.'javax.servlet.error.request_uri'}<br/>
+		<strong>Error ${request?.'jakarta.servlet.error.status_code'}:</strong>
+    		${request?.'jakarta.servlet.error.message'?.encodeAsHTML()}<br/>
+		<strong>Servlet:</strong> ${request?.'jakarta.servlet.error.servlet_name'}<br/>
+		<strong>URI:</strong> ${request?.'jakarta.servlet.error.request_uri'}<br/>
 		<g:if test="${exception}">
 	  		<strong>Exception Message:</strong> ${exception.message?.encodeAsHTML()} <br />
 	  		<strong>Caused by:</strong> ${exception.cause?.message?.encodeAsHTML()} <br />
@@ -78,8 +78,8 @@
                 <g:hiddenField id="dom" name="dom" value=""/>
                 <g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
                 <g:hiddenField name="targetUri" value="${targetUri}"/>
-                <g:hiddenField name="request.statusCode" value="${request?.'javax.servlet.error.status_code'}"/>
-                <g:hiddenField name="request.errorMessage" value="${request?.'javax.servlet.error.message'?.encodeAsHTML()}"/>
+                <g:hiddenField name="request.statusCode" value="${request?.'jakarta.servlet.error.status_code'}"/>
+                <g:hiddenField name="request.errorMessage" value="${request?.'jakarta.servlet.error.message'?.encodeAsHTML()}"/>
                 <g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
                 <g:hiddenField name="exception.class" value="${exception?.className}"/>
                 <g:hiddenField name="exception.date" value="${new Date() }"/>

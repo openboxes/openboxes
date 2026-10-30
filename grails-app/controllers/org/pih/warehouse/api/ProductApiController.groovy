@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.api
 
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional

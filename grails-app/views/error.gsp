@@ -35,8 +35,8 @@
                         <g:if test="${Throwable.isInstance(exception)}">
                             <g:renderException exception="${exception}" />
                         </g:if>
-                        <g:elseif test="${request.getAttribute('javax.servlet.error.exception')}">
-                            <g:renderException exception="${request.getAttribute('javax.servlet.error.exception')}" />
+                        <g:elseif test="${request.getAttribute('jakarta.servlet.error.exception')}">
+                            <g:renderException exception="${request.getAttribute('jakarta.servlet.error.exception')}" />
                         </g:elseif>
                         <g:else>
                             <ul class="errors" role="alert" aria-label="error-message">
@@ -59,8 +59,8 @@
                     <g:hiddenField id="dom" name="dom" value=""/>
                     <g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
                     <g:hiddenField name="targetUri" value="${targetUri}"/>
-                    <g:hiddenField name="request.statusCode" value="${request?.'javax.servlet.error.status_code'}"/>
-                    <g:hiddenField name="request.errorMessage" value="${request?.'javax.servlet.error.message'?.encodeAsHTML()}"/>
+                    <g:hiddenField name="request.statusCode" value="${request?.'jakarta.servlet.error.status_code'}"/>
+                    <g:hiddenField name="request.errorMessage" value="${request?.'jakarta.servlet.error.message'?.encodeAsHTML()}"/>
                     <g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
                     <g:hiddenField name="exception.class" value="${exception?.className}"/>
                     <g:hiddenField name="exception.date" value="${new Date() }"/>

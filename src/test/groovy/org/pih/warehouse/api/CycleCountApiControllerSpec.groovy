@@ -32,7 +32,7 @@ import org.testcontainers.shaded.com.google.common.net.HttpHeaders
 import spock.lang.Shared
 import spock.lang.Unroll
 
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletResponse
 
 @Unroll
 class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiController> {

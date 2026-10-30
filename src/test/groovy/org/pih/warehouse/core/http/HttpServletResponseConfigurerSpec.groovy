@@ -1,6 +1,6 @@
 package org.pih.warehouse.core.http
 
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.mock.web.MockHttpServletResponse
 import spock.lang.Shared
