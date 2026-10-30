@@ -862,6 +862,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return picklistItems.findAll { it.pickable }
     }
 
+    List<String> getPicklistReasonCodes() {
+        List<String> reasonCodes = picklistItems?.findResults { it.reasonCode } ?: []
+        return ([pickReasonCode] + reasonCodes).findAll { it }.unique()
+    }
+
+    String getEffectiveCancelReasonCode() {
+        return cancelReasonCode?.contains("(") ? cancelReasonCode.split("\\(", 2)[1].replace(")", "") : cancelReasonCode
+    }
+
     /**
      * Sort by sort order, name
      *
