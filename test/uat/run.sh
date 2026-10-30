@@ -21,6 +21,9 @@
 set -euo pipefail
 UAT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 E2E_DIR="$(cd "$UAT_DIR/../e2e" && pwd)"
+# the UAT stack runs on the default profile of test/e2e (lib/common.sh), whatever the environment says
+# and builds its WAR from this checkout (an E2E_WAR in the environment is not used)
+export E2E_PROFILE=default; unset E2E_ISSUANCE_JOB E2E_ALLOCATION_MAX_ATTEMPTS E2E_WAR
 export E2E_PROJECT="${E2E_PROJECT:-openboxes-uat-web-$(printf '%s' "$UAT_DIR" | cksum | cut -c1-6)}"
 export E2E_HTTP_PORT="${E2E_HTTP_PORT:-28080}" E2E_DB_PORT="${E2E_DB_PORT:-23306}" E2E_LABEL_PORT="${E2E_LABEL_PORT:-28081}"
 # shellcheck source=../e2e/lib/common.sh
