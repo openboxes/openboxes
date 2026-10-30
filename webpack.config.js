@@ -198,6 +198,7 @@ module.exports = {
       root: ROOT,
       src: SRC,
       components: path.resolve(SRC, 'components'),
+      config: path.resolve(SRC, 'config'),
       hooks: path.resolve(SRC, 'hooks'),
       reducers: path.resolve(SRC, 'reducers'),
       selectors: path.resolve(SRC, 'selectors'),
