@@ -702,6 +702,7 @@ class RequisitionService {
                     'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED, RequisitionStatus.REJECTED])
                 }
             }
+            isNull("parentRequisitionItem")
             eq("product", product)
         }
         return requisitionItems

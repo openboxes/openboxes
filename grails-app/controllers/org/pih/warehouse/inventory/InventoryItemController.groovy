@@ -257,7 +257,7 @@ class InventoryItemController {
         requisitionItems.groupBy { it.requisition }.collect { k, v ->
             itemsMap.put(k, [
                     picklistItemsByLot: k?.picklist?.getPicklistItemsByLot(product),
-                    quantityRequested: v.quantity.sum(),
+                    quantityRequested: v.sum() { RequisitionItem requisitionItem -> requisitionItem.modificationItem ? requisitionItem.modificationItem.quantity : requisitionItem.quantity },
                     quantityRequired: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityRequired() },
                     quantityAllocated: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityAllocated() },
                     quantityPicked: v.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
