@@ -1,25 +1,26 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`logo component should match snapshot 1`] = `
-<div
-  className="d-flex align-items-center logo-wrapper"
-  data-testid="logo-wrapper"
->
+<DocumentFragment>
   <div
-    aria-label="logo"
-    className="logo-square"
+    class="d-flex align-items-center logo-wrapper"
+    data-testid="logo-wrapper"
   >
-    <a
-      href="/openboxes/dashboard"
-      onClick={[Function]}
+    <div
+      aria-label="logo"
+      class="logo-square"
     >
-      <img
-        alt="Openboxes"
-        height="40"
-        src=""
-        width="40"
-      />
-    </a>
+      <a
+        data-discover="true"
+        href="/openboxes/dashboard"
+      >
+        <img
+          alt="Openboxes"
+          height="40"
+          width="40"
+        />
+      </a>
+    </div>
   </div>
-</div>
+</DocumentFragment>
 `;

@@ -1,9 +1,13 @@
 import React from 'react';
 
-import renderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import store from 'tests/__mocks__/formStore';
 
 import CheckboxField from 'components/form-elements/CheckboxField';
 import { renderFormField } from 'utils/form-utils';
+
+import '@testing-library/jest-dom';
 
 jest.mock('react-final-form', () => ({
   Field: (props) => {
@@ -15,6 +19,7 @@ jest.mock('react-final-form', () => ({
 }));
 
 jest.mock('react-localize-redux', () => ({
+  ...jest.requireActual('react-localize-redux'),
   Translate: (props) => {
     const { id } = props;
 
@@ -22,15 +27,16 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-xdescribe('CheckboxField component is correctly rendering', () => {
-  it('renders correctly', () => {
+describe('CheckboxField component is correctly rendering', () => {
+  it('renders an unchecked checkbox with its label', () => {
     const fieldConfig = {
       type: CheckboxField,
       label: 'test label',
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    render(<Provider store={store}>{renderFormField(fieldConfig, 'test-field')}</Provider>);
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    const checkbox = screen.getByRole('checkbox', { name: 'test label' });
+    expect(checkbox).not.toBeChecked();
   });
 });

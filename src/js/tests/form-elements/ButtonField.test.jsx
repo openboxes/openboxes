@@ -1,6 +1,6 @@
 import React from 'react';
 
-import renderer from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 import ButtonField from 'components/form-elements/ButtonField';
 import { renderFormField } from 'utils/form-utils';
@@ -20,9 +20,9 @@ describe('ButtonField component is correctly rendering', () => {
       buttonLabel: 'button label',
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    const rendered = render(renderFormField(fieldConfig, 'test-field'));
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(rendered.asFragment()).toMatchSnapshot();
   });
 
   it('component label', () => {
@@ -31,8 +31,8 @@ describe('ButtonField component is correctly rendering', () => {
       buttonLabel: () => <span>test label</span>,
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    const rendered = render(renderFormField(fieldConfig, 'test-field'));
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(rendered.asFragment()).toMatchSnapshot();
   });
 });

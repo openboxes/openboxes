@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 
 import productApi from 'api/services/ProductApi';
 import useLastCountedDate from 'hooks/cycleCount/useLastCountedDate';

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { render, screen, within } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import DoubleTile from 'utils/DoubleTile';
 
@@ -35,7 +34,7 @@ describe('DoubleTile component', () => {
   });
 
   it('should match snapshot', () => {
-    const doubleTile = renderer.create(<DoubleTile {...defaultProps} />).toJSON();
+    const doubleTile = render(<DoubleTile {...defaultProps} />).asFragment();
     expect(doubleTile).toMatchSnapshot();
   });
 
