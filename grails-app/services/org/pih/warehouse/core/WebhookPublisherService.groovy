@@ -95,6 +95,7 @@ class WebhookPublisherService {
                 triggeredBy: triggeredBy?.name,
                 requisitionNumber: requisition.requestNumber,
                 requisitionType: requisition.type,
+                requisitionStatus: requisition.status,
                 deliveryTypeCode: requisition.deliveryTypeCode.toString(),
                 requestedBy: requisition.requestedBy?.toJson(),
                 createdBy: requisition.createdBy?.toJson(),

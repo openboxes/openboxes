@@ -466,8 +466,9 @@ class PickTaskService {
                     stockMovementService.createMissingShipmentItems(requisition, shipment)
                 }
 
-                grailsApplication.mainContext.publishEvent(new RequisitionEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
             }
+            // Sending a REQUISITION_STAGED event after each task is staged.
+            grailsApplication.mainContext.publishEvent(new RequisitionEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
         }
 
         requisition.save(cascade: true, failOnError: true)
