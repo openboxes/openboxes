@@ -112,7 +112,7 @@ class PutawayTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
     void 'load all of it: IN_PROGRESS, the stock moves from the receiving bin into the cart'() {
         given:
-        PutawaySite s = putawaySite('PA-LD')
+        PutawaySite s = putawaySite('PA-LD', 10, [ActivityCode.TRACK_INTERNAL_TRANSACTIONS])
         Map po = putawayOrderOf(s.dc, s.product, s.lotId, [[10, s.recv, s.stor1]])
         putawayPatch(po.itemIds[0], [action: 'assign', container: s.cart])
 
@@ -129,7 +129,7 @@ class PutawayTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
     void 'load part of it: the loaded part becomes its own IN_PROGRESS task in the cart, the rest a PENDING task left at the receiving bin'() {
         given:
-        PutawaySite s = putawaySite('PA-LDP')
+        PutawaySite s = putawaySite('PA-LDP', 10, [ActivityCode.TRACK_INTERNAL_TRANSACTIONS])
         Map po = putawayOrderOf(s.dc, s.product, s.lotId, [[10, s.recv, s.stor1]])
         putawayPatch(po.itemIds[0], [action: 'assign', container: s.cart])
 
@@ -150,7 +150,7 @@ class PutawayTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
     void 'load: too much, nothing, a location that is not a cart, or another cart without override is refused'() {
         given:
-        PutawaySite s = putawaySite('PA-LDX')
+        PutawaySite s = putawaySite('PA-LDX', 10, [ActivityCode.TRACK_INTERNAL_TRANSACTIONS])
         String cart2 = bin(s.dc, 'CART2', [ActivityCode.PUTAWAY_CART, ActivityCode.HOLD_STOCK], false)
         Map po = putawayOrderOf(s.dc, s.product, s.lotId, [[10, s.recv, s.stor1]])
         putawayPatch(po.itemIds[0], [action: 'assign', container: s.cart])
@@ -171,6 +171,29 @@ class PutawayTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         r.error == null
         putawayTask(po.itemIds[0]).container == 'CART2'
         onHand(s.dc, s.product) == [CART2: 10]
+    }
+
+    void 'load at a facility without TRACK_INTERNAL_TRANSACTIONS records the cart but moves no stock, and complete takes it from the receiving bin'() {
+        given:
+        PutawaySite s = putawaySite('PA-LDN')
+        Map po = putawayOrderOf(s.dc, s.product, s.lotId, [[10, s.recv, s.stor1]])
+        putawayPatch(po.itemIds[0], [action: 'assign', container: s.cart])
+
+        when:
+        Map r = putawayPatch(po.itemIds[0], [action: 'load', quantity: 10, container: s.cart])
+
+        then:
+        r.error == null
+        putawayTask(po.itemIds[0]).subMap(['status', 'container']) == [status: 'IN_PROGRESS', container: 'CART']
+        onHand(s.dc, s.product) == [RECV: 10]
+
+        when:
+        Map c = putawayPatch(po.itemIds[0], [action: 'complete', destination: s.stor2])
+
+        then:
+        c.error == null
+        putawayTask(po.itemIds[0]).status == 'COMPLETED'
+        onHand(s.dc, s.product) == [STOR2: 10]
     }
 
     @PendingFeature(reason = 'PutawayTaskAdapter.groovy:91-110 the task PATCH load / partialComplete return is built by toPutawayTask(OrderItem), which maps identifier = order number, facility = order.origin, assignee = order.orderedBy, dateStarted = order.dateOrdered, unlike the putaway_task view (PT-crc32 identifier, approved_by, date_approved) every GET answers: the same task reads differently in the PATCH response')
@@ -211,7 +234,7 @@ class PutawayTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
     void 'complete from the cart to another destination than planned (the two-step flow)'() {
         given:
-        PutawaySite s = putawaySite('PA-CC')
+        PutawaySite s = putawaySite('PA-CC', 10, [ActivityCode.TRACK_INTERNAL_TRANSACTIONS])
         Map po = putawayOrderOf(s.dc, s.product, s.lotId, [[10, s.recv, s.stor1]])
         putawayPatch(po.itemIds[0], [action: 'start'])
         putawayPatch(po.itemIds[0], [action: 'load', quantity: 10, container: s.cart, override: true])
@@ -393,6 +416,53 @@ class PutawayTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         then:
         r.error == null
         putawayTask(po.itemIds[0]).subMap(['destination', 'comment', 'status']) == [destination: 'STOR2', comment: 'Default Location', status: 'PENDING']
+    }
+
+    void 'rerunStrategy on the PENDING rest of a partial putaway from the cart returns its stock to the receiving bin'() {
+        given:
+        PutawaySite s = putawaySite('PA-RRC', 10, [ActivityCode.TRACK_INTERNAL_TRANSACTIONS])
+        Map po = putawayOrderOf(s.dc, s.product, s.lotId, [[10, s.recv, s.stor1]])
+        putawayPatch(po.itemIds[0], [action: 'load', quantity: 10, container: s.cart, override: true])
+        Map partial = putawayPatch(po.itemIds[0], [action: 'partialComplete', quantity: 4, destination: s.stor2,
+                                                    reasonCode: 'PUTAWAY_DISCREPANCY'])
+
+        expect:
+        partial.error == null
+        putawayTask(partial.result).subMap(['quantity', 'status', 'container']) == [quantity: 6, status: 'PENDING', container: 'CART']
+        onHand(s.dc, s.product) == [CART: 6, STOR2: 4]
+
+        when:
+        Map r = putawayPatch(partial.result, [action: 'rerunStrategy'])
+
+        then:
+        r.error == null
+        putawayTask(partial.result).subMap(['quantity', 'status']) == [quantity: 6, status: 'PENDING']
+        onHand(s.dc, s.product) == [RECV: 6, STOR2: 4]
+
+        when: 'the rest can be sorted again'
+        Map reload = putawayPatch(partial.result, [action: 'load', quantity: 6, container: s.cart, override: true])
+
+        then:
+        reload.error == null
+        onHand(s.dc, s.product) == [CART: 6, STOR2: 4]
+    }
+
+    void 'rerunStrategy on the PENDING rest of a partial putaway without TRACK_INTERNAL_TRANSACTIONS moves no stock'() {
+        given:
+        PutawaySite s = putawaySite('PA-RRCN')
+        Map po = putawayOrderOf(s.dc, s.product, s.lotId, [[10, s.recv, s.stor1]])
+        putawayPatch(po.itemIds[0], [action: 'load', quantity: 10, container: s.cart, override: true])
+        Map partial = putawayPatch(po.itemIds[0], [action: 'partialComplete', quantity: 4, destination: s.stor2,
+                                                    reasonCode: 'PUTAWAY_DISCREPANCY'])
+
+        when:
+        Map r = putawayPatch(partial.result, [action: 'rerunStrategy'])
+
+        then:
+        partial.error == null
+        r.error == null
+        putawayTask(partial.result).subMap(['quantity', 'status']) == [quantity: 6, status: 'PENDING']
+        onHand(s.dc, s.product) == [RECV: 6, STOR2: 4]
     }
 
     void 'rerunStrategy with nothing to route to clears the destination (UNASSIGNED)'() {

@@ -217,6 +217,13 @@ class PutawayTaskService {
                 break
 
             case 'rerunStrategy':
+                // A pending task split off by a partial putaway may still have its stock sitting in the putaway
+                // container, so move it back to the origin before the strategy reassigns the container.
+                Integer quantityInContainer = getQuantityRemainingInContainer(task)
+                if (quantityInContainer > 0) {
+                    transferFromContainerToOrigin(task, quantityInContainer)
+                    task = PutawayTask.get(task.id)
+                }
                 inboundSortationService.rerunPutawayStrategy(task)
                 task = PutawayTask.get(task.id)  // refresh from view
                 break
@@ -564,6 +571,11 @@ class PutawayTaskService {
     }
 
     void transferToContainer(PutawayTask task) {
+        if (!tracksInternalTransactions(task)) {
+            log.warn("Skipping transfer to putaway container: Facility does not support TRACK_INTERNAL_TRANSACTIONS activity")
+            return
+        }
+
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
         command.binLocation = task.location
@@ -577,12 +589,60 @@ class PutawayTaskService {
         transfer(task, command)
     }
 
+    void transferFromContainerToOrigin(PutawayTask task, Integer quantity) {
+        if (!tracksInternalTransactions(task)) {
+            log.warn("Skipping transfer from putaway container: Facility does not support TRACK_INTERNAL_TRANSACTIONS activity")
+            return
+        }
+
+        TransferStockCommand command = new TransferStockCommand()
+        command.location = task.facility
+        command.binLocation = task.container
+        command.inventoryItem = task.inventoryItem
+        command.quantity = quantity
+        command.otherLocation = task.facility
+        command.otherBinLocation = task.location
+        command.order = task.putawayOrder
+        command.transferOut = Boolean.TRUE
+        command.disableRefresh = Boolean.TRUE
+        transfer(task, command)
+    }
+
+    /**
+     * Returns the quantity of a pending task's stock that is still sitting in its putaway container. This happens
+     * when a partial putaway splits an in-progress task, leaving the remainder PENDING while its stock remains in
+     * the container it was loaded into during sortation.
+     */
+    Integer getQuantityRemainingInContainer(PutawayTask task) {
+        if (!tracksInternalTransactions(task) || task.status != PutawayTaskStatus.PENDING || !task.container
+                || !task.putawayOrderItem?.parentOrderItem) {
+            return 0
+        }
+
+        Integer quantityOnHand = inventoryService.getQuantityFromBinLocation(task.facility, task.container, task.inventoryItem) ?: 0
+
+        // Stock in the container that belongs to other tasks currently loaded into it
+        BigDecimal quantityLoadedByOtherTasks = PutawayTask.createCriteria().get {
+            projections {
+                sum('quantity')
+            }
+            eq('container', task.container)
+            eq('inventoryItem', task.inventoryItem)
+            eq('status', PutawayTaskStatus.IN_PROGRESS)
+            ne('id', task.id)
+        } as BigDecimal ?: 0
+
+        BigDecimal quantityRemaining = [quantityOnHand - quantityLoadedByOtherTasks, task.quantity].min()
+        return quantityRemaining > 0 ? quantityRemaining.intValue() : 0
+    }
+
     void transferToDestination(PutawayTask task, Boolean isDirectPutaway) {
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
 
-        // If direct putaway then we transfer from origin to destination
-        if (isDirectPutaway) {
+        // If direct putaway, or stock was never moved into the container because internal transactions are not
+        // tracked, then we transfer from origin to destination
+        if (isDirectPutaway || !tracksInternalTransactions(task)) {
             command.binLocation = task.location
         } else {
             // otherwise if we're performing a two-step putaway, we'll transfer from container destination
@@ -597,6 +657,10 @@ class PutawayTaskService {
         command.transferOut = Boolean.TRUE
         command.disableRefresh = Boolean.TRUE
         transfer(task, command)
+    }
+
+    private boolean tracksInternalTransactions(PutawayTask task) {
+        return task.facility?.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)
     }
 
     void transfer(PutawayTask task, TransferStockCommand command) {
