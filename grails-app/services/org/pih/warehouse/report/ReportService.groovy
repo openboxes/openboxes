@@ -1524,7 +1524,7 @@ class ReportService implements ApplicationContextAware {
             "Opening": data.openingBalance,
             "Credits": data.credits,
             "Debits": data.debits,
-            "Net Change": data.netChange,
+            "Differences": data.differences,
             "Closing": data.closingBalance,
         ]
     }
@@ -1629,9 +1629,10 @@ class ReportService implements ApplicationContextAware {
             Integer closingBalance = closingBalanceByProduct[key.id] ?: 0
             Integer credits = totals.sum { it.credits } as Integer ?: 0
             Integer debits = totals.sum { it.debits } as Integer ?: 0
-            // The change in quantity on hand over the period. Note that this is not the total of the adjustments:
-            // credits and debits are already included in it.
-            Integer netChange = closingBalance - openingBalance
+            // The change in quantity on hand that credits and debits don't account for. Counts (e.g. product
+            // inventory and baseline transactions) set quantity on hand instead of adding to it, so this is the
+            // total difference between what was counted and the balance before each count.
+            Integer differences = closingBalance - openingBalance - credits + debits
 
             if (includeDetails) {
                 return getTransactionReportDetailedRow(
@@ -1665,7 +1666,7 @@ class ReportService implements ApplicationContextAware {
                     openingBalance: openingBalance,
                     credits: credits,
                     debits: debits,
-                    netChange: netChange,
+                    differences: differences,
                     closingBalance: closingBalance
             )
         }
@@ -1730,6 +1731,8 @@ class ReportService implements ApplicationContextAware {
         // Add transaction entries to the list that took place within selected time range
         Transaction productInventoryTransaction = null
         transactionEntriesWithinDateRange.each { TransactionEntry it ->
+            // The change to the balance (negative for debits), or null for counts, which set the balance instead
+            Integer quantityChange = null
             if (it.transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY) {
                 // A product inventory transaction (e.g. an inventory baseline) sets the quantity on hand of the product
                 // to the quantity of its entries, so the balance starts over from its first entry.
@@ -1739,9 +1742,8 @@ class ReportService implements ApplicationContextAware {
                 }
                 openingBalance += it.quantity
             } else {
-                openingBalance = isTransactionEntryDebit(it)
-                        ? openingBalance - Math.abs(it.quantity)
-                        : openingBalance + Math.abs(it.quantity)
+                quantityChange = isTransactionEntryDebit(it) ? -Math.abs(it.quantity) : Math.abs(it.quantity)
+                openingBalance += quantityChange
             }
 
             entries.add([
@@ -1752,7 +1754,12 @@ class ReportService implements ApplicationContextAware {
                             it.transaction.transactionType.name,
                             localizationService.getCurrentLocale(),
                     ),
+                    transactionId: it.transaction.id,
+                    transactionNumber: it.transaction.transactionNumber,
+                    lotNumber: it.inventoryItem?.lotNumber,
+                    binLocation: it.binLocation?.name,
                     quantity: it.quantity,
+                    quantityChange: quantityChange,
                     balance: openingBalance,
             ])
         }

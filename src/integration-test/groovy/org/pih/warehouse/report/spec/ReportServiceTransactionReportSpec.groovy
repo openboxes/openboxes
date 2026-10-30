@@ -144,10 +144,10 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
 
         then:
         rows.keySet() == ["A", "B"] as Set
-        rows.A.subMap("Opening", "Credits", "Debits", "Net Change", "Closing") ==
-                [Opening: 100, Credits: 15, Debits: 5, "Net Change": 10, Closing: 110]
-        rows.B.subMap("Opening", "Credits", "Debits", "Net Change", "Closing") ==
-                [Opening: 0, Credits: 7, Debits: 0, "Net Change": 7, Closing: 7]
+        rows.A.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 100, Credits: 15, Debits: 5, Differences: 0, Closing: 110]
+        rows.B.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 0, Credits: 7, Debits: 0, Differences: 0, Closing: 7]
     }
 
     void 'a credit with a negative quantity counts as a debit'() {
@@ -360,7 +360,7 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
                     closingBalance: closingBalance,
             ]
             if (!args.includeDetails) {
-                return reportService.getTransactionReportRow(data + [netChange: closingBalance - openingBalance])
+                return reportService.getTransactionReportRow(data + [differences: closingBalance - openingBalance - credits + debits])
             }
             // The previous implementation called unique() without a closure, which compares transactions with
             // compareTo (by date) and so dropped backdated transactions with the same dates (see the test above).
