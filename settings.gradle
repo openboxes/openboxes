@@ -4,7 +4,8 @@
  * they say on the tin. Here, we put the cache in the project root.
  */
 buildCache {
-    local(DirectoryBuildCache) {
+    // Gradle 8 dropped the local(DirectoryBuildCache) { } form
+    local {
         directory = new File(rootDir, '.gradle/caches/build')
         removeUnusedEntriesAfterDays = 30
     }
