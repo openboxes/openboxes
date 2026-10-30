@@ -14,7 +14,8 @@ import org.pih.warehouse.data.DataService
  * Handles generating custom identifiers that conform to a certain format.
  */
 @Transactional
-abstract class IdentifierService<T extends GormEntity> {
+// Groovy 4 validates generic bounds before the GORM AST weaves GormEntity into domains, so the bound must stay implicit
+abstract class IdentifierService<T> {
 
     RandomIdentifierGenerator randomIdentifierGenerator
     StringAbbreviator stringAbbreviator

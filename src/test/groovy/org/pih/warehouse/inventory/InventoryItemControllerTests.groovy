@@ -1,10 +1,8 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import spock.lang.Ignore
@@ -13,10 +11,10 @@ import spock.lang.Specification
 
 
 @Ignore // Rewrite in spock
-@TestFor(InventoryItemController)
-@Mock([Location, InventoryItem, TransactionEntry])
-@TestMixin(DomainClassUnitTestMixin)
-class InventoryItemControllerTests extends Specification {
+class InventoryItemControllerTests extends Specification implements ControllerUnitTest<InventoryItemController>, DataTest {
+
+    Class[] getDomainClassesToMock() { [Location, InventoryItem, TransactionEntry] }
+
     Product p = new Product(id:"pro1", name:"product1")
     Inventory inventory = new Inventory(id: "inventory1")
 

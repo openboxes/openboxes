@@ -1,7 +1,7 @@
 package org.pih.warehouse.core.http
 
 import java.nio.charset.StandardCharsets
-import javax.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component

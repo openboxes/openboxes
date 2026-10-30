@@ -1,6 +1,6 @@
 package org.pih.warehouse.api.receiving.v2
 
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 import org.pih.warehouse.api.BaseApiController
 import org.pih.warehouse.api.StockMovement
