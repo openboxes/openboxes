@@ -449,8 +449,10 @@ class PickTaskService {
             }
             boolean partialAllocation = requisition.partialAllocationAllowed
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
-            if (allTasksPicked && (!partialAllocation || !backordered)) {
+            if (allTasksPicked && (!partialAllocation || !backordered) && requisition.status != RequisitionStatus.PICKED) {
                 requisition.status = RequisitionStatus.PICKED
+
+                grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.PICK_COMPLETED))
             }
         } else if (task.status == PickTaskStatus.STAGED) {
             boolean allTasksStaged = allOrderTasks.every {

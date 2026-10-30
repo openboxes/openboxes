@@ -139,23 +139,36 @@ class PicklistService {
 
         if (orderItem?.quantity) {
             // Retrieve all available items and then calculate suggested
-            List<AvailableItem> availableItems = getAvailableItems(location, orderItem)
-            log.info "Available items: ${availableItems}"
-            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, orderItem?.quantity, orderItem?.order?.destination)
-            log.info "Suggested items " + suggestedItems
-            clearPicklist(orderItem)
-            if (suggestedItems) {
-                for (SuggestedItem suggestedItem : suggestedItems) {
-                    createOrUpdatePicklistItem(
-                            orderItem,
-                            null,
-                            suggestedItem.inventoryItem,
-                            suggestedItem.binLocation,
-                            suggestedItem.quantityPicked.intValueExact()
-                    )
-                }
+            createPicklist(orderItem, getAvailableItems(location, orderItem))
+        }
+    }
+
+    /**
+     * Creates the picklist of the order item, suggesting picks from the given available items.
+     *
+     * @return the suggested items that were picked
+     */
+    List<SuggestedItem> createPicklist(OrderItem orderItem, List<AvailableItem> availableItems) {
+        if (!orderItem?.quantity) {
+            return []
+        }
+
+        log.info "Available items: ${availableItems}"
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, orderItem?.quantity, orderItem?.order?.destination)
+        log.info "Suggested items " + suggestedItems
+        clearPicklist(orderItem)
+        if (suggestedItems) {
+            for (SuggestedItem suggestedItem : suggestedItems) {
+                createOrUpdatePicklistItem(
+                        orderItem,
+                        null,
+                        suggestedItem.inventoryItem,
+                        suggestedItem.binLocation,
+                        suggestedItem.quantityPicked.intValueExact()
+                )
             }
         }
+        return suggestedItems ?: []
     }
 
     void createPicklistFromItem(Order order) {
@@ -264,7 +277,7 @@ class PicklistService {
     List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested, Location warehouse) {
 
         List suggestedItems = []
-        List<AvailableItem> autoPickableItems = availableItems?.findAll { it.quantityAvailable > 0 && it.pickable }
+        List<AvailableItem> autoPickableItems = getAutoPickableItems(availableItems)
 
         // As long as quantity requested is less than the total available we can iterate through available items
         // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
@@ -304,13 +317,27 @@ class PicklistService {
     }
 
     List<AvailableItem> getAvailableItems(Location location, OrderItem orderItem) {
-        List<AvailableItem> availableItems = productAvailabilityService.getAvailableBinLocations(location, orderItem.product?.id)
+        return filterAvailableItems(productAvailabilityService.getAvailableBinLocations(location, orderItem.product?.id), orderItem)
+    }
+
+    /**
+     * Narrows the available items of the order item's product down to the ones the order item can be picked from,
+     * counting its own picks as available.
+     */
+    List<AvailableItem> filterAvailableItems(List<AvailableItem> availableItems, OrderItem orderItem) {
         def picklistItems = getPicklistItems(orderItem)
 
         availableItems = availableItems.findAll { it.inventoryItem != orderItem.inventoryItem && it.binLocation != orderItem.destinationBinLocation }
         availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
 
         return availableItems
+    }
+
+    /**
+     * The available items that picks can be suggested from.
+     */
+    List<AvailableItem> getAutoPickableItems(List<AvailableItem> availableItems) {
+        return availableItems?.findAll { it.quantityAvailable > 0 && it.pickable } ?: []
     }
 
     Set<PicklistItem> getPicklistItems(OrderItem orderItem) {

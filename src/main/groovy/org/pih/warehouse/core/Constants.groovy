@@ -173,6 +173,9 @@ class Constants {
     // Order number prefix for bin replenishment case
     static final String REPLENISHMENT_PREFIX = "R-"
 
+    // Order description marking a replenishment generated automatically after picking
+    static final String AUTOMATIC_REPLENISHMENT_DESCRIPTION = "Auto-generated replenishment"
+
     // Transaction types
     static final String ADJUSTMENT = "Adjustment"
 
