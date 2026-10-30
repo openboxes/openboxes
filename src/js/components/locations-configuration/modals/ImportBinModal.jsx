@@ -4,7 +4,7 @@ import fileDownload from 'js-file-download';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
@@ -68,7 +68,7 @@ class ImportBinModal extends Component {
     return apiClient.post(url, formData, config)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate(
+        toast.success(this.props.translate(
           'react.locationsConfiguration.importBinLocations.successMessage.label',
           'Bin Location imported successfully',
         ));

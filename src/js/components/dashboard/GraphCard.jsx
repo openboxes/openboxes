@@ -8,7 +8,6 @@ import {
 } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { SortableElement } from 'react-sortable-hoc';
 
 import DragHandle from 'components/dashboard/DragHandle';
 import LoadingCard from 'components/dashboard/LoadingCard';
@@ -192,7 +191,7 @@ const handleChartClick = (elements) => {
   }
 };
 
-const GraphCard = SortableElement(({
+const GraphCard = (({
   cardId,
   widgetId,
   cardTitle,
@@ -210,6 +209,8 @@ const GraphCard = SortableElement(({
   size = null,
   translate,
   hideDraghandle,
+  sortableRef,
+  handleRef,
 }) => {
   let graph;
   // eslint-disable-next-line no-template-curly-in-string
@@ -268,7 +269,7 @@ const GraphCard = SortableElement(({
   }
 
   return (
-    <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
+    <div ref={sortableRef} className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ? (
           <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
@@ -293,7 +294,7 @@ const GraphCard = SortableElement(({
             )
             : null
 }
-        {!hideDraghandle && <DragHandle />}
+        {!hideDraghandle && <DragHandle handleRef={handleRef} />}
       </div>
       <div className="content-card">
 
@@ -328,9 +329,15 @@ GraphCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardType: PropTypes.string.isRequired,
   cardInfo: PropTypes.string.isRequired,
-  timeLimit: PropTypes.number,
   loadIndicator: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  sortableRef: PropTypes.func,
+  handleRef: PropTypes.func,
+};
+
+GraphCard.defaultProps = {
+  sortableRef: null,
+  handleRef: null,
 };
 
 FilterComponent.defaultProps = {

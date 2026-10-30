@@ -3,12 +3,12 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 import { makeGetCycleCountItem } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import { NEW_ROW } from 'consts/cycleCount';
 import useTranslate from 'hooks/useTranslate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ActionsCell = ({
   id,
@@ -27,18 +27,14 @@ const ActionsCell = ({
 
   return (
     <TableCell className="rt-td d-flex justify-content-center count-step-actions">
-      <Tooltip
-        arrow="true"
-        delay="150"
-        duration="250"
-        hideDelay="50"
+      <CustomTooltip
         className="text-overflow-ellipsis"
-        html={(
+        content={(
           <span className="p-2">
             {translate('react.default.button.delete.label', 'Delete')}
           </span>
         )}
-        disabled={id}
+        show={!id}
       >
         {(id?.includes(NEW_ROW) || custom) && isStepEditable && (
           <RiDeleteBinLine
@@ -47,7 +43,7 @@ const ActionsCell = ({
             size={22}
           />
         )}
-      </Tooltip>
+      </CustomTooltip>
     </TableCell>
   );
 };

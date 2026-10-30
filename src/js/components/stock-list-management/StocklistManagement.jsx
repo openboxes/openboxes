@@ -5,9 +5,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
+import { toast } from 'react-toastify';
 
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import EmailModal from 'components/stock-list-management/EmailModal';
@@ -16,6 +15,8 @@ import apiClient, { parseResponse } from 'utils/apiClient';
 import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-table/react-table.css';
 
@@ -55,7 +56,8 @@ class StocklistManagement extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockListManagement');
     }
@@ -276,44 +278,32 @@ class StocklistManagement extends Component {
           columns={[
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.locationGroup.label', 'Location Group Name')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.locationGroup.label', 'Location Group Name')}
   >
     <Translate id="react.stockListManagement.locationGroup.label" defaultMessage="Location Group Name" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'locationGroup.name',
               className: 'w-space-normal',
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.locationName.label', 'Location Name')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.locationName.label', 'Location Name')}
   >
     <Translate id="react.stockListManagement.locationName.label" defaultMessage="Location Name" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'location.name',
               aggregate: () => '',
               className: 'w-space-normal',
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.stockListName.label', 'Stocklist Name')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.stockListName.label', 'Stocklist Name')}
   >
     <Translate id="react.stockListManagement.stockListName.label" defaultMessage="Stocklist Name" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'name',
               aggregate: () => '',
               // eslint-disable-next-line react/prop-types
@@ -324,30 +314,20 @@ class StocklistManagement extends Component {
 
                 return (
                   <a href={REQUISITION_TEMPLATE_URL.show(original.stocklistId)}>
-                    <Tooltip
-                      title={original.name}
-                      theme="transparent"
-                      delay="150"
-                      duration="250"
-                      hideDelay="50"
-                    >
+                    <CustomTooltip content={original.name}>
                       {original.name}
-                    </Tooltip>
+                    </CustomTooltip>
                   </a>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.monthlyStockListQty.label', 'Monthly Stocklist Qty')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.monthlyStockListQty.label', 'Monthly Stocklist Qty')}
   >
     <Translate id="react.stockListManagement.monthlyStockListQty.label" defaultMessage="Monthly Stocklist Qty" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'monthlyDemand',
               aggregate: (vals) => _.sum(vals),
               className: 'text-center',
@@ -357,29 +337,19 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.monthlyDemand}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
+                  <CustomTooltip content={original.monthlyDemand}>
                     {original.monthlyDemand}
-                  </Tooltip>
+                  </CustomTooltip>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.manager.label', 'Manager')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.manager.label', 'Manager')}
   >
     <Translate id="react.stockListManagement.manager.label" defaultMessage="Manager" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'manager.name',
               aggregate: () => '',
               Cell: ({ aggregated, original }) => {
@@ -388,29 +358,19 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.manager.name}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
+                  <CustomTooltip content={original.manager.name}>
                     {original.manager.name}
-                  </Tooltip>
+                  </CustomTooltip>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.replenishmentPeriod.label', 'Replenishment period')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.replenishmentPeriod.label', 'Replenishment period')}
   >
     <Translate id="react.stockListManagement.replenishmentPeriod.label" defaultMessage="Replenishment period" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'replenishmentPeriod',
               aggregate: () => '',
               className: 'text-center',
@@ -420,29 +380,19 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.replenishmentPeriod}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
+                  <CustomTooltip content={original.replenishmentPeriod}>
                     {original.replenishmentPeriod}
-                  </Tooltip>
+                  </CustomTooltip>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.replenishmentQty.label', 'Replenishment Qty')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.replenishmentQty.label', 'Replenishment Qty')}
   >
     <Translate id="react.stockListManagement.replenishmentQty.label" defaultMessage="Replenishment Qty" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'maxQuantity',
               aggregate: (vals) => _.sum(vals),
               className: 'text-center',
@@ -458,33 +408,23 @@ class StocklistManagement extends Component {
 
                 return (
                   <div className={_.isNil(original.maxQuantity) || original.maxQuantity === '' ? 'has-error' : ''}>
-                    <Tooltip
-                      title={original.maxQuantity}
-                      theme="transparent"
-                      delay="150"
-                      duration="250"
-                      hideDelay="50"
-                    >
+                    <CustomTooltip content={original.maxQuantity}>
                       <Input
                         value={original.maxQuantity || ''}
                         onChange={(value) => this.updateItemField(index, 'maxQuantity', value)}
                       />
-                    </Tooltip>
+                    </CustomTooltip>
                   </div>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.uom.label', 'Unit of measure')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.uom.label', 'Unit of measure')}
   >
     <Translate id="react.stockListManagement.uom.label" defaultMessage="Unit of measure" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'uom',
               aggregate: () => '',
               className: 'text-center',
@@ -494,29 +434,19 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <Tooltip
-                    title={original.uom}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
+                  <CustomTooltip content={original.uom}>
                     {original.uom}
-                  </Tooltip>
+                  </CustomTooltip>
                 );
               },
             },
             {
               Header:
-  <Tooltip
-    title={this.props.translate('react.stockListManagement.actions.label', 'Actions')}
-    theme="transparent"
-    delay="150"
-    duration="250"
-    hideDelay="50"
+  <CustomTooltip
+    content={this.props.translate('react.stockListManagement.actions.label', 'Actions')}
   >
     <Translate id="react.stockListManagement.actions.label" defaultMessage="Actions" />
-  </Tooltip>,
+  </CustomTooltip>,
               accessor: 'edit',
               minWidth: 230,
               className: 'text-center',
@@ -585,7 +515,7 @@ class StocklistManagement extends Component {
                         <button
                           type="button"
                           className="btn btn-outline-secondary btn-xs mr-1"
-                          onClick={() => Alert.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
+                          onClick={() => toast.error(this.props.translate('react.stockListManagement.alert.noManagerAssociated.label', 'There is no manager associated with this stock list. Please add a manager and try again.'))}
                         >
                           <Translate id="react.default.button.email.label" defaultMessage="Email" />
                         </button>
@@ -634,9 +564,9 @@ const mapStateToProps = (state) => ({
   isUserAdmin: state.session.isUserAdmin,
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(StocklistManagement);
+})(StocklistManagement));
 
 StocklistManagement.propTypes = {
   /** React router's object which contains information about url varaiables and params */

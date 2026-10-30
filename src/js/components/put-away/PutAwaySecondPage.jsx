@@ -9,7 +9,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { PUTAWAY_GENERATE_PDF } from 'api/urls';
@@ -24,6 +23,7 @@ import showLocationChangedAlert from 'utils/location-change-alert';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-table/react-table.css';
 
@@ -71,7 +71,8 @@ class PutAwaySecondPage extends Component {
     this.fetchPutAway();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
       () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
@@ -183,15 +184,7 @@ class PutAwaySecondPage extends Component {
 
         if (edit) {
           return (
-            <Tooltip
-              html={disabledMessage}
-              disabled={!disabledMessage}
-              theme="transparent"
-              arrow="true"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-            >
+            <CustomTooltip content={disabledMessage} show={!!disabledMessage}>
               <div className={hasValidationError(props?.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
                 <input
                   type="number"
@@ -207,24 +200,16 @@ class PutAwaySecondPage extends Component {
                   }}
                 />
               </div>
-            </Tooltip>
+            </CustomTooltip>
           );
         }
 
         return (
-          <Tooltip
-            html={disabledMessage}
-            disabled={!disabledMessage}
-            theme="transparent"
-            arrow="true"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          >
+          <CustomTooltip content={disabledMessage} show={!!disabledMessage}>
             <div className={hasValidationError(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
               <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
             </div>
-          </Tooltip>
+          </CustomTooltip>
         );
       },
       Filter,

@@ -4,7 +4,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import {
   fetchTranslations,
@@ -17,6 +16,7 @@ import ReplenishmentSecondPage from 'components/replenishment/ReplenishmentSecon
 import Wizard from 'components/wizard/Wizard';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/replenishment/Replenishment.scss';
 
@@ -42,7 +42,8 @@ class ReplenishmentWizard extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'replenishment');
     }
@@ -106,7 +107,7 @@ class ReplenishmentWizard extends Component {
 
   render() {
     const { page, replenishment } = this.state;
-    const { location, history, match } = this.props;
+    const { location, navigate, match } = this.props;
     const locationId = location.id;
     const pageList = [CreateReplenishment, ReplenishmentSecondPage, ReplenishmentCheckPage];
 
@@ -121,7 +122,7 @@ class ReplenishmentWizard extends Component {
           prevPage={page === 1 ? 1 : page - 1}
           updateWizardValues={this.updateWizardValues}
           additionalProps={{
-            locationId, location, history, match,
+            locationId, location, navigate, match,
           }}
         />
       );
@@ -155,5 +156,5 @@ ReplenishmentWizard.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({ replenishmentId: PropTypes.string }),
   }).isRequired,
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

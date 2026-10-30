@@ -418,7 +418,7 @@ export function reloadIndicator(indicatorConfig, params, locationId) {
 function getData(dispatch, dashboardConfig, locationId, config = 'personal', userId = '') {
   // new reference so that the original config is not modified
 
-  const dashboard = dashboardConfig.dashboard[config] || {};
+  const dashboard = dashboardConfig.dashboard?.[config] || {};
   const widgets = _.map(dashboard.widgets, (widget) => ({
     ...dashboardConfig.dashboardWidgets[widget.widgetId],
     order: widget.order,
@@ -472,8 +472,10 @@ export function addToIndicators(widgetConfig, locationId, userId = '') {
   };
 }
 
-export function reorderIndicators({ oldIndex, newIndex }, e, type) {
-  if (e.target.id === 'archive') {
+export function reorderIndicators({
+  oldIndex, newIndex, type, archive,
+}) {
+  if (archive) {
     return {
       type: REMOVE_FROM_INDICATORS,
       payload: { index: oldIndex, type },

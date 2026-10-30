@@ -14,8 +14,8 @@ const ConfirmReceiptTable = ({
   loading,
   commentModal,
   cancelRemaining,
-  sort,
-  order,
+  sort = null,
+  order = null,
 }) => {
   const {
     isOpen: isCommentModalOpen,

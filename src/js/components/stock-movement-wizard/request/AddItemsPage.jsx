@@ -11,9 +11,7 @@ import { Form } from 'react-final-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
-import { Tooltip } from 'react-tippy';
+import { toast } from 'react-toastify';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import { STOCK_MOVEMENT_STATUS, STOCK_MOVEMENT_UPDATE_ITEMS } from 'api/urls';
@@ -33,6 +31,8 @@ import { renderFormField } from 'utils/form-utils';
 import { matchesProductCodeOrName } from 'utils/form-values-utils';
 import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -172,19 +172,14 @@ const DELETE_BUTTON_FIELD = {
     fieldValue, removeItem, removeRow, updateTotalCount, translate, onDelete,
   }) => (
     <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
-      <Tooltip
-        html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
-        theme="transparent"
-        arrow="true"
-        delay="150"
-        duration="250"
-        hideDelay="50"
+      <CustomTooltip
+        content={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
       >
         <RiDeleteBinLine
           className="delete-icon"
           onClick={() => onDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
         />
-      </Tooltip>
+      </CustomTooltip>
     </div>
   ),
 };
@@ -679,7 +674,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -1323,14 +1319,14 @@ class AddItemsPage extends Component {
               .then((response) => {
                 if (response.status === 204) {
                   this.props.hideSpinner();
-                  Alert.success(this.props.translate(
+                  toast.success(this.props.translate(
                     'react.stockMovement.request.successfullyDeleted.label',
                     'Request was successfully deleted',
-                  ), { timeout: 3000 });
+                  ), { autoClose: 3000 });
                   if (this.state.isRequestFromWard) {
-                    this.props.history.push(DASHBOARD_URL.base);
+                    this.props.navigate(DASHBOARD_URL.base);
                   } else {
-                    this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                    this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
                   }
                 }
               })
@@ -1356,9 +1352,9 @@ class AddItemsPage extends Component {
       return this.saveRequisitionItemsInCurrentStep(lineItems)
         .then(() => {
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-            this.props.history.push(DASHBOARD_URL.base);
+            this.props.navigate(DASHBOARD_URL.base);
           } else {
-            this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+            this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
           }
         })
         .catch(() => {
@@ -1382,9 +1378,9 @@ class AddItemsPage extends Component {
             label: this.props.translate('react.default.yes.label', 'Yes'),
             onClick: () => {
               if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                this.props.history.push(DASHBOARD_URL.base);
+                this.props.navigate(DASHBOARD_URL.base);
               } else {
-                this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
               }
             },
           },
@@ -1406,7 +1402,7 @@ class AddItemsPage extends Component {
     return this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -1493,11 +1489,11 @@ class AddItemsPage extends Component {
       'Thank you for submitting your request. You can check the status of your request using stock movement number',
     );
     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-      this.props.history.push(DASHBOARD_URL.base);
+      this.props.navigate(DASHBOARD_URL.base);
     } else {
-      this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+      this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
     }
-    Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
+    toast.success(`${translatedSubmitMessage} ${movementNumber}`);
     return Promise.resolve();
   }
 
@@ -1850,7 +1846,5 @@ AddItemsPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
   currentLocationId: PropTypes.string.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

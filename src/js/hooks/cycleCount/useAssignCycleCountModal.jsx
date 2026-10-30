@@ -17,14 +17,14 @@ import { clearCountWorkflow } from 'actions';
 import cycleCountApi from 'api/services/CycleCountApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import notification from 'components/Layout/notifications/notification';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import CountIndex from 'consts/countIndex';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import NotificationType from 'consts/notificationTypes';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormatDateFns } from 'consts/timeFormat';
 import useForceRender from 'hooks/useForceRender';
 import useSpinner from 'hooks/useSpinner';
 import useTranslate from 'hooks/useTranslate';
@@ -79,7 +79,7 @@ const useAssignCycleCountModal = ({
         assignee: dataToAssign?.[cycleCount.maxCountIndex]?.assignee,
       }))
         // we only want to update items that have an assignee
-        .filter(item => item.assignee);
+        .filter((item) => item.assignee);
     });
     return _.flatten(mappedData);
   };
@@ -232,12 +232,13 @@ const useAssignCycleCountModal = ({
       id: cycleCountColumn.DEADLINE,
       header: () => (
         <TableHeaderCell>
-          <DateField
+          <DateFieldDateFns
             className="date-counted-date-picker date-field-input"
             wrapperClassName="pb-1"
             placeholder={translate('react.cycleCount.table.deadline.label', 'Deadline')}
             clearable
-            customDateFormat={DateFormat.DD_MMM_YYYY}
+            customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+            outputDateFormat={DateFormatDateFns.MMM_DD_YYYY}
             hideErrorMessageWrapper
             onChange={(newDate) => {
               handleUpdateAssignees(
@@ -253,12 +254,13 @@ const useAssignCycleCountModal = ({
       ),
       cell: ({ getValue, row }) => (
         <TableCell className="rt-td">
-          <DateField
+          <DateFieldDateFns
             className="date-counted-date-picker date-field-input"
             placeholder={translate('react.default.dateInput.placeholder.label', 'Select a date')}
             value={getValue()}
             clearable
-            customDateFormat={DateFormat.DD_MMM_YYYY}
+            customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
+            outputDateFormat={DateFormatDateFns.MMM_DD_YYYY}
             onChange={(newDate) => {
               handleUpdateAssignees(
                 [row.original.cycleCountRequestId],

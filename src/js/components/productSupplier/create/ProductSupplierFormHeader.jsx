@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
 import ProductSupplierFormTitle from 'components/productSupplier/create/ProductSupplierFormTitle';
@@ -20,11 +20,11 @@ import HeaderWrapper from 'wrappers/HeaderWrapper';
  * @returns {JSX.Element} - The ProductSupplierFormHeader component
  */
 const ProductSupplierFormHeader = ({ isValid, isFormDirty }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { productSupplier } = useProductSupplierData();
 
   const redirectToListPage = () => {
-    history.push(PRODUCT_SUPPLIER_URL.list());
+    navigate(PRODUCT_SUPPLIER_URL.list());
   };
 
   const { openConfirmationModal } = useProductSupplierActions({

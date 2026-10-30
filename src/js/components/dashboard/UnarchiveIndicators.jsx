@@ -2,9 +2,9 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import ReactLoading from 'react-loading';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { BeatLoader } from 'react-spinners';
 
 import { getRandomColor } from 'consts/dataFormat/colorMapping';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -82,14 +82,7 @@ const ArchivedGraph = (props) => {
   } else if (props.type === 'numbers') {
     graph = <Numbers />;
   } else if (props.type === 'loading') {
-    graph = (
-      <ReactLoading
-        type="bubbles"
-        color={getRandomColor()}
-        height="40px"
-        width="40px"
-      />
-    );
+    graph = <BeatLoader color={getRandomColor()} size={8} margin={2} />;
   } else if (props.type === 'error') {
     graph = <i className="fa fa-repeat" />;
   } else if (props.type === 'table' || props.type === 'numberTable') {

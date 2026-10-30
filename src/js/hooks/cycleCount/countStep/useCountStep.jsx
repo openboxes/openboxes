@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   getCountWorkflowEntityIds,
   getCurrentLocale,
@@ -25,7 +25,7 @@ const useCountStep = () => {
   const [isStepEditable, setIsStepEditable] = useState(true);
 
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const currentLocationId = useSelector(getCurrentLocationId);
   const currentUserId = useSelector(getCurrentUserId);
 
@@ -125,8 +125,8 @@ const useCountStep = () => {
 
   const handleBackToList = useCallback(() => {
     dispatch(clearCountWorkflow);
-    history.push(CYCLE_COUNT.list(TO_COUNT_TAB));
-  }, [dispatch, history]);
+    navigate(CYCLE_COUNT.list(TO_COUNT_TAB));
+  }, [dispatch, navigate]);
 
   return useMemo(() => ({
     cycleCountIds,

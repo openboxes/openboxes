@@ -12,6 +12,7 @@ import SendOutboundReturns from 'components/returns/outbound/SendOutboundReturn'
 import Wizard from 'components/wizard/Wizard';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -38,7 +39,8 @@ class OutboundReturns extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'outboundReturns');
       this.props.fetchTranslations(nextProps.locale, 'stockMovement');
@@ -156,7 +158,7 @@ class OutboundReturns extends Component {
   render() {
     const { values, currentPage } = this.state;
     const pageList = [CreateOutboundReturn, AddItemsPage, PickPage, SendOutboundReturns];
-    const { location, history, match } = this.props;
+    const { location, navigate, match } = this.props;
     const locationId = location.id;
 
     return (
@@ -168,7 +170,7 @@ class OutboundReturns extends Component {
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         additionalProps={{
-          locationId, location, history, match,
+          locationId, location, navigate, match,
         }}
         updateWizardValues={this.updateWizardValues}
       />
@@ -183,9 +185,9 @@ const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(OutboundReturns);
+})(OutboundReturns));
 
 OutboundReturns.propTypes = {
   match: PropTypes.shape({
@@ -200,9 +202,7 @@ OutboundReturns.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   location: PropTypes.shape({
     name: PropTypes.string,
     id: PropTypes.string,

@@ -3,16 +3,14 @@ import React, { Component, isValidElement } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
-import { Overlay } from 'react-overlays';
 import { connect } from 'react-redux';
-import ReactSelect, { Async, components } from 'react-select';
-import Creatable from 'react-select/lib/Creatable';
-import { Tooltip } from 'react-tippy';
+import ReactSelect, { components } from 'react-select';
+import Async from 'react-select/async';
+import Creatable from 'react-select/creatable';
 
 import { selectNullOption } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'react-tippy/dist/tippy.css';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const Dropdown = ({ children, style, width }) => (
   <div
@@ -33,36 +31,29 @@ Dropdown.propTypes = {
 const Menu = (props) => {
   const target = document.getElementById(`${props.selectProps.id}-container`);
   return (
-    <Overlay
-      show
-      placement="bottom"
-      target={target}
-      container={document.getElementById('root')}
-    >
-      <Dropdown width={target.offsetWidth.toString()}>
-        <div role="list" data-testid="custom-select-dropdown-menu" className="custom-option" {...props.innerProps}>
-          {props.selectProps.createNewFromModal
-            && (
-            <div
-              className="add-new-button"
-              onClick={props.selectProps.newOptionModalOpen}
-              onKeyPress={props.selectProps.newOptionModalOpen}
-              role="button"
-              tabIndex={0}
-            >
-              <span>
-                <i className="fa fa-plus pr-2" />
-                <Translate
-                  id={props.selectProps.createNewFromModalLabel}
-                  defaultMessage={props.selectProps.defaultMessage}
-                />
-              </span>
-            </div>
-            )}
-          {props.children}
-        </div>
-      </Dropdown>
-    </Overlay>
+    <Dropdown width={target.offsetWidth.toString()}>
+      <div role="list" data-testid="custom-select-dropdown-menu" className="custom-option" {...props.innerProps}>
+        {props.selectProps.createNewFromModal
+          && (
+          <div
+            className="add-new-button"
+            onClick={props.selectProps.newOptionModalOpen}
+            onKeyPress={props.selectProps.newOptionModalOpen}
+            role="button"
+            tabIndex={0}
+          >
+            <span>
+              <i className="fa fa-plus pr-2" />
+              <Translate
+                id={props.selectProps.createNewFromModalLabel}
+                defaultMessage={props.selectProps.defaultMessage}
+              />
+            </span>
+          </div>
+          )}
+        {props.children}
+      </div>
+    </Dropdown>
   );
 };
 
@@ -334,18 +325,11 @@ class Select extends Component {
         : (this.props.value.label ? this.props.value.label : this.props.value);
       return (
         <div id={`${this.state.id}-container`}>
-          <Tooltip
-            html={this.props.value.label}
-            disabled={!showValueTooltip}
-            theme="transparent"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          >
+          <CustomTooltip content={this.props.value.label} show={!!showValueTooltip}>
             <div title="" className={`font-size-xs text-truncate ${className}`}>
               {formattedValue}
             </div>
-          </Tooltip>
+          </CustomTooltip>
         </div>
       );
     }
@@ -395,19 +379,14 @@ class Select extends Component {
 
     return (
       <div id={`${this.state.id}-container`} data-testid={attributes?.dataTestId ?? 'custom-select-element'}>
-        <Tooltip
-          html={this.getTooltipHtml()}
-          disabled={isTooltipDisabled()}
-          theme="transparent"
-          arrow="true"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          title=" "
-          classes=""
-        >
+        <CustomTooltip content={this.getTooltipHtml()} show={!isTooltipDisabled()}>
           <SelectType
             {...attributes}
+            menuPortalTarget={document.body}
+            styles={{
+              ...attributes.styles,
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            }}
             closeMenuOnScroll={closeMenuOnScroll}
             placeholder={getPlaceholder()}
             isDisabled={attributes.disabled}
@@ -486,7 +465,7 @@ class Select extends Component {
             id={this.state.id}
             optionRenderer={optionRenderer}
           />
-        </Tooltip>
+        </CustomTooltip>
       </div>
     );
   }

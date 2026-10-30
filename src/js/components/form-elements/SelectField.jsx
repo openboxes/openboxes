@@ -9,7 +9,7 @@ const SelectField = (props) => {
     <Select
       name={attributes.id}
       {...attributes}
-      className={`select-xs ${className}`}
+      className={`select-xs ${className || ''}`}
       classNamePrefix="react-select"
     />
   );

@@ -3,11 +3,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { useDispatch } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { addEmptyRow } from 'actions';
 import Button from 'components/form-elements/Button';
 import useTranslate from 'hooks/useTranslate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const AddNewRecordFooter = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
   const translate = useTranslate();
@@ -23,9 +23,9 @@ const AddNewRecordFooter = ({ cycleCountId, isStepEditable, isFormDisabled }) =>
       <div
         className="ml-4 mb-3 d-flex"
       >
-        <Tooltip
+        <CustomTooltip
           className="d-flex align-items-center"
-          html={(
+          content={(
             <span className="p-1">
               {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
             </span>
@@ -39,7 +39,7 @@ const AddNewRecordFooter = ({ cycleCountId, isStepEditable, isFormDisabled }) =>
             StartIcon={<RiAddCircleLine size={18} />}
             disabled={isFormDisabled}
           />
-        </Tooltip>
+        </CustomTooltip>
       </div>
     )
   );

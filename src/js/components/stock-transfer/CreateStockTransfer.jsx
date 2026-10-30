@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
@@ -23,6 +22,7 @@ import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-table/react-table.css';
 
@@ -75,7 +75,8 @@ class CreateStockTransfer extends Component {
     this.props.hideInfoBar(InfoBar.STOCK_TRANSFER_DESCRIPTION);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockTransferTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;
@@ -216,7 +217,7 @@ class CreateStockTransfer extends Component {
         const stockTransfer = parseResponse(response.data.data);
         this.props.hideSpinner();
 
-        this.props.history.push(STOCK_TRANSFER_URL.createById(stockTransfer.id));
+        this.props.navigate(STOCK_TRANSFER_URL.createById(stockTransfer.id));
         this.props.nextPage({ stockTransfer });
       })
       .catch(() => this.props.hideSpinner());
@@ -407,8 +408,8 @@ CreateStockTransfer.propTypes = {
   nextPage: PropTypes.func.isRequired,
   /** Location ID (currently chosen). To be used in stock transfer requests. */
   locationId: PropTypes.string.isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
   stockTransferTranslationsFetched: PropTypes.bool.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
   hideInfoBar: PropTypes.func.isRequired,

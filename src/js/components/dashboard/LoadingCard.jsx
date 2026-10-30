@@ -1,17 +1,12 @@
 import React from 'react';
 
-import ReactLoading from 'react-loading';
+import { BeatLoader } from 'react-spinners';
 
 import { getRandomColor } from 'consts/dataFormat/colorMapping';
 
 const LoadingCard = () => (
   <div className="loader-div">
-    <ReactLoading
-      type="bubbles"
-      color={getRandomColor()}
-      height="150px"
-      width="150px"
-    />
+    <BeatLoader color={getRandomColor()} size={30} margin={8} />
   </div>
 );
 

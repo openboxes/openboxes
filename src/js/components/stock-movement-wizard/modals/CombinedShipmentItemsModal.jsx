@@ -407,8 +407,6 @@ class CombinedShipmentItemsModal extends Component {
             onChange={(value) => this.setSelectedOrders(value)}
             valueKey="id"
             labelKey="orderNumber"
-            classes=""
-            cache={false}
           />
           &nbsp;
           <ProductSelect

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { withRouter } from 'react-router-dom';
+import withRouter from 'utils/withRouter';
 
 import Translate from 'utils/Translate';
 

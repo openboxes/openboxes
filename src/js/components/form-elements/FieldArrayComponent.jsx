@@ -4,13 +4,11 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import TableBody from 'components/form-elements/TableBody';
 import TableBodyVirtualized from 'components/form-elements/TableBodyVirtualized';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'react-tippy/dist/tippy.css';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 class FieldArrayComponent extends Component {
   constructor(props) {
@@ -118,8 +116,8 @@ class FieldArrayComponent extends Component {
                       textAlign: config.headerAlign ? config.headerAlign : 'center',
                     }}
                   >
-                    <Tooltip
-                      html={config.headerTooltip ? (
+                    <CustomTooltip
+                      content={config.headerTooltip ? (
                         <div>
                           {this.props.translate(config.headerTooltip, config.headerDefaultTooltip)}
                         </div>
@@ -130,11 +128,6 @@ class FieldArrayComponent extends Component {
                         </div>
                         )
                       )}
-                      theme="transparent"
-                      arrow="true"
-                      delay="150"
-                      duration="250"
-                      hideDelay="50"
                     >
                       <div
                         className={`mx-2 ${config.multilineHeader ? '' : 'text-truncate'} ${config.required ? 'arrayfield-header-required' : ''}`}
@@ -146,7 +139,7 @@ class FieldArrayComponent extends Component {
                         { headerLabel && !headerHtml
                           && <Translate id={headerLabel} defaultMessage={headerDefaultMessage} />}
                       </div>
-                    </Tooltip>
+                    </CustomTooltip>
                   </div>
                 );
               }

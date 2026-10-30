@@ -7,7 +7,6 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { TableCell } from 'components/DataTable';
@@ -21,6 +20,7 @@ import Filter from 'utils/Filter';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-table/react-table.css';
 
@@ -95,7 +95,8 @@ class StockTransferSecondPage extends Component {
     this.fetchStockTransfer();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
@@ -220,15 +221,7 @@ class StockTransferSecondPage extends Component {
         }
 
         return (
-          <Tooltip
-            html={disabledMessage}
-            disabled={!disabled}
-            theme="transparent"
-            arrow="true"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          >
+          <CustomTooltip content={disabledMessage} show={!!disabled}>
             <div className={disabled && props.original.status !== StockTransferStatus.CANCELED ? 'has-error' : ''}>
               <input
                 type="number"
@@ -243,7 +236,7 @@ class StockTransferSecondPage extends Component {
                 }}
               />
             </div>
-          </Tooltip>
+          </CustomTooltip>
         );
       },
       Filter,

@@ -1,20 +1,28 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
-import PropTypes from 'prop-types';
+import { Outlet, useLocation } from 'react-router-dom';
 
+import ChunkLoadErrorBoundary from 'components/ChunkLoadErrorBoundary';
 import Footer from 'components/Layout/Footer';
 import Header from 'components/Layout/Header';
+import Loading from 'components/Loading';
 
-const MainLayout = ({ children }) => (
-  <div className="page-layout">
-    <Header />
-    <main className="page-layout__main">{children}</main>
-    <Footer />
-  </div>
-);
+const MainLayout = () => {
+  const { pathname } = useLocation();
+
+  return (
+    <div className="page-layout">
+      <Header />
+      <main className="page-layout__main">
+        <ChunkLoadErrorBoundary resetKeys={[pathname]}>
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
+        </ChunkLoadErrorBoundary>
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
 export default MainLayout;
-
-MainLayout.propTypes = {
-  children: PropTypes.element.isRequired,
-};

@@ -8,7 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
@@ -37,6 +37,7 @@ import { debouncePeopleFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -144,12 +145,8 @@ const FIELDS = {
           async: true,
           required: true,
           showValueTooltip: true,
-          openOnClick: false,
-          autoload: false,
-          cache: false,
           options: [],
           labelKey: 'name',
-          filterOptions: (options) => options,
         },
         getDynamicAttr: ({
           debouncedPeopleFetch, showOnly, setRecipientValue, translate,
@@ -269,7 +266,8 @@ class PackingPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -404,7 +402,7 @@ class PackingPage extends Component {
         const { data } = resp.data;
         this.setState((prev) => ({ values: { ...prev.values, packPageItems: data } }));
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -677,7 +675,7 @@ class PackingPage extends Component {
                 <button
                   type="button"
                   disabled={invalid}
-                  onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listOutbound())}
+                  onClick={() => this.props.navigate(STOCK_MOVEMENT_URL.listOutbound())}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
                   <span>
@@ -742,7 +740,7 @@ const mapStateToProps = (state) => ({
   formatLocalizedDate: formatDate(state.localize),
 });
 
-export default (connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner,
 })(PackingPage));
 
@@ -771,8 +769,6 @@ PackingPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
 };

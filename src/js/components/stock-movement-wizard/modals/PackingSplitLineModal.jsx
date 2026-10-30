@@ -97,12 +97,8 @@ const FIELDS = {
           async: true,
           required: true,
           showValueTooltip: true,
-          openOnClick: false,
-          autoload: false,
-          cache: false,
           options: [],
           labelKey: 'name',
-          filterOptions: (options) => options,
         },
         getDynamicAttr: (props) => ({
           loadOptions: props.debouncedPeopleFetch,
@@ -176,7 +172,8 @@ class PackingSplitLineModal extends Component {
     );
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
     } = nextProps;

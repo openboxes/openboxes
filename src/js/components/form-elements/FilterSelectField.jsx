@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Overlay } from 'react-overlays';
 import { components } from 'react-select';
 
 import BaseField from 'components/form-elements/BaseField';
@@ -36,9 +35,8 @@ const Dropdown = ({
       className="filter-select__dropdown"
       style={{
         ...style,
+        position: 'absolute',
         width: dropdownWidth,
-        left: inputContainerRec.left,
-        top: inputContainerRec?.bottom,
       }}
     >
       {children}
@@ -69,21 +67,14 @@ Dropdown.defaultProps = {
 const Menu = (props) => {
   const inputContainer = document.getElementById(`${props.selectProps.id}-container`);
   return (
-    <Overlay
-      show
-      placement="bottom"
-      target={inputContainer}
-      container={document.getElementById('root')}
+    <Dropdown
+      inputContainerRec={inputContainer.getBoundingClientRect()}
+      hasOptions={!!props.options.length}
     >
-      <Dropdown
-        inputContainerRec={inputContainer.getBoundingClientRect()}
-        hasOptions={!!props.options.length}
-      >
-        <div className="filter-select__custom-option" {...props.innerProps}>
-          {props.children}
-        </div>
-      </Dropdown>
-    </Overlay>
+      <div className="filter-select__custom-option" {...props.innerProps}>
+        {props.children}
+      </div>
+    </Dropdown>
   );
 };
 

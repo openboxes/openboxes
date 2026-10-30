@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 
+import { DragDropProvider } from '@dnd-kit/react';
+import { isSortable } from '@dnd-kit/react/sortable';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { defaults } from 'react-chartjs-2';
 import { connect } from 'react-redux';
-import { SortableContainer } from 'react-sortable-hoc';
 
 import {
   addToIndicators,
@@ -19,9 +20,11 @@ import Filter from 'components/dashboard/Filter';
 import GraphCard from 'components/dashboard/GraphCard';
 import LoadingNumbers from 'components/dashboard/LoadingNumbers';
 import NumberCard from 'components/dashboard/NumberCard';
+import SortableCard from 'components/dashboard/SortableCard';
 import UnarchiveIndicators from 'components/dashboard/UnarchiveIndicators';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -31,15 +34,18 @@ defaults.scale.ticks.beginAtZero = true;
 
 // TODO: OBPIH-4385 Refactor/Split this file into separate components
 
-const SortableCards = SortableContainer(({
+const SortableCards = ({
   data, loadIndicator, allLocations, personalDashboardActive,
 }) => (
   <div className="card-component">
     {data.map((value, index) =>
       (value
         && (
-        <GraphCard
-          key={`item-${value.id}`}
+        <SortableCard
+          component={GraphCard}
+          type="graph"
+          id={`graph-${value.widgetId}`}
+          key={value.widgetId}
           index={index}
           cardId={value.id}
           widgetId={value.widgetId}
@@ -62,15 +68,18 @@ const SortableCards = SortableContainer(({
         )
       ))}
   </div>
-));
+);
 
-const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }) => (
+const SortableNumberCards = ({ data, personalDashboardActive }) => (
   <div className="card-component">
     {data.map((value, index) => (
       (value
         && (
-        <NumberCard
-          key={`item-${value.id}`}
+        <SortableCard
+          component={NumberCard}
+          type="number"
+          id={`number-${value.widgetId}`}
+          key={value.widgetId}
           index={index}
           widgetId={value.widgetId}
           cardTitle={value.title}
@@ -88,7 +97,7 @@ const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }
       )
     ))}
   </div>
-));
+);
 
 const ArchiveIndicator = ({ hideArchive }) => (
   <div className={hideArchive ? 'archive-div hide-archive' : 'archive-div'}>
@@ -168,10 +177,11 @@ class Dashboard extends Component {
       pageFilters: [],
       subdashboardKeys: [],
     };
-    this.fetchLocations();
   }
 
   componentDidMount() {
+    this.fetchLocations();
+
     if (this.props.currentLocation !== '') {
       this.getSubdashboardKeys().then(() => this.fetchData(this.determineActiveConfig()));
     }
@@ -284,11 +294,11 @@ class Dashboard extends Component {
   updateConfig = () => {
     const widgets = [];
 
-    _.forEach(this.props.indicatorsData, (widgetData, index) => {
+    _.forEach(_.compact(this.props.indicatorsData), (widgetData, index) => {
       widgets.push({ widgetId: widgetData.widgetId, order: index + 1 });
     });
 
-    _.forEach(this.props.numberData, (widgetData, index) => {
+    _.forEach(_.compact(this.props.numberData), (widgetData, index) => {
       widgets.push({ widgetId: widgetData.widgetId, order: index + 1 });
     });
 
@@ -325,28 +335,24 @@ class Dashboard extends Component {
     this.setState({ isDragging: true });
   };
 
-  sortEndHandle = ({ oldIndex, newIndex }, e, type) => {
-    const maxHeight = window.innerHeight - (((6 * window.innerHeight) / 100) + 80);
-    if (e.clientY > maxHeight) {
-      e.target.id = 'archive';
-    }
-    this.props.reorderIndicators({ oldIndex, newIndex }, e, type);
-    if (this.props.activeConfig === 'personal' && (oldIndex !== newIndex || e.target.id === 'archive')) {
-      this.setState({
-        configModified: true,
-        isDragging: false,
-      });
-    } else {
+  sortEndHandle = ({ operation, canceled }) => {
+    const { source, position } = operation;
+    if (canceled || !isSortable(source)) {
       this.setState({ isDragging: false });
+      return;
     }
-  };
 
-  sortEndHandleNumber = ({ oldIndex, newIndex }, e) => {
-    this.sortEndHandle({ oldIndex, newIndex }, e, 'number');
-  };
-
-  sortEndHandleGraph = ({ oldIndex, newIndex }, e) => {
-    this.sortEndHandle({ oldIndex, newIndex }, e, 'graph');
+    const { initialIndex: oldIndex, index: newIndex, type } = source;
+    const maxHeight = window.innerHeight - (((6 * window.innerHeight) / 100) + 80);
+    const archive = position.current.y > maxHeight;
+    this.props.reorderIndicators({
+      oldIndex, newIndex, type, archive,
+    });
+    const configModified = this.isPersonalDashboardActive() && (oldIndex !== newIndex || archive);
+    this.setState((prev) => ({
+      isDragging: false,
+      configModified: prev.configModified || configModified,
+    }));
   };
 
   unarchiveHandler = () => {
@@ -392,11 +398,7 @@ class Dashboard extends Component {
     if (this.props.numberData.length) {
       numberCards = (
         <SortableNumberCards
-          data={this.props.numberData}
-          onSortStart={this.sortStartHandle}
-          onSortEnd={this.sortEndHandleNumber}
-          axis="xy"
-          useDragHandle
+          data={_.compact(this.props.numberData)}
           personalDashboardActive={isPersonalDashboardActive}
         />
       );
@@ -431,17 +433,15 @@ class Dashboard extends Component {
             pageFilters={this.state.pageFilters}
           />
           <div className="cards-container">
-            {numberCards}
-            <SortableCards
-              allLocations={this.state.allLocations}
-              data={this.props.indicatorsData.filter((indicator) => indicator)}
-              onSortStart={this.sortStartHandle}
-              onSortEnd={this.sortEndHandleGraph}
-              loadIndicator={this.loadIndicator}
-              axis="xy"
-              useDragHandle
-              personalDashboardActive={isPersonalDashboardActive}
-            />
+            <DragDropProvider onDragStart={this.sortStartHandle} onDragEnd={this.sortEndHandle}>
+              {numberCards}
+              <SortableCards
+                allLocations={this.state.allLocations}
+                data={_.compact(this.props.indicatorsData)}
+                loadIndicator={this.loadIndicator}
+                personalDashboardActive={isPersonalDashboardActive}
+              />
+            </DragDropProvider>
             <ArchiveIndicator hideArchive={!this.state.isDragging} />
             {isPersonalDashboardActive
               && (
@@ -471,7 +471,7 @@ const mapStateToProps = (state) => ({
   currentUser: state.session.user.id,
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   fetchIndicators,
   reloadIndicator,
   addToIndicators,
@@ -479,7 +479,7 @@ export default connect(mapStateToProps, {
   resetIndicators,
   fetchConfigAndData,
   fetchConfig,
-})(Dashboard);
+})(Dashboard));
 
 Dashboard.defaultProps = {
   currentLocation: '',

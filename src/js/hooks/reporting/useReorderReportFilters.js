@@ -3,7 +3,7 @@ import { useState } from 'react';
 import _ from 'lodash';
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
 import { REORDER_REPORT } from 'api/urls';
@@ -36,15 +36,16 @@ const useReorderReportFilters = () => {
 
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const spinner = useSpinner();
 
   const currentLocation = useSelector(getCurrentLocation);
 
   const clearFilterValues = () => {
-    const { pathname } = history.location;
-    history.push({ pathname });
+    const { pathname } = location;
+    navigate({ pathname });
   };
 
   const setDefaultValue = (queryPropsParam, elementsList) => {
@@ -78,7 +79,7 @@ const useReorderReportFilters = () => {
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(window.location.search);
 
     const {
       additionalInventoryLocations,
@@ -110,7 +111,7 @@ const useReorderReportFilters = () => {
     setCategories(categoryList);
     setTags(tagList);
     // Filter out current location from additional inventory locations
-    setLocations(locationList.filter((location) => location.id !== currentLocation?.id));
+    setLocations(locationList.filter((loc) => loc.id !== currentLocation?.id));
 
     defaultValues.tags = setDefaultValue(selectedTags, tagList);
     defaultValues.categories = setDefaultValue(selectedCategories, categoryList);
@@ -153,9 +154,9 @@ const useReorderReportFilters = () => {
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

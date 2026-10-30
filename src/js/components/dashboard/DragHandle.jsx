@@ -1,11 +1,19 @@
 import React from 'react';
 
-import { sortableHandle } from 'react-sortable-hoc';
+import PropTypes from 'prop-types';
 
-const DragHandle = sortableHandle(() => (
-  <span className="drag-handler">
+const DragHandle = ({ handleRef }) => (
+  <span ref={handleRef} className="drag-handler">
     <i className="fa fa-ellipsis-v" />
   </span>
-));
+);
 
 export default DragHandle;
+
+DragHandle.propTypes = {
+  handleRef: PropTypes.func,
+};
+
+DragHandle.defaultProps = {
+  handleRef: null,
+};

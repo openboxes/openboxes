@@ -1,24 +1,18 @@
 import React from 'react';
 
 import _ from 'lodash';
-import { Tooltip } from 'react-tippy';
 
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import renderHandlingIcons from 'utils/product-handling-icons';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 export const getInvoiceDescription = (rowValue) => {
   if (!rowValue?.orderAdjustment && !rowValue?.isAdjustment && rowValue?.displayNames?.default) {
     return (
-      <Tooltip
-        html={rowValue?.productName}
-        theme="transparent"
-        delay="150"
-        duration="250"
-        hideDelay="50"
-      >
+      <CustomTooltip content={rowValue?.productName}>
         {rowValue.displayNames?.default}
-      </Tooltip>
+      </CustomTooltip>
     );
   }
   return rowValue?.description;

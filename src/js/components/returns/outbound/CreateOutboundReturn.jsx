@@ -4,7 +4,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { STOCK_TRANSFER_API, STOCK_TRANSFER_BY_ID } from 'api/urls';
@@ -15,6 +14,7 @@ import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -53,11 +53,7 @@ const FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
@@ -72,11 +68,7 @@ const FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
@@ -106,7 +98,8 @@ class CreateOutboundReturn extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.outboundReturnsTranslationsFetched && nextProps.location.id) {
       if (!this.dataFetched) {
         this.dataFetched = true;
@@ -185,7 +178,7 @@ class CreateOutboundReturn extends Component {
           if (response.data) {
             const resp = parseResponse(response.data.data);
             this.setState({ values: resp }, () => {
-              this.props.history.push(STOCK_TRANSFER_URL.editOutbound(this.state.values.id));
+              this.props.navigate(STOCK_TRANSFER_URL.editOutbound(this.state.values.id));
               this.props.nextPage(this.state.values);
             });
           }
@@ -265,9 +258,7 @@ CreateOutboundReturn.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   location: PropTypes.shape({
     name: PropTypes.string,
     id: PropTypes.string,

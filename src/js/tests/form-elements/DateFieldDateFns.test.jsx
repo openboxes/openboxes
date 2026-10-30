@@ -85,7 +85,7 @@ describe('DateFieldDateFns', () => {
   });
 
   it('displays selected time', () => {
-    renderWithStore(<DateFieldDateFns showTimeSelect value="Sep 23, 2025 14:07:09" />)
+    renderWithStore(<DateFieldDateFns showTimeSelect value="Sep 23, 2025 14:07:09" />);
     expect(screen.getByText('Sep 23, 2025 14:07:09')).toBeInTheDocument();
   });
 

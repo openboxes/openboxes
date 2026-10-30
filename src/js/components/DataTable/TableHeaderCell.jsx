@@ -14,7 +14,7 @@ const TableHeaderCell = ({
   columnId,
   dynamicClassName,
   required,
-  tooltip,
+  tooltip = false,
   tooltipLabel,
 }) => {
   const sortableProps = {
