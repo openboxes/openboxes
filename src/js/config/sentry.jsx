@@ -4,10 +4,10 @@ import * as Sentry from '@sentry/react';
  * Initialize Sentry for performance and error monitoring.
  */
 const initializeSentry = () => {
-  // If our custom DSN environment variable isn't defined, skip all frontend monitoring. This check
-  // is potentially unnecessary, but avoids potential weirdness with environments that don't have
-  // Sentry configured on the frontend.
-  if (!process.env.REACT_APP_WEB_SENTRY_DSN) {
+  // The server passes us its Sentry config at runtime (see ConfigHelper.sentryWebConfigJson).
+  const config = window.SENTRY_CONFIG ?? {};
+
+  if (!config.dsn) {
     return;
   }
 
@@ -16,8 +16,8 @@ const initializeSentry = () => {
     // will not be able to discover the "SENTRY_DSN" and "SENTRY_ENVIRONMENT" environment variables
     // so we need to define our own.
     // https://docs.sentry.io/platforms/javascript/guides/react/configuration/options/#common-options
-    dsn: process.env.REACT_APP_WEB_SENTRY_DSN,
-    environment: process.env.REACT_APP_SENTRY_ENVIRONMENT,
+    dsn: config.dsn,
+    environment: config.environment,
 
     integrations: [
       Sentry.httpClientIntegration(), // Adds HTTP request/response body to errors
@@ -45,13 +45,28 @@ const initializeSentry = () => {
     // The ratio of all requests to capture for performance tracing. 1.0 is 100% of requests.
     // Disable tracing by setting a value of 0. We keep this number low (as recommended by Sentry)
     // for performance reasons, but it can be increased if we decide we need more data.
-    tracesSampleRate: process.env.REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE || 0.1,
+    tracesSampleRate: config.tracesSampleRate ?? 0.1,
 
     // For Session Replay. By default, we only capture session recordings if there is an error,
     // which we record 100% of.
-    replaysSessionSampleRate: process.env.REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE || 0,
-    replaysOnErrorSampleRate: process.env.REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE || 1.0,
+    replaysSessionSampleRate: config.replaysSampleRate ?? 0,
+    replaysOnErrorSampleRate: config.replaysErrorSampleRate ?? 1.0,
   });
+};
+
+/**
+ * Tag all Sentry events with the current user. Does nothing if Sentry is disabled.
+ */
+export const setSentryUser = (user) => {
+  Sentry.setUser(user ? { id: user.id, username: user.username } : null);
+};
+
+/**
+ * Tag all Sentry events with the current location. Does nothing if Sentry is disabled.
+ */
+export const setSentryLocation = (location) => {
+  Sentry.setTag('location.id', location?.id);
+  Sentry.setTag('location.name', location?.name);
 };
 
 export default initializeSentry;
