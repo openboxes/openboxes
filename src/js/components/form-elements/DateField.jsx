@@ -6,6 +6,7 @@ import * as locales from 'date-fns/locale';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import { connect } from 'react-redux';
+import { getDefaultTranslationsFetched } from 'selectors';
 
 import BaseField from 'components/form-elements/BaseField';
 import DateFormat from 'consts/dateFormat';
@@ -55,7 +56,7 @@ class DateField extends Component {
     };
 
     const getFormat = () => {
-      if (localizeDate) {
+      if (localizeDate && this.props.defaultTranslationsFetched && this.props.localeCode) {
         return this.props.dateFormat(localizedDateFormat);
       }
 
@@ -168,6 +169,7 @@ const mapStateToProps = (state) => ({
   formatDate: formatDate(state.localize),
   dateFormat: getDateFormat(state.localize),
   localeCode: getLocaleCode(state.localize),
+  defaultTranslationsFetched: getDefaultTranslationsFetched(state),
 });
 
 export default connect(mapStateToProps)(DateField);

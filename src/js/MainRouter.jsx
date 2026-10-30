@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { withLocalize } from 'react-localize-redux';
-import connect from 'react-redux/es/connect/connect';
+import { connect } from 'react-redux';
 
 import { fetchMenuConfig, fetchSessionInfo, fetchTranslations } from 'actions';
 import Router from 'components/Router';
