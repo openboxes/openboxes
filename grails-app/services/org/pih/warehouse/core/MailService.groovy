@@ -10,13 +10,13 @@
 package org.pih.warehouse.core
 
 import grails.config.Config
-import org.apache.commons.mail.Email
-import org.apache.commons.mail.EmailAttachment
-import org.apache.commons.mail.HtmlEmail
-import org.apache.commons.mail.SimpleEmail
+import org.apache.commons.mail2.jakarta.Email
+import org.apache.commons.mail2.jakarta.EmailAttachment
+import org.apache.commons.mail2.jakarta.HtmlEmail
+import org.apache.commons.mail2.jakarta.SimpleEmail
 import grails.util.Holders
 
-import javax.mail.util.ByteArrayDataSource
+import jakarta.mail.util.ByteArrayDataSource
 
 class MailService {
 

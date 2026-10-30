@@ -3,7 +3,7 @@ package org.pih.warehouse.api
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import java.time.Instant
-import javax.validation.Valid
+import jakarta.validation.Valid
 import org.apache.commons.csv.CSVPrinter
 import org.springframework.web.multipart.MultipartFile
 

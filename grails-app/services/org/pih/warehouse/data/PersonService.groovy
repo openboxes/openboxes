@@ -11,8 +11,8 @@ package org.pih.warehouse.data
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import javax.mail.internet.AddressException
-import javax.mail.internet.InternetAddress
+import jakarta.mail.internet.AddressException
+import jakarta.mail.internet.InternetAddress
 import org.apache.commons.lang.StringUtils
 
 import org.pih.warehouse.core.Person
