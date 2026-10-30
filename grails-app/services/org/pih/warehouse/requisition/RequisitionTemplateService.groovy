@@ -1,6 +1,7 @@
 package org.pih.warehouse.requisition
 
 import grails.gorm.transactions.Transactional
+import grails.plugins.csv.CSVReaderUtils
 import org.pih.warehouse.core.localization.MessageLocalizer
 
 @Transactional
@@ -15,7 +16,8 @@ class RequisitionTemplateService {
                 throw new IllegalArgumentException("Must specify a file")
             }
 
-            inputStream.toCsvReader('separatorChar': delimiter, 'skipLines': skipLines).eachLine { tokens ->
+            // The csv plugin's dynamic InputStream.toCsvReader() is gone (plugin vendored); call the util directly.
+            CSVReaderUtils.eachLine(CSVReaderUtils.toCsvReader(inputStream, ['separatorChar': delimiter, 'skipLines': skipLines])) { String[] tokens ->
                 println "line: " + tokens + " delimiter=" + delimiter
                 println "ROW " + tokens
                 if (tokens) {
