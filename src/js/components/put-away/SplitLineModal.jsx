@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import Modal from 'react-modal';
-import connect from 'react-redux/es/connect/connect';
+import { connect } from 'react-redux';
 
 import DateFormat from 'consts/dateFormat';
 import Input from 'utils/Input';
