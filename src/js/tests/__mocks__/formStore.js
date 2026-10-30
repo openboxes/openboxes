@@ -4,7 +4,7 @@ import { legacy_configureStore as configureStore } from 'redux-mock-store';
 // Store for connected form components, with no translations loaded
 const store = configureStore()({
   localize: localizeReducer(undefined, { type: '@@INIT' }),
-  session: {},
+  session: { fetchedTranslations: {} },
 });
 
 export default store;
