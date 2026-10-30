@@ -19,7 +19,8 @@ class EnumParser<T extends Enum> extends Parser<T, ParserContext<T>> {
      * @param enumClass the class of the Enum that we are parsing into
      * @param context the context object containing information about how to parse the string
      */
-    static T parseString(String toParse, Class<T> enumClass, ParserContext<T> context=null) {
+    // Groovy 4: a static method cannot use the class-level type parameter; declare its own
+    static <T extends Enum> T parseString(String toParse, Class<T> enumClass, ParserContext<T> context=null) {
         if (StringUtils.isBlank(toParse)) {
             return context?.defaultValue
         }

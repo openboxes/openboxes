@@ -11,7 +11,8 @@ import org.pih.warehouse.core.Identifiable
  * If you need to specify a mapper for converting a domain entity into this DTO, use
  * {@link org.pih.warehouse.core.mapper.EntityToDtoMapper}.
  */
-trait DomainDto<E extends GormEntity> implements Identifiable {
+// Groovy 4 validates generic bounds before the GORM AST weaves GormEntity into domains, so the bound must stay implicit
+trait DomainDto<E> implements Identifiable {
     /*
      * We need to annotate trait fields with "@JsonProperty" even if the declared field name matches the serialized
      * field name due to how Groovy handles traits. Because classes can implement multiple traits, Groovy changes
