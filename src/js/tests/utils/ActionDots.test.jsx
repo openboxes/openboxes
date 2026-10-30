@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import ContextMenu from 'utils/ContextMenu';
 
@@ -41,24 +40,24 @@ describe('action dots', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedActionDots = renderer.create(actionDots);
-    expect(renderedActionDots.toJSON())
+    const renderedActionDots = render(actionDots);
+    expect(renderedActionDots.asFragment())
       .toMatchSnapshot();
   });
 
   it('should render component correctly', () => {
-    const renderedActionDots = renderer.create(actionDots);
-    expect(renderedActionDots.root.findByProps({ 'data-testid': 'action-dots-component' }))
+    const renderedActionDots = render(actionDots);
+    expect(renderedActionDots.getByTestId('dropdown-toggle'))
       .toBeTruthy();
   });
 
   it('should have button after clicking it', () => {
     const testId = 'dropdown-toggle';
     render(actionDots);
-    expect(screen.findByTestId(testId))
+    expect(screen.getByTestId(testId))
       .toBeTruthy();
     fireEvent.click(screen.getByTestId(testId));
-    expect(screen.findByTestId(testId))
+    expect(screen.getByTestId(testId))
       .toBeTruthy();
   });
 });

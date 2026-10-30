@@ -2,7 +2,6 @@ import React from 'react';
 
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
 
 import Menu from 'components/Layout/menu/Menu';
 import MenuConfigurationSubsection from 'components/Layout/menu/MenuConfigurationSubsection';
@@ -22,7 +21,7 @@ describe('menu component', () => {
       label: 'Configuration',
       href: '/openboxes/configuration/index',
     }];
-    renderedMenu = renderer.create(
+    renderedMenu = render(
       <Router>
         <Menu
           menuConfig={menuConfig}
@@ -34,7 +33,7 @@ describe('menu component', () => {
   });
 
   it('should match snapshot', () => {
-    expect(renderedMenu.toJSON())
+    expect(renderedMenu.asFragment())
       .toMatchSnapshot();
   });
 });
@@ -48,37 +47,36 @@ describe('menuConfigurationSubsection component', () => {
         href: '/openboxes/admin/showSettings',
       }],
     };
-    renderedMenuConfigurationSubsection = renderer
-      .create(<Router><MenuConfigurationSubsection subsection={subsection} /></Router>);
+    renderedMenuConfigurationSubsection = render(
+      <Router><MenuConfigurationSubsection subsection={subsection} /></Router>,
+    );
   });
 
   it('should map menu items correctly', () => {
-    render(<Router><MenuConfigurationSubsection subsection={subsection} /></Router>);
-    expect(screen.findByText('Settings'))
+    expect(screen.getByText('Settings'))
       .toBeTruthy();
   });
 
   it('should match snapshot', () => {
-    expect(renderedMenuConfigurationSubsection.toJSON())
+    expect(renderedMenuConfigurationSubsection.asFragment())
       .toMatchSnapshot();
   });
 });
 
 describe('menuItem component', () => {
   beforeEach(() => {
-    renderedMenuItem = renderer
-      .create(<Router><MenuItem section={{}} active={false} /></Router>);
+    renderedMenuItem = render(<Router><MenuItem section={{}} active={false} /></Router>);
   });
 
   it('should match snapshot', () => {
-    expect(renderedMenuItem.toJSON())
+    expect(renderedMenuItem.asFragment())
       .toMatchSnapshot();
   });
 
   it('should render collapseMenuItem and dropdownMenuItem correctly', () => {
-    expect(renderedMenuItem.root.findByProps({ 'data-testid': 'collapseMenuItem' }))
+    expect(renderedMenuItem.getByTestId('collapseMenuItem'))
       .toBeTruthy();
-    expect(renderedMenuItem.root.findByProps({ 'data-testid': 'dropdownMenuItem' }))
+    expect(renderedMenuItem.getByTestId('dropdownMenuItem'))
       .toBeTruthy();
   });
 });

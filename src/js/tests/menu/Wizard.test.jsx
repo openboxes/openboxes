@@ -3,7 +3,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
-import renderer from 'react-test-renderer';
 
 import CreateInvoicePage from 'components/invoice/create/CreateInvoicePage';
 import Wizard from 'components/wizard/Wizard';
@@ -27,7 +26,7 @@ describe('wizard component', () => {
       pageList: [CreateInvoicePage],
       stepList: ['Create', 'Add items', 'Confirm'],
     };
-    renderedWizard = renderer.create(
+    renderedWizard = render(
       <Router>
         <Provider
           store={store}
@@ -39,19 +38,19 @@ describe('wizard component', () => {
   });
 
   it('should match snapshot', () => {
-    expect(renderedWizard.toJSON())
+    expect(renderedWizard.asFragment())
       .toMatchSnapshot();
   });
 
   it('should render component correctly', () => {
-    expect(renderedWizard.root.findByProps({ 'data-testid': 'content-wrap' }))
+    expect(renderedWizard.getByTestId('content-wrap'))
       .toBeTruthy();
   });
 });
 
 describe('wizardPage component', () => {
   beforeEach(() => {
-    renderedWizardPage = renderer.create(
+    renderedWizardPage = render(
       <Router>
         <Provider
           store={store}
@@ -69,19 +68,19 @@ describe('wizardPage component', () => {
   });
 
   it('should match snapshot', () => {
-    expect(renderedWizardPage.toJSON())
+    expect(renderedWizardPage.asFragment())
       .toMatchSnapshot();
   });
 
   it('should render component correctly', () => {
-    expect(renderedWizardPage.root.findByProps({ 'data-testid': 'wizardPage' }))
+    expect(renderedWizardPage.getByTestId('wizardPage'))
       .toBeTruthy();
   });
 });
 
 describe('wizardSteps component', () => {
   beforeEach(() => {
-    renderedWizardSteps = renderer.create(
+    renderedWizardSteps = render(
       <Router>
         <Provider
           store={store}
@@ -93,24 +92,24 @@ describe('wizardSteps component', () => {
   });
 
   it('should match snapshot', () => {
-    expect(renderedWizardSteps.toJSON())
+    expect(renderedWizardSteps.asFragment())
       .toMatchSnapshot();
   });
 
   it('should have an active element', () => {
-    expect(renderedWizardSteps.root.findByProps({ 'data-stepstate': 'active' }))
+    expect(renderedWizardSteps.container.querySelector('[data-stepstate="active"]'))
       .toBeTruthy();
   });
 
   it('should have an inactive element', () => {
-    expect(renderedWizardSteps.root.findByProps({ 'data-stepstate': 'inactive' }))
+    expect(renderedWizardSteps.container.querySelector('[data-stepstate="inactive"]'))
       .toBeTruthy();
   });
 });
 
 describe('wizardTitle component', () => {
   beforeEach(() => {
-    renderedWizardTitle = renderer.create(
+    renderedWizardTitle = render(
       <Router>
         <Provider store={store}>
           <WizardTitle
@@ -122,12 +121,12 @@ describe('wizardTitle component', () => {
   });
 
   it('should match snapshot', () => {
-    expect(renderedWizardTitle.toJSON())
+    expect(renderedWizardTitle.asFragment())
       .toMatchSnapshot();
   });
 
   it('should render component correctly', () => {
-    expect(renderedWizardTitle.root.findByProps({ 'data-testid': 'wizardTitle' }))
+    expect(renderedWizardTitle.getByTestId('wizardTitle'))
       .toBeTruthy();
   });
 

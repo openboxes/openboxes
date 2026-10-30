@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 
 import ProductApi from 'api/services/ProductApi';
 import useConfirmExpirationDateChange from 'hooks/receiving/v2/useConfirmExpirationDateChange';
@@ -33,12 +33,12 @@ const mockLotAvailability = (lotAvailability) => mockLotAvailabilities(lotAvaila
 
 // The modal opens from a promise chain, so the pending microtasks are drained before the
 // state it sets is asserted (React 16.8 has no async act).
-const flushPromises = async () => {
+const flushPromises = () => act(async () => {
   for (let i = 0; i < 20; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     await Promise.resolve();
   }
-};
+});
 
 // A row of the form. Rows loaded with the modal carry a receipt item id and are matched against
 // the line items the modal was opened with (below), rows added in the modal do not.

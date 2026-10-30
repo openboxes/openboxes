@@ -1,11 +1,15 @@
 import React from 'react';
 
-import renderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import store from 'tests/__mocks__/formStore';
 
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import TextField from 'components/form-elements/TextField';
 import { renderFormField } from 'utils/form-utils';
+
+import '@testing-library/jest-dom';
 
 jest.mock('react-final-form', () => ({
   Field: (props) => {
@@ -31,6 +35,7 @@ jest.mock('react-final-form-arrays', () => ({
 }));
 
 jest.mock('react-localize-redux', () => ({
+  ...jest.requireActual('react-localize-redux'),
   Translate: (props) => {
     const { id } = props;
 
@@ -52,7 +57,7 @@ jest.mock('react-virtualized', () => ({
   formValueSelector: () => {},
 }));
 
-xdescribe('ArrayField component is correctly rendering', () => {
+describe('ArrayField component is correctly rendering', () => {
   it('with Add button', () => {
     const fieldConfig = {
       type: ArrayField,
@@ -79,9 +84,12 @@ xdescribe('ArrayField component is correctly rendering', () => {
       },
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    render(<Provider store={store}>{renderFormField(fieldConfig, 'test-field')}</Provider>);
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(screen.getByText('Add item')).toBeInTheDocument();
+    expect(document.getElementById('test-field[0].textField')).toBeInTheDocument();
+    expect(document.getElementById('test-field[1].textField2')).toBeInTheDocument();
+    expect(screen.getAllByText('Delete')).toHaveLength(2);
   });
 
   it('with no Add button', () => {
@@ -109,8 +117,10 @@ xdescribe('ArrayField component is correctly rendering', () => {
       },
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    render(<Provider store={store}>{renderFormField(fieldConfig, 'test-field')}</Provider>);
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(screen.queryByText('Add item')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('input')).toHaveLength(4);
+    expect(screen.getAllByText('Delete')).toHaveLength(2);
   });
 });

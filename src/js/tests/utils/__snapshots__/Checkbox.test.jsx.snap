@@ -1,53 +1,49 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`checkbox with label should match snapshot 1`] = `
-<div
-  className="d-flex align-items-center"
-  data-testid="with-label-checkbox"
->
-  <input
-    checked={false}
-    id=""
-    onChange={[Function]}
-    type="checkbox"
-  />
-  <label
-    htmlFor=""
-    style={
-      {
-        "margin": "0 0 0 5px",
-      }
-    }
+<DocumentFragment>
+  <div
+    class="d-flex align-items-center"
+    data-testid="with-label-checkbox"
   >
-    test label
-  </label>
-</div>
+    <input
+      id=""
+      type="checkbox"
+    />
+    <label
+      for=""
+      style="margin: 0px 0px 0px 5px;"
+    >
+      test label
+    </label>
+  </div>
+</DocumentFragment>
 `;
 
 exports[`custom checkbox should match snapshot 1`] = `
-<div
-  className="custom-checkbox"
-  data-testid="custom-checkbox"
->
-  <label
-    htmlFor=""
+<DocumentFragment>
+  <div
+    class="custom-checkbox"
+    data-testid="custom-checkbox"
   >
-    <input
-      checked={false}
-      id=""
-      onChange={[Function]}
-      type="checkbox"
-    />
-  </label>
-</div>
+    <label
+      for=""
+    >
+      <input
+        id=""
+        type="checkbox"
+      />
+    </label>
+  </div>
+</DocumentFragment>
 `;
 
 exports[`default checkbox should match snapshot 1`] = `
-<input
-  checked={false}
-  data-testid="checkbox"
-  id=""
-  onChange={[Function]}
-  type="checkbox"
-/>
+<DocumentFragment>
+  <input
+    data-testid="checkbox"
+    id=""
+    type="checkbox"
+  />
+</DocumentFragment>
 `;
