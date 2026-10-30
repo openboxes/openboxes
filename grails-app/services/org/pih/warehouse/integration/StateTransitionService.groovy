@@ -34,7 +34,7 @@ class StateTransitionService {
         // If requisition is in picking and is fully picked, then transition to PICKED status
         if (requisition.status == RequisitionStatus.PICKING) {
             if (!picklist?.picklistItems?.empty) {
-                if (picklist.isFullyPicked) {
+                if (picklist.isFullyPicked && !requisition.awaitingBackorder) {
                     log.info "Stock movement ${stockMovement.identifier} has been picked"
                     stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, [status: StockMovementStatusCode.PICKED] as JSONObject)
                 }

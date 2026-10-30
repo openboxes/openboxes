@@ -1,10 +1,12 @@
 package org.pih.warehouse.api.regression.obaf.jobs
 
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.PendingFeature
 
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService
+import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.api.regression.obaf.support.ObafIntegrationSpec
 import org.pih.warehouse.api.regression.obaf.support.QuartzRunner
 import org.pih.warehouse.core.ActivityCode
@@ -26,6 +28,8 @@ import org.pih.warehouse.jobs.AutomaticStateTransitionJob
 import org.pih.warehouse.jobs.AutomaticStateTransitionPollingJob
 import org.pih.warehouse.jobs.PutawayLocationReassignmentJob
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.picking.PickTaskService
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.product.Product
@@ -51,6 +55,9 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
 
     @Autowired
     PutawayTaskService putawayTaskService
+
+    @Autowired
+    PickTaskService pickTaskService
 
     static final Date SOON = new Date() + 30
 
@@ -134,22 +141,31 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
      * The job is disabled while the inbound is received, so neither the receipt nor the putaway
      * completion schedules it: the feature fires it itself.
      */
-    Map crossDockScenario(String prefix, int ordered, int delivered) {
+    Map crossDockScenario(String prefix, int ordered, int delivered, Map orderProps = [:]) {
         config.set('openboxes.jobs.automaticBackorderReallocationJob.enabled', false)
         String dc = depot(prefix, [ActivityCode.AUTOMATED_PUTAWAY_CREATION, ActivityCode.AUTO_RECEIVING])
         bin(dc, 'SORT', [ActivityCode.INBOUND_SORTATION, ActivityCode.RECEIVE_STOCK], false)
         String xdock = bin(dc, 'XDOCK', [ActivityCode.CROSS_DOCKING, ActivityCode.DELIVERY_TYPE_LOCAL_DELIVERY])
         String p = product(prefix)
         String so = requisition(dc, [[productId: p, quantity: ordered, quantityBackordered: ordered, backorderedReasonCode: ReasonCode.BACKORDER.toString()]],
-                [autoAllocationRequested: true])
-        String soNumber = tx { Requisition.get(so).requestNumber }
-        String shipment = inboundShipment(dc, [[productId: p, quantity: delivered, lotNumber: 'XD', backorderReference: soNumber]])
+                [autoAllocationRequested: true] + orderProps)
+        Map s = [dc: dc, xdock: xdock, product: p, so: so]
+        return s + deliverToCrossDock(s, delivered)
+    }
+
+    Map deliverToCrossDock(Map s, int delivered) {
+        config.set('openboxes.jobs.automaticBackorderReallocationJob.enabled', false)
+        String soNumber = tx { Requisition.get(s.so).requestNumber }
+        List<String> existingTasks = tx { PutawayTask.findAllByFacility(Location.get(s.dc))*.id } as List<String>
+        String shipment = inboundShipment(s.dc as String, [[productId: s.product, quantity: delivered, lotNumber: 'XD', backorderReference: soNumber]])
         assert fire(AutomaticReceiptJob, [shipmentId: shipment]).exception == null
         List<String> crossDockTasks = tx {
-            PutawayTask.findAllByFacility(Location.get(dc)).findAll { it.putawayTypeCode == PutawayTypeCode.CROSS_DOCK }*.id
+            PutawayTask.findAllByFacility(Location.get(s.dc)).findAll {
+                it.putawayTypeCode == PutawayTypeCode.CROSS_DOCK && !(it.id in existingTasks)
+            }*.id
         } as List<String>
         assert crossDockTasks.size() == 1
-        return [dc: dc, xdock: xdock, product: p, so: so, shipment: shipment, task: crossDockTasks[0]]
+        return [shipment: shipment, task: crossDockTasks[0]]
     }
 
     /**
@@ -201,6 +217,55 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
         picks(s.so) == [['XDOCK', 'XD', 4, 4]]
         tx { RequisitionItem ri = Requisition.get(s.so).requisitionItems[0]; [ri.quantityBackordered, ri.backorderedReasonCode] } ==
                 [6, ReasonCode.BACKORDER.toString()]
+    }
+
+    void pickAndStageAll(String requisitionId) {
+        tx {
+            PicklistItem.findAllByRequisitionItemInList(Requisition.get(requisitionId).requisitionItems as List).each {
+                it.quantityPicked = it.quantity
+                it.status = 'STAGED'
+                it.save(flush: true, failOnError: true)
+            }
+        }
+    }
+
+    List<String> batchPickTaskIds(Map s) {
+        return tx {
+            SearchPickTaskCommand command = new SearchPickTaskCommand(facility: Location.get(s.dc), deliveryTypeCode: DeliveryTypeCode.LOCAL_DELIVERY,
+                    ordersCount: 10, excludeAssignedRequisitions: true)
+            pickTaskService.search(command, new GrailsParameterMap([:], null))*.id
+        } as List<String>
+    }
+
+    List<String> openPickTaskIds(String requisitionId) {
+        return tx {
+            PicklistItem.findAllByRequisitionItemInList(Requisition.get(requisitionId).requisitionItems as List)
+                    .findAll { it.status != 'STAGED' }*.id
+        } as List<String>
+    }
+
+    void 'OBLS-1009: the state transition poll does not mark a partially allocated order PICKED while a cross-dock backorder is still on its way'() {
+        given: 'a partial-allocation order of 5, of which 3 arrive, are released, picked and staged'
+        Map s = crossDockScenario('JOB-XDP', 5, 3, [partialAllocationAllowed: true])
+        completeAndRelease(s)
+        pickAndStageAll(s.so)
+
+        when: 'the five-minute poll runs before the other 2 have arrived'
+        QuartzRunner.Run poll = fire(AutomaticStateTransitionJob, [id: s.so])
+
+        then: 'the order stays PICKING'
+        poll.exception == null
+        status(s.so) == RequisitionStatus.PICKING
+
+        when: 'the other 2 arrive, are put away into the cross-dock lane and released'
+        Map second = s + deliverToCrossDock(s, 2)
+        completeAndRelease(second)
+
+        then: 'the backorder pick is offered to batch picking'
+        status(s.so) == RequisitionStatus.PICKING
+        List<String> open = openPickTaskIds(s.so)
+        open.size() == 1
+        batchPickTaskIds(s).containsAll(open)
     }
 
     // ------------------------------------------------------------------ AutomaticIssuanceJob
