@@ -204,7 +204,7 @@ export const fetchAvailableApprovers = () => async (dispatch) => {
 export async function fetchSessionInfo() {
   const url = '/api/getAppContext';
   const res = await apiClient.get(url);
-  const { user, location } = _.get(res, 'data.data', {});
+  const { user, location } = res?.data?.data ?? {};
 
   setSentryUser(user);
   setSentryLocation(location);
