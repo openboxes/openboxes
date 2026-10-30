@@ -709,11 +709,11 @@ sentry:
     # backend, we can investigate loading the frontend app config directly on the frontend.
     # To disable Sentry on the frontend, leave the DSN blank. Leave sample rates blank to use defaults.
     web:
-        dsn: ${REACT_APP_WEB_SENTRY_DSN:""}
-        environment: ${REACT_APP_SENTRY_ENVIRONMENT:""}
-        tracesSampleRate: ${REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE:""}
-        replaysSampleRate: ${REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE:""}
-        replaysErrorSampleRate: ${REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE:""}
+        dsn: ${REACT_APP_WEB_SENTRY_DSN:}
+        environment: ${REACT_APP_SENTRY_ENVIRONMENT:}
+        tracesSampleRate: ${REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE:}
+        replaysSampleRate: ${REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE:}
+        replaysErrorSampleRate: ${REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE:}
 
 # Application-level logger config. See logback.xml for Logback-specific configuration.
 logging:
