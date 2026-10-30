@@ -13,7 +13,8 @@ import org.grails.datastore.gorm.GormEntity
  * not called by the AssignIdentifierJob.
  */
 @Slf4j
-trait BlankIdentifierResolver<T extends GormEntity> {
+// Groovy 4 validates generic bounds before the GORM AST weaves GormEntity into domains, so the bound must stay implicit
+trait BlankIdentifierResolver<T> {
 
     /**
      * @return the domain-specific name/keyword that is used in identifier properties.

@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.product
 
+import groovy.xml.XmlParser
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
