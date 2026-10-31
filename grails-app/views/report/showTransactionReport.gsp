@@ -75,33 +75,41 @@
 
 	/* Transaction report table. Scoped to the wrapper because DataTables moves the header and footer into their
 	   own tables when the table scrolls. */
-	#transactionReport_wrapper th {
+	#transactionReport_wrapper th,
+	#dialogDataTable_wrapper th {
 		font-weight: 600;
 	}
 
 	/* Same horizontal padding in the header, body and footer so that the columns line up */
 	#transactionReport_wrapper th,
-	#transactionReport_wrapper td {
+	#dialogDataTable_wrapper th,
+	#transactionReport_wrapper td,
+	#dialogDataTable_wrapper td {
 		padding: 6px 10px;
 	}
 
 	/* Keep the sort icon on the same line as the column name */
-	#transactionReport_wrapper .DataTables_sort_wrapper {
+	#transactionReport_wrapper .DataTables_sort_wrapper,
+	#dialogDataTable_wrapper .DataTables_sort_wrapper {
 		display: flex;
 		align-items: center;
 		gap: 2px;
 	}
 
-	#transactionReport_wrapper th.right .DataTables_sort_wrapper {
+	#transactionReport_wrapper th.right .DataTables_sort_wrapper,
+	#dialogDataTable_wrapper th.right .DataTables_sort_wrapper {
 		justify-content: flex-end;
 	}
 
-	#transactionReport_wrapper .DataTables_sort_icon {
+	#transactionReport_wrapper .DataTables_sort_icon,
+	#dialogDataTable_wrapper .DataTables_sort_icon {
 		flex: none;
 	}
 
 	#transactionReport_wrapper th.right,
-	#transactionReport_wrapper td.right {
+	#dialogDataTable_wrapper th.right,
+	#transactionReport_wrapper td.right,
+	#dialogDataTable_wrapper td.right {
 		text-align: right;
 		font-variant-numeric: tabular-nums;
 		white-space: nowrap;
@@ -117,12 +125,16 @@
 
 	/* Zebra stripes, overriding the DataTables colors for the sorted column */
 	#transactionReport_wrapper tbody tr.odd td,
-	#transactionReport_wrapper tbody tr.odd td.sorting_1 {
+	#dialogDataTable_wrapper tbody tr.odd td,
+	#transactionReport_wrapper tbody tr.odd td.sorting_1,
+	#dialogDataTable_wrapper tbody tr.odd td.sorting_1 {
 		background-color: #fff;
 	}
 
 	#transactionReport_wrapper tbody tr.even td,
-	#transactionReport_wrapper tbody tr.even td.sorting_1 {
+	#dialogDataTable_wrapper tbody tr.even td,
+	#transactionReport_wrapper tbody tr.even td.sorting_1,
+	#dialogDataTable_wrapper tbody tr.even td.sorting_1 {
 		background-color: #f7f7f9;
 	}
 
@@ -133,32 +145,48 @@
 		cursor: pointer;
 	}
 
-	#transactionReport_wrapper .credit {
+	#transactionReport_wrapper .credit,
+	#dialogDataTable_wrapper .credit {
 		color: #2e7d32;
 	}
 
-	#transactionReport_wrapper .debit {
+	#transactionReport_wrapper .debit,
+	#dialogDataTable_wrapper .debit {
 		color: #c62828;
 	}
 
-	#transactionReport_wrapper .zero {
+	#transactionReport_wrapper .zero,
+	#dialogDataTable_wrapper .zero {
 		color: #bbb;
 	}
 
-	#transactionReport_wrapper tfoot th {
-		border-top: 2px solid #ccc;
+	/* A column header with a tooltip */
+	#transactionReport_wrapper th .hint {
+		cursor: help;
+		border-bottom: 1px dotted;
+	}
+
+	#transactionReport_wrapper a,
+	#dialogDataTable_wrapper a {
+		color: #1a5ea8;
+	}
+
+	/* Details dialog: the opening and closing balances stand out from the transactions */
+	#dialogDataTable_wrapper tbody tr.balance-row td {
+		font-weight: 600;
 		background-color: #f0f0f2;
 	}
 
-	/* DataTables keeps an empty copy of the footer in the scrolling body to size the columns. Hide the parentheses
-	   that the debit style would add to it. */
-	#transactionReport_wrapper .dataTables_scrollBody tfoot th:before,
-	#transactionReport_wrapper .dataTables_scrollBody tfoot th:after {
-		content: none;
+	.report-details-empty {
+		padding: 10px;
+		color: #666;
 	}
 
-	#transactionReport_wrapper .dataTables_scrollBody tfoot th {
-		border: 0;
+	/* Counted quantities don't change the balance */
+	#dialogDataTable_wrapper .counted {
+		color: #999;
+		font-style: italic;
+		cursor: help;
 	}
 	</style>
 </head>
@@ -309,9 +337,36 @@
 							</button>
 						</div>
 					</div>
-					<div class="box">
-						<h2><warehouse:message code="report.metadata.label" default="Metadata"/></h2>
-						<g:render template="showTransactionReportMetadata"/>
+					<%-- Details of the last report that was run. Filled in by showReportDetails. --%>
+					<div class="box report-details">
+						<h2><g:message code="report.details.label" default="Report Details"/></h2>
+						<p class="report-details-empty">
+							<g:message code="report.details.empty" default="Run the report to see its details here."/>
+						</p>
+						<table class="report-details-values" style="display: none">
+							<tbody>
+								<tr class="prop">
+									<td class="name"><label><g:message code="location.label" default="Location"/></label></td>
+									<td class="value report-details-location"></td>
+								</tr>
+								<tr class="prop">
+									<td class="name"><label><g:message code="report.details.period.label" default="Period"/></label></td>
+									<td class="value report-details-period"></td>
+								</tr>
+								<tr class="prop">
+									<td class="name"><label><g:message code="products.label" default="Products"/></label></td>
+									<td class="value report-details-products"></td>
+								</tr>
+								<tr class="prop">
+									<td class="name"><label><g:message code="report.details.generated.label" default="Generated"/></label></td>
+									<td class="value report-details-generated"></td>
+								</tr>
+								<tr class="prop">
+									<td class="name"><label><g:message code="report.details.duration.label" default="Duration"/></label></td>
+									<td class="value report-details-duration"></td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>
@@ -324,31 +379,18 @@
                     <table id="transactionReport" class="dataTable">
                         <thead>
                         <tr>
-                            <th><warehouse:message code="product.productCode.label" default="Code" /></th>
-                            <th><warehouse:message code="product.label" default="Product" /></th>
-                            <th><warehouse:message code="category.label" default="Category" /></th>
-                            <th class="right"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></th>
-                            <th class="right"><warehouse:message code="default.credits.label" default="Credits"/></th>
-                            <th class="right"><warehouse:message code="default.debits.label" default="Debits"/></th>
-                            <th class="right"><warehouse:message code="report.transaction.netChange.label" default="Net Change"/></th>
-                            <th class="right"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></th>
+                            <th><span class="hint" title="${g.message(code: 'report.transaction.code.hint', default: "The product code")}"><warehouse:message code="product.productCode.label" default="Code" /></span></th>
+                            <th><span class="hint" title="${g.message(code: 'report.transaction.product.hint', default: "The product name. Click a row to see the product's transactions.")}"><warehouse:message code="product.label" default="Product" /></span></th>
+                            <th><span class="hint" title="${g.message(code: 'report.transaction.category.hint', default: "The category of the product")}"><warehouse:message code="category.label" default="Category" /></span></th>
+                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.openingBalance.hint', default: "Quantity on hand at the beginning of the start date")}"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></span></th>
+                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.credits.hint', default: "Quantity added by credit transactions during the period, e.g. receipts, transfers in and adjustments up")}"><warehouse:message code="default.credits.label" default="Credits"/></span></th>
+                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.debits.hint', default: "Quantity removed by debit transactions during the period, e.g. issues, transfers out and adjustments down")}"><warehouse:message code="default.debits.label" default="Debits"/></span></th>
+                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.differences.hint', default: "The change in quantity from counts that didn't match the balance, i.e. the change that credits and debits don't account for")}"><warehouse:message code="report.transaction.differences.label" default="Differences"/></span></th>
+                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.closingBalance.hint', default: "Quantity on hand at the end of the end date (or now, if the end date is today or later)")}"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></span></th>
                         </tr>
                         </thead>
                         <tbody>
                         </tbody>
-                        <tfoot>
-                        <%-- Totals of the rows that match the search. Filled in by fnFooterCallback. --%>
-                        <tr>
-							<th><warehouse:message code="default.total.label" default="Total" /></th>
-							<th></th>
-							<th></th>
-                            <th class="right"></th>
-                            <th class="right"></th>
-                            <th class="right"></th>
-                            <th class="right"></th>
-                            <th class="right"></th>
-                        </tr>
-                        </tfoot>
                     </table>
 				</div>
 			</div>
@@ -374,6 +416,7 @@
     // and the buttons are disabled, so that it can't be run again until it's done (see #6201).
     var reportRequestInProgress = false;
     var reportElapsedTimer = null;
+    var reportStartTime = null;
     var reportTimeout = ${grailsApplication.config.openboxes.report.transactionReport.timeout ?: 300000};
 
     function startReportRequest() {
@@ -383,7 +426,7 @@
         reportRequestInProgress = true;
         $(".submit-button, .download-button").prop("disabled", true);
 
-        var startTime = Date.now();
+        var startTime = reportStartTime = Date.now();
         $(".report-overlay-elapsed-time").text("0:00");
         reportElapsedTimer = setInterval(function () {
             var seconds = Math.floor((Date.now() - startTime) / 1000);
@@ -480,9 +523,21 @@
     }
 
     // Shows a change in quantity as a credit if it's positive, or as a debit (without the sign) if it's negative
-    function renderNetChange(cell, value) {
+    function renderQuantityChange(cell, value) {
         var quantity = Number(value) || 0;
         renderQuantity(cell, Math.abs(quantity), quantity > 0 ? 'credit' : 'debit');
+    }
+
+    // Shows the details of the report that was just loaded
+    function showReportDetails(json) {
+        var seconds = Math.round((Date.now() - reportStartTime) / 1000);
+        $(".report-details-location").text($("#locationId option:selected").text());
+        $(".report-details-period").text($("#startDate-datepicker").val() + " - " + $("#endDate-datepicker").val());
+        $(".report-details-products").text(((json && json.aaData) || []).length.toLocaleString('en-US'));
+        $(".report-details-generated").text(new Date().toLocaleString());
+        $(".report-details-duration").text(Math.floor(seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60);
+        $(".report-details-empty").hide();
+        $(".report-details-values").show();
     }
 
     function destroyDataTable() {
@@ -521,26 +576,7 @@
 			"aLengthMenu": [
 				[5, 15, 25, 50, 100, 500, 1000, -1],
 				[5, 15, 25, 50, 100, 500, 1000, "All"]
-			],
-			// Totals of the rows that match the search (on every page, not just the current one)
-			"fnFooterCallback": function (nFoot, aaData, iStart, iEnd, aiDisplay) {
-				var cells = $('th', nFoot);
-				["Opening", "Credits", "Debits", "Net Change", "Closing"].forEach(function (column, index) {
-					var cell = cells.eq(index + 3);
-					if (!aiDisplay.length) {
-						cell.html('').removeClass('credit debit zero');
-						return;
-					}
-					var total = aiDisplay.reduce(function (sum, row) {
-						return sum + (Number(aaData[row][column]) || 0);
-					}, 0);
-					if (column === "Net Change") {
-						renderNetChange(cell, total);
-					} else {
-						renderQuantity(cell, total, column === "Credits" ? 'credit' : column === "Debits" ? 'debit' : null);
-					}
-				});
-			}
+			]
 		}
 		const dataOptions = {
 			"sAjaxSource": "${request.contextPath}/json/getTransactionReport",
@@ -569,7 +605,10 @@
 					"type": "POST",
 					"url": sSource,
 					"data": aoData,
-					"success": fnCallback,
+					"success": function (json) {
+						showReportDetails(json);
+						fnCallback(json);
+					},
 					"timeout": reportTimeout,
 					"complete": finishReportRequest,
 					"error": function (xhr, status, error) {
@@ -590,7 +629,7 @@
 				{"mData": "Opening", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
 				{"mData": "Credits", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
 				{"mData": "Debits", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
-				{"mData": "Net Change", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
+				{"mData": "Differences", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
 				{"mData": "Closing", "sType": 'numeric', "sClass": "right", "sWidth": "90px" }
 			],
 			"bUseRendered": false,
@@ -605,7 +644,7 @@
 				renderQuantity($('td:eq(3)', nRow), aData["Opening"]);
 				renderQuantity($('td:eq(4)', nRow), aData["Credits"], 'credit');
 				renderQuantity($('td:eq(5)', nRow), aData["Debits"], 'debit');
-				renderNetChange($('td:eq(6)', nRow), aData["Net Change"]);
+				renderQuantityChange($('td:eq(6)', nRow), aData["Differences"]);
 				renderQuantity($('td:eq(7)', nRow), aData["Closing"]);
 				return nRow;
 	          }
@@ -696,38 +735,7 @@
 			if (productCode && productName) {
 				var queryString = $.param(params);
 				var url = "${request.contextPath}/report/showTransactionReportDialog?" + queryString;
-				openModalDialog("#dlgShowDialog", productCode + " " + productName, 800, null, url);
-			}
-		});
-
-		$("#refreshTransactionFact").click(function(event) {
-			event.preventDefault();
-			var url = $(this).data("url");
-			var confirmationPrompt = $(this).data("confirmation-prompt");
-			var confirmed = confirm(confirmationPrompt);
-			if (confirmed) {
-				$.ajax({
-					url: url,
-					data: {},
-					cache: false,
-					timeout: ${grailsApplication.config.openboxes.ajaxRequest.timeout},
-					success: function (html) {
-						console.log(html);
-						alert("Data has been refreshed")
-					},
-					error: function (error) {
-						alert("An error occurred while refreshing the data");
-					},
-					beforeSend: function () {
-						$('.loading').livequery(function () {
-							$(this).show();
-						});
-					},
-					complete: function () {
-						$(".loading").hide();
-						window.location.reload();
-					}
-				});
+				openModalDialog("#dlgShowDialog", productCode + " " + productName, 1000, null, url);
 			}
 		});
 	});
