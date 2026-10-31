@@ -132,10 +132,15 @@ bootRun {
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
-        '-Xms1g',
-        '-Xmx4g',
+        "-Xms${findProperty('bootRunMinHeap') ?: '1g'}",
+        "-Xmx${findProperty('bootRunMaxHeap') ?: '4g'}",
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
+    // e.g. ./gradlew bootRun -PbootRunMaxHeap=1800m -PheapDumpOnOom
+    if (project.hasProperty('heapDumpOnOom')) {
+        jvmArgs '-XX:+HeapDumpOnOutOfMemoryError', "-XX:HeapDumpPath=${buildDir}/heapdumps"
+        doFirst { mkdir "${buildDir}/heapdumps" }
+    }
     systemProperties System.properties
 
     // if using a Gradle daemon, don't use its working directory
