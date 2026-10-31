@@ -3,7 +3,6 @@ package org.pih.warehouse.importer
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import org.apache.commons.lang3.StringUtils
-import org.apache.poi.ss.util.CellReference
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
@@ -41,7 +40,12 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
                     .build()
                     .parse(reader)
 
-            Map<String, String> columnToFieldMap = config.columnMapping
+            Map<Integer, String> columnToFieldMap = BulkDataColumnIndex.toIntKeys(config.columnMapping)
+
+            // Every defined column must be present in the row, so a row needs at least as many cells as the highest
+            // index (+1 because integer column indexes are zero-indexed).
+            int expectedNumberOfCells = columnToFieldMap ? columnToFieldMap.keySet().max() + 1 : 0
+
             List<Map<String, BulkDataCell>> readRows = []
             for (CSVRecord csvRow : csvRows) {
                 if (csvRow.recordNumber <= config.linesToSkip) {  // recordNumber is 1-indexed
@@ -51,19 +55,19 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
                 int rowIndex = (int) (csvRow.recordNumber - 1)  // recordNumber is 1-indexed
 
                 // If a row has fewer columns than we expect, error.
-                if (csvRow.size() < columnToFieldMap.size()) {
+                if (csvRow.size() < expectedNumberOfCells) {
                     result.readErrors.add(new BulkDataError(
                             row: rowIndex,
                             severity: BulkDataErrorSeverity.ERROR,
                             localizedMessage: messageLocalizer.localize(
-                                    "import.reader.unexpectedNumberCells", [columnToFieldMap.size(), csvRow.size()]),
+                                    "import.reader.unexpectedNumberCells", [expectedNumberOfCells, csvRow.size()]),
                     ))
                 }
 
                 Map<String, BulkDataCell> readRow = [:]
                 for (int i = 0; i < csvRow.size(); i++) {
                     // Only bother importing cells whose columns are specified in the config
-                    String fieldName = getFieldName(i, columnToFieldMap)
+                    String fieldName = columnToFieldMap.get(i)
                     if (StringUtils.isBlank(fieldName)) {
                         continue
                     }
@@ -83,16 +87,5 @@ class CsvReader extends BulkDataReader<CsvReaderConfig> {
         } finally {
             reader?.close()
         }
-    }
-
-    /**
-     * Extract the field name from the column mapping config for the given column index.
-     *
-     * We allow our columns in our mapping config to be represented as either zero-indexed numerical keys,
-     * or as letters (as they appear in Excel). Ex: The first column can be represented as "0" or "A".
-     */
-    private String getFieldName(int columnIndex, Map<String, String> columnMapping) {
-        return columnMapping.get(String.valueOf(columnIndex)) ?:
-                columnMapping.get(CellReference.convertNumToColString(columnIndex))
     }
 }

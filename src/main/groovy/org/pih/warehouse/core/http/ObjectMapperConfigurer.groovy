@@ -1,6 +1,7 @@
 package org.pih.warehouse.core.http
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.BeanDescription
@@ -55,7 +56,22 @@ class ObjectMapperConfigurer {
         // Instruct the ObjectMapper to consult our custom module whenever it constructs a serializer.
         SimpleModule module = new SimpleModule("OpenBoxes")
         module.setSerializerModifier(new OpenBoxesBeanSerializerModifier(mapperComponentResolver))
+
+        // Hook in custom serializers/mixins for when we don't want to rely on the default serialization behaviour.
+        objectMapper.addMixIn(Throwable.class, ThrowableMixIn.class)
+
         objectMapper.registerModule(module)
+    }
+
+    /**
+     * This mixin avoids an infinite loop when serializing a Throwable. There's a known Jackson issue around directly
+     * accessing a Throwable's "cause" field (which leads to a self referential loop) vs accessing it via the getCause()
+     * method. Because we configure the object mapper to rely on direct field accessors instead of on getter methods,
+     * we need to force the serializer to use getCause().
+     */
+    abstract class ThrowableMixIn {
+        @JsonProperty("cause")
+        abstract Throwable getCause()
     }
 
     /**

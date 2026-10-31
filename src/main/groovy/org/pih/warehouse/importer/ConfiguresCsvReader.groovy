@@ -14,12 +14,12 @@ trait ConfiguresCsvReader implements ConfiguresBulkDataReader {
 
     @Override
     BulkDataReaderConfig getBulkDataReaderConfig(ContentType contentType) {
-        // Ignore the given content type. We're a CSV writer so always return the CSV config
+        // Ignore the given content type. We're a CSV reader so always return the CSV config
         return getCsvReaderConfig()
     }
 
     @Override
-    List<ContentType> getSupportedContentTypes() {
+    Set<ContentType> getSupportedContentTypes() {
         return [ContentType.CSV]
     }
 }

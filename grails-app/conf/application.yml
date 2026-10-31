@@ -655,6 +655,9 @@ openboxes:
             # False if the import should fail if any categories assigned to products don't exist.
             createMissingCategories: false
 
+    export:
+        defaultSheetName: "Sheet1"
+
 mail:
     error:
         enabled: false

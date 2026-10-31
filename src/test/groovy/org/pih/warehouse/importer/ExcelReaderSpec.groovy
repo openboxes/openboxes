@@ -71,6 +71,47 @@ class ExcelReaderSpec extends Specification {
         5        || "苹果"         | "Special characters"
     }
 
+    void 'read should map columns using columnMapping key: #columnIndex'() {
+        given:
+        ExcelReaderConfig config = new ExcelReaderConfig(
+                sheetName: "string",
+                linesToSkip: 1,
+                columnMapping: [(columnIndex): "string"],
+        )
+
+        when:
+        BulkDataReaderResult result = reader.read(xlsFile, config)
+
+        then:
+        BulkDataCell cell = result.rows[0]["string"]
+        assert cell.value == "ABC"
+        assert cell.column == 0
+
+        where:
+        columnIndex << ["A", "a", "0", " A "]
+    }
+
+    void 'read should fail when columnMapping keys #key1 and #key2 refer to the same column'() {
+        given:
+        ExcelReaderConfig config = new ExcelReaderConfig(
+                sheetName: "string",
+                linesToSkip: 1,
+                columnMapping: [(key1): "field1", (key2): "field2"],
+        )
+
+        when:
+        reader.read(xlsFile, config)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        key1 | key2
+        "A"  | "a"
+        "A"  | "0"
+        "b"  | "1"
+    }
+
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'read should successfully import strings from xlsx file for case: #scenario'() {
         given:

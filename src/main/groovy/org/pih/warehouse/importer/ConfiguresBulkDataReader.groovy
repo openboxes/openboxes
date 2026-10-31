@@ -19,7 +19,7 @@ trait ConfiguresBulkDataReader {
     abstract BulkDataType getBulkDataType()
 
     /**
-     * @return The list of content types that can be handled by the reader that we configure.
+     * @return The set of content types that can be handled by the reader that we configure.
      */
-    abstract List<ContentType> getSupportedContentTypes()
+    abstract Set<ContentType> getSupportedContentTypes()
 }
