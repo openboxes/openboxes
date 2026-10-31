@@ -384,22 +384,18 @@ class ReportService implements ApplicationContextAware {
     }
 
     def truncateFacts() {
-        dataService.executeStatements(["SET FOREIGN_KEY_CHECKS = 0",
-                                       "truncate transaction_fact",
+        dataService.executeStatements(["truncate transaction_fact",
                                        "truncate consumption_fact",
-                                       "truncate stockout_fact",
-                                       "SET FOREIGN_KEY_CHECKS = 1"], Isolation.READ_COMMITTED)
+                                       "truncate stockout_fact"], Isolation.READ_COMMITTED, true)
     }
 
     def truncateDimensions() {
         dataService.executeStatements([
-                "SET FOREIGN_KEY_CHECKS = 0",
                 "truncate date_dimension",
                 "truncate location_dimension",
                 "truncate lot_dimension",
                 "truncate product_dimension",
-                "truncate transaction_type_dimension",
-                "SET FOREIGN_KEY_CHECKS = 1"], Isolation.READ_COMMITTED)
+                "truncate transaction_type_dimension"], Isolation.READ_COMMITTED, true)
     }
 
 

@@ -12,6 +12,7 @@ package org.pih.warehouse.data
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.importer.CSVUtils
 import org.springframework.transaction.annotation.Isolation
 
@@ -57,27 +58,62 @@ class DataService {
      * implicit commit in MySQL/MariaDB regardless of this transaction wrapper.
      * A sequence containing DDL needs a different pattern (build into a
      * _tmp table, then RENAME TABLE to swap). See #6190.
+     *
+     * Pass disableForeignKeyChecks = true (e.g. to truncate tables referenced by
+     * foreign keys) instead of including SET FOREIGN_KEY_CHECKS statements in the
+     * list. FOREIGN_KEY_CHECKS is session-scoped and not undone by a rollback, so it
+     * has to be re-enabled in a finally block on the same connection; otherwise a
+     * failure would return the pooled connection with foreign key checks disabled.
+     *
+     * Statements are logged abbreviated at INFO and in full at DEBUG (and in full
+     * at ERROR on failure), since some (e.g. order summary, ETL) are very long.
      */
-    void executeStatements(List<String> statementList, Isolation isolation = null) {
+    void executeStatements(List<String> statementList, Isolation isolation = null, Boolean disableForeignKeyChecks = false) {
         Sql sql = new Sql(dataSource)
         sql.cacheConnection { Connection connection ->
-            withTransactionIsolation(connection, isolation) {
-                sql.withTransaction {
-                    statementList.each { String statement ->
-                        def startTime = System.currentTimeMillis()
-                        log.info "Executing statement ${statement}"
-                        try {
-                            sql.execute(statement)
-                        } catch (Exception e) {
-                            log.error("Failed executing statement: ${statement}", e)
-                            throw e
+            withForeignKeyChecksDisabled(sql, disableForeignKeyChecks) {
+                withTransactionIsolation(connection, isolation) {
+                    sql.withTransaction {
+                        statementList.each { String statement ->
+                            def startTime = System.currentTimeMillis()
+                            log.info "Executing statement: ${abbreviateStatement(statement)}"
+                            log.debug "Full statement: ${statement}"
+                            try {
+                                sql.execute(statement)
+                            } catch (Exception e) {
+                                log.error("Failed executing statement: ${statement}", e)
+                                throw e
+                            }
+                            log.info "Updated ${sql.updateCount} rows in " + (System.currentTimeMillis() - startTime) + " ms"
                         }
-                        log.info "Updated ${sql.updateCount} rows in " + (System.currentTimeMillis() - startTime) + " ms"
                     }
                 }
             }
         }
         sql.close()
+    }
+
+    private static String abbreviateStatement(String statement) {
+        return StringUtils.abbreviate(statement.replaceAll(/\s+/, ' ').trim(), 100)
+    }
+
+    /**
+     * Runs the given closure with foreign key checks disabled on the sql's cached
+     * connection, re-enabling them afterward regardless of success or failure.
+     * Must be called inside sql.cacheConnection so both SET statements run on the
+     * same connection as the closure.
+     */
+    private void withForeignKeyChecksDisabled(Sql sql, Boolean disableForeignKeyChecks, Closure closure) {
+        if (!disableForeignKeyChecks) {
+            closure()
+            return
+        }
+        sql.execute("SET FOREIGN_KEY_CHECKS = 0")
+        try {
+            closure()
+        } finally {
+            sql.execute("SET FOREIGN_KEY_CHECKS = 1")
+        }
     }
 
     /**
@@ -96,6 +132,10 @@ class DataService {
             return
         }
         Integer previousTransactionIsolation = connection.getTransactionIsolation()
+        if (previousTransactionIsolation == transactionIsolation.value()) {
+            closure()
+            return
+        }
         try {
             connection.setTransactionIsolation(transactionIsolation.value())
             closure()
