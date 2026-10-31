@@ -16,6 +16,10 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
+import org.hibernate.Criteria
+import org.hibernate.SQLQuery
+import org.hibernate.SessionFactory
+import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
@@ -83,6 +87,7 @@ class ReportService implements ApplicationContextAware {
     ForecastingService forecastingService
     NumberDataService numberDataService
     ProductService productService
+    SessionFactory sessionFactory
 
     ApplicationContext applicationContext
 
@@ -1424,21 +1429,89 @@ class ReportService implements ApplicationContextAware {
         return getFilteredTransactionEntries(transactionCodes, startDate, endDate, null, null, null, location, products, orderBy, sortOrder)
     }
 
-    Map<Product, Map<String, Integer>> getDetailedTransactionReportData(Map<Product, List<TransactionEntry>> transactionEntries) {
-        return transactionEntries.collectEntries { product, entriesForProduct ->
-            Map<String, Integer> totalsByType = entriesForProduct
-                    .groupBy { entry ->
-                        entry.transaction.transactionType.name
-                    }
-                    .collectEntries { transactionTypeName, entriesByType ->
-                        Integer total = entriesByType.sum { entry ->
-                            entry.quantity as Integer
-                        }
-                        [(transactionTypeName): total]
-                    }
-
-            [(product): totalsByType]
+    /**
+     * Sums the credit and debit transactions of each product at a facility over a period, grouped by transaction
+     * type. The totals are calculated in the database so that we don't need to load the transaction entries into
+     * memory (see #6201).
+     *
+     * @return a row per product and transaction type, with:
+     *         - credits: the sum of positive CREDIT quantities
+     *         - debits: the sum of DEBIT quantities and negative CREDIT quantities, as a positive number
+     *         - quantity: the sum of the quantities as they're stored
+     *         - backdatedQuantity: the net quantity (credits minus debits) of transactions that were created more
+     *           than a day after their transaction date
+     */
+    private List<Map> getTransactionReportTotals(Location location,
+                                                 List<Category> categories,
+                                                 List<Tag> tags,
+                                                 List<ProductCatalog> catalogs,
+                                                 List<Product> products,
+                                                 Date startDate,
+                                                 Date endDate) {
+        if (!location?.inventory) {
+            return []
         }
+
+        String credit = "tt.transaction_code = 'CREDIT' AND te.quantity > 0"
+        String query = """
+            SELECT ii.product_id AS product_id,
+                   t.transaction_type_id AS transaction_type_id,
+                   SUM(CASE WHEN ${credit} THEN te.quantity ELSE 0 END) AS credits,
+                   SUM(CASE WHEN ${credit} THEN 0 ELSE ABS(te.quantity) END) AS debits,
+                   SUM(te.quantity) AS quantity,
+                   SUM(CASE WHEN t.date_created IS NULL OR t.date_created <= t.transaction_date + INTERVAL 1 DAY THEN 0
+                            WHEN ${credit} THEN te.quantity
+                            ELSE -ABS(te.quantity) END) AS backdated_quantity
+            FROM transaction t
+            JOIN transaction_type tt ON tt.id = t.transaction_type_id
+            JOIN transaction_entry te ON te.transaction_id = t.id
+            JOIN inventory_item ii ON ii.id = te.inventory_item_id
+            JOIN product p ON p.id = ii.product_id
+            WHERE t.inventory_id = :inventoryId
+            AND tt.transaction_code IN ('CREDIT', 'DEBIT')
+            AND t.transaction_date > :startDate
+            AND t.transaction_date < :endDate
+            ${categories ? "AND p.category_id IN (:categoryIds)" : ""}
+            ${products ? "AND ii.product_id IN (:productIds)" : ""}
+            ${tags ? "AND EXISTS (SELECT 1 FROM product_tag pt WHERE pt.product_id = p.id AND pt.tag_id IN (:tagIds))" : ""}
+            ${catalogs ? """AND EXISTS (SELECT 1 FROM product_catalog_item pci
+                                       WHERE pci.product_id = p.id AND pci.product_catalog_id IN (:catalogIds))""" : ""}
+            GROUP BY ii.product_id, t.transaction_type_id
+        """
+
+        SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
+        sqlQuery.addScalar("product_id", StandardBasicTypes.STRING)
+                .addScalar("transaction_type_id", StandardBasicTypes.STRING)
+                .addScalar("credits", StandardBasicTypes.BIG_DECIMAL)
+                .addScalar("debits", StandardBasicTypes.BIG_DECIMAL)
+                .addScalar("quantity", StandardBasicTypes.BIG_DECIMAL)
+                .addScalar("backdated_quantity", StandardBasicTypes.BIG_DECIMAL)
+                .setString("inventoryId", location.inventory.id)
+                .setTimestamp("startDate", startDate)
+                .setTimestamp("endDate", endDate)
+                .setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        if (categories) {
+            sqlQuery.setParameterList("categoryIds", categories*.id)
+        }
+        if (products) {
+            sqlQuery.setParameterList("productIds", products*.id)
+        }
+        if (tags) {
+            sqlQuery.setParameterList("tagIds", tags*.id)
+        }
+        if (catalogs) {
+            sqlQuery.setParameterList("catalogIds", catalogs*.id)
+        }
+        return sqlQuery.list()
+    }
+
+    /**
+     * @return the total quantity on hand of each product in the given items, keyed on product id
+     */
+    private static Map<String, Integer> sumQuantityOnHandByProduct(AvailableItemMap availableItems) {
+        return availableItems.values()
+                .groupBy { it.inventoryItem.product.id }
+                .collectEntries { productId, items -> [(productId): items.sum { it.quantityOnHand } as Integer ?: 0] }
     }
 
     Map<String, String> getTransactionReportRow(Map data) {
@@ -1493,12 +1566,11 @@ class ReportService implements ApplicationContextAware {
 
         return row + [
                 "Closing": data.closingBalance,
-                "Backdated inventory correction": data.backdatedTransactionEntries?.sum {
-                    isTransactionEntryCredit(it) ? Math.abs(it.quantity) : -Math.abs(it.quantity)
-                } ?: 0
+                "Backdated inventory correction": data.backdatedQuantity ?: 0
         ]
     }
 
+    @Transactional(readOnly = true)
     List<Object> getTransactionReport(Location location,
                                       List<Category> categories,
                                       List<Tag> tagsList,
@@ -1513,79 +1585,55 @@ class ReportService implements ApplicationContextAware {
                 TransactionCode.DEBIT
         ]
 
-        // Transaction entries that have relation to the transactions happened between startDate <-> endDate
-        // with appropriate filter applied and with transaction type code that is credit or debit
-        List<TransactionEntry> transactionEntriesWithinDateRange = getFilteredTransactionEntries(
-                adjustmentTransactionCodes,
-                startDate,
-                endDate,
+        // The credits and debits of each product between startDate and endDate, by transaction type. Only products
+        // with a credit or debit in that period are included in the report.
+        Map<String, List<Map>> totalsByProduct = getTransactionReportTotals(
+                location,
                 categories,
                 tagsList,
                 catalogsList,
-                location,
                 productList,
-                null,
-                null
-        )
-
-        // Grouping transaction entries by product to get the desired report granularity
-        Map<Product, List<TransactionEntry>> productsMap = transactionEntriesWithinDateRange.groupBy {
-            it.inventoryItem.product
+                startDate,
+                endDate
+        ).groupBy { it.product_id }
+        if (!totalsByProduct) {
+            return []
         }
+        List<Product> products = Product.getAll(totalsByProduct.keySet().toList()).sort { it.productCode }
 
-        // Calculate items available at the startDate to get quantity on hand for found products
-        AvailableItemMap availableItemStartDateMap = productAvailabilityService.getQuantityOnHandAtDateAsMap(
-                location,
-                productsMap.keySet().toList(),
-                startDate
-        )
+        // Quantity on hand of each product at the startDate (opening balance) and endDate (closing balance)
+        Map<String, Integer> openingBalanceByProduct = sumQuantityOnHandByProduct(
+                productAvailabilityService.getQuantityOnHandAtDateAsMap(location, products, startDate))
+        Map<String, Integer> closingBalanceByProduct = sumQuantityOnHandByProduct(
+                productAvailabilityService.getQuantityOnHandAtDateAsMap(
+                        location, products, endDate.before(new Date()) ? endDate : new Date()))
 
-        // Calculate items available at the startDate to get quantity on hand for found products
-        AvailableItemMap availableItemEndDateMap = productAvailabilityService.getQuantityOnHandAtDateAsMap(
-                location,
-                productsMap.keySet().toList(),
-                endDate.before(new Date()) ? endDate : new Date()
-        )
-
-        // AvailableTransactionTypes and detailedReportData are only used in case of generating CSV.
-        // The CSV file should contain additional information about the product and the transaction
-        // entries should be grouped by transaction types (greater granularity)
+        // AvailableTransactionTypes are only used in case of generating CSV. The CSV file should contain
+        // additional information about the product and the quantities should be grouped by transaction types
+        // (greater granularity)
         List<TransactionType> availableTransactionTypes = includeDetails
                 ? TransactionType.createCriteria().list {
                     'in'("transactionCode", adjustmentTransactionCodes)
                 }
                 : []
+        Map<String, String> transactionTypeNames = availableTransactionTypes.collectEntries { [(it.id): it.name] }
 
-        Map<Product, List<Integer>> detailedReportData = includeDetails
-                ? getDetailedTransactionReportData(productsMap)
-                : [:]
-
-        // Final calculations of data:
-        // 1. Get the current QoH
-        // 2. Calculate closing balance using available items at endDate
-        // 3. Calculate opening balance using available items at startDate
         // Additional calculation info:
         // 1. CREDITS = transaction entries in relation with transactions that are CREDIT type
         // and the quantity of that transaction entry is greater than 0
         // 2. DEBITS = transaction entries in relation with transaction that are DEBIT type
         // and transaction that are CREDIT type, but with quantity lower than 0
-        return productsMap.collect { key, value ->
-            Integer openingBalance = availableItemStartDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
-            Integer closingBalance = availableItemEndDateMap.getAllByProduct(key).quantityOnHand.sum() ?: 0
-            Integer credits = getCreditTransactionEntries(value).sum { it.quantity } as Integer ?: 0
-            Integer debits = getDebitTransactionEntries(value).sum { Math.abs(it.quantity) } as Integer ?: 0
+        return products.collect { Product key ->
+            List<Map> totals = totalsByProduct[key.id]
+            Integer openingBalance = openingBalanceByProduct[key.id] ?: 0
+            Integer closingBalance = closingBalanceByProduct[key.id] ?: 0
+            Integer credits = totals.sum { it.credits } as Integer ?: 0
+            Integer debits = totals.sum { it.debits } as Integer ?: 0
             // The change in quantity on hand over the period. Note that this is not the total of the adjustments:
             // credits and debits are already included in it.
             Integer netChange = closingBalance - openingBalance
 
             if (includeDetails) {
-                List<TransactionEntry> backdatedTransactionEntries = value.transaction
-                        .unique()
-                        .findAll {it.dateCreated > (it.transactionDate + 1) }
-                        .transactionEntries
-                        .flatten()
-                        .findAll { it.inventoryItem.product == key }
-
                 return getTransactionReportDetailedRow(
                         productCode: key.productCode,
                         name: key.name,
@@ -1599,9 +1647,12 @@ class ReportService implements ApplicationContextAware {
                         credits: credits,
                         debits: debits,
                         closingBalance: closingBalance,
-                        detailedReportData: detailedReportData[key],
+                        // The quantity of each transaction type, keyed on transaction type name
+                        detailedReportData: totals.collectEntries {
+                            [(transactionTypeNames[it.transaction_type_id]): it.quantity as Integer]
+                        },
                         availableTransactionTypes: availableTransactionTypes,
-                        backdatedTransactionEntries: backdatedTransactionEntries
+                        backdatedQuantity: totals.sum { it.backdated_quantity } as Integer ?: 0
                 )
             }
 
