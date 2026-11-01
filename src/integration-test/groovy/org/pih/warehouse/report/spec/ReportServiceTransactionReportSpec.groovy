@@ -75,10 +75,13 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
     void setup() {
         // The report uses Product.displayName, which looks up the locale in the session of the current request
         GrailsWebMockUtil.bindMockWebRequest()
+        // Other database connections can't see the test data, which is in a transaction that's rolled back
+        reportService.calculateTransactionReportBalancesInParallel = false
     }
 
     void cleanup() {
         RequestContextHolder.resetRequestAttributes()
+        reportService.calculateTransactionReportBalancesInParallel = true
     }
 
     /**
@@ -174,15 +177,74 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         report().A.Credits == 4
     }
 
-    void 'products without credits or debits in the period are not included'() {
-        given:
+    void 'includes products with stock or a count but no credits or debits in the period'() {
+        given: 'product A has stock, B was only counted, and C has no stock (and no activity)'
         setupFacilityAndProducts()
         insertTransaction(TRANSFER_IN, day(1), [[itemA1, 10]])
         insertTransaction(INVENTORY_BASELINE, day(6), [[itemB1, 5]])
-        insertTransaction(TRANSFER_IN, day(6), [[itemC1, 1]])
+        insertTransaction(TRANSFER_IN, day(2), [[itemC1, 3]])
+        insertTransaction(CONSUMPTION, day(3), [[itemC1, 3]])
 
-        expect:
-        report().keySet() == ["C"] as Set
+        when:
+        Map<String, Map> rows = report(includeProductsWithNoActivity: true)
+
+        then:
+        rows.keySet() == ["A", "B"] as Set
+        rows.A.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 10, Credits: 0, Debits: 0, Differences: 0, Closing: 10]
+        rows.B.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 0, Credits: 0, Debits: 0, Differences: 5, Closing: 5]
+        report(includeProductsWithNoActivity: true, includeDetails: true).keySet() == ["A", "B"] as Set
+
+        and: 'by default, only products with activity: B'
+        report().keySet() == ["B"] as Set
+        report(includeDetails: true).keySet() == ["B"] as Set
+    }
+
+    void 'leaves out transfers between bins of the same facility, but not transfers between facilities'() {
+        given:
+        setupFacilityAndProducts()
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[itemA1, 100], [itemB1, 5]])
+
+        and: 'an internal transfer of product A (e.g. a putaway), recorded as a Transfer Out and a Transfer In'
+        insertLocalTransfer(
+                insertTransaction(TRANSFER_OUT, day(6), [[itemA1, 30]]),
+                insertTransaction(TRANSFER_IN, day(6), [[itemA1, 30]]))
+
+        and: 'a transfer of product A to another facility'
+        insertLocalTransfer(
+                insertTransaction(TRANSFER_OUT, day(7), [[itemA1, 20]]),
+                insertTransaction(TRANSFER_IN, day(7), [[itemA1, 20]], day(7), otherFacility))
+
+        and: 'product B only had an internal transfer'
+        insertLocalTransfer(
+                insertTransaction(TRANSFER_OUT, day(8), [[itemB1, 5]]),
+                insertTransaction(TRANSFER_IN, day(8), [[itemB1, 5]]))
+
+        when:
+        Map<String, Map> rows = report(includeDetails: true, includeProductsWithNoActivity: true)
+
+        then:
+        rows.A.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 100, Credits: 0, Debits: 20, Differences: 0, Closing: 80]
+        rows.A["Transfer Out"] == 20
+        rows.A["Transfer In"] == 0
+        rows.B.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 5, Credits: 0, Debits: 0, Differences: 0, Closing: 5]
+
+        and: 'B had no activity, so it is only listed when products with no activity are included'
+        report().keySet() == ["A"] as Set
+
+        when: 'internal transfers are included'
+        rows = report(includeDetails: true, includeInternalTransfers: true)
+
+        then:
+        rows.keySet() == ["A", "B"] as Set
+        rows.A.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 100, Credits: 30, Debits: 50, Differences: 0, Closing: 80]
+        rows.A["Transfer Out"] == 50
+        rows.A["Transfer In"] == 30
+        rows.B.subMap("Credits", "Debits") == [Credits: 5, Debits: 5]
     }
 
     void 'filters by category, tag, catalog and product'() {
@@ -272,9 +334,17 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         ].each { Map filters ->
             [false, true].each { Boolean includeDetails ->
                 Map args = filters + [includeDetails: includeDetails]
-                Map<String, Map> actual = report(args)
+                Map<String, Map> actual = report(args + [includeProductsWithNoActivity: true])
                 Map<String, Map> expected = previousReport(args)
-                assert actual.keySet() == expected.keySet(), "Different products for ${args}"
+                // The previous implementation only included products with credits or debits in the period. The others
+                // are included now if they had stock, and have no credits or debits.
+                assert actual.keySet().containsAll(expected.keySet()), "Missing products for ${args}"
+                (actual.keySet() - expected.keySet()).each { String product ->
+                    assert actual[product].subMap("Credits", "Debits") == [Credits: 0, Debits: 0], "Extra product ${product} for ${args}"
+                }
+                assert report(args).keySet() ==
+                        actual.findAll { product, row -> row.Credits || row.Debits || row.Differences ||
+                                row.Closing != row.Opening }.keySet(), "Products with activity for ${args}"
                 expected.each { String product, Map row ->
                     Map differences = row.findAll { column, value -> actual[product][column] != value }
                             .collectEntries { column, value -> [(column): [expected: value, actual: actual[product][column]]] }
@@ -291,7 +361,8 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
     private Map<String, Map> report(Map args = [:]) {
         return keyByProduct(reportService.getTransactionReport(facility, args.categories as List,
                 args.tags as List, args.catalogs as List, args.products as List, startDate, endDate,
-                args.includeDetails as Boolean))
+                args.includeDetails as Boolean, args.includeProductsWithNoActivity as Boolean,
+                args.includeInternalTransfers as Boolean))
     }
 
     /**
@@ -405,8 +476,10 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
 
     /**
      * Inserts a transaction with the given entries, each given as [inventory item, quantity].
+     *
+     * @return the id of the transaction
      */
-    private void insertTransaction(String transactionTypeId, Date transactionDate, List<List> entries,
+    private String insertTransaction(String transactionTypeId, Date transactionDate, List<List> entries,
                                    Date dateCreated = transactionDate, Location location = facility) {
         String transactionId = UUID.randomUUID().toString()
         sessionFactory.currentSession.createSQLQuery("""
@@ -434,5 +507,17 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
                     .setInteger("index", index)
                     .executeUpdate()
         }
+        return transactionId
+    }
+
+    /**
+     * Links a Transfer Out and a Transfer In, like InventoryService.transferStock and saveLocalTransfer do.
+     */
+    private void insertLocalTransfer(String sourceTransactionId, String destinationTransactionId) {
+        executeSql("""INSERT INTO local_transfer (id, version, date_created, last_updated, source_transaction_id,
+                                                  destination_transaction_id)
+                      VALUES (:id, 0, NOW(), NOW(), :sourceTransactionId, :destinationTransactionId)""",
+                [id: UUID.randomUUID().toString(), sourceTransactionId: sourceTransactionId,
+                 destinationTransactionId: destinationTransactionId])
     }
 }

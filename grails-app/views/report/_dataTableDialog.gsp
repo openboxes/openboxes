@@ -1,3 +1,7 @@
+<label class="internal-transfers-toggle" title="${g.message(code: 'report.transaction.internalTransfer.hint', default: 'A transfer between two bin locations of this facility (e.g. a putaway or stock transfer). It moves stock between bins without changing the balance, so it isn\'t counted in the credits and debits of the report.')}">
+    <input type="checkbox" id="dialogIncludeInternalTransfers"/>
+    <g:message code="report.transaction.includeInternalTransfers.label" default="Include internal transfers"/>
+</label>
 <table id="dialogDataTable" class="dataTable">
     <thead>
         <tr>
@@ -40,6 +44,21 @@
             UNRECONCILED: "${g.message(code: 'report.transaction.unreconciled.hint', default: 'The transactions above do not add up to the closing balance. This is the rest of the difference.')}"
         };
         var countHint = "${g.message(code: 'report.transaction.countQuantity.hint', default: 'Counted quantity. The balance is set to the counted quantity instead of adding to it.')}";
+        var internalTransferHint = $('.internal-transfers-toggle').attr('title');
+
+        // Hide internal transfers unless "Include internal transfers" is checked. The filter is added once, since this
+        // dialog is loaded each time a product is clicked, and only applies to this table.
+        if (!$.fn.dataTableExt.internalTransferFilterAdded) {
+            $.fn.dataTableExt.internalTransferFilterAdded = true;
+            $.fn.dataTableExt.afnFiltering.push(function (oSettings, aData, iDataIndex) {
+                return oSettings.nTable.id !== 'dialogDataTable'
+                    || !oSettings.aoData[iDataIndex]._aData.internal
+                    || $('#dialogIncludeInternalTransfers').is(':checked');
+            });
+        }
+        $('#dialogIncludeInternalTransfers').change(function () {
+            $('#dialogDataTable').dataTable().fnDraw();
+        });
 
         // Until the transactions have loaded, the empty table shows that they're loading instead of "No records found"
         var loadingMessage = "<img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner.gif')}\" /> ${g.message(code: 'default.loading.label', default: 'Loading...')}";
@@ -106,6 +125,11 @@
                 {"mData": "quantity", "sClass": "right", "sWidth": "80px", "sDefaultContent": ""},
                 {"mData": "balance", "sClass": "right", "sWidth": "80px", "sDefaultContent": ""}
             ],
+            // DataTables doesn't filter the first draw after loading the data when sorting is off, so redraw to hide
+            // the internal transfers
+            "fnInitComplete": function () {
+                this.fnDraw();
+            },
             "fnDrawCallback": function () {
                 // Dim a date that's the same as the row above, and draw a line above the first row of each day, so
                 // that it's easier to see where each day starts
@@ -150,6 +174,12 @@
                     cells.slice(2, 7).empty();
                     renderQuantity(cells.eq(7), aData.balance);
                     return nRow;
+                }
+
+                // Internal transfers are dimmed, since they don't change the balance
+                $(nRow).toggleClass('internal-row', !!aData.internal);
+                if (aData.internal) {
+                    $(nRow).attr('title', internalTransferHint);
                 }
 
                 if (aData.transactionId) {

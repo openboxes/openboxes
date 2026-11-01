@@ -1463,7 +1463,9 @@ class JsonController {
                 command.products,
                 startDate,
                 endDate,
-                isCsvReport)
+                isCsvReport,
+                params.boolean("includeProductsWithNoActivity") ?: false,
+                params.boolean("includeInternalTransfers") ?: false)
 
         if (isCsvReport) {
             String csv = dataService.generateCsv(data)

@@ -44,12 +44,14 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditRollup
 import org.pih.warehouse.inventory.InventoryAuditSummary
+import org.pih.warehouse.inventory.LocalTransfer
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.inventory.product.availability.AvailableItemMap
+import org.pih.warehouse.jobs.GparsService
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.order.OrderAdjustment
@@ -93,6 +95,13 @@ class ReportService implements ApplicationContextAware {
     SessionFactory sessionFactory
 
     ApplicationContext applicationContext
+
+    /**
+     * Whether the transaction report calculates the opening and closing balances at the same time, on two database
+     * connections. Integration tests turn this off, because their data is in a transaction that's rolled back, which
+     * other connections can't see.
+     */
+    boolean calculateTransactionReportBalancesInParallel = true
 
     void generateShippingReport(ChecklistReportCommand command) {
         def shipmentItems = command?.shipment?.shipmentItems?.sort()
@@ -1433,8 +1442,60 @@ class ReportService implements ApplicationContextAware {
     }
 
     /**
+     * The conditions on a product (aliased p) for the transaction report's product filters. Each filter that's set
+     * must match. Its parameters are set by setProductFilterParameters.
+     */
+    private static String getProductFilterConditions(List<Category> categories,
+                                                     List<Tag> tags,
+                                                     List<ProductCatalog> catalogs,
+                                                     List<Product> products) {
+        return """
+            ${categories ? "AND p.category_id IN (:categoryIds)" : ""}
+            ${products ? "AND p.id IN (:productIds)" : ""}
+            ${tags ? "AND EXISTS (SELECT 1 FROM product_tag pt WHERE pt.product_id = p.id AND pt.tag_id IN (:tagIds))" : ""}
+            ${catalogs ? """AND EXISTS (SELECT 1 FROM product_catalog_item pci
+                                       WHERE pci.product_id = p.id AND pci.product_catalog_id IN (:catalogIds))""" : ""}
+        """
+    }
+
+    private static void setProductFilterParameters(SQLQuery sqlQuery,
+                                                   List<Category> categories,
+                                                   List<Tag> tags,
+                                                   List<ProductCatalog> catalogs,
+                                                   List<Product> products) {
+        if (categories) {
+            sqlQuery.setParameterList("categoryIds", categories*.id)
+        }
+        if (products) {
+            sqlQuery.setParameterList("productIds", products*.id)
+        }
+        if (tags) {
+            sqlQuery.setParameterList("tagIds", tags*.id)
+        }
+        if (catalogs) {
+            sqlQuery.setParameterList("catalogIds", catalogs*.id)
+        }
+    }
+
+    /**
+     * A condition that excludes transactions (aliased t) that are one side of an internal transfer: a transfer between
+     * two bin locations of the same facility, e.g. a putaway, a stock transfer or a bin replenishment.
+     * InventoryService.transferStock records it as a Transfer Out and a Transfer In at the facility, linked by a local
+     * transfer. It moves stock without changing the facility's quantity on hand, so it isn't a credit or debit of the
+     * facility (OBPIH-7878). A local transfer between two facilities (e.g. from a request) isn't internal.
+     */
+    private static final String NOT_INTERNAL_TRANSFER_CONDITION = """
+            AND NOT EXISTS (SELECT 1 FROM local_transfer lt
+                            JOIN transaction other ON other.id = lt.destination_transaction_id
+                            WHERE lt.source_transaction_id = t.id AND other.inventory_id = t.inventory_id)
+            AND NOT EXISTS (SELECT 1 FROM local_transfer lt
+                            JOIN transaction other ON other.id = lt.source_transaction_id
+                            WHERE lt.destination_transaction_id = t.id AND other.inventory_id = t.inventory_id)
+    """
+
+    /**
      * Sums the credit and debit transactions of each product at a facility over a period, grouped by transaction
-     * type. The totals are calculated in the database so that we don't need to load the transaction entries into
+     * type. Internal transfers are left out unless includeInternalTransfers is true. The totals are calculated in the database so that we don't need to load the transaction entries into
      * memory (see #6201).
      *
      * @return a row per product and transaction type, with:
@@ -1450,7 +1511,8 @@ class ReportService implements ApplicationContextAware {
                                                  List<ProductCatalog> catalogs,
                                                  List<Product> products,
                                                  Date startDate,
-                                                 Date endDate) {
+                                                 Date endDate,
+                                                 Boolean includeInternalTransfers) {
         if (!location?.inventory) {
             return []
         }
@@ -1474,11 +1536,8 @@ class ReportService implements ApplicationContextAware {
             AND tt.transaction_code IN ('CREDIT', 'DEBIT')
             AND t.transaction_date > :startDate
             AND t.transaction_date < :endDate
-            ${categories ? "AND p.category_id IN (:categoryIds)" : ""}
-            ${products ? "AND ii.product_id IN (:productIds)" : ""}
-            ${tags ? "AND EXISTS (SELECT 1 FROM product_tag pt WHERE pt.product_id = p.id AND pt.tag_id IN (:tagIds))" : ""}
-            ${catalogs ? """AND EXISTS (SELECT 1 FROM product_catalog_item pci
-                                       WHERE pci.product_id = p.id AND pci.product_catalog_id IN (:catalogIds))""" : ""}
+            ${includeInternalTransfers ? "" : NOT_INTERNAL_TRANSFER_CONDITION}
+            ${getProductFilterConditions(categories, tags, catalogs, products)}
             GROUP BY ii.product_id, t.transaction_type_id
         """
 
@@ -1493,19 +1552,57 @@ class ReportService implements ApplicationContextAware {
                 .setTimestamp("startDate", startDate)
                 .setTimestamp("endDate", endDate)
                 .setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
-        if (categories) {
-            sqlQuery.setParameterList("categoryIds", categories*.id)
-        }
-        if (products) {
-            sqlQuery.setParameterList("productIds", products*.id)
-        }
-        if (tags) {
-            sqlQuery.setParameterList("tagIds", tags*.id)
-        }
-        if (catalogs) {
-            sqlQuery.setParameterList("catalogIds", catalogs*.id)
-        }
+        setProductFilterParameters(sqlQuery, categories, tags, catalogs, products)
         return sqlQuery.list()
+    }
+
+    /**
+     * @return the ids of the given products that match the transaction report's product filters
+     */
+    private List<String> filterTransactionReportProductIds(Collection<String> productIds,
+                                                           List<Category> categories,
+                                                           List<Tag> tags,
+                                                           List<ProductCatalog> catalogs,
+                                                           List<Product> products) {
+        if (!productIds) {
+            return []
+        }
+        SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery("""
+            SELECT p.id FROM product p
+            WHERE p.id IN (:candidateIds)
+            ${getProductFilterConditions(categories, tags, catalogs, products)}
+        """)
+        sqlQuery.setParameterList("candidateIds", productIds)
+        setProductFilterParameters(sqlQuery, categories, tags, catalogs, products)
+        return sqlQuery.list() as List<String>
+    }
+
+    /**
+     * Calculates the total quantity on hand of each product at a facility at each of the given dates.
+     *
+     * Each date takes a few seconds at a large facility, mostly reading its transaction history (see
+     * ProductAvailabilityService.getQuantityOnHandAtDate), so the dates are calculated at the same time, each on its
+     * own database connection and Hibernate session (see calculateTransactionReportBalancesInParallel). Only ids are
+     * passed to the other threads, and they return plain totals, so no entity is shared between sessions.
+     *
+     * @return the total quantity on hand of each product keyed on product id, for each date in the same order
+     */
+    private List<Map<String, Integer>> getQuantityOnHandByProductAtDates(Location location,
+                                                                         List<Product> products,
+                                                                         List<Date> dates) {
+        Closure<Map<String, Integer>> getQuantityOnHandByProduct = { Date date ->
+            sumQuantityOnHandByProduct(productAvailabilityService.getQuantityOnHandAtDateAsMap(location, products, date))
+        }
+        if (!calculateTransactionReportBalancesInParallel) {
+            return dates.collect(getQuantityOnHandByProduct)
+        }
+        // Load the facility's inventory in this session, so the other threads only read its id
+        location.inventory?.id
+        return GparsService.withPool("TransactionReport", dates.size()) {
+            dates.collectParallel { Date date ->
+                Transaction.withNewSession { getQuantityOnHandByProduct(date) }
+            }
+        } as List<Map<String, Integer>>
     }
 
     /**
@@ -1582,15 +1679,16 @@ class ReportService implements ApplicationContextAware {
                                       List<Product> productList,
                                       Date startDate,
                                       Date endDate,
-                                      Boolean includeDetails) {
+                                      Boolean includeDetails,
+                                      Boolean includeProductsWithNoActivity = false,
+                                      Boolean includeInternalTransfers = false) {
 
         List<TransactionCode> adjustmentTransactionCodes = [
                 TransactionCode.CREDIT,
                 TransactionCode.DEBIT
         ]
 
-        // The credits and debits of each product between startDate and endDate, by transaction type. Only products
-        // with a credit or debit in that period are included in the report.
+        // The credits and debits of each product between startDate and endDate, by transaction type
         Map<String, List<Map>> totalsByProduct = getTransactionReportTotals(
                 location,
                 categories,
@@ -1598,19 +1696,24 @@ class ReportService implements ApplicationContextAware {
                 catalogsList,
                 productList,
                 startDate,
-                endDate
+                endDate,
+                includeInternalTransfers
         ).groupBy { it.product_id }
-        if (!totalsByProduct) {
-            return []
-        }
-        List<Product> products = Product.getAll(totalsByProduct.keySet().toList()).sort { it.productCode }
 
-        // Quantity on hand of each product at the startDate (opening balance) and endDate (closing balance)
-        Map<String, Integer> openingBalanceByProduct = sumQuantityOnHandByProduct(
-                productAvailabilityService.getQuantityOnHandAtDateAsMap(location, products, startDate))
-        Map<String, Integer> closingBalanceByProduct = sumQuantityOnHandByProduct(
-                productAvailabilityService.getQuantityOnHandAtDateAsMap(
-                        location, products, endDate.before(new Date()) ? endDate : new Date()))
+        // Quantity on hand of each product at the startDate (opening balance) and endDate (closing balance), for all
+        // products at the facility (or the selected products), so that products with stock but no credits or debits
+        // in the period are included too
+        List<Map<String, Integer>> balancesByProduct = getQuantityOnHandByProductAtDates(
+                location, productList ?: [], [startDate, endDate.before(new Date()) ? endDate : new Date()])
+        Map<String, Integer> openingBalanceByProduct = balancesByProduct[0]
+        Map<String, Integer> closingBalanceByProduct = balancesByProduct[1]
+
+        // The report includes every product that matches the filters and had stock at the start or end of the period,
+        // or a credit or debit during it. A product whose stock was counted during the period has either stock or a
+        // difference, so it's included too.
+        Set<String> productIds = totalsByProduct.keySet() + openingBalanceByProduct.keySet() + closingBalanceByProduct.keySet()
+        List<Product> products = Product.getAll(filterTransactionReportProductIds(
+                productIds, categories, tagsList, catalogsList, productList)).sort { it.productCode }
 
         // AvailableTransactionTypes are only used in case of generating CSV. The CSV file should contain
         // additional information about the product and the quantities should be grouped by transaction types
@@ -1627,8 +1730,8 @@ class ReportService implements ApplicationContextAware {
         // and the quantity of that transaction entry is greater than 0
         // 2. DEBITS = transaction entries in relation with transaction that are DEBIT type
         // and transaction that are CREDIT type, but with quantity lower than 0
-        return products.collect { Product key ->
-            List<Map> totals = totalsByProduct[key.id]
+        return products.findResults { Product key ->
+            List<Map> totals = totalsByProduct[key.id] ?: []
             Integer openingBalance = openingBalanceByProduct[key.id] ?: 0
             Integer closingBalance = closingBalanceByProduct[key.id] ?: 0
             Integer credits = totals.sum { it.credits } as Integer ?: 0
@@ -1637,6 +1740,11 @@ class ReportService implements ApplicationContextAware {
             // inventory and baseline transactions) set quantity on hand instead of adding to it, so this is the
             // total difference between what was counted and the balance before each count.
             Integer differences = closingBalance - openingBalance - credits + debits
+
+            // No activity: the quantity on hand didn't change, and nothing was added or removed
+            if (!includeProductsWithNoActivity && !credits && !debits && !differences) {
+                return null
+            }
 
             if (includeDetails) {
                 return getTransactionReportDetailedRow(
@@ -1726,6 +1834,25 @@ class ReportService implements ApplicationContextAware {
             }
             return reference ? [(row[0]): reference] : [:]
         }
+    }
+
+    /**
+     * @return the ids of the given transactions that are one side of an internal transfer (see
+     *         NOT_INTERNAL_TRANSFER_CONDITION), and of the other side
+     */
+    Set<String> getInternalTransferTransactionIds(List<String> transactionIds) {
+        if (!transactionIds) {
+            return [] as Set
+        }
+        List<Object[]> rows = LocalTransfer.executeQuery("""
+            SELECT source.id, destination.id
+            FROM LocalTransfer lt
+            JOIN lt.sourceTransaction source
+            JOIN lt.destinationTransaction destination
+            WHERE source.inventory = destination.inventory
+            AND (source.id IN (:transactionIds) OR destination.id IN (:transactionIds))
+        """, [transactionIds: transactionIds])
+        return rows.collectMany { Object[] row -> row as List<String> } as Set<String>
     }
 
     /**
@@ -1832,14 +1959,16 @@ class ReportService implements ApplicationContextAware {
             quantityByStockKey[key.id] = (quantityByStockKey[key.id] ?: 0) + (availableItem.quantityOnHand as Integer)
         }
 
-        Map<String, Map> referencesByTransactionId = getTransactionReferences(
-                transactionEntriesWithinDateRange*.transaction*.id.unique())
+        List<String> transactionIds = transactionEntriesWithinDateRange*.transaction*.id.unique()
+        Map<String, Map> referencesByTransactionId = getTransactionReferences(transactionIds)
+        Set<String> internalTransferTransactionIds = getInternalTransferTransactionIds(transactionIds)
 
         // Add transaction entries to the list that took place within selected time range
         Transaction productInventoryTransaction = null
         transactionEntriesWithinDateRange.each { TransactionEntry it ->
             // The change to the balance (negative for debits), or null for counts, which set the balance instead
             Integer quantityChange = null
+            boolean internal = internalTransferTransactionIds.contains(it.transaction.id)
             if (isCountTransaction(it.transaction)) {
                 // A product inventory transaction (e.g. an inventory baseline) sets the quantity on hand of each lot
                 // and bin of the product to the quantity of its entries, and of every lot and bin it doesn't include
@@ -1871,7 +2000,11 @@ class ReportService implements ApplicationContextAware {
                 }
             } else {
                 quantityChange = isTransactionEntryDebit(it) ? -Math.abs(it.quantity) : Math.abs(it.quantity)
-                openingBalance += quantityChange
+                // An internal transfer moves stock between bins, so it changes the quantity of each bin but not the
+                // balance of the facility (its Transfer Out and Transfer In cancel out)
+                if (!internal) {
+                    openingBalance += quantityChange
+                }
                 StockKey key = new StockKey(it.inventoryItem, it.binLocation)
                 stockKeys[key.id] = key
                 quantityByStockKey[key.id] = (quantityByStockKey[key.id] ?: 0) + quantityChange
@@ -1893,6 +2026,7 @@ class ReportService implements ApplicationContextAware {
                     quantity: it.quantity,
                     quantityChange: quantityChange,
                     balance: openingBalance,
+                    internal: internal,
             ])
         }
 
