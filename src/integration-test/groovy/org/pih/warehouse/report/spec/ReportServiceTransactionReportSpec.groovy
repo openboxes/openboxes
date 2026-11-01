@@ -231,7 +231,7 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         row["Transfer Out"] == 5
         row["Adjustment (Credit and Debit)"] == 4 + 6 - 1
         row["Backdated inventory correction"] == 6 - 2
-        row.subMap("Credits", "Debits", "Closing") == [Credits: 20, Debits: 11, Closing: 9]
+        row.subMap("Credits", "Debits", "Differences", "Closing") == [Credits: 20, Debits: 11, Differences: 0, Closing: 9]
     }
 
     void 'backdated transactions are each counted, even when they have the same dates'() {
@@ -357,10 +357,11 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
                     openingBalance: openingBalance,
                     credits: credits,
                     debits: debits,
+                    differences: closingBalance - openingBalance - credits + debits,
                     closingBalance: closingBalance,
             ]
             if (!args.includeDetails) {
-                return reportService.getTransactionReportRow(data + [differences: closingBalance - openingBalance - credits + debits])
+                return reportService.getTransactionReportRow(data)
             }
             // The previous implementation called unique() without a closure, which compares transactions with
             // compareTo (by date) and so dropped backdated transactions with the same dates (see the test above).

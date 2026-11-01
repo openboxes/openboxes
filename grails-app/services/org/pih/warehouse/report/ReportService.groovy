@@ -25,6 +25,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DashboardService
 import org.pih.warehouse.core.LocalizationService
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.SynonymTypeCode
@@ -39,6 +40,7 @@ import org.pih.warehouse.data.DataService
 import org.pih.warehouse.inventory.InventoryCount
 import org.pih.warehouse.inventory.CycleCountItem
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryAuditDetails
 import org.pih.warehouse.inventory.InventoryAuditRollup
 import org.pih.warehouse.inventory.InventoryAuditSummary
@@ -53,6 +55,7 @@ import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderService
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
@@ -1565,6 +1568,7 @@ class ReportService implements ApplicationContextAware {
         }
 
         return row + [
+                "Differences": data.differences,
                 "Closing": data.closingBalance,
                 "Backdated inventory correction": data.backdatedQuantity ?: 0
         ]
@@ -1647,6 +1651,7 @@ class ReportService implements ApplicationContextAware {
                         openingBalance: openingBalance,
                         credits: credits,
                         debits: debits,
+                        differences: differences,
                         closingBalance: closingBalance,
                         // The quantity of each transaction type, keyed on transaction type name
                         detailedReportData: totals.collectEntries {
@@ -1670,6 +1675,92 @@ class ReportService implements ApplicationContextAware {
                     closingBalance: closingBalance
             )
         }
+    }
+
+    /**
+     * Finds the document that each transaction came from (a request, shipment or order), like the stock card's
+     * reference column. Loaded with one query so that the transactions' associations aren't loaded one at a time.
+     *
+     * @return the reference of each transaction that has one, keyed by transaction id, with:
+     *         - type: REQUISITION, SHIPMENT or ORDER
+     *         - typeName: the order type, for orders (e.g. Putaway)
+     *         - number: the request, shipment or order number
+     *         - url: the page of the document, relative to the context path
+     */
+    Map<String, Map> getTransactionReferences(List<String> transactionIds) {
+        if (!transactionIds) {
+            return [:]
+        }
+        List<Object[]> rows = Transaction.executeQuery("""
+            SELECT t.id, requisition.id, requisition.requestNumber,
+                   incomingShipment.id, incomingShipment.shipmentNumber,
+                   outgoingShipment.id, outgoingShipment.shipmentNumber,
+                   o.id, o.orderNumber, orderType.name, orderType.code, orderType.orderTypeCode
+            FROM Transaction t
+            LEFT JOIN t.requisition requisition
+            LEFT JOIN t.incomingShipment incomingShipment
+            LEFT JOIN t.outgoingShipment outgoingShipment
+            LEFT JOIN t.order o
+            LEFT JOIN o.orderType orderType
+            WHERE t.id IN (:transactionIds)
+        """, [transactionIds: transactionIds])
+
+        Locale locale = localizationService.getCurrentLocale()
+        return rows.collectEntries { Object[] row ->
+            String requisitionId = row[1], shipmentId = row[3] ?: row[5], orderId = row[7]
+            Map reference = null
+            // Same order as the stock card: a shipment that was requested shows the request
+            if (requisitionId) {
+                reference = [type: "REQUISITION", number: row[2], url: "/stockMovement/show/${requisitionId}"]
+            } else if (shipmentId) {
+                reference = [type: "SHIPMENT", number: row[4] ?: row[6], url: "/shipment/showDetails/${shipmentId}"]
+            } else if (orderId) {
+                // Stock transfers and bin replenishments have their own page, but putaways use the order page
+                boolean isStockTransfer = row[11] == OrderTypeCode.TRANSFER_ORDER && row[10] != Constants.PUTAWAY_ORDER
+                reference = [
+                        type: "ORDER",
+                        typeName: row[9] ? LocalizationUtil.getLocalizedString(row[9] as String, locale) : null,
+                        number: row[8],
+                        url: isStockTransfer ? "/stockTransfer/show/${orderId}" : "/order/show/${orderId}",
+                ]
+            }
+            return reference ? [(row[0]): reference] : [:]
+        }
+    }
+
+    /**
+     * A lot and bin location of a product, for following the quantity of each in the transaction report details.
+     */
+    private static class StockKey {
+        String id
+        String lotNumber
+        String binLocationName
+
+        StockKey(InventoryItem inventoryItem, Location binLocation) {
+            id = "${inventoryItem?.id}:${binLocation?.id}"
+            lotNumber = inventoryItem?.lotNumber
+            binLocationName = binLocation?.name
+        }
+    }
+
+    private static boolean isCountTransaction(Transaction transaction) {
+        return transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY
+    }
+
+    /**
+     * A "ghost" row in the transaction report details: a change in quantity on hand that no transaction recorded.
+     */
+    private static Map getUnrecordedChangeRow(Date date, Integer quantityChange, Integer balance,
+                                              String transactionCode = "UNRECORDED_CHANGE") {
+        return [
+                transactionDate: JavaUtilDateFormatter.formatAsDate(date),
+                transactionTime: JavaUtilDateFormatter.formatAsTime(date),
+                transactionCode: transactionCode,
+                transactionTypeName: null,  // The details dialog labels these rows
+                quantity       : null,
+                quantityChange : quantityChange,
+                balance        : balance,
+        ]
     }
 
     List<Object> getTransactionReportModalData(Location location, Product product, Date startDate, Date endDate) {
@@ -1724,26 +1815,66 @@ class ReportService implements ApplicationContextAware {
 
         // Sort the entries in the order that quantity on hand is calculated in: by transaction date, then by date
         // created. The query only sorts by transaction date, so transactions with the same date could be in any order.
+        // A count comes before credits and debits with exactly the same dates, like it does for quantity on hand.
         transactionEntriesWithinDateRange = transactionEntriesWithinDateRange.sort(false) { TransactionEntry a, TransactionEntry b ->
-            a.transaction <=> b.transaction ?: a.transaction.id <=> b.transaction.id
+            a.transaction <=> b.transaction ?:
+                    !isCountTransaction(a.transaction) <=> !isCountTransaction(b.transaction) ?:
+                    a.transaction.id <=> b.transaction.id
         }
+
+        // The quantity of each lot and bin, so that a count's difference can be shown for each lot and bin. Starts with
+        // the quantities at the start date and follows the transactions below.
+        Map<String, StockKey> stockKeys = [:]
+        Map<String, Integer> quantityByStockKey = [:]
+        availableItemStartDateMap.values().each { AvailableItem availableItem ->
+            StockKey key = new StockKey(availableItem.inventoryItem, availableItem.binLocation)
+            stockKeys[key.id] = key
+            quantityByStockKey[key.id] = (quantityByStockKey[key.id] ?: 0) + (availableItem.quantityOnHand as Integer)
+        }
+
+        Map<String, Map> referencesByTransactionId = getTransactionReferences(
+                transactionEntriesWithinDateRange*.transaction*.id.unique())
 
         // Add transaction entries to the list that took place within selected time range
         Transaction productInventoryTransaction = null
         transactionEntriesWithinDateRange.each { TransactionEntry it ->
             // The change to the balance (negative for debits), or null for counts, which set the balance instead
             Integer quantityChange = null
-            if (it.transaction.transactionType.transactionCode == TransactionCode.PRODUCT_INVENTORY) {
-                // A product inventory transaction (e.g. an inventory baseline) sets the quantity on hand of the product
-                // to the quantity of its entries, so the balance starts over from its first entry.
-                if (productInventoryTransaction != it.transaction) {
+            if (isCountTransaction(it.transaction)) {
+                // A product inventory transaction (e.g. an inventory baseline) sets the quantity on hand of each lot
+                // and bin of the product to the quantity of its entries, and of every lot and bin it doesn't include
+                // to zero. Where the counted quantity differs from the quantity before the count, the change wasn't
+                // recorded as a transaction (e.g. a loss, or a transaction that was deleted later), so it's shown as a
+                // "ghost" row before the count's entries. These rows add up to the Differences column of the report.
+                // Transactions are compared by id: == compares them with compareTo (by date), so a transaction with the
+                // same dates would be the same transaction.
+                if (productInventoryTransaction?.id != it.transaction.id) {
                     productInventoryTransaction = it.transaction
-                    openingBalance = 0
+                    Map<String, Integer> countedQuantityByStockKey = [:]
+                    transactionEntriesWithinDateRange.findAll { it.transaction.id == productInventoryTransaction.id }.each { TransactionEntry countEntry ->
+                        StockKey key = new StockKey(countEntry.inventoryItem, countEntry.binLocation)
+                        stockKeys[key.id] = key
+                        countedQuantityByStockKey[key.id] = (countedQuantityByStockKey[key.id] ?: 0) + countEntry.quantity
+                    }
+                    (quantityByStockKey.keySet() + countedQuantityByStockKey.keySet())
+                            .collect { stockKeys[it] }
+                            .sort { StockKey a, StockKey b -> a.lotNumber <=> b.lotNumber ?: a.binLocationName <=> b.binLocationName }
+                            .each { StockKey key ->
+                                Integer difference = (countedQuantityByStockKey[key.id] ?: 0) - (quantityByStockKey[key.id] ?: 0)
+                                if (difference) {
+                                    openingBalance += difference
+                                    entries.add(getUnrecordedChangeRow(it.transaction.transactionDate, difference, openingBalance)
+                                            + [lotNumber: key.lotNumber, binLocation: key.binLocationName])
+                                }
+                            }
+                    quantityByStockKey = countedQuantityByStockKey
                 }
-                openingBalance += it.quantity
             } else {
                 quantityChange = isTransactionEntryDebit(it) ? -Math.abs(it.quantity) : Math.abs(it.quantity)
                 openingBalance += quantityChange
+                StockKey key = new StockKey(it.inventoryItem, it.binLocation)
+                stockKeys[key.id] = key
+                quantityByStockKey[key.id] = (quantityByStockKey[key.id] ?: 0) + quantityChange
             }
 
             entries.add([
@@ -1756,12 +1887,19 @@ class ReportService implements ApplicationContextAware {
                     ),
                     transactionId: it.transaction.id,
                     transactionNumber: it.transaction.transactionNumber,
+                    reference: referencesByTransactionId[it.transaction.id],
                     lotNumber: it.inventoryItem?.lotNumber,
                     binLocation: it.binLocation?.name,
                     quantity: it.quantity,
                     quantityChange: quantityChange,
                     balance: openingBalance,
             ])
+        }
+
+        // The transactions should always add up to the closing balance. If they don't, show the rest of the difference
+        // instead of hiding it (e.g. a legacy INVENTORY transaction, which only sets the quantity of one lot).
+        if (openingBalance != closingBalance) {
+            entries.add(getUnrecordedChangeRow(endDate - 1, closingBalance - openingBalance, closingBalance, "UNRECONCILED"))
         }
 
         // Add closing balance as a last element

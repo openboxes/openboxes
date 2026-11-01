@@ -75,9 +75,11 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
         when:
         List<Map> rows = modalData()
 
-        then:
-        rows.transactionCode == ["BALANCE_OPENING", "DEBIT", "PRODUCT_INVENTORY", "CREDIT", "BALANCE_CLOSING"]
-        rows.balance == [100, 90, 80, 85, 85]
+        then: 'a ghost row before the count shows the 10 that no transaction recorded'
+        rows.transactionCode ==
+                ["BALANCE_OPENING", "DEBIT", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "CREDIT", "BALANCE_CLOSING"]
+        rows.balance == [100, 90, 80, 80, 85, 85]
+        rows[2].quantityChange == -10
 
         where:
         type                   | transactionTypeId
@@ -94,10 +96,12 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
         when:
         List<Map> rows = modalData()
 
-        then: 'the entries of the count can be in either order'
-        rows.balance[0] == 100
-        rows.balance[1] in [20, 30]
-        rows.balance[2..4] == [50, 45, 45]
+        then: 'a ghost row for each lot shows its difference, and the balance is the total of the count for each entry'
+        rows.transactionCode == ["BALANCE_OPENING", "UNRECORDED_CHANGE", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY",
+                                 "PRODUCT_INVENTORY", "DEBIT", "BALANCE_CLOSING"]
+        rows.balance == [100, 30, 50, 50, 50, 45, 45]
+        rows[1].subMap("lotNumber", "quantityChange") == [lotNumber: "L1", quantityChange: -70]
+        rows[2].subMap("lotNumber", "quantityChange") == [lotNumber: "L2", quantityChange: 20]
     }
 
     void 'transactions with the same transaction date are in the order they were created'() {
@@ -110,8 +114,68 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
         List<Map> rows = modalData()
 
         then: 'the count comes first, so the debit is taken from the counted quantity, like quantity on hand'
-        rows.transactionCode == ["BALANCE_OPENING", "PRODUCT_INVENTORY", "DEBIT", "BALANCE_CLOSING"]
-        rows.balance == [100, 50, 40, 40]
+        rows.transactionCode == ["BALANCE_OPENING", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "DEBIT", "BALANCE_CLOSING"]
+        rows.balance == [100, 50, 50, 40, 40]
+    }
+
+    void 'a count comes before a credit with exactly the same dates, like it does for quantity on hand'() {
+        given: 'a credit with the same transaction date and date created as a count, inserted first'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(ADJUSTMENT_CREDIT, day(7), [[item1, 5]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 50]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        rows.transactionCode == ["BALANCE_OPENING", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "CREDIT", "BALANCE_CLOSING"]
+        rows.balance == [100, 50, 50, 55, 55]
+    }
+
+    void 'a count that leaves out a lot sets it to zero, with a ghost row for the lot'() {
+        given: 'a count of lot 1 only, when lot 2 has 20'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100], [item2, 20]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 100]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        rows.transactionCode == ["BALANCE_OPENING", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "BALANCE_CLOSING"]
+        rows[1].subMap("lotNumber", "quantityChange", "balance") == [lotNumber: "L2", quantityChange: -20, balance: 100]
+        rows.last().balance == 100
+    }
+
+    void 'a count that matches the balance has no ghost row'() {
+        given:
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(TRANSFER_OUT, day(6), [[item1, 10]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 90]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        rows.transactionCode == ["BALANCE_OPENING", "DEBIT", "PRODUCT_INVENTORY", "BALANCE_CLOSING"]
+        rows.balance == [100, 90, 90, 90]
+    }
+
+    void 'the ghost rows add up to the change that the credits and debits do not account for'() {
+        given: 'two counts that each recorded less than the balance before them'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(INVENTORY_BASELINE, day(6), [[item1, 95]])
+        insertTransaction(ADJUSTMENT_CREDIT, day(7), [[item2, 20]])
+        insertTransaction(INVENTORY_BASELINE, day(8), [[item1, 90], [item2, 18]])
+
+        when:
+        List<Map> rows = modalData()
+        Integer credits = rows.findAll { it.transactionCode == "CREDIT" }.sum { it.quantityChange } as Integer ?: 0
+
+        then: 'closing - opening - credits + debits, i.e. the Differences column of the report'
+        rows.findAll { it.transactionCode == "UNRECORDED_CHANGE" }.collect { [it.lotNumber, it.quantityChange] } ==
+                [["L1", -5], ["L1", -5], ["L2", -2]]
+        rows.last().balance - rows.first().balance - credits == -12
+        !rows.any { it.transactionCode == "UNRECONCILED" }
     }
 
     private List<Map> modalData() {

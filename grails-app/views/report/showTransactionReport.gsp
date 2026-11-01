@@ -20,31 +20,105 @@
 		overflow-y: auto;
 	}
 
-	/* Covers the report while it's being generated, so that it can't be run again until it's done (see #6201) */
-	.body {
-		position: relative;
+	/* The report period field and its range picker */
+	.report-period input[type=text] {
+		width: 100%;
+		box-sizing: border-box;
 	}
 
+	.report-period .hint {
+		cursor: help;
+	}
+
+	/* The picker sizes itself assuming content-box, so its months wrap onto two lines with the site's border-box */
+	.date-picker-wrapper, .date-picker-wrapper * {
+		box-sizing: content-box;
+	}
+
+	/* The picker's shortcuts, one line per group (days, months, quarters, years) */
+	.date-picker-wrapper .footer .shortcuts {
+		line-height: 1.8;
+	}
+
+	.date-picker-wrapper .shortcut-group {
+		display: block;
+	}
+
+	.date-picker-wrapper .shortcut-group-label {
+		display: inline-block;
+		width: 70px;
+		color: #666;
+	}
+
+	.date-picker-wrapper .shortcut-group .custom-shortcut {
+		margin-right: 10px;
+	}
+
+	/* The message in the empty table, before a report has been run or when it has no rows */
+	#transactionReport_wrapper td.dataTables_empty {
+		padding: 40px 20px;
+		text-align: center;
+		color: #666;
+		font-size: 1.1em;
+	}
+
+	/* Run and download buttons side by side, filling the width of the sidebar */
+	.sidebar .buttons {
+		display: flex;
+		gap: 10px;
+		padding: 10px;
+	}
+
+	.sidebar .buttons .button {
+		flex: 1;
+		justify-content: center;
+		margin: 0;
+	}
+
+	.required-marker {
+		color: #c00;
+	}
+
+	/* The optional filters, set apart from the required parameters above them */
+	.product-filters {
+		margin-top: 15px;
+		border-top: 1px solid #ddd;
+		padding-top: 5px;
+	}
+
+	.product-filters h3 {
+		margin: 10px 10px 0;
+		font-size: 1em;
+		font-weight: bold;
+	}
+
+	.product-filters-hint {
+		margin: 3px 10px 0;
+		color: #666;
+		font-size: 0.9em;
+	}
+
+	/* Covers the whole page (including the header and footer) while the report is being generated, so that it can't
+	   be run again until it's done (see #6201) */
 	.report-overlay {
 		display: none;
-		position: absolute;
+		position: fixed;
 		top: 0;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		z-index: 1000;
+		z-index: 10000;
+		align-items: center;
+		justify-content: center;
 		background-color: rgba(128, 128, 128, 0.5);
 		cursor: wait;
 	}
 
 	.report-overlay.active {
-		display: block;
+		display: flex;
 	}
 
 	.report-overlay-message {
-		position: sticky;
-		top: 40%;
-		margin: 15% auto 0;
 		width: 320px;
 		padding: 20px;
 		background-color: #fff;
@@ -115,6 +189,69 @@
 		white-space: nowrap;
 	}
 
+	/* Transaction dates in the details dialog: fixed-width digits so that they line up, a lighter time, a dimmed date
+	   when it's the same as the row above, and a line above the first row of each day */
+	#dialogDataTable_wrapper td.date-cell {
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+
+	#dialogDataTable_wrapper td.date-cell .time {
+		color: #999;
+	}
+
+	#dialogDataTable_wrapper td.date-cell .date.same-date {
+		color: #ccc;
+	}
+
+	#dialogDataTable_wrapper tbody tr.new-day td {
+		border-top: 1px solid #ddd;
+	}
+
+	/* "Ghost" rows in the details dialog: changes that no transaction recorded */
+	#dialogDataTable_wrapper tbody tr.ghost-row td {
+		font-style: italic;
+		color: #888;
+		cursor: help;
+	}
+
+	#dialogDataTable_wrapper tbody tr.ghost-row td:nth-child(2) {
+		border-left: 3px dashed #ccc;
+	}
+
+	/* Fixed layout, so that the columns keep their widths and the product name gets the rest. Otherwise the browser
+	   spreads the extra width over every column, which pushes the quantities away from the product. Applies to the
+	   header and body tables, which DataTables splits the table into when it scrolls. */
+	#transactionReport_wrapper table.dataTable {
+		table-layout: fixed;
+	}
+
+	/* The column widths. DataTables sets its own width on every header cell (and doesn't keep the widths it's given),
+	   so they're set here instead. The product name has no width, so it gets the rest. */
+	#transactionReport_wrapper table.dataTable thead th:nth-child(1) {
+		width: 80px !important;
+	}
+
+	#transactionReport_wrapper table.dataTable thead th:nth-child(2) {
+		width: auto !important;
+	}
+
+	#transactionReport_wrapper table.dataTable thead th:nth-child(3) {
+		width: 260px !important;
+	}
+
+	/* The site limits data table cells to 100px wide */
+	#transactionReport_wrapper table.dataTable th:nth-child(2),
+	#transactionReport_wrapper table.dataTable td:nth-child(2),
+	#transactionReport_wrapper table.dataTable th:nth-child(3),
+	#transactionReport_wrapper table.dataTable td:nth-child(3) {
+		max-width: none;
+	}
+
+	#transactionReport_wrapper table.dataTable thead th:nth-child(n+4) {
+		width: 75px !important;
+	}
+
 	/* Show at most two lines of long product and category names (the full name is in the tooltip) */
 	#transactionReport_wrapper .clamp {
 		display: -webkit-box;
@@ -143,6 +280,12 @@
 	#transactionReport_wrapper tbody tr:hover td.sorting_1 {
 		background-color: #eaf2fb;
 		cursor: pointer;
+	}
+
+	/* Except the message in an empty table, which isn't a product */
+	#transactionReport_wrapper tbody tr:hover td.dataTables_empty {
+		background-color: #fff;
+		cursor: default;
 	}
 
 	#transactionReport_wrapper .credit,
@@ -177,7 +320,7 @@
 		background-color: #f0f0f2;
 	}
 
-	.report-details-empty {
+	.report-metadata-empty {
 		padding: 10px;
 		color: #666;
 	}
@@ -189,6 +332,10 @@
 		cursor: help;
 	}
 	</style>
+	<%-- The same date range picker as the request list --%>
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/daterangepicker.min.css" />
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/jquery.daterangepicker.min.js"></script>
 </head>
 <body>
 
@@ -229,31 +376,9 @@
 						<div class="parameters">
 
 							<div class="filter-list-item">
-
 								<label>
-									<warehouse:message code="report.startDate.label"/>
-								</label>
-
-								<g:jqueryDatePicker name="startDate"
-													cssClass="filter"
-													value="${command?.startDate}"
-                                />
-
-							</div>
-							<div class="filter-list-item">
-
-								<label>
-									<warehouse:message code="report.endDate.label"/>
-								</label>
-
-								<g:jqueryDatePicker name="endDate"
-													cssClass="filter"
-													value="${command?.endDate}"
-                                />
-							</div>
-							<div class="filter-list-item">
-								<label>
-									<warehouse:message code="report.location.label"/>
+									<warehouse:message code="report.facility.label" default="Facility"/>
+									<span class="required-marker">*</span>
 								</label>
 								<g:selectLocation
 									class="chzn-select-deselect filter"
@@ -266,104 +391,125 @@
 									value="${command?.location?.id}"
 								/>
 							</div>
-							<div class="filter-list-item">
-								<label><warehouse:message code="category.label"/></label>
-								<p>
-									<g:selectCategory
-										id="category"
-									    class="chzn-select-deselect filter"
-									    data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
-									    name="category"
-									    noSelection="['':'']"
-									    value="${params?.category?.id?:command?.rootCategory?.id}"
-									/>
-								</p>
-								<p>
-									<label>
-										<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
-										${warehouse.message(
-											code:'report.search.includeCategoryChildren.label',
-											default: 'Include all products in all subcategories',
-										)}
-									</label>
-								</p>
+							<%-- The report period, picked as a range. The hidden fields hold the dates in the format the server reads
+							     (MM/dd/yyyy), and are filled in from the text field by syncReportPeriod. --%>
+							<div class="filter-list-item report-period">
+								<label for="reportPeriod" class="hint" title="${g.message(code: 'report.period.hint', default: 'Both dates are included: from the start of the first day to the end of the last.')}">
+									<g:message code="report.period.label" default="Period"/>
+									<span class="required-marker">*</span>
+								</label>
+								<input type="text" id="reportPeriod" class="text filter" autocomplete="off"
+									   placeholder="${g.message(code: 'report.period.placeholder', default: 'e.g. 01/Jan/2026 - 31/Jan/2026')}"/>
+								<input type="hidden" id="startDate" name="startDate" value="${formatDate(date: command?.startDate, format: 'MM/dd/yyyy')}"/>
+								<input type="hidden" id="endDate" name="endDate" value="${formatDate(date: command?.endDate, format: 'MM/dd/yyyy')}"/>
 							</div>
-                            <div class="filter-list-item">
-                                <label><g:message code="product.label"/></label>
-                                <p>
-                                    <g:selectProductAjax id="products-select"
-                                                         value="${params?.products}"
-                                                         multiple="true"
-                                    />
-                                </p>
-                            </div>
-							<div class="filter-list-item">
-								<label><warehouse:message code="tag.label"/></label>
-								<p>
-									<g:selectTags
-										name="tags"
-									    id="tags"
-									    value="${params?.tags}"
-										data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
-										multiple="true"
-									    class="chzn-select-deselect"
-									/>
+
+							<%-- Optional filters, ordered from broadest to narrowest. The report combines them with AND. --%>
+							<div class="product-filters">
+								<h3><g:message code="report.productFilters.label" default="Filter products (optional)"/></h3>
+								<p class="product-filters-hint">
+									<g:message code="report.productFilters.hint" default="Leave blank for all products. Products must match every filter you set."/>
 								</p>
-							</div>
-							<div class="filter-list-item">
-								<label><warehouse:message code="catalogs.name.label"/></label>
-								<p>
-									<g:selectCatalogs
-										id="catalogs"
-										name="catalogs"
-										noSelection="['null':'']"
-									    value="${params?.catalogs}"
-										data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
-										class="chzn-select-deselect"
-									/>
-								</p>
+								<div class="filter-list-item">
+									<label><warehouse:message code="category.label"/></label>
+									<p>
+										<g:selectCategory
+											id="category"
+										    class="chzn-select-deselect filter"
+										    data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
+										    name="category"
+										    noSelection="['':'']"
+										    value="${params?.category?.id?:command?.rootCategory?.id}"
+										/>
+									</p>
+									<p>
+										<label>
+											<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
+											${warehouse.message(
+												code:'report.search.includeCategoryChildren.label',
+												default: 'Include all products in all subcategories',
+											)}
+										</label>
+									</p>
+								</div>
+								<div class="filter-list-item">
+									<label><warehouse:message code="catalogs.name.label"/></label>
+									<p>
+										<g:selectCatalogs
+											id="catalogs"
+											name="catalogs"
+											noSelection="['null':'']"
+										    value="${params?.catalogs}"
+											data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+											class="chzn-select-deselect"
+										/>
+									</p>
+								</div>
+								<div class="filter-list-item">
+									<label><warehouse:message code="tags.label" default="Tags"/></label>
+									<p>
+										<g:selectTags
+											name="tags"
+										    id="tags"
+										    value="${params?.tags}"
+											data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+											multiple="true"
+										    class="chzn-select-deselect"
+										/>
+									</p>
+								</div>
+								<div class="filter-list-item">
+									<label><g:message code="products.label" default="Products"/></label>
+									<p>
+										<g:selectProductAjax id="products-select"
+															 value="${params?.products}"
+															 multiple="true"
+										/>
+									</p>
+								</div>
 							</div>
 						</div>
 						<div class="buttons">
-							<button class="submit-button button">
+							<button class="submit-button button primary">
 								<img src="${resource(dir:'images/icons/silk',file:'play_blue.png')}" />
 								<g:set var="reportLabel" value="${g.message(code:'default.report.label', default: 'Report')}"/>
 								${g.message(code: 'default.run.label', args: [reportLabel])}
 							</button>
-							<button class="download-button button">
+							<button class="download-button button"
+									title="${g.message(code: 'report.transaction.download.hint', default: 'Downloads the report as a CSV file, with a column for each transaction type')}">
 								<img src="${resource(dir:'images/icons/silk',file:'page_excel.png')}" />
-								<g:set var="dataLabel" value="${g.message(code:'default.data.label', default: 'Data')}"/>
-								${g.message(code: 'default.download.label', args: [dataLabel])}
+								<g:set var="csvLabel" value="${g.message(code:'default.csv.label', default: 'CSV')}"/>
+								${g.message(code: 'default.download.label', args: [csvLabel])}
 							</button>
 						</div>
 					</div>
-					<%-- Details of the last report that was run. Filled in by showReportDetails. --%>
-					<div class="box report-details">
-						<h2><g:message code="report.details.label" default="Report Details"/></h2>
-						<p class="report-details-empty">
-							<g:message code="report.details.empty" default="Run the report to see its details here."/>
+					<%-- Metadata of the last report that was run. Filled in by showReportMetadata. --%>
+					<div class="box report-metadata">
+						<h2><g:message code="report.metadata.label" default="Report Metadata"/></h2>
+						<p class="report-metadata-empty">
+							<g:message code="report.metadata.empty" default="Run the report to see its details here."/>
 						</p>
-						<table class="report-details-values" style="display: none">
+						<table class="report-metadata-values" style="display: none">
 							<tbody>
 								<tr class="prop">
-									<td class="name"><label><g:message code="location.label" default="Location"/></label></td>
-									<td class="value report-details-location"></td>
+									<td class="name"><label><g:message code="report.facility.label" default="Facility"/></label></td>
+									<td class="value report-metadata-facility"></td>
 								</tr>
 								<tr class="prop">
-									<td class="name"><label><g:message code="report.details.period.label" default="Period"/></label></td>
-									<td class="value report-details-period"></td>
+									<td class="name"><label><g:message code="report.metadata.period.label" default="Period"/></label></td>
+									<td class="value report-metadata-period"></td>
 								</tr>
 								<tr class="prop">
 									<td class="name"><label><g:message code="products.label" default="Products"/></label></td>
-									<td class="value report-details-products"></td>
+									<td class="value report-metadata-products"></td>
 								</tr>
 								<tr class="prop">
-									<td class="name"><label><g:message code="report.details.generated.label" default="Generated"/></label></td>
-									<td class="value report-details-generated"></td>
+									<td class="name"><label><g:message code="report.metadata.generated.label" default="Generated"/></label></td>
+									<td class="value report-metadata-generated"></td>
 								</tr>
 								<tr class="prop">
-									<td class="name"><label><g:message code="report.details.duration.label" default="Duration"/></label></td>
-									<td class="value report-details-duration"></td>
+									<td class="name"><label><g:message code="report.metadata.duration.label" default="Duration"/></label></td>
+									<td class="value report-metadata-duration"></td>
 								</tr>
 							</tbody>
 						</table>
@@ -373,7 +519,7 @@
 			<div class="yui-u">
 				<div class="box">
 					<h2>
-						${warehouse.message(code:'report.transactionReport.title', default: "Transaction Report")}
+						${warehouse.message(code:'report.details.label', default: "Report Details")}
 					</h2>
 
                     <table id="transactionReport" class="dataTable">
@@ -529,19 +675,36 @@
     }
 
     // Shows the details of the report that was just loaded
-    function showReportDetails(json) {
+    function showReportMetadata(json) {
         var seconds = Math.round((Date.now() - reportStartTime) / 1000);
-        $(".report-details-location").text($("#locationId option:selected").text());
-        $(".report-details-period").text($("#startDate-datepicker").val() + " - " + $("#endDate-datepicker").val());
-        $(".report-details-products").text(((json && json.aaData) || []).length.toLocaleString('en-US'));
-        $(".report-details-generated").text(new Date().toLocaleString());
-        $(".report-details-duration").text(Math.floor(seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60);
-        $(".report-details-empty").hide();
-        $(".report-details-values").show();
+        $(".report-metadata-facility").text($("#locationId option:selected").text());
+        $(".report-metadata-period").text($("#reportPeriod").val());
+        $(".report-metadata-products").text(((json && json.aaData) || []).length.toLocaleString('en-US'));
+        $(".report-metadata-generated").text(new Date().toLocaleString());
+        $(".report-metadata-duration").text(Math.floor(seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60);
+        $(".report-metadata-empty").hide();
+        $(".report-metadata-values").show();
     }
 
-    function destroyDataTable() {
-    	$('#transactionReport').dataTable().fnDestroy();
+	// The DataTables messages. The empty table message depends on whether a report has been run.
+	function getDataTableLanguage(emptyTableMessage) {
+		return {
+			"sEmptyTable": emptyTableMessage,
+			"sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+			"sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
+					"_START_" +
+					" ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
+					"_END_" +
+					" ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
+					"_TOTAL_" +
+					" ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
+			"sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
+			"sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
+			"sProcessing": "<img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner.gif')}\" /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
+			"sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
+					"_MAX_" +
+					" ${g.message(code: 'default.dataTable.totalEntries.label', default: 'total entries')})"
+		};
 	}
 
 	function initializeDataTable(validated) {
@@ -552,27 +715,21 @@
 			"iDisplayLength": 100,
 			"bSearch": false,
 			"bScrollCollapse": true,
-			"bAutoWidth": false,  // Use the column widths below
+			"bAutoWidth": false,  // The column widths are set in the styles
 			"bScrollInfinite": true,
 			"sScrollY": 500,
 			"sPaginationType": "two_button",
-			"oLanguage": {
-				"sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
-				"sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
-				"sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
-						"_START_" +
-						" ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
-						"_END_" +
-						" ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
-						"_TOTAL_" +
-						" ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
-				"sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
-				"sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
-				"sProcessing": "<img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner.gif')}\" /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
-				"sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
-						"_MAX_" +
-						" ${g.message(code: 'default.dataTable.totalEntries.label', default: 'total entries')})"
-			},
+			"aoColumns": [
+				// The column widths are set in the styles
+				{"mData": "Code"},
+				{"mData": "Name"},
+				{"mData": "Category"},
+				{"mData": "Opening", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Credits", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Debits", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Differences", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Closing", "sType": 'numeric', "sClass": "right" }
+			],
 			"aLengthMenu": [
 				[5, 15, 25, 50, 100, 500, 1000, -1],
 				[5, 15, 25, 50, 100, 500, 1000, "All"]
@@ -606,7 +763,7 @@
 					"url": sSource,
 					"data": aoData,
 					"success": function (json) {
-						showReportDetails(json);
+						showReportMetadata(json);
 						fnCallback(json);
 					},
 					"timeout": reportTimeout,
@@ -617,21 +774,11 @@
 							return;
 						}
 						alert(getReportErrorMessage(status === "timeout" ? status : xhr.status, xhr.responseText));
-						destroyDataTable();
+						initializeDataTable(false);
 					}
 				})
 			},
-			"aoColumns": [
-				// The product name gets whatever width is left over
-				{"mData": "Code", "sWidth": "70px"},
-				{"mData": "Name"},
-				{"mData": "Category", "sWidth": "170px"},
-				{"mData": "Opening", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
-				{"mData": "Credits", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
-				{"mData": "Debits", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
-				{"mData": "Differences", "sType": 'numeric', "sClass": "right", "sWidth": "90px" },
-				{"mData": "Closing", "sType": 'numeric', "sClass": "right", "sWidth": "90px" }
-			],
+			"oLanguage": getDataTableLanguage("${g.message(code: 'report.transaction.noRows.message', default: 'No products had credits or debits in this period.')}"),
 			"bUseRendered": false,
 			"dom": '<"top"i>rt<"bottom"flp><"clear">',
             "fnRowCallback": function (nRow, aData) {
@@ -650,15 +797,168 @@
 	          }
 		};
 
-		const options = validated ? { ...baseOptions, ...dataOptions } : baseOptions
+		// Before a report has been run, show only the column headers and a prompt (no info, search or paging)
+		const emptyOptions = {
+			"sDom": 'rt',
+			"oLanguage": getDataTableLanguage("${g.message(code: 'report.transaction.notRun.message', default: 'Choose a facility and period, then click Run Report.')}")
+		};
+		const options = validated ? { ...baseOptions, ...dataOptions } : { ...baseOptions, ...emptyOptions }
 		$('#transactionReport').dataTable(options);
 	}
 
+
+	// The format of the dates in the report period field, and the separator between them
+	var REPORT_PERIOD_FORMAT = "DD/MMM/YYYY";
+	var REPORT_PERIOD_SEPARATOR = " - ";
+
+	// Sets the report period. The end date is capped at today.
+	function setReportPeriod(startDate, endDate) {
+		var today = new Date();
+		$("#reportPeriod").data("dateRangePicker").setDateRange(startDate, endDate > today ? today : endDate);
+		syncReportPeriod();
+	}
+
+	// Fills in the hidden start and end date fields from the report period field, or clears them when it isn't a
+	// valid period, so that the run button's checks catch it.
+	function syncReportPeriod() {
+		var dates = $("#reportPeriod").val().split(REPORT_PERIOD_SEPARATOR);
+		var startDate = moment(dates[0], REPORT_PERIOD_FORMAT, true);
+		var endDate = moment(dates[1], REPORT_PERIOD_FORMAT, true);
+		var valid = dates.length === 2 && startDate.isValid() && endDate.isValid();
+		$("#startDate").val(valid ? startDate.format("MM/DD/YYYY") : "");
+		$("#endDate").val(valid ? endDate.format("MM/DD/YYYY") : "");
+	}
+
+	// Returns the [start, end] dates of a period shortcut (e.g. last month). "Last n days" ends today, and "last n
+	// months" is the n whole months before this one.
+	function getShortcutPeriod(period) {
+		var now = new Date();
+		var year = now.getFullYear();
+		var month = now.getMonth();
+		var today = new Date(year, month, now.getDate());
+		var daysAgo = function (days) { return new Date(year, month, now.getDate() - days); };
+		var quarterStartMonth = month - month % 3;
+		switch (period) {
+			case "today": return [today, today];
+			case "yesterday": return [daysAgo(1), daysAgo(1)];
+			case "last7Days": return [daysAgo(6), today];
+			case "last30Days": return [daysAgo(29), today];
+			case "last90Days": return [daysAgo(89), today];
+			case "thisMonth": return [new Date(year, month, 1), today];
+			case "lastMonth": return [new Date(year, month - 1, 1), new Date(year, month, 0)];
+			case "last3Months": return [new Date(year, month - 3, 1), new Date(year, month, 0)];
+			case "last6Months": return [new Date(year, month - 6, 1), new Date(year, month, 0)];
+			case "last12Months": return [new Date(year, month - 12, 1), new Date(year, month, 0)];
+			case "thisQuarter": return [new Date(year, quarterStartMonth, 1), today];
+			case "lastQuarter": return [new Date(year, quarterStartMonth - 3, 1), new Date(year, quarterStartMonth, 0)];
+			case "thisYear": return [new Date(year, 0, 1), today];
+			case "lastYear": return [new Date(year - 1, 0, 1), new Date(year - 1, 11, 31)];
+		}
+	}
+
+	// The picker's shortcuts, in groups. The picker shows them all on one line, so initializeReportPeriod puts each
+	// group on its own line with a label.
+	var REPORT_PERIOD_SHORTCUTS = [
+		{ label: "${g.message(code: 'report.period.days.label', default: 'Days')}", periods: {
+			today: "${g.message(code: 'report.period.today.label', default: 'Today')}",
+			yesterday: "${g.message(code: 'report.period.yesterday.label', default: 'Yesterday')}",
+			last7Days: "${g.message(code: 'report.period.last7Days.label', default: 'Last 7 days')}",
+			last30Days: "${g.message(code: 'report.period.last30Days.label', default: 'Last 30 days')}",
+			last90Days: "${g.message(code: 'report.period.last90Days.label', default: 'Last 90 days')}"
+		}},
+		{ label: "${g.message(code: 'report.period.months.label', default: 'Months')}", periods: {
+			thisMonth: "${g.message(code: 'report.period.thisMonth.label', default: 'This month')}",
+			lastMonth: "${g.message(code: 'report.period.lastMonth.label', default: 'Last month')}",
+			last3Months: "${g.message(code: 'report.period.last3Months.label', default: 'Last 3 months')}",
+			last6Months: "${g.message(code: 'report.period.last6Months.label', default: 'Last 6 months')}",
+			last12Months: "${g.message(code: 'report.period.last12Months.label', default: 'Last 12 months')}"
+		}},
+		{ label: "${g.message(code: 'report.period.quarters.label', default: 'Quarters')}", periods: {
+			thisQuarter: "${g.message(code: 'report.period.thisQuarter.label', default: 'This quarter')}",
+			lastQuarter: "${g.message(code: 'report.period.lastQuarter.label', default: 'Last quarter')}"
+		}},
+		{ label: "${g.message(code: 'report.period.years.label', default: 'Years')}", periods: {
+			thisYear: "${g.message(code: 'report.period.thisYear.label', default: 'This year')}",
+			lastYear: "${g.message(code: 'report.period.lastYear.label', default: 'Last year')}"
+		}}
+	];
+
+	function initializeReportPeriod() {
+		var customShortcuts = [];
+		$.each(REPORT_PERIOD_SHORTCUTS, function (i, group) {
+			$.each(group.periods, function (period, name) {
+				// The picker can't pick a day after endDate, so cap the shortcut's end date at today
+				customShortcuts.push({ name: name, dates: function () {
+					var dates = getShortcutPeriod(period);
+					var today = new Date();
+					return [dates[0], dates[1] > today ? today : dates[1]];
+				}});
+			});
+		});
+
+		$("#reportPeriod").dateRangePicker({
+			format: REPORT_PERIOD_FORMAT,
+			separator: REPORT_PERIOD_SEPARATOR,
+			autoClose: true,
+			endDate: new Date(),
+			startOfWeek: "monday",
+			// Reports are about the past, so when the period is in one month, show it with the month before rather than
+			// the month after (which is often in the future and can't be picked)
+			lookBehind: true,
+			showShortcuts: true,
+			shortcuts: {},
+			customShortcuts: customShortcuts
+		}).on("datepicker-change", syncReportPeriod)
+			// Typed periods are read by the picker, but it doesn't fire datepicker-change for them
+			.on("change keyup", syncReportPeriod);
+
+		// Put each group of shortcuts on its own line, with a label. The &nbsp; spacers between them would be left
+		// between the groups, so remove them.
+		var shortcuts = $("#reportPeriod").data("dateRangePicker").getDatePicker().find(".custom-shortcut");
+		shortcuts.parent().contents().filter(function () { return this.nodeType === Node.TEXT_NODE; }).remove();
+		var index = 0;
+		$.each(REPORT_PERIOD_SHORTCUTS, function (i, group) {
+			var count = Object.keys(group.periods).length;
+			shortcuts.slice(index, index + count)
+				.wrapAll('<div class="shortcut-group"></div>')
+				.first().before($('<span class="shortcut-group-label"></span>').text(group.label));
+			index += count;
+		});
+
+		// Close the picker after a shortcut is picked, like after picking the end date (autoClose)
+		shortcuts.find("a").click(function () {
+			$("#reportPeriod").data("dateRangePicker").close();
+		});
+
+		// Show the period that was submitted, or default to last month, so that the report can be run after only
+		// choosing a facility
+		var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		if (startDate && endDate) {
+			setReportPeriod(moment(startDate, "MM/DD/YYYY").toDate(), moment(endDate, "MM/DD/YYYY").toDate());
+		} else {
+			var lastMonth = getShortcutPeriod("lastMonth");
+			setReportPeriod(lastMonth[0], lastMonth[1]);
+		}
+	}
 
 	$(document).ready(function() {
 
 		$(".loading").hide();
 		initializeDataTable(false);
+
+		initializeReportPeriod();
+
+		// Pressing Enter in a field runs the report, like submitting a form. Enter is left alone in the dropdowns,
+		// where it picks an option, and while the date picker is open.
+		$(".parameters").on("keydown", "input[type=text]", function (event) {
+			if (event.key !== "Enter" || $(this).closest(".chosen-container, .select2-container").length
+					|| $(".date-picker-wrapper").is(":visible")) {
+				return;
+			}
+			event.preventDefault();
+			$(".submit-button").click();
+		});
 
 		// DataTables doesn't resize the columns when the page width changes. Because the header and footer are in
 		// their own tables when the table scrolls, they'd no longer line up with the rows.
@@ -722,6 +1022,10 @@
 		});
 
 		$('#transactionReport tbody').on('click', 'tr', function () {
+			// The message in an empty table isn't a product
+			if ($(this).find('td.dataTables_empty').length) {
+				return;
+			}
 			var nTds = $('td', this);
 			var productCode = $(nTds[0]).text();
 			var productName = $(nTds[1]).text();
