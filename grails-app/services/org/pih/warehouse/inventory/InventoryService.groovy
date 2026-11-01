@@ -2568,11 +2568,9 @@ class InventoryService implements ApplicationContextAware {
             def sql = "select te from TransactionEntry as te left join fetch te.binLocation where te.transaction.inventory.id=:inventoryId and te.inventoryItem.product.id in (:productIds)"
             log.debug "SQL: " + sql
             def transactionEntries = TransactionEntry.executeQuery(sql, [inventoryId:inventory.id, productIds:productIds])
-            log.debug "transactionEntries " + transactionEntries
             def map = getQuantityByProductMap(transactionEntries)
             map.keySet().each { result[it.id] = map[it] }
         }
-        log.debug "getQuantityForProducts " + result
         result
     }
 
