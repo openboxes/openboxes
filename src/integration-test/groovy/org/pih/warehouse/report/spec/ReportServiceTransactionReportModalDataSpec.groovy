@@ -29,6 +29,7 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
 
     private static final String ADJUSTMENT_CREDIT = Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
     private static final String TRANSFER_OUT = Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID
+    private static final String TRANSFER_IN = Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
     private static final String PRODUCT_INVENTORY = Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
     private static final String INVENTORY_BASELINE = Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
 
@@ -178,6 +179,33 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
         !rows.any { it.transactionCode == "UNRECONCILED" }
     }
 
+    void 'an internal transfer is marked and moves stock between bins without changing the balance'() {
+        given:
+        Location binA = new LocationTestBuilder().name(new RandomUtil().randomStringFieldValue("bin")).asBinLocation(facility).build(true)
+        Location binB = new LocationTestBuilder().name(new RandomUtil().randomStringFieldValue("bin")).asBinLocation(facility).build(true)
+        // So that the transaction entries inserted with SQL can reference the bin locations
+        sessionFactory.currentSession.flush()
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100, binA]])
+
+        and: 'a putaway of 30 from bin A to bin B'
+        insertLocalTransfer(
+                insertTransaction(TRANSFER_OUT, day(6), [[item1, 30, binA]]),
+                insertTransaction(TRANSFER_IN, day(6, 1), [[item1, 30, binB]]))
+
+        and: 'a count that matches the quantity in each bin after the putaway'
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 70, binA], [item1, 30, binB]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        rows.transactionCode == ["BALANCE_OPENING", "DEBIT", "CREDIT", "PRODUCT_INVENTORY", "PRODUCT_INVENTORY",
+                                 "BALANCE_CLOSING"]
+        rows.internal == [null, true, true, false, false, null]
+        rows.quantityChange == [null, -30, 30, null, null, null]
+        rows.balance == [100, 100, 100, 100, 100, 100]
+    }
+
     private List<Map> modalData() {
         // So that the transaction entries inserted with SQL are loaded from the database
         sessionFactory.currentSession.clear()
@@ -195,9 +223,12 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
     }
 
     /**
-     * Inserts a transaction with the given entries, each given as [inventory item, quantity].
+     * Inserts a transaction with the given entries, each given as [inventory item, quantity] or [inventory item,
+     * quantity, bin location].
+     *
+     * @return the id of the transaction
      */
-    private void insertTransaction(String transactionTypeId, Date transactionDate, List<List> entries,
+    private String insertTransaction(String transactionTypeId, Date transactionDate, List<List> entries,
                                    Date dateCreated = transactionDate) {
         String transactionId = UUID.randomUUID().toString()
         sessionFactory.currentSession.createSQLQuery("""
@@ -215,15 +246,32 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
         entries.eachWithIndex { entry, int index ->
             sessionFactory.currentSession.createSQLQuery("""
                     INSERT INTO transaction_entry (id, version, transaction_id, inventory_item_id, quantity,
-                                                   transaction_entries_idx)
-                    VALUES (:id, 0, :transactionId, :inventoryItemId, :quantity, :index)
+                                                   bin_location_id, transaction_entries_idx)
+                    VALUES (:id, 0, :transactionId, :inventoryItemId, :quantity, :binLocationId, :index)
                 """)
                     .setString("id", UUID.randomUUID().toString())
                     .setString("transactionId", transactionId)
                     .setString("inventoryItemId", (entry[0] as InventoryItem).id)
                     .setInteger("quantity", entry[1] as Integer)
+                    .setString("binLocationId", entry.size() > 2 ? (entry[2] as Location).id : null)
                     .setInteger("index", index)
                     .executeUpdate()
         }
+        return transactionId
+    }
+
+    /**
+     * Links a Transfer Out and a Transfer In, like InventoryService.transferStock and saveLocalTransfer do.
+     */
+    private void insertLocalTransfer(String sourceTransactionId, String destinationTransactionId) {
+        sessionFactory.currentSession.createSQLQuery("""
+                INSERT INTO local_transfer (id, version, date_created, last_updated, source_transaction_id,
+                                            destination_transaction_id)
+                VALUES (:id, 0, NOW(), NOW(), :sourceTransactionId, :destinationTransactionId)
+            """)
+                .setString("id", UUID.randomUUID().toString())
+                .setString("sourceTransactionId", sourceTransactionId)
+                .setString("destinationTransactionId", destinationTransactionId)
+                .executeUpdate()
     }
 }

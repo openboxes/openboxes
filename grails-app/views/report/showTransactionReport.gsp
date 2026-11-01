@@ -219,6 +219,24 @@
 		border-left: 3px dashed #ccc;
 	}
 
+	/* Internal transfers in the details dialog: they move stock between bins without changing the balance */
+	#dialogDataTable_wrapper tbody tr.internal-row td,
+	#dialogDataTable_wrapper tbody tr.internal-row td.credit,
+	#dialogDataTable_wrapper tbody tr.internal-row td.debit,
+	#dialogDataTable_wrapper tbody tr.internal-row td a {
+		color: #aaa;
+	}
+
+	#dialogDataTable_wrapper tbody tr.internal-row {
+		cursor: help;
+	}
+
+	.internal-transfers-toggle {
+		display: inline-block;
+		margin-bottom: 8px;
+		cursor: help;
+	}
+
 	/* Fixed layout, so that the columns keep their widths and the product name gets the rest. Otherwise the browser
 	   spreads the extra width over every column, which pushes the quantities away from the product. Applies to the
 	   header and body tables, which DataTables splits the table into when it scrolls. */
@@ -467,6 +485,18 @@
 										/>
 									</p>
 								</div>
+							</div>
+							<div class="filter-list-item">
+								<label class="hint" title="${g.message(code: 'report.transaction.includeProductsWithNoActivity.hint', default: 'Also lists products that had stock but no activity, i.e. their credits, debits and differences are all 0.')}">
+									<g:checkBox name="includeProductsWithNoActivity" value="${params?.includeProductsWithNoActivity}"/>
+									<g:message code="report.transaction.includeProductsWithNoActivity.label" default="Include products with no activity"/>
+								</label>
+							</div>
+							<div class="filter-list-item">
+								<label class="hint" title="${g.message(code: 'report.transaction.includeInternalTransfers.hint', default: 'Counts transfers between bin locations of the facility (e.g. putaways and stock transfers) in the credits and debits. They move stock between bins without changing the facility\'s quantity on hand, so they\'re left out by default.')}">
+									<g:checkBox name="includeInternalTransfers" value="${params?.includeInternalTransfers}"/>
+									<g:message code="report.transaction.includeInternalTransfers.label" default="Include internal transfers"/>
+								</label>
 							</div>
 						</div>
 						<div class="buttons">
@@ -752,6 +782,12 @@
 
 				data.push({ name: "tags", value: $("#tags").val() });
 				data.push({ name: "catalogs", value: $("#catalogs").val() });
+				if ($('#includeProductsWithNoActivity').is(':checked')) {
+					data.push({ name: "includeProductsWithNoActivity", value: true });
+				}
+				if ($('#includeInternalTransfers').is(':checked')) {
+					data.push({ name: "includeInternalTransfers", value: true });
+				}
 				if($('#includeCategoryChildren').is(':checked')) {
 					data.push({ name: "includeCategoryChildren", value: $("#includeCategoryChildren").val() });
 				}
@@ -778,7 +814,7 @@
 					}
 				})
 			},
-			"oLanguage": getDataTableLanguage("${g.message(code: 'report.transaction.noRows.message', default: 'No products had credits or debits in this period.')}"),
+			"oLanguage": getDataTableLanguage("${g.message(code: 'report.transaction.noRows.message', default: 'No products had activity in this period. Check Include products with no activity to see products that had stock.')}"),
 			"bUseRendered": false,
 			"dom": '<"top"i>rt<"bottom"flp><"clear">',
             "fnRowCallback": function (nRow, aData) {
@@ -1014,6 +1050,12 @@
 				catalogs: $("#catalogs").val(),
 				format: "text/csv"
 			};
+			if ($('#includeProductsWithNoActivity').is(':checked')) {
+				params.includeProductsWithNoActivity = true;
+			}
+			if ($('#includeInternalTransfers').is(':checked')) {
+				params.includeInternalTransfers = true;
+			}
 			if($('#includeCategoryChildren').is(':checked')) {
 				params.includeCategoryChildren = $("#includeCategoryChildren").val();
 			}
