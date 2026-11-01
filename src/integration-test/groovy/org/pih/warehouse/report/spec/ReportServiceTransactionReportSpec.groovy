@@ -144,10 +144,10 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
 
         then:
         rows.keySet() == ["A", "B"] as Set
-        rows.A.subMap("Opening", "Credits", "Debits", "Net Change", "Closing") ==
-                [Opening: 100, Credits: 15, Debits: 5, "Net Change": 10, Closing: 110]
-        rows.B.subMap("Opening", "Credits", "Debits", "Net Change", "Closing") ==
-                [Opening: 0, Credits: 7, Debits: 0, "Net Change": 7, Closing: 7]
+        rows.A.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 100, Credits: 15, Debits: 5, Differences: 0, Closing: 110]
+        rows.B.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
+                [Opening: 0, Credits: 7, Debits: 0, Differences: 0, Closing: 7]
     }
 
     void 'a credit with a negative quantity counts as a debit'() {
@@ -231,7 +231,7 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         row["Transfer Out"] == 5
         row["Adjustment (Credit and Debit)"] == 4 + 6 - 1
         row["Backdated inventory correction"] == 6 - 2
-        row.subMap("Credits", "Debits", "Closing") == [Credits: 20, Debits: 11, Closing: 9]
+        row.subMap("Credits", "Debits", "Differences", "Closing") == [Credits: 20, Debits: 11, Differences: 0, Closing: 9]
     }
 
     void 'backdated transactions are each counted, even when they have the same dates'() {
@@ -357,10 +357,11 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
                     openingBalance: openingBalance,
                     credits: credits,
                     debits: debits,
+                    differences: closingBalance - openingBalance - credits + debits,
                     closingBalance: closingBalance,
             ]
             if (!args.includeDetails) {
-                return reportService.getTransactionReportRow(data + [netChange: closingBalance - openingBalance])
+                return reportService.getTransactionReportRow(data)
             }
             // The previous implementation called unique() without a closure, which compares transactions with
             // compareTo (by date) and so dropped backdated transactions with the same dates (see the test above).

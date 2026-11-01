@@ -12,7 +12,6 @@ package org.pih.warehouse.reporting
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
-import grails.plugins.quartz.GrailsJobClassConstants
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -30,8 +29,6 @@ import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 
-import org.quartz.JobKey
-import org.quartz.impl.StdScheduler
 import org.springframework.web.util.UriUtils
 import util.ReportUtil
 
@@ -55,7 +52,6 @@ class ReportController {
     def shipmentService
     def orderService
     def userService
-    StdScheduler quartzScheduler
 
     def refreshProductDemand() {
         reportService.refreshProductDemandData()
@@ -286,22 +282,7 @@ class ReportController {
         command.location = Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
 
-        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob", GrailsJobClassConstants.DEFAULT_GROUP))
-        def previousFireTime = triggers*.previousFireTime.max()
-        def nextFireTime = triggers*.nextFireTime.max()
-        def locationKey = LocationDimension.findByLocationId(command?.location?.id)
-        def model = [
-                command           : command,
-                locationKey       : locationKey,
-                transactionCount  : locationKey ? TransactionFact.countByLocationKey(locationKey) : 0,
-                productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).get(),
-                minTransactionDate: TransactionFact.minTransactionDate(locationKey?.locationId).get(),
-                maxTransactionDate: TransactionFact.maxTransactionDate(locationKey?.locationId).get(),
-                previousFireTime  : previousFireTime,
-                nextFireTime      : nextFireTime,
-        ]
-
-        return model
+        return [command: command]
     }
 
     def showTransactionReportDialog() {
