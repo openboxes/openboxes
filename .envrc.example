@@ -5,6 +5,7 @@
 # Remote debugging (JDWP)
 # Attach your IDE debugger to DEBUG_PORT. Use a unique port per
 # environment (e.g. 5005, 5006, 5007) so parallel apps don't collide.
+# Debugging is on by default; set DEBUG_ENABLED=false to turn it off.
 export DEBUG_ENABLED=true
 export DEBUG_PORT=5005
 
