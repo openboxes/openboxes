@@ -185,13 +185,13 @@ class StockMovementService {
                         break
                     //RequisitionStatus.APPROVED:
                     case StockMovementStatusCode.APPROVED:
-                        if (!stockMovement.pendingApproval) {
+                        if (!stockMovement.isPendingApproval()) {
                             throw new IllegalArgumentException("Cannot update to status ${jsonObject.status} because request is not pending approval")
                         }
                         break
                     //RequisitionStatus.REJECTED:
                     case StockMovementStatusCode.REJECTED:
-                        if (!stockMovement.pendingApproval) {
+                        if (!stockMovement.isPendingApproval()) {
                             throw new IllegalArgumentException("Cannot update to status ${jsonObject.status} because request is not pending approval")
                         }
                         comment = new Comment(jsonObject)
@@ -1565,7 +1565,7 @@ class StockMovementService {
         boolean isInDefaultLocation = availableItems.every { it.isDefaultLocation }
         boolean isInReceivingLocations = availableItems.every { it.isReceivingLocation }
         boolean isInBinLocations = availableItems.every { it.isPhysicalLocation && !it.isDefaultLocation }
-        boolean hasAllHoldLocations = !availableItems.empty ? availableItems.every { it.onHold } : false
+        boolean hasAllHoldLocations = !availableItems.empty ? availableItems.every { it.isOnHold() } : false
         boolean hasAnyPhysicalLocations = availableItems?.any { it?.isPhysicalLocation }
         boolean hasAnyVirtualLocations = availableItems?.any { it?.isVirtualLocation }
 

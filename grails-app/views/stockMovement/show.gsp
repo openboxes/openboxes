@@ -142,7 +142,7 @@
                 </g:isUserAdmin>
                     <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
                     <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
-                    <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.electronicType}">
+                    <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.isElectronicType()}">
                         <g:if test="${stockMovement?.order}">
                             <g:isUserAdmin>
                                 <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
@@ -162,7 +162,7 @@
                             </g:link>
                         </g:else>
                     </g:if>
-                    <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.electronicType}">
+                    <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.isElectronicType()}">
                         <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
                                 onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
                                 disabledMessage="You do not have minimum required role to delete stock request"
@@ -202,7 +202,7 @@
                                 action="updateStatus"
                                 id="${stockMovement.id}"
                                 params="[status: StockMovementStatusCode.APPROVED]"
-                                disabled="${!stockMovement.pendingApproval}"
+                                disabled="${!stockMovement.isPendingApproval()}"
                                 disabledMessage="Request is not pending approval"
                         >
                             <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
@@ -213,7 +213,7 @@
                                 controller="stockRequest"
                                 action="reject"
                             id="${stockMovement.id}"
-                                disabled="${!stockMovement.pendingApproval}"
+                                disabled="${!stockMovement.isPendingApproval()}"
                                 disabledMessage="Request is not pending approval"
                         >
                             <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;

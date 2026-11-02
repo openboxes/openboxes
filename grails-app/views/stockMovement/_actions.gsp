@@ -43,7 +43,7 @@
             </div>
             <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
             <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
-            <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.electronicType}">
+            <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.isElectronicType()}">
                 <hr/>
                 <div class="action-menu-item">
                     <g:if test="${stockMovement?.order}">
@@ -66,7 +66,7 @@
                     </g:else>
                 </div>
             </g:if>
-            <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.electronicType}">
+            <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.isElectronicType()}">
                 <hr/>
                 <div class="action-menu-item">
                     <g:link controller="stockRequest" action="remove" id="${stockMovement?.id}"

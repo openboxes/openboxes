@@ -121,51 +121,51 @@ class LocationType implements Comparable<LocationType>, Serializable {
                         name <=> obj?.name
     }
 
-    Boolean isDepot() {
+    boolean isDepot() {
         return locationTypeCode == LocationTypeCode.DEPOT
     }
 
-    Boolean isWard() {
+    boolean isWard() {
         return locationTypeCode == LocationTypeCode.WARD
     }
 
-    Boolean isDispensary() {
+    boolean isDispensary() {
         return locationTypeCode == LocationTypeCode.DISPENSARY
     }
 
-    Boolean isBinLocation() {
+    boolean isBinLocation() {
         return locationTypeCode == LocationTypeCode.BIN_LOCATION
     }
 
-    Boolean isSupplier() {
+    boolean isSupplier() {
         return locationTypeCode == LocationTypeCode.SUPPLIER
     }
 
-    Boolean isDonor() {
+    boolean isDonor() {
         return locationTypeCode == LocationTypeCode.DONOR
     }
 
-    Boolean isVirtual() {
+    boolean isVirtual() {
         return locationTypeCode == LocationTypeCode.VIRTUAL
     }
 
-    Boolean isWardOrPharmacy() {
+    boolean isWardOrPharmacy() {
         return (locationTypeCode in [LocationTypeCode.DISPENSARY, LocationTypeCode.WARD])
     }
 
-    Boolean isDepotWardOrPharmacy() {
+    boolean isDepotWardOrPharmacy() {
         return (locationTypeCode in [LocationTypeCode.DEPOT, LocationTypeCode.DISPENSARY, LocationTypeCode.WARD])
     }
 
-    Boolean isInternalLocation() {
+    boolean isInternalLocation() {
         return (locationTypeCode in LocationTypeCode.listInternalTypeCodes())
     }
 
-    Boolean isFacilityLocation() {
+    boolean isFacilityLocation() {
         return (locationTypeCode in LocationTypeCode.listFacilityTypeCodes())
     }
 
-    Boolean isZone() {
+    boolean isZone() {
         return (locationTypeCode in LocationTypeCode.listZoneTypeCodes())
     }
 

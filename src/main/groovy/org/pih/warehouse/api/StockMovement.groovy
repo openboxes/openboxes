@@ -200,8 +200,8 @@ class StockMovement implements Validateable, Historizable {
             isShipped           : isShipped,
             isReceived          : isReceived,
             isPartiallyReceived : hasBeenPartiallyReceived(),
-            isElectronicType    : electronicType,
-            isPending           : pending,
+            isElectronicType    : isElectronicType(),
+            isPending           : isPending(),
             shipped             : isShipped,
             received            : isReceived,
             requestType         : requestType,
@@ -282,7 +282,7 @@ class StockMovement implements Validateable, Historizable {
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
         // stock request /stockRequest/remove/:id
-        if (electronicType) {
+        if (isElectronicType()) {
             User user = AuthService.currentUser
             def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
             def userService = Holders.grailsApplication.mainContext.getBean("userService")
@@ -291,7 +291,7 @@ class StockMovement implements Validateable, Historizable {
             }
         }
 
-        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder) || (electronicType && isDestination))
+        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder) || (isElectronicType() && isDestination))
     }
 
     Boolean isEditAuthorized(Location currentLocation) {

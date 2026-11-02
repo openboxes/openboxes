@@ -64,7 +64,7 @@ class StockMovementStatusContext {
         return shipment?.isFromPurchaseOrder
     }
 
-    Boolean isElectronicType() {
+    boolean isElectronicType() {
         return requisition?.sourceType == RequisitionSourceType.ELECTRONIC
     }
 }

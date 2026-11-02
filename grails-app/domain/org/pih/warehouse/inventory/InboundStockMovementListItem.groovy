@@ -85,19 +85,19 @@ class InboundStockMovementListItem implements Serializable, Validateable {
         return StockMovementStatusResolver.getStatusMetaData(status)
     }
 
-    Boolean isFromReturnOrder() {
+    boolean isFromReturnOrder() {
         return order?.isReturnOrder ?: false
     }
 
-    Boolean isPending() {
+    boolean isPending() {
         return shipment?.currentStatus == ShipmentStatusCode.PENDING
     }
 
-    Boolean isReceived() {
+    boolean isReceived() {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
-    Boolean isPartiallyReceived() {
+    boolean isPartiallyReceived() {
         return shipment?.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED
     }
 
