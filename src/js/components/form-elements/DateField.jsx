@@ -57,7 +57,12 @@ class DateField extends Component {
 
     const getFormat = () => {
       if (localizeDate && this.props.defaultTranslationsFetched && this.props.localeCode) {
-        return this.props.dateFormat(localizedDateFormat);
+        const localizedFormat = this.props.dateFormat(localizedDateFormat);
+        // Right after a language change its translations may not be loaded yet, then the key
+        // comes back instead, which date-fns cannot parse, so the default format is used
+        if (localizedFormat !== localizedDateFormat) {
+          return localizedFormat;
+        }
       }
 
       return dateFormat;
