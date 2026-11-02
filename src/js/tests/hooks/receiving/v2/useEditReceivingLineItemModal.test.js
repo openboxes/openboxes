@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 
 import ReceivingRowType from 'consts/receivingRowType';
 import useEditReceivingLineItemModal from 'hooks/receiving/v2/useEditReceivingLineItemModal';

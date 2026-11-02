@@ -1,9 +1,13 @@
 import React from 'react';
 
-import renderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import store from 'tests/__mocks__/formStore';
 
 import DateField from 'components/form-elements/DateField';
 import { renderFormField } from 'utils/form-utils';
+
+import '@testing-library/jest-dom';
 
 jest.mock('react-final-form', () => ({
   Field: (props) => {
@@ -15,6 +19,7 @@ jest.mock('react-final-form', () => ({
 }));
 
 jest.mock('react-localize-redux', () => ({
+  ...jest.requireActual('react-localize-redux'),
   Translate: (props) => {
     const { id } = props;
 
@@ -22,8 +27,8 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-xdescribe('DateField component is correctly rendering', () => {
-  it('renders correctly', () => {
+describe('DateField component is correctly rendering', () => {
+  it('renders an empty date picker input with its label', () => {
     const fieldConfig = {
       type: DateField,
       label: 'test label',
@@ -33,8 +38,13 @@ xdescribe('DateField component is correctly rendering', () => {
       },
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    const { container } = render(
+      <Provider store={store}>{renderFormField(fieldConfig, 'test-field')}</Provider>,
+    );
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(screen.getByText('test label')).toBeInTheDocument();
+    const dateInput = container.querySelector('.react-datepicker__input-container input');
+    expect(dateInput).toHaveAttribute('type', 'text');
+    expect(dateInput).toHaveValue('');
   });
 });

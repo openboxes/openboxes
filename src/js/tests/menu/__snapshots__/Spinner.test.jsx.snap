@@ -1,18 +1,20 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`spinner component should match snapshot 1`] = `
-<div
-  className="d-flex w-100 h-100 justify-content-center align-items-center"
->
+<DocumentFragment>
   <div
-    className="circle-spinner spinner-border"
-    role="status"
+    class="d-flex w-100 h-100 justify-content-center align-items-center"
   >
-    <span
-      className="sr-only"
+    <div
+      class="circle-spinner spinner-border"
+      role="status"
     >
-      Loading...
-    </span>
+      <span
+        class="sr-only"
+      >
+        Loading...
+      </span>
+    </div>
   </div>
-</div>
+</DocumentFragment>
 `;

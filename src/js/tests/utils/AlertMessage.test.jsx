@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { render, screen, waitFor } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import AlertMessage from 'utils/AlertMessage';
 
@@ -15,8 +14,8 @@ describe('alert message', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedAlertMessage = renderer.create(alertMessage);
-    expect(renderedAlertMessage.toJSON()).toMatchSnapshot();
+    const renderedAlertMessage = render(alertMessage);
+    expect(renderedAlertMessage.asFragment()).toMatchSnapshot();
   });
 
   it('should render properly', () => {
@@ -33,6 +32,6 @@ describe('alert message', () => {
 
   it('should display alert message', () => {
     render(alertMessage);
-    expect(screen.findByText('test message')).toBeTruthy();
+    expect(screen.getByText('test message')).toBeTruthy();
   });
 });

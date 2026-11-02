@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 import { useSelector } from 'react-redux';
 
 import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
@@ -61,9 +61,9 @@ const getRemoveRow = () => getColumnsProps().removeRow;
 
 // The resolver validates asynchronously, so its result is awaited before the errors are
 // asserted (React 16.8 has no async act).
-const flushValidation = () => new Promise((resolve) => {
+const flushValidation = () => act(() => new Promise((resolve) => {
   setTimeout(resolve, 0);
-});
+}));
 
 describe('useReceivingLineItems', () => {
   beforeEach(() => {

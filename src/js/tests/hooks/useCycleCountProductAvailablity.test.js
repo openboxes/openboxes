@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 
 import { ALL_PRODUCTS_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import cycleCountCandidateStatus from 'consts/cycleCountCandidateStatus';
