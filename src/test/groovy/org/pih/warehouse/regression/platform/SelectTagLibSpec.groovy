@@ -480,7 +480,7 @@ class SelectTagLibSpec extends Specification implements TagLibUnitTest<SelectTag
         html.contains('value="v1"')
 
         where:
-        tag << ['selectBinLocation', 'selectBinLocationWithOptGroup']
+        tag << ['selectBinLocation', 'selectBinLocationWithOptGroup', 'selectBinLocationAjax']
     }
 
     void 'selectBinLocationWithOptGroup groups bins by zone'() {
@@ -499,6 +499,66 @@ class SelectTagLibSpec extends Specification implements TagLibUnitTest<SelectTag
         html.contains('<optgroup label="Cold">')
         options(html).collect { [it.value, it.text, it.selected] } ==
                 [[inZone.id, 'Cold: C-1', true], [loose.id, 'A-1', false]]
+    }
+
+    void 'selectBinLocationAjax renders a bin search field of the current facility without listing its bins'() {
+        given:
+        save(new Location(name: 'A-1', locationType: binType, parentLocation: depot, active: true))
+        save(new Location(name: 'B-1', locationType: binType, parentLocation: depot, active: true))
+
+        when:
+        String html = applyTemplate('<g:selectBinLocationAjax id="bin-0" name="rows[0].binLocation.id" class="binLocation"/>')
+
+        then:
+        html.contains('id="bin-0"')
+        html.contains('name="rows[0].binLocation.id"')
+        html.contains('class="bin-location-ajax binLocation"')
+        html.contains('data-url="/api/internalLocations/search"')
+        html.contains("data-parent-location-id=\"${depot.id}\"")
+        html.contains('data-placeholder="Select an Option"')
+        html.contains('data-min-length="3"')
+        html.contains('data-delay="300"')
+        options(html) == [[value: '', text: '', selected: false]]
+        !html.contains('<script')
+    }
+
+    void 'selectBinLocationAjax renders only the selected bin, labelled with its zone'() {
+        given:
+        LocationType zoneType = save(new LocationType(name: 'Zone', locationTypeCode: LocationTypeCode.ZONE))
+        Location zone = save(new Location(name: 'Cold & Dry', locationType: zoneType, parentLocation: depot))
+        Location inZone = save(new Location(name: 'C-1 <top>', locationType: binType, parentLocation: depot, zone: zone, active: true))
+        save(new Location(name: 'A-1', locationType: binType, parentLocation: depot, active: true))
+
+        when:
+        String html = applyTemplate('<g:selectBinLocationAjax id="bin" name="binId" value="${v}"/>', [v: inZone.id])
+
+        then:
+        options(html) == [
+                [value: '', text: '', selected: false],
+                [value: inZone.id, text: 'Cold &amp; Dry: C-1 &lt;top&gt;', selected: true],
+        ]
+    }
+
+    void 'selectBinLocationAjax keeps jQuery template expressions for rows added on the client'() {
+        when:
+        String html = applyTemplate('<g:selectBinLocationAjax id="bin-{{= getIndex()}}" name="rows[{{= getIndex()}}].binLocation.id" value="{{= BinLocation}}"/>')
+
+        then:
+        html.contains('id="bin-{{= getIndex()}}"')
+        html.contains('name="rows[{{= getIndex()}}].binLocation.id"')
+        options(html) == [[value: '', text: '', selected: false]]
+    }
+
+    void 'selectBinLocationAjax requires an id and a name'() {
+        when:
+        tagLib.selectBinLocationAjax(attrs, null)
+
+        then:
+        GrailsTagException e = thrown()
+        e.message.contains('[id] and [name]')
+
+        where:
+        attrs << [[name: 'binId'], [id: 'bin']]
     }
 
     void 'selectBinLocationByLocation and selectZoneLocationByLocation use the location service'() {

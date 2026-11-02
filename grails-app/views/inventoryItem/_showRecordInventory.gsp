@@ -78,8 +78,8 @@
                                 <tr class="${styleClass} ${status%2==0?'odd':'even'}" style="${recordInventoryRow.error ? 'background-color: #ffcccb;' : ''}">
                                     <td aria-label="Bin Location">
 									<g:if test ="${!recordInventoryRow?.oldQuantity}">
-										<g:selectBinLocation  id="binLocation-${status}" class="binLocation" name="recordInventoryRows[${status}].binLocation.id"
-															  value="${recordInventoryRow?.binLocation?.id}" noSelection="['':'']"/>
+										<g:selectBinLocationAjax id="binLocation-${status}" class="binLocation" name="recordInventoryRows[${status}].binLocation.id"
+																 value="${recordInventoryRow?.binLocation?.id}"/>
 									</g:if>
 									<g:else>
 											<g:hiddenField
@@ -316,10 +316,6 @@
 		    $(this).select();
 		});
 
-		$(".binLocation").livequery(function() {
-		    $(this).chosen({ allow_single_deselect:true, width: '100%' });
-        });
-
 		$('.lotNumberSuggest').livequery(function() {
 			$(this).autocomplete( {
 				source: function(req, add){
@@ -452,8 +448,7 @@
 <tr id="row-{{= getIndex()}}" class="{{= getClass()}}">
 
 	<td aria-label="Bin Location" style="max-width: 200px;">
-		<g:selectBinLocationWithOptGroup id="binLocation-{{= getIndex()}}" class="binLocation" name="recordInventoryRows[{{= getIndex()}}].binLocation.id"
-                             value="{{= BinLocation}}" noSelection="['':'']"/>
+		<g:selectBinLocationAjax id="binLocation-{{= getIndex()}}" class="binLocation" name="recordInventoryRows[{{= getIndex()}}].binLocation.id"/>
 
 	</td>
 
