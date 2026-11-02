@@ -1415,6 +1415,10 @@ class InventoryService implements ApplicationContextAware {
     RecordInventoryCommand saveRecordInventoryCommand(RecordInventoryCommand cmd, Map params) {
         log.debug "Saving record inventory command params: " + params
 
+        // Rows removed on the page leave gaps in the submitted row indexes, which data binding fills with nulls.
+        // Drop them here, so that neither the save nor the page shown again after an error has to deal with them.
+        cmd.recordInventoryRows.removeAll { !it }
+
         // First, we need to check if there is no validation error (OBPIH-7438)
         cmd.recordInventoryRows.each { RecordInventoryRowCommand row ->
             if (!row) {
