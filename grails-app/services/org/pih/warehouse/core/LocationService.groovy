@@ -65,6 +65,62 @@ class LocationService {
         return location
     }
 
+    /**
+     * The location standing in for an employee working without a physical container. Scoped to the
+     * employee rather than to picking, so the same bin can back other employee-held activities later.
+     * Created on first use, one per person per facility.
+     */
+    Location findOrCreateEmployeeLocation(Location facility, Person person) {
+        if (!facility || !person) {
+            throw new IllegalArgumentException("Must specify facility and person in order to create an employee location")
+        }
+
+        String locationNumber = employeeLocationNumber(facility, person)
+        Location location = Location.findByParentLocationAndLocationNumber(facility, locationNumber)
+        if (location) {
+            return location
+        }
+
+        LocationType locationType = LocationType.findByName(Constants.OUTBOUND_CONTAINER_LOCATION_TYPE_NAME)
+        if (!locationType) {
+            throw new IllegalStateException("Location type ${Constants.OUTBOUND_CONTAINER_LOCATION_TYPE_NAME} does not exist")
+        }
+
+        location = new Location()
+        // Not person.name: that one honours the anonymize setting, which would freeze a display-time
+        // choice into a stored value.
+        location.name = "${person.firstName} ${person.lastName}".trim()
+        location.locationNumber = locationNumber
+        location.locationType = locationType
+        location.parentLocation = facility
+        location.supportedActivities = employeeLocationActivities()
+        location.save(failOnError: true)
+
+        return location
+    }
+
+    // Username rather than Person.identifier: it is unique and never blank, where identifier is
+    // neither, so it cannot collide between two people or change once the location exists. Both
+    // halves still fall back to an id - a facility need not have a location number, and a person
+    // picked for need not have a user account.
+    private static String employeeLocationNumber(Location facility, Person person) {
+        String employeeKey = User.get(person.id)?.username ?: person.id
+        return "EMP-${facility.locationNumber ?: facility.id}-${employeeKey}"
+    }
+
+    // Deliberately omits PICK_STOCK: its absence is what keeps picked stock out of the allocable pool.
+    // Every delivery type is supported because one picker mixes delivery types on a single run, and
+    // validateOutboundContainer checks the container against the task's delivery type.
+    private static Set<String> employeeLocationActivities() {
+        List<ActivityCode> activityCodes = [
+                ActivityCode.OUTBOUND_CONTAINER,
+                ActivityCode.HOLD_STOCK,
+                ActivityCode.EMPLOYEE_LOCATION,
+        ]
+        activityCodes.addAll(DeliveryTypeCode.values()*.activityCode.findAll())
+        return activityCodes*.name() as Set
+    }
+
     def getZones(Location parentLocation) {
         return Location.createCriteria().list {
             eq("active", Boolean.TRUE)
@@ -758,6 +814,13 @@ class LocationService {
             List<String> activityCodes = params.list("activityCodes")
             locations = locations.findAll { Location loc ->
                 activityCodes.any { String code -> loc.supports(code) }
+            }
+        }
+
+        if (params.ignoreActivityCodes) {
+            List<String> ignoredActivityCodes = params.list("ignoreActivityCodes")
+            locations = locations.findAll { Location loc ->
+                !ignoredActivityCodes.any { String code -> loc.supports(code) }
             }
         }
 

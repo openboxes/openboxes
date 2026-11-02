@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.picking
 
 import grails.core.GrailsApplication
@@ -5,8 +14,8 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.api.picking.DropPickTaskCommand
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
@@ -287,15 +296,34 @@ class PickTaskService {
         save(task)
     }
 
+    /**
+     * The container the picked stock goes into. When the picker skipped the container scan and the
+     * facility allows that, their own standing container is used, so the stock always lands somewhere
+     * that does not support PICK_STOCK and cannot be re-allocated out from under them.
+     */
+    private Location resolveOutboundContainer(PickTask task, String outboundContainerId, Person pickedBy) {
+        if (outboundContainerId) {
+            Location outboundContainer = findInFacility(outboundContainerId, task.facility)
+            validateOutboundContainer(outboundContainer, task)
+            return outboundContainer
+        }
+
+        if (!task.facility?.supports(ActivityCode.ALLOW_OUTBOUND_CONTAINER_BYPASS)) {
+            throw new IllegalArgumentException("Outbound container is required at ${task.facility?.name}")
+        }
+
+        return locationService.findOrCreateEmployeeLocation(task.facility, pickedBy)
+    }
+
     void pick(PickTask task, String outboundContainerId, String pickedById) {
-        Location outboundContainer = findInFacility(outboundContainerId, task.facility)
-        validateOutboundContainer(outboundContainer, task)
+        Person pickedBy = Person.get(pickedById)
+        Location outboundContainer = resolveOutboundContainer(task, outboundContainerId, pickedBy)
 
         transferToContainer(task, outboundContainer, task.quantityRequired.toInteger())
         executeStateTransition(task, PickTaskStatus.PICKED)
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
-        existingPickItem.pickedBy = Person.get(pickedById)
+        existingPickItem.pickedBy = pickedBy
         existingPickItem.datePicked = new Date()
         existingPickItem.outboundContainer = outboundContainer
         existingPickItem.quantityPicked = task.quantityRequired.toInteger()
@@ -304,12 +332,6 @@ class PickTaskService {
     }
 
     void shortPick(PickTask task, String outboundContainerId, Integer quantityPicked, String pickedById, String reasonCode) {
-        Location outboundContainer = null
-        if (outboundContainerId != null) {
-            outboundContainer = findInFacility(outboundContainerId, task.facility)
-            validateOutboundContainer(outboundContainer, task)
-        }
-
         PicklistItem existingPickItem = PicklistItem.get(task.id)
 
         if (quantityPicked == null || quantityPicked < 0) {
@@ -325,6 +347,7 @@ class PickTaskService {
         boolean newShortage = reasonCode && task.status in [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
 
         if (quantityPicked > 0) {
+            Location outboundContainer = resolveOutboundContainer(task, outboundContainerId, Person.get(pickedById))
             picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
             transferToContainer(task, outboundContainer, quantityPicked)
             existingPickItem.outboundContainer = outboundContainer
@@ -436,14 +459,19 @@ class PickTaskService {
     }
 
     /**
-     * Applies an action to an outbound container. The signed-in user is recorded as the user who staged it.
+     * Applies an action to a whole outbound container. The signed-in user is recorded as the user who staged it.
      */
     def drop(Location outboundContainer, Map data = [:]) {
         switch (data?.action) {
 
             case 'drop':
-                dropToStaging(outboundContainer, data.stagingLocationId as String, AuthService.currentUser?.id,
-                        data.overrideStagingLocationZone as Boolean ?: false)
+                DropPickTaskCommand command = new DropPickTaskCommand(
+                        facility: outboundContainer.parentLocation,
+                        outboundContainerId: outboundContainer.id,
+                        stagingLocationId: data.stagingLocationId as String,
+                        overrideStagingLocationZone: data.overrideStagingLocationZone as Boolean ?: false,
+                )
+                dropToStaging(command)
                 break
 
             default:
@@ -512,44 +540,77 @@ class PickTaskService {
         task.status = to
     }
 
-    void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById,
-                        boolean overrideStagingLocationZone = false) {
-        if (!stagingLocationId?.trim()) {
+    /**
+     * Moves every PICKED task matching the command's scope into the staging location. Driven by the
+     * tasks rather than by what the container holds, because neither an order nor a subset of one can
+     * be expressed in terms of container availability.
+     */
+    void dropToStaging(DropPickTaskCommand command) {
+        if (!command.stagingLocationId?.trim()) {
             throw new IllegalArgumentException("Staging location is required")
         }
-        Location stagingLocation = findInFacility(stagingLocationId, outboundContainer.parentLocation)
+        Location stagingLocation = findInFacility(command.stagingLocationId, command.facility)
         if (!stagingLocation) {
-            throw new StagingLocationNotFoundException(stagingLocationId)
+            throw new StagingLocationNotFoundException(command.stagingLocationId)
         }
         validateStagingLocation(stagingLocation)
 
-        List<AvailableItem> itemsToMove = productAvailabilityService.getAvailableItems(outboundContainer)
-
-        if (!itemsToMove) {
-            throw new IllegalStateException("Outbound container with number ${outboundContainer.locationNumber} is empty")
+        List<PickTask> tasks = findTasksInDropScope(command)
+        if (!tasks) {
+            throw new IllegalStateException("No picked items found for the given scope")
         }
 
         // Validate the zone for every task up front so the drop fails atomically rather than
         // partially transferring stock before hitting a mismatch on a later item.
-        List<PickTask> allTasks = itemsToMove.collectMany { item ->
-            PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
-        }.unique { it.id }
-        allTasks.each { task -> validateStagingLocationZone(stagingLocation, task, overrideStagingLocationZone) }
+        boolean overrideStagingLocationZone = command.overrideStagingLocationZone ?: false
+        tasks.each { PickTask task -> validateStagingLocationZone(stagingLocation, task, overrideStagingLocationZone) }
 
-        Person stagedBy = Person.get(stagedById)
-        itemsToMove.each { item ->
-            List<PickTask> tasks = PickTask.findAllByOutboundContainerAndInventoryItemAndStatus(
-                    outboundContainer, item.inventoryItem, PickTaskStatus.PICKED)
-            tasks.each { task ->
-                transferToStaging(task, item, stagingLocation)
+        Person stagedBy = AuthService.currentUser
+        tasks.each { PickTask task ->
+            Location sourceBin = task.outboundContainer ?: task.location
+            transferToStaging(task, sourceBin, stagingLocation)
 
-                executeStateTransition(task, PickTaskStatus.STAGED)
-                PicklistItem existingPickItem = PicklistItem.get(task.id)
-                existingPickItem.stagingLocation = stagingLocation
-                existingPickItem.dateStaged = new Date()
-                existingPickItem.stagedBy = stagedBy
+            executeStateTransition(task, PickTaskStatus.STAGED)
+            PicklistItem existingPickItem = PicklistItem.get(task.id)
+            existingPickItem.stagingLocation = stagingLocation
+            existingPickItem.dateStaged = new Date()
+            existingPickItem.stagedBy = stagedBy
 
-                save(task)
+            save(task)
+        }
+    }
+
+    private List<PickTask> findTasksInDropScope(DropPickTaskCommand command) {
+        Location outboundContainer = null
+        if (command.outboundContainerId) {
+            outboundContainer = findInFacility(command.outboundContainerId, command.facility)
+            if (!outboundContainer) {
+                throw new IllegalArgumentException("Outbound container with identifier ${command.outboundContainerId} does not exist")
+            }
+        }
+
+        Requisition requisition = null
+        if (command.requisitionId) {
+            requisition = Requisition.get(command.requisitionId) ?: Requisition.findByRequestNumber(command.requisitionId)
+            if (!requisition) {
+                throw new IllegalArgumentException("Order with identifier ${command.requisitionId} does not exist")
+            }
+        }
+
+        return PickTask.createCriteria().list {
+            eq("facility", command.facility)
+            eq("status", PickTaskStatus.PICKED)
+
+            if (outboundContainer) {
+                eq("outboundContainer", outboundContainer)
+            }
+
+            if (requisition) {
+                eq("requisition", requisition)
+            }
+
+            if (command.pickTaskIds) {
+                'in'("id", command.pickTaskIds)
             }
         }
     }
@@ -635,18 +696,18 @@ class PickTaskService {
         }
     }
 
-    void transferToStaging(PickTask task, AvailableItem item, Location stagingLocation) {
+    void transferToStaging(PickTask task, Location sourceBin, Location stagingLocation) {
         if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
             log.warn("Skipping transfer to staging: Facility does not support TRACK_INTERNAL_TRANSACTIONS activity")
             return
         }
 
         TransferStockCommand command = new TransferStockCommand()
-        command.location = item.binLocation?.parentLocation
-        command.binLocation = item.binLocation
-        command.inventoryItem = item.inventoryItem
+        command.location = task.facility
+        command.binLocation = sourceBin
+        command.inventoryItem = task.inventoryItem
         command.quantity = task.quantityPicked.toInteger()
-        command.otherLocation = item.binLocation?.parentLocation
+        command.otherLocation = task.facility
         command.otherBinLocation = stagingLocation
         command.transferOut = Boolean.TRUE
         command.disableRefresh = Boolean.TRUE

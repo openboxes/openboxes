@@ -27,6 +27,8 @@ SELECT
 
     pli.bin_location_id AS location_id,
     pli.outbound_container_id AS outbound_container_id,
+    -- Where the item actually went once staged, falling back to the system's suggestion while it is not.
+    COALESCE(pli.staging_location_id,
     (SELECT loc.id
      FROM location loc
      JOIN location_effective_supported_activities lesa ON lesa.location_id = loc.id
@@ -51,7 +53,7 @@ SELECT
                        END
             THEN 1 ELSE 0 END) > 0
      LIMIT 1
-    ) AS staging_location_id,
+    )) AS staging_location_id,
     pli.inventory_item_id AS inventory_item_id,
     pli.quantity AS quantity_required,
     pli.quantity_picked AS quantity_picked,
