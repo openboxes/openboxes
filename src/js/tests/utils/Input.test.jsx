@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import Input from 'utils/Input';
 
@@ -19,8 +18,8 @@ describe('input', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedInput = renderer.create(input);
-    expect(renderedInput.toJSON()).toMatchSnapshot();
+    const renderedInput = render(input);
+    expect(renderedInput.asFragment()).toMatchSnapshot();
   });
 
   it('should render properly', () => {

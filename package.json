@@ -36,6 +36,9 @@
     "testEnvironmentOptions": {
       "url": "http://localhost/"
     },
+    "setupFiles": [
+      "<rootDir>/src/js/tests/setupTests.js"
+    ],
     "setupFilesAfterEnv": [
       "mock-local-storage"
     ]
@@ -121,6 +124,7 @@
     "@babel/eslint-parser": "7.28.6",
     "@babel/preset-env": "7.29.2",
     "@babel/preset-react": "7.28.5",
+    "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
     "babel-loader": "9.1.2",
@@ -144,7 +148,6 @@
     "mock-local-storage": "1.1.23",
     "postcss": "8.5.6",
     "react-styleguidist": "12.0.1",
-    "react-test-renderer": "19.2.4",
     "sass": "1.62.1",
     "sass-loader": "13.2.2",
     "url-loader": "4.1.1",

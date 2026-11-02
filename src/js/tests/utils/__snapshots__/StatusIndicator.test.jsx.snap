@@ -1,21 +1,23 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`status indicator should match snapshot 1`] = `
-<div
-  className="d-flex align-items-center justify-content-between"
-  data-testid="status-indicator"
->
+<DocumentFragment>
   <div
-    className="d-flex justify-content-between align-items-center"
+    class="d-flex align-items-center justify-content-between"
+    data-testid="status-indicator"
   >
-    <span
-      className="test-circle status-circle"
-    />
-    <span
-      className="px-1"
+    <div
+      class="d-flex justify-content-between align-items-center"
     >
-      test status to display
-    </span>
+      <span
+        class="test-circle status-circle"
+      />
+      <span
+        class="px-1"
+      >
+        test status to display
+      </span>
+    </div>
   </div>
-</div>
+</DocumentFragment>
 `;

@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 import moment from 'moment/moment';
 import { baseUser } from 'tests/__mocks__/users';
 

@@ -196,7 +196,7 @@ describe('useTableArrowNavigation', () => {
       { id: 'below', column: COLUMN },
     ]);
     // What react-select gives the focus to. The value lives in a hidden input next to it.
-    const selectInput = document.querySelector('.react-select__input input');
+    const selectInput = document.querySelector('input.react-select__input');
 
     arrowDown(screen.getByTestId('above'));
     expect(selectInput).toHaveFocus();

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import Filter from 'utils/Filter';
 
@@ -19,8 +18,8 @@ describe('filter', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedFilter = renderer.create(filter);
-    expect(renderedFilter.toJSON())
+    const renderedFilter = render(filter);
+    expect(renderedFilter.asFragment())
       .toMatchSnapshot();
   });
 

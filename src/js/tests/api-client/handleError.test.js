@@ -102,6 +102,18 @@ describe('handleError', () => {
       expect(notification).not.toHaveBeenCalled();
     });
 
+    it('warns about denied access for 403', async () => {
+      const error = buildResponseError(403, { errorMessage: 'You do not have permissions' });
+
+      await expect(handleError(error)).rejects.toBe(error);
+
+      expect(notification).toHaveBeenCalledWith(NotificationType.WARNING);
+      expect(mockShowNotification).toHaveBeenCalledWith({
+        message: 'Access denied',
+        details: 'You do not have permissions',
+      });
+    });
+
     it('notifies about a missing resource for 404', async () => {
       const error = buildResponseError(404, { errorMessage: 'Shipment not found' });
 

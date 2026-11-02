@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 
 import { AutosaveStatus } from 'consts/autosaveStatuses';
 import RowSaveStatus from 'consts/rowSaveStatus';
@@ -42,12 +42,12 @@ const buildRow = (rowId, overrides = {}) => ({
 
 const buildInitialRows = (rows) => normalizeData(rows, 'rowId');
 
-const flushPromises = async () => {
+const flushPromises = () => act(async () => {
   for (let i = 0; i < 20; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     await Promise.resolve();
   }
-};
+});
 
 describe('useAutosave', () => {
   let deferreds;

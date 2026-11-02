@@ -1,23 +1,19 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`alert message should match snapshot 1`] = `
-<div
-  className=" alert alert-warning"
-  data-testid="alert-message"
-  onClick={[Function]}
-  role="presentation"
-  style={
-    {
-      "cursor": "pointer",
-      "whiteSpace": "pre-line",
-    }
-  }
->
-  <div>
-    <i
-      className="fa fa-exclamation-circle pr-2"
-    />
-    test message
+<DocumentFragment>
+  <div
+    class=" alert alert-warning"
+    data-testid="alert-message"
+    role="presentation"
+    style="cursor: pointer; white-space: pre-line;"
+  >
+    <div>
+      <i
+        class="fa fa-exclamation-circle pr-2"
+      />
+      test message
+    </div>
   </div>
-</div>
+</DocumentFragment>
 `;

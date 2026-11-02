@@ -43,7 +43,8 @@ export const renderFormFields = ({
   const hiddenClass = hidden ? 'd-none' : '';
   const hasErrorClass = (touched || fieldTouched || showError) && error ? 'has-error' : '';
   const className = [supplementClass, filterElementClass, requiredClass, hiddenClass, hasErrorClass].join(' ');
-  const fieldAriaLabel = ariaLabel || translate(FieldLabel, defaultMessage);
+  const fieldAriaLabel = ariaLabel
+    || (typeof FieldLabel === 'string' ? translate(FieldLabel, defaultMessage) : undefined);
   const tooltipId = useId();
 
   if (arrayField) {

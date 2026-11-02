@@ -1,107 +1,99 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`WizardSteps renders correctly 1`] = `
-<div
-  className="steps-main-box"
->
+<DocumentFragment>
   <div
-    className="steps-inside-wrapper"
+    class="steps-main-box"
   >
     <div
-      className="step-container "
-      data-stepstate="inactive"
-      data-testid="wizard-step"
+      class="steps-inside-wrapper"
     >
       <div
-        className="circle"
-        disabled={true}
-        onClick={[Function]}
-        onKeyPress={[Function]}
-        role="button"
-        tabIndex="0"
-      />
-      <div
-        className="step-name"
+        class="step-container "
+        data-stepstate="inactive"
+        data-testid="wizard-step"
       >
-        Create
+        <div
+          class="circle"
+          disabled=""
+          role="button"
+          tabindex="0"
+        />
+        <div
+          class="step-name"
+        >
+          Create
+        </div>
       </div>
-    </div>
-    <div
-      className="step-container active"
-      data-stepstate="active"
-      data-testid="wizard-step"
-    >
       <div
-        className="circle"
-        disabled={true}
-        onClick={[Function]}
-        onKeyPress={[Function]}
-        role="button"
-        tabIndex="0"
-      />
-      <div
-        className="step-name"
+        class="step-container active"
+        data-stepstate="active"
+        data-testid="wizard-step"
       >
-        Add items
+        <div
+          class="circle"
+          disabled=""
+          role="button"
+          tabindex="0"
+        />
+        <div
+          class="step-name"
+        >
+          Add items
+        </div>
       </div>
-    </div>
-    <div
-      className="step-container "
-      data-stepstate="inactive"
-      data-testid="wizard-step"
-    >
       <div
-        className="circle"
-        disabled={true}
-        onClick={[Function]}
-        onKeyPress={[Function]}
-        role="button"
-        tabIndex="0"
-      />
-      <div
-        className="step-name"
+        class="step-container "
+        data-stepstate="inactive"
+        data-testid="wizard-step"
       >
-        Edit
+        <div
+          class="circle"
+          disabled=""
+          role="button"
+          tabindex="0"
+        />
+        <div
+          class="step-name"
+        >
+          Edit
+        </div>
       </div>
-    </div>
-    <div
-      className="step-container "
-      data-stepstate="inactive"
-      data-testid="wizard-step"
-    >
       <div
-        className="circle"
-        disabled={true}
-        onClick={[Function]}
-        onKeyPress={[Function]}
-        role="button"
-        tabIndex="0"
-      />
-      <div
-        className="step-name"
+        class="step-container "
+        data-stepstate="inactive"
+        data-testid="wizard-step"
       >
-        Pick
+        <div
+          class="circle"
+          disabled=""
+          role="button"
+          tabindex="0"
+        />
+        <div
+          class="step-name"
+        >
+          Pick
+        </div>
       </div>
-    </div>
-    <div
-      className="step-container "
-      data-stepstate="inactive"
-      data-testid="wizard-step"
-    >
       <div
-        className="circle"
-        disabled={true}
-        onClick={[Function]}
-        onKeyPress={[Function]}
-        role="button"
-        tabIndex="0"
-      />
-      <div
-        className="step-name"
+        class="step-container "
+        data-stepstate="inactive"
+        data-testid="wizard-step"
       >
-        Send
+        <div
+          class="circle"
+          disabled=""
+          role="button"
+          tabindex="0"
+        />
+        <div
+          class="step-name"
+        >
+          Send
+        </div>
       </div>
     </div>
   </div>
-</div>
+</DocumentFragment>
 `;
