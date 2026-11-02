@@ -10,6 +10,7 @@
 package util
 
 import grails.util.Holders
+import jakarta.servlet.ServletContext
 import org.springframework.boot.info.GitProperties
 
 // See http://jira.codehaus.org/browse/GRAILS-6515
@@ -44,9 +45,13 @@ class ConfigHelper {
         return defaultBranch ?: gitProperties.branch
     }
 
-    static getContextPath() {
-        String contextPath = Holders.grailsApplication.config.server.contextPath
-        return (contextPath != '/') ? contextPath : ''
+    /**
+     * @return the context path the application is served under (ex: "/openboxes"), or an empty String when it is
+     *         served from the root context or runs outside a servlet container.
+     */
+    static String getContextPath() {
+        String contextPath = (Holders.servletContext as ServletContext)?.contextPath
+        return (contextPath && contextPath != '/') ? contextPath : ''
     }
 
     static booleanValue(def value) {
