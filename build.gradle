@@ -275,6 +275,8 @@ dependencies {
     implementation 'joda-time:joda-time:2.12.5'  // vendored excel-import + a few services
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.6.Final'  // was transitive via grails-pretty-time
     implementation 'org.apache.groovy:groovy-sql'  // Groovy 4 coordinates (was org.codehaus.groovy)
+    implementation 'org.apache.groovy:groovy-dateutil'  // Date/Timestamp GDK methods (format, parse, clearTime, plus/minus), not in Groovy 4 core
+    implementation 'org.apache.groovy:groovy-datetime'  // java.time GDK methods
 
     // --- Tests (NOT the target of this spike; expect further work) ---
     testImplementation 'org.apache.grails:grails-testing-support-datamapping'
