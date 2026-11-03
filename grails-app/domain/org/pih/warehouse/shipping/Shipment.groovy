@@ -327,7 +327,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         return this.shipmentItems*.orderItems?.order?.flatten()?.unique()
     }
 
-    Boolean isPending() {
+    boolean isPending() {
         return !this.hasShipped() && !this.wasReceived()
     }
 
@@ -360,24 +360,24 @@ class Shipment implements Comparable, Serializable, Historizable {
         return !orders?.isEmpty() && orders?.every { it.isTransferOrder } && !orders?.any { it.isPutawayOrder } && !orders?.any { it.isReturnOrder }
     }
 
-    Boolean isStockMovement() {
+    boolean isStockMovement() {
         return requisition != null
     }
 
-    Boolean isReceiveAllowed() {
+    boolean isReceiveAllowed() {
         return hasShipped() && !wasReceived()
     }
 
-    Boolean isPartialReceiveAllowed() {
+    boolean isPartialReceiveAllowed() {
         return isReceiveAllowed() && isStockMovement()
     }
 
-    Boolean isSendAllowed() {
+    boolean isSendAllowed() {
         return !hasShipped() && !wasReceived()
     }
 
-    Boolean isFullyReceived() {
-        return shipmentItems?.every { ShipmentItem shipmentItem -> shipmentItem.isFullyReceived() }
+    boolean isFullyReceived() {
+        return shipmentItems?.every { ShipmentItem shipmentItem -> shipmentItem.isFullyReceived() } ?: false
     }
 
     ReferenceNumber getReferenceNumber(String typeName) {

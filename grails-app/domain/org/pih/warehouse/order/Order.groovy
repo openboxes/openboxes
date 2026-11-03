@@ -248,21 +248,21 @@ class Order implements Serializable, Historizable {
     /**
      * @return a boolean indicating whether the order is pending
      */
-    Boolean isPending() {
+    boolean isPending() {
         return (status == null || status == OrderStatus.PENDING)
     }
 
     /**
      * @return a boolean indicating whether the order has been placed
      */
-    Boolean isPlaced() {
+    boolean isPlaced() {
         return (status == OrderStatus.PLACED)
     }
 
     /**
      * @return a boolean indicating whether the order has been fully shipped
      */
-    Boolean isShipped() {
+    boolean isShipped() {
         return activeOrderItems?.every { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
     }
 
@@ -273,22 +273,22 @@ class Order implements Serializable, Historizable {
      *
      * @return
      */
-    Boolean isPartiallyReceived() {
+    boolean isPartiallyReceived() {
         return (status == OrderStatus.PARTIALLY_RECEIVED)
     }
 
     /**
      * @return a boolean indicating whether the order has been received
      */
-    Boolean isReceived() {
+    boolean isReceived() {
         return (status == OrderStatus.RECEIVED)
     }
 
-    Boolean isCompleted() {
+    boolean isCompleted() {
         return (status == OrderStatus.COMPLETED)
     }
 
-    Boolean isCanceled() {
+    boolean isCanceled() {
         return (status == OrderStatus.CANCELED)
     }
 
@@ -545,7 +545,7 @@ class Order implements Serializable, Historizable {
      * Order is fully invoiceable if all items and adjustment that can be added to regular invoice,
      *  that are not yet fully invoiced are fully invoiceable.
      * */
-    Boolean isFullyInvoiceable() {
+    boolean isFullyInvoiceable() {
         if (!orderItems && !orderAdjustments) {
             return false
         }

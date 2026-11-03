@@ -178,7 +178,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     }
 
-    Boolean isManagedLocally() {
+    boolean isManagedLocally() {
         return supports(ActivityCode.MANAGE_INVENTORY)
     }
 
@@ -197,7 +197,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @deprecated use{@link #isDepot()} instead.
      */
     @Deprecated
-    Boolean isWarehouse() {
+    boolean isWarehouse() {
         return locationType.locationTypeCode == LocationTypeCode.DEPOT ||
                 // FIXME Keep for backwards compatibility or until we migrate all locations
                 supports(ActivityCode.MANAGE_INVENTORY)
@@ -208,7 +208,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @return true if location is a ward or pharmacy
      */
     @Deprecated
-    Boolean isWardOrPharmacy() {
+    boolean isWardOrPharmacy() {
         return (locationType.locationTypeCode in [LocationTypeCode.DISPENSARY, LocationTypeCode.WARD] ||
                 // FIXME Keep for backwards compatibility or until we migrate all locations
                 locationType.description in ["Pharmacy", "Ward"])
@@ -218,37 +218,37 @@ class Location implements Comparable<Location>, java.io.Serializable {
      * @return true if location is a depot, ward, or pharmacy
      */
     @Deprecated
-    Boolean isDepotWardOrPharmacy() {
+    boolean isDepotWardOrPharmacy() {
         return (locationType.locationTypeCode in [LocationTypeCode.DEPOT, LocationTypeCode.DISPENSARY, LocationTypeCode.WARD] ||
                 // FIXME Keep for backwards compatibility or until we migrate all locations
                 locationType.description in ["Depot", "Pharmacy", "Ward"])
     }
 
-    Boolean isDepot() {
+    boolean isDepot() {
         return locationType.locationTypeCode == LocationTypeCode.DEPOT
     }
 
-    Boolean isWard() {
+    boolean isWard() {
         return locationType.locationTypeCode == LocationTypeCode.WARD
     }
 
-    Boolean isDispensary() {
+    boolean isDispensary() {
         return locationType.locationTypeCode == LocationTypeCode.DISPENSARY
     }
 
-    Boolean isBinLocation() {
+    boolean isBinLocation() {
         return locationType.locationTypeCode == LocationTypeCode.BIN_LOCATION
     }
 
-    Boolean isSupplier() {
+    boolean isSupplier() {
         return locationType.locationTypeCode == LocationTypeCode.SUPPLIER
     }
 
-    Boolean isDonor() {
+    boolean isDonor() {
         return locationType.locationTypeCode == LocationTypeCode.DONOR
     }
 
-    Boolean isVirtual() {
+    boolean isVirtual() {
         return locationType.locationTypeCode == LocationTypeCode.VIRTUAL
     }
 
@@ -266,16 +266,16 @@ class Location implements Comparable<Location>, java.io.Serializable {
         }
     }
 
-    Boolean isInternalLocation() {
-        return locationType?.isInternalLocation()
+    boolean isInternalLocation() {
+        return locationType?.isInternalLocation() ?: false
     }
 
-    Boolean isFacilityLocation() {
-        return locationType?.isFacilityLocation()
+    boolean isFacilityLocation() {
+        return locationType?.isFacilityLocation() ?: false
     }
 
-    Boolean isZoneLocation() {
-        return locationType?.isZone()
+    boolean isZoneLocation() {
+        return locationType?.isZone() ?: false
     }
 
     /**
@@ -338,19 +338,19 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return internalLocations
     }
 
-    Boolean isAccountingRequired() {
+    boolean isAccountingRequired() {
         return Holders.config.openboxes.accounting.enabled && supports(ActivityCode.REQUIRE_ACCOUNTING)
     }
 
-    Boolean isOnHold() {
+    boolean isOnHold() {
         return supports(ActivityCode.HOLD_STOCK)
     }
 
-    Boolean isPickable() {
+    boolean isPickable() {
         return !onHold
     }
 
-    Boolean isDownstreamConsumer() {
+    boolean isDownstreamConsumer() {
         return !supports(ActivityCode.MANAGE_INVENTORY) && supports(ActivityCode.SUBMIT_REQUEST)
     }
 
@@ -361,7 +361,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
     }
 
-    Boolean isApprovalRequired() {
+    boolean isApprovalRequired() {
         return supports(ActivityCode.APPROVE_REQUEST)
     }
 

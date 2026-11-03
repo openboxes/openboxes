@@ -92,7 +92,7 @@ class InvoiceItemCandidate {
         return null
     }
 
-    Boolean isAdjustment() {
+    boolean isAdjustment() {
         return adjustmentAmount || adjustmentPercentage
     }
 

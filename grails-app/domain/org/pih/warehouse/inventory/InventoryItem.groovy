@@ -135,11 +135,11 @@ class InventoryItem implements Serializable {
         return [product?.id]
     }
 
-    Boolean isRecalled() {
+    boolean isRecalled() {
         return lotStatus == LotStatusCode.RECALLED
     }
 
-    Boolean isPickable() {
+    boolean isPickable() {
         return !recalled
     }
 
