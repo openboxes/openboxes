@@ -3605,6 +3605,25 @@ class StockMovementService {
         return shipmentItems
     }
 
+    /**
+     * Rebuilds the shipment items of a line whose picked quantity no longer matches them, e.g. after
+     * an amendment of an already picked line. {@link #createShipmentItems} skips a line that has any.
+     */
+    void refreshShipmentItems(RequisitionItem requisitionItem, Shipment shipment) {
+        Integer quantityShipped = ShipmentItem.findAllByRequisitionItem(requisitionItem).sum { it.quantity } ?: 0
+        if (quantityShipped == requisitionItem.calculateQuantityPicked()) {
+            return
+        }
+
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+        // createShipmentItems skips the line while the removed items are still in the database
+        shipment.save(flush: true)
+        createShipmentItems(requisitionItem).each { ShipmentItem shipmentItem ->
+            shipment.addToShipmentItems(shipmentItem)
+        }
+        shipment.save(flush: true)
+    }
+
     List<PackPageItem> updatePackPageItems(List<PackPageItem> packPageItems) {
         if (packPageItems) {
             packPageItems.each { PackPageItem packPageItem ->

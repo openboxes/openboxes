@@ -445,11 +445,11 @@ class PickTaskService {
 
         if (task.status == PickTaskStatus.PICKED) {
             boolean allTasksPicked = allOrderTasks.every {
-                it.status == PickTaskStatus.PICKED.name()
+                it.status in [PickTaskStatus.PICKED.name(), PickTaskStatus.STAGED.name()]
             }
             boolean partialAllocation = requisition.partialAllocationAllowed
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
-            if (allTasksPicked && (!partialAllocation || !backordered)) {
+            if (allTasksPicked && (!partialAllocation || !backordered) && requisition.status < RequisitionStatus.PICKED) {
                 requisition.status = RequisitionStatus.PICKED
             }
         } else if (task.status == PickTaskStatus.STAGED) {
@@ -459,19 +459,29 @@ class PickTaskService {
             boolean partialAllocation = requisition.partialAllocationAllowed
             boolean backordered = requisition.requisitionItems?.any { it.isBackordered() }
             if (allTasksStaged && (!partialAllocation || !backordered)) {
-                requisition.status = RequisitionStatus.STAGED
-
-                if (!requisition.shipment) {
-                    Shipment shipment = stockMovementService.createShipment(requisition)
-                    stockMovementService.createMissingShipmentItems(requisition, shipment)
-                }
-
-                grailsApplication.mainContext.publishEvent(new RequisitionEvent(task.requisition.id, WebhookEventType.REQUISITION_STAGED))
+                stageRequisition(requisition)
             }
         }
 
         requisition.save(cascade: true, failOnError: true)
         task.discard()
+    }
+
+    void stageRequisition(Requisition requisition) {
+        requisition.status = RequisitionStatus.STAGED
+
+        // Staged again after an amendment, so the existing shipment items may no longer match the picks
+        Shipment shipment = requisition.shipment
+        if (shipment) {
+            requisition.requisitionItems.each { RequisitionItem requisitionItem ->
+                stockMovementService.refreshShipmentItems(requisitionItem, shipment)
+            }
+        } else {
+            shipment = stockMovementService.createShipment(requisition)
+            stockMovementService.createMissingShipmentItems(requisition, shipment)
+        }
+
+        grailsApplication.mainContext.publishEvent(new RequisitionEvent(requisition.id, WebhookEventType.REQUISITION_STAGED))
     }
 
     void executeStateTransition(PickTask task, PickTaskStatus to, boolean validate = true) {

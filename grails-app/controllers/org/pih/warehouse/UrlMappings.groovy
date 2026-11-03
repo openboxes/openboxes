@@ -1357,6 +1357,11 @@ class UrlMappings {
             action = [POST: "allocate"]
         }
 
+        "/api/outbound-orders/$id/items/$itemId/amend"(parseRequest: true) {
+            controller = "outboundOrderApi"
+            action = [POST: "amend"]
+        }
+
         // Allocation API endpoints
 
         "/api/requisitions/$id/allocate"(parseRequest: true) {

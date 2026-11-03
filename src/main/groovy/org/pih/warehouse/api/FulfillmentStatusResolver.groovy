@@ -77,7 +77,7 @@ class FulfillmentStatusResolver {
     // Helpers
 
     private static boolean isCanceled(StockMovementItem item) {
-        return item.getQuantityRequired() <= 0
+        return item.requisitionItem?.isCanceled() || item.getQuantityRequired() <= 0
     }
 
     private static boolean isBackordered(StockMovementItem item) {
