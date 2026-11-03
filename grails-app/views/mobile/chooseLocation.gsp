@@ -63,7 +63,7 @@
                         </div>
                     </div>
                 </g:each>
-            </ul>
+            </div>
         </div>
     </div>
 </body>
