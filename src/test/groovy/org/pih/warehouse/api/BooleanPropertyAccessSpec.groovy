@@ -67,6 +67,9 @@ class BooleanPropertyAccessSpec extends Specification implements DataTest {
 
     void "StockMovement.validate() evaluates the boolean getters without throwing"() {
         given:
+        // Only validate the boolean getters: validate() also calls every other getter (e.g. getDisplayStatus(),
+        // which needs the ApplicationTagLib bean that isn't available in a unit test).
+        List<String> booleanProperties = ["pending", "electronicType", "pendingApproval", "inApprovalState", "approvalRequired"]
         Location origin = Stub(Location) {
             isApprovalRequired() >> true
         }
@@ -75,9 +78,13 @@ class BooleanPropertyAccessSpec extends Specification implements DataTest {
         StockMovement stockMovement = new StockMovement(origin: origin, requisition: requisition)
 
         when:
-        stockMovement.validate()
+        stockMovement.validate(booleanProperties)
 
         then:
         noExceptionThrown()
+        !stockMovement.errors.hasFieldErrors("approvalRequired")
+
+        and: "the boolean getters are picked up as constrained properties, so validate() really calls them"
+        StockMovement.constraintsMap.keySet().containsAll(booleanProperties)
     }
 }
