@@ -232,9 +232,148 @@
 	}
 
 	.internal-transfers-toggle {
-		display: inline-block;
-		margin-bottom: 8px;
 		cursor: help;
+	}
+
+	/* Details dialog: the summary of the product's period, like its row in the report */
+	.dialog-summary {
+		padding: 4px 0 8px;
+	}
+
+	/* The internal transfers option, on the right of the tab bar. No z-index: the modal dialog ignores clicks on
+	   elements with a z-index below its overlay's (jQuery UI's .zIndex() stops at the first one it finds). */
+	#dialogTabs {
+		position: relative;
+	}
+
+	#dialogTabs .internal-transfers-toggle {
+		position: absolute;
+		top: 12px;
+		right: 10px;
+	}
+
+	/* A row of figures, each a small label above a quantity, like a row of the report */
+	.dialog-summary-equation {
+		display: flex;
+		align-items: flex-end;
+		gap: 4px;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.dialog-stat {
+		display: inline-flex;
+		flex-direction: column;
+		padding: 2px 8px;
+		border-radius: 3px;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.dialog-stat-label {
+		font-size: 0.8em;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		color: #777;
+	}
+
+	.dialog-stat-value {
+		font-size: 1.25em;
+	}
+
+	.dialog-summary .credit {
+		color: #2e7d32;
+	}
+
+	.dialog-summary .debit {
+		color: #c62828;
+	}
+
+	.dialog-summary .zero {
+		color: #bbb;
+	}
+
+	a.dialog-summary-figure:hover .dialog-stat-value {
+		text-decoration: underline;
+	}
+
+	a.dialog-summary-figure.active {
+		background-color: #e8f0fa;
+	}
+
+	a.dialog-summary-figure.active .dialog-stat-label {
+		color: #1a5ea8;
+		font-weight: 600;
+	}
+
+	.dialog-stat-divider {
+		align-self: stretch;
+		margin: 0 8px;
+		border-left: 1px solid #ddd;
+	}
+
+	.internal-transfers-count,
+	.dialog-tab-count {
+		color: #666;
+	}
+
+	/* The filter that's shown, on the left of the table's search row */
+	.dialog-filter {
+		float: left;
+		margin: 2px 0 0 4px;
+		padding: 2px 8px;
+		background-color: #e8f0fa;
+		border-radius: 3px;
+		font-weight: normal;
+	}
+
+	#dialogTabs .ui-tabs-panel {
+		padding: 8px 0 0;
+	}
+
+	/* The By type tab */
+	table.dialog-by-type {
+		width: 100%;
+		border-collapse: collapse;
+		font-variant-numeric: tabular-nums;
+	}
+
+	table.dialog-by-type th,
+	table.dialog-by-type td {
+		padding: 5px 8px;
+		border-bottom: 1px solid #eee;
+	}
+
+	table.dialog-by-type th {
+		text-align: left;
+		background-color: #f0f0f2;
+	}
+
+	table.dialog-by-type th.right,
+	table.dialog-by-type td.right {
+		text-align: right;
+	}
+
+	table.dialog-by-type tr.special td {
+		font-style: italic;
+	}
+
+	table.dialog-by-type tr.not-counted td,
+	table.dialog-by-type tr.not-counted td a {
+		color: #aaa;
+	}
+
+	table.dialog-by-type tfoot td {
+		font-weight: 600;
+		border-top: 2px solid #ccc;
+		border-bottom: none;
+	}
+
+	table.dialog-by-type td.credit {
+		color: #2e7d32;
+	}
+
+	table.dialog-by-type td.debit {
+		color: #c62828;
 	}
 
 	/* Fixed layout, so that the columns keep their widths and the product name gets the rest. Otherwise the browser
@@ -338,6 +477,48 @@
 		background-color: #f0f0f2;
 	}
 
+	/* The period label, with the links to the period before and after on the right */
+	.report-period-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+	}
+
+	.report-period-steps a {
+		margin-left: 8px;
+		font-size: 0.9em;
+		color: #1a5ea8;
+		text-decoration: none;
+	}
+
+	.report-period-steps a:hover {
+		text-decoration: underline;
+	}
+
+	.report-period-steps a.disabled {
+		color: #bbb;
+		cursor: default;
+		text-decoration: none;
+	}
+
+	/* The summary counts in the metadata box filter the table */
+	.report-metadata-summary a {
+		color: #1a5ea8;
+	}
+
+	.report-metadata-summary a.active {
+		font-weight: 600;
+	}
+
+	.report-metadata-summary .zero {
+		color: #999;
+	}
+
+	.report-metadata-filter-clear {
+		margin-left: 6px;
+		font-size: 0.9em;
+	}
+
 	.report-metadata-empty {
 		padding: 10px;
 		color: #666;
@@ -412,10 +593,17 @@
 							<%-- The report period, picked as a range. The hidden fields hold the dates in the format the server reads
 							     (MM/dd/yyyy), and are filled in from the text field by syncReportPeriod. --%>
 							<div class="filter-list-item report-period">
-								<label for="reportPeriod" class="hint" title="${g.message(code: 'report.period.hint', default: 'Both dates are included: from the start of the first day to the end of the last.')}">
-									<g:message code="report.period.label" default="Period"/>
-									<span class="required-marker">*</span>
-								</label>
+								<div class="report-period-header">
+									<label for="reportPeriod" class="hint" title="${g.message(code: 'report.period.hint', default: 'Both dates are included: from the start of the first day to the end of the last.')}">
+										<g:message code="report.period.label" default="Period"/>
+										<span class="required-marker">*</span>
+									</label>
+									<%-- Move to the period before or after, of the same length (e.g. the month before) --%>
+									<span class="report-period-steps">
+										<a href="#" class="report-period-previous">&lsaquo; <g:message code="report.period.previous.label" default="Previous"/></a>
+										<a href="#" class="report-period-next"><g:message code="report.period.next.label" default="Next"/> &rsaquo;</a>
+									</span>
+								</div>
 								<input type="text" id="reportPeriod" class="text filter" autocomplete="off"
 									   placeholder="${g.message(code: 'report.period.placeholder', default: 'e.g. 01/Jan/2026 - 31/Jan/2026')}"/>
 								<input type="hidden" id="startDate" name="startDate" value="${formatDate(date: command?.startDate, format: 'MM/dd/yyyy')}"/>
@@ -530,8 +718,29 @@
 									<td class="value report-metadata-period"></td>
 								</tr>
 								<tr class="prop">
+									<td class="name"><label><g:message code="report.metadata.filters.label" default="Filters"/></label></td>
+									<td class="value report-metadata-filters"></td>
+								</tr>
+								<tr class="prop">
+									<td class="name"><label><g:message code="report.metadata.included.label" default="Included"/></label></td>
+									<td class="value report-metadata-included"></td>
+								</tr>
+								<tr class="prop">
 									<td class="name"><label><g:message code="products.label" default="Products"/></label></td>
 									<td class="value report-metadata-products"></td>
+								</tr>
+								<%-- Products to look into. Each one filters the table to those products. --%>
+								<tr class="prop">
+									<td class="name"><label class="hint" title="${g.message(code: 'report.metadata.withDifferences.hint', default: 'Products whose counts changed their quantity, i.e. Differences is not 0')}"><g:message code="report.metadata.withDifferences.label" default="With differences"/></label></td>
+									<td class="value report-metadata-summary" data-summary="differences"></td>
+								</tr>
+								<tr class="prop">
+									<td class="name"><label class="hint" title="${g.message(code: 'report.metadata.stockouts.hint', default: 'Products that had stock at the start of the period and none at the end')}"><g:message code="report.metadata.stockouts.label" default="Stockouts"/></label></td>
+									<td class="value report-metadata-summary" data-summary="stockouts"></td>
+								</tr>
+								<tr class="prop">
+									<td class="name"><label class="hint" title="${g.message(code: 'report.metadata.negativeClosing.hint', default: 'Products with a negative closing balance, which usually means a transaction is missing or wrong')}"><g:message code="report.metadata.negativeClosing.label" default="Negative closing"/></label></td>
+									<td class="value report-metadata-summary" data-summary="negativeClosing"></td>
 								</tr>
 								<tr class="prop">
 									<td class="name"><label><g:message code="report.metadata.generated.label" default="Generated"/></label></td>
@@ -704,12 +913,112 @@
         renderQuantity(cell, Math.abs(quantity), quantity > 0 ? 'credit' : 'debit');
     }
 
+    // The settings of the report that was run, so that the metadata and the details dialog use them even if the form
+    // has been changed since (e.g. with the previous and next period links)
+    var lastReportParams = null;
+
+    function getSelectedText(selector) {
+        return $(selector).find("option:selected").map(function () { return $.trim($(this).text()); }).get()
+            .filter(function (text) { return text; });
+    }
+
+    // The settings of the report, read from the form when the report is run
+    function getReportParams() {
+        var labels = {
+            category: "${g.message(code: 'category.label', default: 'Category')}",
+            catalogs: "${g.message(code: 'catalogs.name.label', default: 'Formulary')}",
+            tags: "${g.message(code: 'tags.label', default: 'Tags')}",
+            products: "${g.message(code: 'products.label', default: 'Products')}",
+            subcategories: "${g.message(code: 'report.metadata.withSubcategories.label', default: 'with subcategories')}",
+            internalTransfers: "${g.message(code: 'report.metadata.internalTransfers.label', default: 'Internal transfers')}",
+            productsWithNoActivity: "${g.message(code: 'report.metadata.productsWithNoActivity.label', default: 'Products with no activity')}"
+        };
+        var filters = [];
+        if ($("#category").val() && $("#category").val() !== "${command?.rootCategory?.id}") {
+            filters.push(labels.category + ": " + getSelectedText("#category").join(", ") +
+                ($("#includeCategoryChildren").is(":checked") ? " (" + labels.subcategories + ")" : ""));
+        }
+        [["#catalogs", labels.catalogs], ["#tags", labels.tags], ["#products-select", labels.products]].forEach(function (filter) {
+            var selected = getSelectedText(filter[0]);
+            if (selected.length) {
+                filters.push(filter[1] + ": " + selected.join(", "));
+            }
+        });
+        var included = [];
+        if ($("#includeInternalTransfers").is(":checked")) {
+            included.push(labels.internalTransfers);
+        }
+        if ($("#includeProductsWithNoActivity").is(":checked")) {
+            included.push(labels.productsWithNoActivity);
+        }
+        return {
+            locationId: $("#locationId").val(),
+            locationName: $("#locationId option:selected").text(),
+            startDate: $("#startDate").val(),
+            endDate: $("#endDate").val(),
+            period: $("#reportPeriod").val(),
+            includeInternalTransfers: $("#includeInternalTransfers").is(":checked"),
+            filters: filters,
+            included: included
+        };
+    }
+
+    // The products in the report to look into. Each one filters the table to those products.
+    var REPORT_SUMMARIES = {
+        differences: function (row) { return row.Differences !== 0; },
+        stockouts: function (row) { return row.Opening > 0 && row.Closing <= 0; },
+        negativeClosing: function (row) { return row.Closing < 0; }
+    };
+
+    // The filter that a summary count set on the table, or null for none
+    var reportRowFilter = null;
+
+    function setReportRowFilter(key) {
+        reportRowFilter = (reportRowFilter === key) ? null : key;
+        $(".report-metadata-summary a.summary-count").removeClass("active");
+        $(".report-metadata-filter-clear").remove();
+        if (reportRowFilter) {
+            var cell = $(".report-metadata-summary[data-summary='" + reportRowFilter + "']");
+            cell.find("a.summary-count").addClass("active");
+            cell.append($('<a href="#" class="report-metadata-filter-clear">')
+                .text("${g.message(code: 'default.clear.label', default: 'Clear')}")
+                .click(function (event) {
+                    event.preventDefault();
+                    setReportRowFilter(reportRowFilter);
+                }));
+        }
+        $('#transactionReport').dataTable().fnDraw();
+    }
+
     // Shows the details of the report that was just loaded
     function showReportMetadata(json) {
         var seconds = Math.round((Date.now() - reportStartTime) / 1000);
-        $(".report-metadata-facility").text($("#locationId option:selected").text());
-        $(".report-metadata-period").text($("#reportPeriod").val());
-        $(".report-metadata-products").text(((json && json.aaData) || []).length.toLocaleString('en-US'));
+        var rows = (json && json.aaData) || [];
+        var none = "${g.message(code: 'default.none.label', default: 'None')}";
+        $(".report-metadata-facility").text(lastReportParams.locationName);
+        $(".report-metadata-period").text(lastReportParams.period);
+        $(".report-metadata-filters").text(lastReportParams.filters.join("; ") || none);
+        $(".report-metadata-included").text(lastReportParams.included.join(", ") || none);
+        $(".report-metadata-products").text(rows.length.toLocaleString('en-US'));
+        reportRowFilter = null;
+        $.each(REPORT_SUMMARIES, function (key, test) {
+            var matching = rows.filter(test);
+            var cell = $(".report-metadata-summary[data-summary='" + key + "']").empty();
+            if (!matching.length) {
+                cell.append($('<span class="zero">').text("0"));
+                return;
+            }
+            cell.append($('<a href="#" class="summary-count">').text(matching.length.toLocaleString('en-US')).click(function (event) {
+                event.preventDefault();
+                setReportRowFilter(key);
+            }));
+            // The net change from counts, for the products with differences
+            if (key === "differences") {
+                var net = matching.reduce(function (sum, row) { return sum + row.Differences; }, 0);
+                cell.append(document.createTextNode(" (" + (net > 0 ? "+" : net < 0 ? "\u2212" : "") +
+                    Math.abs(net).toLocaleString('en-US') + ")"));
+            }
+        });
         $(".report-metadata-generated").text(new Date().toLocaleString());
         $(".report-metadata-duration").text(Math.floor(seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60);
         $(".report-metadata-empty").hide();
@@ -863,6 +1172,75 @@
 		var valid = dates.length === 2 && startDate.isValid() && endDate.isValid();
 		$("#startDate").val(valid ? startDate.format("MM/DD/YYYY") : "");
 		$("#endDate").val(valid ? endDate.format("MM/DD/YYYY") : "");
+		updateReportPeriodSteps();
+	}
+
+	// The length of the period, for the previous and next links: {months: n} or {days: n}. It's set by the shortcut
+	// that was picked (so that "this quarter" steps by quarters), and kept when stepping. Otherwise (null), it's
+	// worked out from the dates.
+	var reportPeriodLength = null;
+	var pickedShortcutLength = null;
+	var SHORTCUT_LENGTHS = {
+		today: { days: 1 }, yesterday: { days: 1 }, last7Days: { days: 7 }, last30Days: { days: 30 }, last90Days: { days: 90 },
+		thisMonth: { months: 1 }, lastMonth: { months: 1 }, last3Months: { months: 3 }, last6Months: { months: 6 },
+		last12Months: { months: 12 }, thisQuarter: { months: 3 }, lastQuarter: { months: 3 }, thisYear: { months: 12 },
+		lastYear: { months: 12 }
+	};
+
+	// A period of whole months (from the first of a month to the end of a month) steps by months, anything else by
+	// its number of days
+	function getReportPeriodLength(startDate, endDate) {
+		if (reportPeriodLength) {
+			return reportPeriodLength;
+		}
+		if (startDate.date() === 1 && endDate.isSame(endDate.clone().endOf("month"), "day")) {
+			return { months: (endDate.year() - startDate.year()) * 12 + endDate.month() - startDate.month() + 1 };
+		}
+		return { days: endDate.diff(startDate, "days") + 1 };
+	}
+
+	// The period before (direction -1) or after (direction 1) the selected one, of the same length, or null if no period
+	// is selected. The end date isn't capped at today here.
+	function getSteppedReportPeriod(direction) {
+		var startDate = moment($("#startDate").val(), "MM/DD/YYYY", true);
+		var endDate = moment($("#endDate").val(), "MM/DD/YYYY", true);
+		if (!startDate.isValid() || !endDate.isValid()) {
+			return null;
+		}
+		var length = getReportPeriodLength(startDate, endDate);
+		var start, end;
+		if (length.months) {
+			start = startDate.clone().startOf("month").add(direction * length.months, "months");
+			end = start.clone().add(length.months, "months").subtract(1, "days");
+		} else {
+			start = startDate.clone().add(direction * length.days, "days");
+			end = start.clone().add(length.days - 1, "days");
+		}
+		return { start: start, end: end, length: length };
+	}
+
+	// Shows the period each link moves to, and disables the next link when that period would start after today
+	function updateReportPeriodSteps() {
+		var today = moment().startOf("day");
+		[[".report-period-previous", -1], [".report-period-next", 1]].forEach(function (step) {
+			var period = getSteppedReportPeriod(step[1]);
+			var disabled = !period || period.start.isAfter(today);
+			$(step[0]).toggleClass("disabled", disabled).attr("title", disabled ? "" :
+				period.start.format(REPORT_PERIOD_FORMAT) + REPORT_PERIOD_SEPARATOR +
+				moment.min(period.end, today).format(REPORT_PERIOD_FORMAT));
+		});
+	}
+
+	function stepReportPeriod(direction) {
+		var period = getSteppedReportPeriod(direction);
+		if (!period || period.start.isAfter(moment().startOf("day"))) {
+			return;
+		}
+		setReportPeriod(period.start.toDate(), period.end.toDate());
+		// Keep stepping by the same length, even if the dates alone would give a different one (e.g. this month, which
+		// ends today, steps back to the whole month before)
+		reportPeriodLength = period.length;
+		updateReportPeriodSteps();
 	}
 
 	// Returns the [start, end] dates of a period shortcut (e.g. last month). "Last n days" ends today, and "last n
@@ -925,6 +1303,7 @@
 			$.each(group.periods, function (period, name) {
 				// The picker can't pick a day after endDate, so cap the shortcut's end date at today
 				customShortcuts.push({ name: name, dates: function () {
+					pickedShortcutLength = SHORTCUT_LENGTHS[period];
 					var dates = getShortcutPeriod(period);
 					var today = new Date();
 					return [dates[0], dates[1] > today ? today : dates[1]];
@@ -944,9 +1323,22 @@
 			showShortcuts: true,
 			shortcuts: {},
 			customShortcuts: customShortcuts
-		}).on("datepicker-change", syncReportPeriod)
+		}).on("datepicker-change", function () {
+			// A shortcut sets the length of the period; dates picked in the calendar don't
+			reportPeriodLength = pickedShortcutLength;
+			pickedShortcutLength = null;
+			syncReportPeriod();
+		})
 			// Typed periods are read by the picker, but it doesn't fire datepicker-change for them
-			.on("change keyup", syncReportPeriod);
+			.on("change keyup", function () {
+				reportPeriodLength = null;
+				syncReportPeriod();
+			});
+
+		$(".report-period-previous, .report-period-next").click(function (event) {
+			event.preventDefault();
+			stepReportPeriod($(this).hasClass("report-period-next") ? 1 : -1);
+		});
 
 		// Put each group of shortcuts on its own line, with a label. The &nbsp; spacers between them would be left
 		// between the groups, so remove them.
@@ -981,6 +1373,14 @@
 	$(document).ready(function() {
 
 		$(".loading").hide();
+
+		// Shows only the rows of the summary that was clicked in the metadata box. DataTables is loaded after this
+		// script, so this is added here rather than above.
+		$.fn.dataTableExt.afnFiltering.push(function (oSettings, aData, iDataIndex) {
+			return oSettings.nTable.id !== 'transactionReport' || !reportRowFilter
+				|| REPORT_SUMMARIES[reportRowFilter](oSettings.aoData[iDataIndex]._aData);
+		});
+
 		initializeDataTable(false);
 
 		initializeReportPeriod();
@@ -1034,6 +1434,7 @@
 			}
 
 			if (validated && startReportRequest()) {
+				lastReportParams = getReportParams();
 				initializeDataTable(true);
 			}
 		});
@@ -1071,14 +1472,18 @@
 			var nTds = $('td', this);
 			var productCode = $(nTds[0]).text();
 			var productName = $(nTds[1]).text();
+			// The settings of the report that was run, not the form, which may have been changed since
 			var params = {
 				productCode: productCode,
-				locationId: $("#locationId").val(),
-				startDate: $("#startDate").val(),
-				endDate: $("#endDate").val()
+				locationId: lastReportParams.locationId,
+				startDate: lastReportParams.startDate,
+				endDate: lastReportParams.endDate
 			};
+			if (lastReportParams.includeInternalTransfers) {
+				params.includeInternalTransfers = true;
+			}
 
-			if (productCode && productName) {
+			if (productCode && productName && lastReportParams) {
 				var queryString = $.param(params);
 				var url = "${request.contextPath}/report/showTransactionReportDialog?" + queryString;
 				openModalDialog("#dlgShowDialog", productCode + " " + productName, 1000, null, url);
