@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="analytics" />
+    <g:render template="/common/sentry"/>
     <title><warehouse:message code="openboxes.analytics.title" default="OpenBoxes Analytics"/> | <g:layoutTitle/></title>
 
     <!-- Include Favicon -->

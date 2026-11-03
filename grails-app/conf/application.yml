@@ -703,10 +703,10 @@ sentry:
     # A custom setting that defines the format of Sentry HTTP transaction names
     httpTransactionNameFormat: CONTROLLER_METHOD
 
-    # Settings for Sentry on the frontend (React). Passed to the browser at runtime by ConfigHelper.sentryWebConfigJson.
-    # We do it this way because npm_run_bundle is run when the WAR is generated via CI/CD. The WAR is per release, not
-    # per environment, so we don't have the per-host configuration at that time. Once we split the frontend from the
-    # backend, we can investigate loading the frontend app config directly on the frontend.
+    # Settings for React (web) Sentry. Passed to the browser at runtime by SentryConfigResolver.webConfigJson.
+    # We do it this way because npm_run_bundle is run when the WAR is generated via CI/CD. This runs on the build agent,
+    # not the host machine, which doesn't have access to the per-host configuration to inject into the WAR. Once we
+    # split the frontend from the backend, we can investigate loading the frontend app config directly on the frontend.
     # To disable Sentry on the frontend, leave the DSN blank. Leave sample rates blank to use defaults.
     web:
         dsn: ${REACT_APP_WEB_SENTRY_DSN:}

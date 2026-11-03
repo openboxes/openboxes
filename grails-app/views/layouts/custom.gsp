@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
     <%= NewRelic.getBrowserTimingHeader() %>
+    <g:render template="/common/sentry"/>
 
     <!-- Include default page title -->
     <title><g:layoutTitle default="OpenBoxes" /></title>

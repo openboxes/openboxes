@@ -38,6 +38,7 @@ npm-debug.log
 /web-app/js/fonts/*
 grails-app/views/partialReceiving/create.gsp
 grails-app/views/common/react.gsp
+grails-app/views/common/_sentryBundle.gsp
 grails-app/assets/javascripts/bundle*
 grails-app/assets/stylesheets/bundle*
 grails-app/assets/images/*.eot

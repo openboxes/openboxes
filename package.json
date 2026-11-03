@@ -59,7 +59,7 @@
     "@fortawesome/free-solid-svg-icons": "5.14.0",
     "@fortawesome/react-fontawesome": "0.1.8",
     "@hookform/resolvers": "3.3.4",
-    "@sentry/react": "7.119.2",
+    "@sentry/browser": "7.119.2",
     "@tanstack/react-table": "8.20.5",
     "@tanstack/react-virtual": "3.13.10",
     "axios": "1.6.8",
