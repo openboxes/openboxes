@@ -1,7 +1,7 @@
 # We previously used openjdk 8 (which itself was based on Debian 10 aka "buster") as our base image, but they have
-# since deprecated their images. Following their recommendation, we have switched to Temurin. The Temurin image for
-# Java 8 is based on Ubuntu 22.04 (which has LTS until April 2027).
-FROM eclipse-temurin:8-jre-jammy
+# since deprecated their images. Following their recommendation, we have switched to Temurin. Grails 7 requires
+# Java 17, so we use the Temurin 17 JRE image based on Ubuntu 22.04 (which has LTS until April 2027).
+FROM eclipse-temurin:17-jre-jammy
 
 LABEL maintainer="support@openboxes.com"
 EXPOSE 8080
