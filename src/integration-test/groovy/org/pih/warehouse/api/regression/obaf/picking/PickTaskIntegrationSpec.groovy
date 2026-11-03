@@ -215,7 +215,7 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         status(o.requisitionId) == RequisitionStatus.PICKED
     }
 
-    void 'short pick with a reason code: what was picked is moved, the task is PICKED with the shortage recorded'() {
+    void 'short pick with a reason code: what was picked is moved, the shorted quantity goes to lost and found, the task is PICKED with the shortage recorded'() {
         given:
         PickSite s = pickSite('PT-SPR')
         PickOrder o = pickOrder(s, [5])
@@ -230,8 +230,79 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         e == null
         pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) == [status: 'PICKED', quantityPicked: 3, reasonCode: 'STOCKOUT']
         tx { PicklistItem.get(o.taskIds[0]).quantityCanceled } == 2
-        onHand(s.dc, s.product) == [BIN: 17, ALT: 20, TOTE: 3]
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 3, LNF: 2]
         status(o.requisitionId) == RequisitionStatus.PICKED
+    }
+
+    void 'short pick with a reason code at a facility without a lost and found location is refused and nothing moves'() {
+        given:
+        PickSite s = pickSite('PT-SPNL', DeliveryTypeCode.LOCAL_DELIVERY, true, 20, false)
+        PickOrder o = pickOrder(s, [5])
+        String picker = person()
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+
+        when:
+        Throwable e = pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 3,
+                                               pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        then:
+        e instanceof IllegalStateException
+        e.message == 'No discrepancy location found'
+        pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) == [status: 'PICKING', quantityPicked: 0, reasonCode: null]
+        onHand(s.dc, s.product) == [BIN: 20, ALT: 20]
+    }
+
+    void 'short pick with a reason code without internal transactions: nothing goes to a tote, the shorted quantity still goes to lost and found'() {
+        given:
+        PickSite s = pickSite('PT-SPNI', DeliveryTypeCode.LOCAL_DELIVERY, false)
+        PickOrder o = pickOrder(s, [5])
+        String picker = person()
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+
+        when:
+        Throwable e = pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 3,
+                                               pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        then:
+        e == null
+        pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) == [status: 'PICKED', quantityPicked: 3, reasonCode: 'STOCKOUT']
+        onHand(s.dc, s.product) == [BIN: 18, ALT: 20, LNF: 2]
+    }
+
+    void 'short pick with a reason code moves no more to lost and found than is left in the bin'() {
+        given:
+        PickSite s = pickSite('PT-SPCAP', DeliveryTypeCode.LOCAL_DELIVERY, true, 3)
+        PickOrder o = pickOrder(s, [5])
+        String picker = person()
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+
+        when:
+        Throwable e = pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 2,
+                                               pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        then:
+        e == null
+        tx { PicklistItem.get(o.taskIds[0]).quantityCanceled } == 3
+        onHand(s.dc, s.product) == [ALT: 3, TOTE: 2, LNF: 1]
+    }
+
+    void 'rolling back the pick tasks returns both the picked and the shorted quantity to the pick bin'() {
+        given:
+        PickSite s = pickSite('PT-SPRB')
+        PickOrder o = pickOrder(s, [5])
+        String picker = person()
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+        pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 3,
+                                 pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        expect:
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 3, LNF: 2]
+
+        when:
+        tx { pickTaskService.rollbackPickTasks(Requisition.get(o.requisitionId)) }
+
+        then:
+        onHand(s.dc, s.product) == [BIN: 20, ALT: 20]
     }
 
     void 'short pick: more than the task still needs is refused and nothing moves'() {
@@ -264,7 +335,7 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         e == null
         tx { PicklistItem.get(o.taskIds[0]).status } == 'STAGED'
         status(o.requisitionId) == RequisitionStatus.CANCELED
-        onHand(s.dc, s.product) == [BIN: 20, ALT: 20]
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, LNF: 5]
     }
 
     void 'short pick of zero with a reason on a task nobody started is refused (PENDING -> STAGED is not a transition)'() {
@@ -297,6 +368,7 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         e == null
         pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) == [status: 'PICKED', quantityPicked: 2, reasonCode: 'STOCKOUT']
         status(o.requisitionId) == RequisitionStatus.PICKED
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 2, LNF: 3]
     }
 
     void 'short pick of zero with no reason changes nothing'() {
