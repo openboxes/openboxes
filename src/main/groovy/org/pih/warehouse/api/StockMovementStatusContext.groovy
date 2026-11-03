@@ -60,8 +60,8 @@ class StockMovementStatusContext {
         return order?.orderType?.isReturnOrder()
     }
 
-    Boolean isFromPurchaseOrder() {
-        return shipment?.isFromPurchaseOrder
+    boolean isFromPurchaseOrder() {
+        return shipment?.isFromPurchaseOrder ?: false
     }
 
     boolean isElectronicType() {

@@ -200,8 +200,8 @@ class StockMovement implements Validateable, Historizable {
             isShipped           : isShipped,
             isReceived          : isReceived,
             isPartiallyReceived : hasBeenPartiallyReceived(),
-            isElectronicType    : isElectronicType(),
-            isPending           : isPending(),
+            isElectronicType    : electronicType,
+            isPending           : pending,
             shipped             : isShipped,
             received            : isReceived,
             requestType         : requestType,
@@ -245,7 +245,7 @@ class StockMovement implements Validateable, Historizable {
             return null
     }
 
-    Boolean isPending() {
+    boolean isPending() {
         return shipment?.currentStatus == ShipmentStatusCode.PENDING
     }
 
@@ -265,11 +265,11 @@ class StockMovement implements Validateable, Historizable {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
-    Boolean isElectronicType() {
+    boolean isElectronicType() {
         requisition?.sourceType == RequisitionSourceType.ELECTRONIC
     }
 
-    Boolean isPendingApproval() {
+    boolean isPendingApproval() {
         return requisition?.status == RequisitionStatus.PENDING_APPROVAL
     }
 
@@ -282,7 +282,7 @@ class StockMovement implements Validateable, Historizable {
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
         // stock request /stockRequest/remove/:id
-        if (isElectronicType()) {
+        if (electronicType) {
             User user = AuthService.currentUser
             def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
             def userService = Holders.grailsApplication.mainContext.getBean("userService")
@@ -291,7 +291,7 @@ class StockMovement implements Validateable, Historizable {
             }
         }
 
-        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder) || (isElectronicType() && isDestination))
+        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder) || (electronicType && isDestination))
     }
 
     Boolean isEditAuthorized(Location currentLocation) {
@@ -494,7 +494,7 @@ class StockMovement implements Validateable, Historizable {
         return approvers?.contains(user) || requestedBy?.id == user?.id
     }
 
-    Boolean isInApprovalState() {
+    boolean isInApprovalState() {
         return requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]
     }
 
@@ -507,9 +507,10 @@ class StockMovement implements Validateable, Historizable {
                         user?.id == requestedBy?.id))
     }
 
-    Boolean isApprovalRequired() {
+    boolean isApprovalRequired() {
         // The requisition status has to be lower than PICKING (so comparing them will return -1)
-        return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
+        // Null-safe: Validateable calls this getter during validate(), and RequisitionStatus.compare NPEs on a null status
+        return requisition?.approvalRequired && origin?.approvalRequired && requisition.status && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
     }
 
     // Function for checking if user in exact location can edit request

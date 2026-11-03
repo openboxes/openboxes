@@ -266,16 +266,16 @@ class Location implements Comparable<Location>, java.io.Serializable {
         }
     }
 
-    Boolean isInternalLocation() {
-        return locationType?.isInternalLocation()
+    boolean isInternalLocation() {
+        return locationType?.isInternalLocation() ?: false
     }
 
-    Boolean isFacilityLocation() {
-        return locationType?.isFacilityLocation()
+    boolean isFacilityLocation() {
+        return locationType?.isFacilityLocation() ?: false
     }
 
-    Boolean isZoneLocation() {
-        return locationType?.isZone()
+    boolean isZoneLocation() {
+        return locationType?.isZone() ?: false
     }
 
     /**
