@@ -80,7 +80,6 @@ const TextInput = ({
       hasErrors={!!(errorMessage || hasErrors)}
     >
       <input
-        ref={inputRef}
         id={id || name}
         name={name}
         disabled={disabled}
@@ -90,6 +89,7 @@ const TextInput = ({
         step={numberIncrementValue}
         value={value}
         {...fieldProps}
+        ref={inputRef}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
         onKeyDown={onKeyDown}

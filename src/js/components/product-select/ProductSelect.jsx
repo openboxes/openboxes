@@ -82,7 +82,7 @@ const ProductSelect = ({
       }
 
       if (exactMatchProduct) {
-        selectRef.current.select.select.setValue(exactMatchProduct);
+        selectRef.current.selectOption(exactMatchProduct);
       }
       if (onExactProductSelected) {
         /* There are cases when we want to call this callback right after the state change.

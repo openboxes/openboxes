@@ -84,8 +84,8 @@ const useTableArrowNavigation = ({ onNavigatePastLastField, verticalOnly } = {})
       && onNavigatePastLastField
       && isLastNavigableFieldOfTable(table, event.target);
 
-    // The field of the added row has to be in the DOM before the focus moves to it
     if (hasNavigatedPastLastField) {
+      // The new row has to be in the DOM before the fields are read again
       flushSync(() => onNavigatePastLastField(columnId));
     }
 
