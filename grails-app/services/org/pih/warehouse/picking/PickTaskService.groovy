@@ -311,10 +311,22 @@ class PickTaskService {
         }
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
+
+        // A shortage is recorded only once (the first time a reason code is given). The stock that should have been
+        // in the bin is held in the facility's lost and found location, so it is not allocated again and Inventory
+        // can investigate it. Like putaway, refuse the shortage when the facility has no lost and found location.
+        boolean newShortage = reasonCode && !existingPickItem.reasonCode
+        Location lostAndFound = newShortage ? findLostAndFoundLocation(task) : null
+
         if (quantityPicked > 0) {
             picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
             transferToContainer(task, outboundContainer, quantityPicked)
             existingPickItem.outboundContainer = outboundContainer
+        }
+
+        Integer quantityMovedToLostAndFound = 0
+        if (newShortage) {
+            quantityMovedToLostAndFound = transferShortageToLostAndFound(task, existingPickItem, lostAndFound)
         }
 
         def isFullyPicked = task.quantityRequired.toInteger() == existingPickItem.quantityPicked
@@ -333,6 +345,11 @@ class PickTaskService {
         }
 
         save(task)
+
+        if (newShortage) {
+            sendShortageNotification(existingPickItem, quantityMovedToLostAndFound, lostAndFound)
+        }
+
         // has to be done after save() because we need new requisition status for isCanceledDuringPick() check
         if (!existingPickItem.quantityPicked || existingPickItem.quantityPicked == 0) {
             Set<PicklistItem> list = existingPickItem.picklist.picklistItems
@@ -544,6 +561,67 @@ class PickTaskService {
         command.transferOut = Boolean.TRUE
         command.disableRefresh = Boolean.TRUE
         transfer(task, command)
+    }
+
+    private Location findLostAndFoundLocation(PickTask task) {
+        Location lostAndFound = task.facility?.internalLocations?.find { it.supports(ActivityCode.LOST_AND_FOUND) }
+        if (!lostAndFound) {
+            throw new IllegalStateException("No discrepancy location found")
+        }
+        return lostAndFound
+    }
+
+    /**
+     * Moves the shorted quantity (quantity requested - quantity picked) from the pick bin to the lost and found
+     * location. The quantity is capped at what is still recorded in the bin; when internal transactions are not
+     * tracked, the picked quantity is still in the bin, so it is not available to move.
+     *
+     * The transfer is linked to the picklist (like the transfer to the outbound container), so rolling back the
+     * pick tasks moves the stock back to the pick bin.
+     *
+     * @return the quantity moved to lost and found
+     */
+    private Integer transferShortageToLostAndFound(PickTask task, PicklistItem picklistItem, Location lostAndFound) {
+        Integer quantityPicked = picklistItem.quantityPicked ?: 0
+        Integer quantityShorted = (picklistItem.quantity ?: 0) - quantityPicked
+        if (quantityShorted <= 0) {
+            return 0
+        }
+
+        Integer quantityInBin = inventoryService.getQuantityFromBinLocation(task.facility, task.location, task.inventoryItem) ?: 0
+        if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+            quantityInBin -= quantityPicked
+        }
+
+        Integer quantity = Math.min(quantityShorted, quantityInBin)
+        if (quantity <= 0) {
+            log.warn("Skipping transfer to lost and found for pick task ${task.identifier}: no stock left in ${task.location?.name}")
+            return 0
+        }
+        if (quantity < quantityShorted) {
+            log.warn("Only ${quantity} of ${quantityShorted} shorted units are left in ${task.location?.name} for pick task ${task.identifier}")
+        }
+
+        TransferStockCommand command = new TransferStockCommand()
+        command.location = task.facility
+        command.binLocation = task.location
+        command.inventoryItem = task.inventoryItem
+        command.quantity = quantity
+        command.otherLocation = task.facility
+        command.otherBinLocation = lostAndFound
+        command.transferOut = Boolean.TRUE
+        command.disableRefresh = Boolean.TRUE
+        transfer(task, command)
+
+        return quantity
+    }
+
+    private void sendShortageNotification(PicklistItem picklistItem, Integer quantityMovedToLostAndFound, Location lostAndFound) {
+        try {
+            grailsApplication.mainContext.publishEvent(new PickShortageEvent(picklistItem, quantityMovedToLostAndFound, lostAndFound))
+        } catch (Exception e) {
+            log.error("Error while processing PickShortageEvent", e)
+        }
     }
 
     void transferToStaging(PickTask task, AvailableItem item, Location stagingLocation) {
