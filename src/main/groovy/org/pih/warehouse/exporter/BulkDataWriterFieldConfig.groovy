@@ -2,6 +2,7 @@ package org.pih.warehouse.exporter
 
 import org.pih.warehouse.core.formatter.Formatter
 import org.pih.warehouse.core.formatter.FormatterContext
+import org.pih.warehouse.importer.BulkDataColumnIndex
 
 /**
  * Field-specific configuration for writing bulk data to files.
@@ -14,7 +15,9 @@ class BulkDataWriterFieldConfig {
     String fieldName
 
     /**
-     * The index of the column in the output document.
+     * The index of the column in the output document. Can be a zero-indexed numerical (ex: "0", "1", "10")
+     * or a letter (ex: "A", "B", "AA"). This should match the column indexes defined in
+     * {@link org.pih.warehouse.importer.BulkDataReaderConfig}.
      */
     String columnIndex
 
@@ -43,4 +46,12 @@ class BulkDataWriterFieldConfig {
      * If null, will use the default context for the formatter.
      */
     FormatterContext formatterContext
+
+    /**
+     * @return The zero-indexed numerical representation of the column, or null if no columnIndex is specified.
+     * @throws IllegalArgumentException if the columnIndex is neither all digits nor all letters.
+     */
+    Integer resolveColumnIndex() {
+        return BulkDataColumnIndex.toInt(columnIndex)
+    }
 }
