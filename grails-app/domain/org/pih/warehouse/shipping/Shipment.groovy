@@ -376,8 +376,8 @@ class Shipment implements Comparable, Serializable, Historizable {
         return !hasShipped() && !wasReceived()
     }
 
-    Boolean isFullyReceived() {
-        return shipmentItems?.every { ShipmentItem shipmentItem -> shipmentItem.isFullyReceived() }
+    boolean isFullyReceived() {
+        return shipmentItems?.every { ShipmentItem shipmentItem -> shipmentItem.isFullyReceived() } ?: false
     }
 
     ReferenceNumber getReferenceNumber(String typeName) {

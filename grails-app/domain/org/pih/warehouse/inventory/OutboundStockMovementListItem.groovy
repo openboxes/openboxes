@@ -171,7 +171,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 requestType         : requestType?.name(),
                 sourceType          : sourceType?.name(),
                 isPending           : pending,
-                isReturn            : isFromReturnOrder(),
+                isReturn            : fromReturnOrder,
                 isElectronicType    : electronicType,
                 isApprovalRequired  : requisition?.approvalRequired,
                 shipmentType        : shipmentType,
@@ -192,8 +192,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         return 0
     }
 
-    Boolean isFromReturnOrder() {
-        return order?.isReturnOrder
+    boolean isFromReturnOrder() {
+        return order?.isReturnOrder ?: false
     }
 
     boolean isPending() {

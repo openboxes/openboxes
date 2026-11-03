@@ -83,7 +83,7 @@ class Category implements Comparable, Serializable {
     /**
      * @return true if the category is marked as root or if it's the same object returned by the getRootCategory() method.
      */
-    Boolean isRootCategory() {
+    boolean isRootCategory() {
         return isRoot || this.equals(Category.getRootCategory())
     }
 
