@@ -11,6 +11,7 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.util.Holders
+import org.hibernate.Hibernate
 
 import org.pih.warehouse.core.mapper.MapperComponentResolver
 import org.pih.warehouse.core.serialization.Serializable
@@ -300,7 +301,8 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Party) { Party party ->
-            return party.toJson()
+            // A lazy Party association is a Hibernate proxy of Party even when the row is an Organization
+            return Hibernate.unproxy(party).toJson()
         }
 
         JSON.registerObjectMarshaller(PartyRole) { PartyRole partyRole ->
@@ -312,7 +314,8 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Person) { Person person ->
-            return person.toJson()
+            // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+            return Hibernate.unproxy(person).toJson()
         }
 
         JSON.registerObjectMarshaller(Picklist) { Picklist picklist ->
