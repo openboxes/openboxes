@@ -8,7 +8,7 @@ class PartialReceiptContainer{
     String sortBy
     List<PartialReceiptItem> partialReceiptItems = []
 
-    Boolean isDefault() {
+    boolean isDefault() {
         return container == null
     }
     private static int defaultOrderComparison(a, b) {

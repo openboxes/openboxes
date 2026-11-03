@@ -205,15 +205,15 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
         return requisition?.approvers?.toList()
     }
 
-    Boolean isPendingApproval() {
+    boolean isPendingApproval() {
         return requisition?.status == RequisitionStatus.PENDING_APPROVAL
     }
 
-    Boolean isPending() {
+    boolean isPending() {
         return shipment?.currentStatus == ShipmentStatusCode.PENDING
     }
 
-    Boolean isElectronicType() {
+    boolean isElectronicType() {
         sourceType == RequisitionSourceType.ELECTRONIC
     }
 
@@ -312,7 +312,7 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
         this.lineItems = lineItems
     }
 
-    Boolean isInApprovalState() {
+    boolean isInApprovalState() {
         return requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]
     }
 
@@ -338,7 +338,7 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
                 user?.id == requestedBy?.id))
     }
 
-    Boolean isApprovalRequired() {
+    boolean isApprovalRequired() {
         // The requisition status has to be lower than PICKING (so comparing them will return -1)
         return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
     }

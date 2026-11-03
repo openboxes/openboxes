@@ -190,7 +190,7 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
      *  - adjustment is not canceled, and does not have full unit price (total adjustment) invoiced in all regular invoices
      *  - adjustment does not have full unit price (total adjustment) invoiced in all regular invoices yet and order is placed
      * */
-    Boolean isInvoiceable() {
+    boolean isInvoiceable() {
         Boolean fullyInvoiced = invoicedUnitPrice == totalAdjustments
 
         if (canceled) {

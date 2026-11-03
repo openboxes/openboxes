@@ -100,7 +100,7 @@ class ShipmentItem implements Comparable, Serializable {
         sortOrder(nullable: true)
     }
 
-    Boolean isFullyReceived() {
+    boolean isFullyReceived() {
         return quantityReceivedAndCanceled >= quantity
     }
 
@@ -298,7 +298,7 @@ class ShipmentItem implements Comparable, Serializable {
         return quantityToInvoiceInStandardUom / quantityPerUom
     }
 
-    Boolean isInvoiceable() {
+    boolean isInvoiceable() {
         return quantityToInvoiceInStandardUom > 0
     }
 

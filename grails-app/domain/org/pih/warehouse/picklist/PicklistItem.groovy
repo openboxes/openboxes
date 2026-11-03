@@ -92,7 +92,7 @@ class PicklistItem implements Serializable {
         return [inventoryItem?.product?.id]
     }
 
-    Boolean isPickable() {
+    boolean isPickable() {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 

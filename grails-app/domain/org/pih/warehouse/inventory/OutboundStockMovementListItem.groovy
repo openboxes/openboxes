@@ -192,15 +192,15 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
         return 0
     }
 
-    Boolean isFromReturnOrder() {
-        return order?.isReturnOrder
+    boolean isFromReturnOrder() {
+        return order?.isReturnOrder ?: false
     }
 
-    Boolean isPending() {
+    boolean isPending() {
         return shipment?.currentStatus == ShipmentStatusCode.PENDING
     }
 
-    Boolean isElectronicType() {
+    boolean isElectronicType() {
         sourceType == RequisitionSourceType.ELECTRONIC
     }
 
