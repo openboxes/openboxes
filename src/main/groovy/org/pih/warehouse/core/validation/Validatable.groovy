@@ -5,8 +5,8 @@ import grails.validation.ValidationException
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
-import javax.validation.ConstraintViolation
-import javax.validation.Valid
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.Valid
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.core.GenericTypeResolver
 import org.springframework.validation.Errors
@@ -22,7 +22,7 @@ import org.pih.warehouse.core.AppUtil
  * to implement this trait.
  *
  * There are three supported validation methods:
- * 1) Via javax.validation.constraints.* annotations: for simple validations
+ * 1) Via jakarta.validation.constraints.* annotations: for simple validations
  * 2) Via a custom *Validator component: for complex validations that depend on other components
  * 3) Via Grails' static "constraints" block: Uses Grails validation. Prefer the other options when possible.
  *
@@ -76,7 +76,7 @@ trait Validatable<V extends Validator> {
     }
 
     /**
-     * Validates against any javax.validation.constraints.* annotations on the object.
+     * Validates against any jakarta.validation.constraints.* annotations on the object.
      *
      * @return True if the object is valid, false otherwise
      */
@@ -107,11 +107,11 @@ trait Validatable<V extends Validator> {
         return violations.empty
     }
 
-    private javax.validation.Validator javaxValidator() {
+    private jakarta.validation.Validator javaxValidator() {
         // There are two javax Validator beans in a Spring application (we use number 2):
         // 1) mvcValidator: for use in Spring MVC data binding during web request processing
         // 2) defaultValidator: for use in Hibernate validation (JSR-303 Bean Validation using constraint annotations)
-        return AppUtil.getBean(javax.validation.Validator, "defaultValidator")
+        return AppUtil.getBean(jakarta.validation.Validator, "defaultValidator")
     }
 
     /**
@@ -141,7 +141,7 @@ trait Validatable<V extends Validator> {
 
     /**
      * Returns true if the object being validated is a controller action parameter that is annotated with
-     * javax.validation @Valid. The goal is to mirror the same annotation behaviour that Spring uses.
+     * jakarta.validation @Valid. The goal is to mirror the same annotation behaviour that Spring uses.
      *
      * For example: def someAction(@Valid XCommand requestBody) { ... }
      */

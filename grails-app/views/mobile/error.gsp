@@ -12,10 +12,10 @@
     <div class="container-fluid">
         <h2>Error Details</h2>
         <div class="message" role="status" aria-label="message">
-            <strong>Error ${request?.'javax.servlet.error.status_code'}:</strong>
-                ${request?.'javax.servlet.error.message'}<br/>
-            <strong>Servlet:</strong> ${request?.'javax.servlet.error.servlet_name'}<br/>
-            <strong>URI:</strong> ${request?.'javax.servlet.error.request_uri'}<br/>
+            <strong>Error ${request?.'jakarta.servlet.error.status_code'}:</strong>
+                ${request?.'jakarta.servlet.error.message'}<br/>
+            <strong>Servlet:</strong> ${request?.'jakarta.servlet.error.servlet_name'}<br/>
+            <strong>URI:</strong> ${request?.'jakarta.servlet.error.request_uri'}<br/>
             <g:if test="${exception}">
                 <strong>Exception Message:</strong> ${exception.message} <br />
                 <strong>Caused by:</strong> ${exception.cause?.message} <br />

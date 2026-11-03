@@ -1,7 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location

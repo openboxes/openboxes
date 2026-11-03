@@ -29,7 +29,7 @@ import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
 
-import javax.xml.bind.ValidationException
+import jakarta.xml.bind.ValidationException
 
 @Transactional
 class ReplenishmentService {

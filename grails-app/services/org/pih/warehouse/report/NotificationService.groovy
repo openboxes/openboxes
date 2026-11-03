@@ -12,10 +12,10 @@ package org.pih.warehouse.report
 import grails.core.GrailsApplication
 import grails.util.GrailsWebMockUtil
 import grails.util.Holders
-import org.apache.commons.mail.EmailException
+import org.apache.commons.mail2.core.EmailException
 import org.apache.commons.validator.EmailValidator
+import grails.gsp.PageRenderer
 import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.grails.plugins.web.taglib.RenderTagLib
 import grails.web.context.ServletContextHolder
 import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
@@ -54,14 +54,12 @@ class NotificationService {
         return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 
+    PageRenderer groovyPageRenderer
+
     def renderTemplate(String template, Map model) {
-        def webRequest = RequestContextHolder.getRequestAttributes()
-        if(!webRequest) {
-            def servletContext = ServletContextHolder.getServletContext()
-            def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-            GrailsWebMockUtil.bindMockWebRequest(applicationContext)
-        }
-        return new RenderTagLib().render(template: template, model: model)
+        // Grails 7: RenderTagLib can no longer be instantiated by hand; PageRenderer
+        // renders GSP templates outside a web request (it binds its own mock request).
+        return groovyPageRenderer.render(template: template, model: model)
     }
 
     def getExpiryAlertsByLocation(Location location, Integer daysUntilExpiry = 0) {

@@ -1,0 +1,3 @@
+moduleName=openboxes-parallel-extensions
+moduleVersion=1.0
+extensionClasses=org.pih.warehouse.concurrent.ParallelExtensions

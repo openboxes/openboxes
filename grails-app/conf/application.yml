@@ -8,11 +8,8 @@
 
 ---
 grails:
-    profile: react-webpack
     codegen:
         defaultPackage: org
-    dbconsole:
-        enabled: true
     gorm:
         reactor:
             # Whether to translate GORM events into Reactor events
@@ -34,10 +31,7 @@ grails:
             - ~/.grails/openboxes-config.groovy
             - ~/.grails/openboxes.yml
     plugin:
-        console:
-            enabled: true  # https://github.com/sheehan/grails-console#security
-
-        # Grails Liquibase database migration support. https://grails.github.io/grails-database-migration/latest/
+        # Grails Liquibase database migration support (grails-data-hibernate5-dbmigration on Grails 7).
         # Automatic migrations are disabled by default. We run them manually in BootStrap.groovy
         databasemigration:
             changelogFileName: changelog.groovy
@@ -51,6 +45,9 @@ info:
 spring:
     main:
         banner-mode: "off"
+        # Legacy Grails 3 app: service/bean graph still has circular references.
+        # TODO G7: untangle them and remove this flag.
+        allow-circular-references: true
     groovy:
         template:
             check-template-location: false
@@ -59,29 +56,24 @@ quartz:
     pluginEnabled: true
     jdbcStore: false
     autoStartup: false
-    monitor:
-        layout: custom
-        showTriggerNames: true
-        showCountdown: true
-        showTickingCloud: true
 
-# Spring Actuator Endpoints are Disabled by Default
-endpoints:
-    enabled: true
-    jmx:
-        enabled: true
-
+# Spring Boot 3 actuator config (replaces the Boot 1.5 'endpoints:' block).
+# Keep the exposed set minimal; SecurityInterceptor whitelists /health and /info.
 management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info
     info:
         git:
             mode: full
 
 server:
-    contextPath: "/openboxes"
-    session:
-        # The time (in seconds) of inactivity before we invalidate the user's session. (7200 is two hours.)
-        # For future reference, this setting has been renamed to "server.servlet.session.timeout" in SpringBoot 2+
-        timeout: 7200
+    servlet:
+        context-path: "/openboxes"
+        session:
+            # The time (in seconds) of inactivity before we invalidate the user's session. (7200 is two hours.)
+            timeout: 7200
 ---
 grails:
     #
@@ -194,10 +186,11 @@ grails:
             htmlcodec: xml
             codecs:
                 expression: html
-                scriptlets: html
+                scriptlet: html  # Grails 7 metadata declares the singular key; plural bound to nothing
                 taglib: none
                 staticparts: none
-            sitemesh:
+            # Grails 7 removed Sitemesh 2; layouts are handled by grailsLayout
+            layout:
                 preprocess: true
         javascript:
             library: jquery
@@ -246,64 +239,38 @@ hibernate:
     format_sql: false
     allow_update_outside_transaction: false
     cache:
+        # Ehcache 2 region factory removed with the Grails 7 migration; the
+        # second-level cache was already disabled, so nothing replaces it.
         queries: false
-        provider_class: org.hibernate.cache.EhCacheProvider
-        region:
-            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
         use_query_cache: false
         use_second_level_cache: false
 
 dataSource:
     pooled: true
-    jmxExport: true
     driverClassName: com.mysql.cj.jdbc.Driver
     dbCreate: none
-    dialect: org.hibernate.dialect.MySQL57InnoDBDialect
-    factory: org.apache.tomcat.jdbc.pool.DataSourceFactory
-    type: org.apache.tomcat.jdbc.pool.DataSource
-
-    # Settings for database logging
-    logger: com.mysql.cj.jdbc.log.StandardLogger
-    dumpQueriesOnException: false
+    # MySQL57InnoDBDialect no longer exists on Hibernate 5.6 (use MySQL8Dialect on MySQL 8)
+    dialect: org.hibernate.dialect.MySQL57Dialect
     logSql: false  # Logs SQL queries to the console. We configure this via Logback instead.
     formatSql: false
-    logSlowQueries: false
-    includeInnodbStatusInDeadlockExceptions: true
 
+    # HikariCP replaced tomcat-jdbc with the move to Grails 7; the old tomcat
+    # pool knobs (maxActive, validationQuery, jdbcInterceptors...) do not bind
+    # to Hikari and were removed. These map to HikariConfig properties.
     properties:
-        # from https://docs.grails.org/3.3.16/guide/conf.html#dataSource
-        jmxEnabled: true
-        initialSize: 5
-        maxActive: 50
-        minIdle: 5
-        maxIdle: 25
-        maxWait: 10000
-        maxAge: 10 * 60000
-        timeBetweenEvictionRunsMillis: 5000
-        minEvictableIdleTimeMillis: 60000
-        validationQuery: SELECT 1
-        validationQueryTimeout: 3
-        validationInterval: 15000
-        testOnBorrow: false
-        testWhileIdle: true
-        testOnReturn: false
-        # https://tomcat.apache.org/tomcat-8.5-doc/jdbc-pool.html#JDBC_interceptors
-        jdbcInterceptors: "ConnectionState;StatementCache(max=200)"
-        defaultTransactionIsolation: java.sql.Connection.TRANSACTION_READ_COMMITTED
+        maximumPoolSize: 50
+        minimumIdle: 5
+        connectionTimeout: 10000
+        transactionIsolation: TRANSACTION_READ_COMMITTED
 
 environments:
     development:
         dataSource:
-            dumpQueriesOnException: true
-            logAbandoned: true
-            logSlowQueries: true
             username: "openboxes"
             password: "openboxes"
             url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
     test:
         dataSource:
-            dumpQueriesOnException: true
-            logAbandoned: true
             # Our integration tests run against a containerized database: https://java.testcontainers.org/modules/databases/jdbc/.
             # Note that testcontainers auto-disable SSL when connecting via jdbc: https://github.com/testcontainers/testcontainers-java/pull/561
             # For more information, see /src/integration-test/README.md
@@ -587,7 +554,7 @@ openboxes:
 
     # Allow users to customize logo image url as well as label
     logo:
-        url: "${server.contextPath}/assets/openboxes_logo_40x40.jpg"
+        url: "${server.servlet.context-path}/assets/openboxes_logo_40x40.jpg"
         label: ""
     report:
         logo:

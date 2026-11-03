@@ -2,7 +2,7 @@ package org.pih.warehouse.monitoring
 
 import io.sentry.HubAdapter
 import io.sentry.IHub
-import io.sentry.spring.tracing.SentryTracingFilter
+import io.sentry.spring.jakarta.tracing.SentryTracingFilter
 
 /**
  * Creates HTTP request transactions for Sentry performance tracing.

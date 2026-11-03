@@ -31,7 +31,7 @@ import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.report.InventoryReportCommand
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.springframework.web.multipart.MultipartFile
 
 import java.text.SimpleDateFormat
 
@@ -1196,7 +1196,7 @@ class InventoryController {
         if (request.method == "POST") {
             File localFile = null
             MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
-            CommonsMultipartFile uploadFile = (CommonsMultipartFile) mpr.getFile("file")
+            MultipartFile uploadFile = mpr.getFile("file")  // Spring 6 dropped Commons FileUpload multipart
             if (!uploadFile?.empty) {
                 try {
                     localFile = uploadService.createLocalFile(uploadFile.originalFilename)

@@ -1,6 +1,6 @@
 package org.pih.warehouse.core.session
 
-import javax.servlet.http.HttpSession
+import jakarta.servlet.http.HttpSession
 import org.springframework.stereotype.Component
 import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.context.request.RequestContextHolder

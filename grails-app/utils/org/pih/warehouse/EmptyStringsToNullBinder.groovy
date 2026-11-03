@@ -5,7 +5,8 @@ import grails.databinding.DataBindingSource
 
 class EmptyStringsToNullBinder<T> implements BindingHelper<T> {
 
-    static final T bindEmptyStringToNull(Object source, String fieldName) {
+    // Groovy 4: a static method cannot use the class-level type parameter; declare its own
+    static final <T> T bindEmptyStringToNull(Object source, String fieldName) {
         return source[fieldName] == "" ? null : source[fieldName]
     }
 
