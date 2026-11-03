@@ -887,6 +887,9 @@ class ProductAvailabilityService {
         return availableItemsMap
     }
 
+    // The most products that getQuantityOnHandAtDate starts its query from (see entriesJoin)
+    private static final int PRODUCT_FIRST_JOIN_LIMIT = 100
+
     /**
      * Calculates the stock of each inventory item + bin at a facility at a moment in time, excluding items where
      * quantity on hand is zero.
@@ -915,7 +918,7 @@ class ProductAvailabilityService {
             return []
         }
 
-        List<String> productIds = products?.collect { it.id }?.unique()
+        List<String> productIds = products*.id?.unique()
         String productFilter = productIds ? "AND ii.product_id IN (:productIds)" : ""
 
         // A sortable key that orders transactions the same way as Transaction.compareTo. Fixed width (40 chars) so
@@ -927,12 +930,25 @@ class ProductAvailabilityService {
         String sortKey = """CONCAT(DATE_FORMAT(t.transaction_date, '%Y%m%d%H%i%s%f'),
                                   DATE_FORMAT(t.date_created, '%Y%m%d%H%i%s%f'))"""
 
-        // The transaction entries (of the given products) that happened at the facility before the given date
-        String entriesBeforeDate = """
+        // The transaction entries (of the given products) that happened at the facility before the given date.
+        //
+        // For a few products (e.g. the transaction report's details dialog), start from their inventory items. Left to
+        // itself, the optimizer starts from the transaction types and reads every transaction of each type at every
+        // facility, which takes as long for one product as for the whole facility (~4s at a large facility, vs 0.2s).
+        // For many products that's the better plan: starting from the products got slower than it past ~1000 of them.
+        String entriesJoin = (productIds && productIds.size() <= PRODUCT_FIRST_JOIN_LIMIT) ? """
+            FROM inventory_item ii
+            STRAIGHT_JOIN transaction_entry te ON te.inventory_item_id = ii.id
+            STRAIGHT_JOIN transaction t ON t.id = te.transaction_id
+            STRAIGHT_JOIN transaction_type tt ON tt.id = t.transaction_type_id
+        """ : """
             FROM transaction t
             JOIN transaction_entry te ON te.transaction_id = t.id
             JOIN inventory_item ii ON ii.id = te.inventory_item_id
             JOIN transaction_type tt ON tt.id = t.transaction_type_id
+        """
+        String entriesBeforeDate = """
+            ${entriesJoin}
             WHERE t.inventory_id = :inventoryId
             AND t.transaction_date < :at
             ${productFilter}

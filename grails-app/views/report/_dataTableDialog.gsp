@@ -99,7 +99,6 @@
             countsHint: "${g.message(code: 'report.transaction.byType.counts.hint', default: 'Counts set the balance instead of adding to it. Their differences are in the Unrecorded change row.')}",
             internalType: "${g.message(code: 'report.transaction.byType.internalTransfers.label', default: 'Internal transfers')}",
             total: "${g.message(code: 'default.total.label', default: 'Total')}",
-            net: "${g.message(code: 'report.transaction.net.label', default: 'Net')}",
             filterHint: "${g.message(code: 'report.transaction.summary.filter.hint', default: 'Click to show only these rows')}"
         };
 
@@ -189,39 +188,35 @@
                 }
             });
 
-            // Each figure is a label above a quantity, formatted like the report's columns: credits in green, debits
-            // in red (in parentheses), differences as a credit or debit, and zeros in grey
-            var quantity = function (value, nonZeroClass) {
-                return $('<span class="dialog-stat-value">').text(formatNumber(Math.abs(value)))
-                    .addClass(value === 0 ? 'zero' : nonZeroClass || '');
+            // Read like a bank statement: the opening balance, plus credits, minus debits, plus or minus differences,
+            // equals the closing balance. The balances are set apart from the period's activity between them, and the
+            // activity carries its sign (instead of the report's parentheses, which would read as a double negative).
+            // Zeros are grey.
+            var balance = function (label, value) {
+                return $('<span class="dialog-stat dialog-stat-balance">').append(
+                    $('<span class="dialog-stat-label">').text(label),
+                    $('<span class="dialog-stat-value">').text(formatNumber(value)));
             };
-            var change = function (value) {
-                return quantity(value, value > 0 ? 'credit' : 'debit');
-            };
-            var stat = function (label, value) {
-                return $('<span class="dialog-stat">').append($('<span class="dialog-stat-label">').text(label), value);
+            var signed = function (value) {
+                return $('<span class="dialog-stat-value">').text(value ? formatSigned(value) : '0')
+                    .addClass(value > 0 ? 'credit' : value < 0 ? 'debit' : 'zero');
             };
             // Credits, debits and differences show only their rows when clicked
-            var filterStat = function (key, label, value, test) {
+            var activity = function (key, label, value, test) {
                 return $('<a href="#" class="dialog-stat dialog-summary-figure">').attr('title', labels.filterHint).attr('data-filter', key)
-                    .append($('<span class="dialog-stat-label">').text(label), value)
+                    .append($('<span class="dialog-stat-label">').text(label), signed(value))
                     .click(function (event) {
                         event.preventDefault();
                         setDialogFilter(key, label, test);
                     });
             };
-            var stats = {
-                opening: stat(labels.opening, quantity(opening)),
-                credits: filterStat('credits', labels.credits, quantity(credits, 'credit'), function (row) { return isCountedRow(row) && !isGhostRow(row) && row.quantityChange > 0; }),
-                debits: filterStat('debits', labels.debits, quantity(debits, 'debit'), function (row) { return isCountedRow(row) && !isGhostRow(row) && row.quantityChange < 0; }),
-                differences: filterStat('differences', labels.differences, change(differences), function (row) { return isGhostRow(row); }),
-                closing: stat(labels.closing, quantity(closing))
-            };
-            // Like the product's row in the report, with the net change (closing - opening) before the closing balance
             $('.dialog-summary-equation').empty().append(
-                stats.opening, stats.credits, stats.debits, stats.differences,
-                $('<span class="dialog-stat-divider">'),
-                stat(labels.net, change(closing - opening)), stats.closing
+                balance(labels.opening, opening),
+                activity('credits', labels.credits, credits, function (row) { return isCountedRow(row) && !isGhostRow(row) && row.quantityChange > 0; }),
+                activity('debits', labels.debits, -debits, function (row) { return isCountedRow(row) && !isGhostRow(row) && row.quantityChange < 0; }),
+                activity('differences', labels.differences, differences, function (row) { return isGhostRow(row); }),
+                $('<span class="dialog-stat-operator">').text('='),
+                balance(labels.closing, closing)
             );
 
             // The number of transactions (and counts) in the table goes in the Transactions tab, with the breakdown in
@@ -366,7 +361,6 @@
             "bProcessing": false,  // The empty table shows the loading message
             "bSort": false,
             "iDisplayLength": 100,
-            "bSearch": false,
             "bScrollCollapse": true,
             "bJQueryUI": true,
             "bAutoWidth": false,

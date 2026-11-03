@@ -1426,6 +1426,9 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
+    // Read-only, because the class-level @Transactional starts a read-write transaction that the service's
+    // @Transactional(readOnly = true) would only join
+    @Transactional(readOnly = true)
     def getTransactionReport(TransactionReportCommand command) {
         Date startDate = command.startDate
         Date endDate = command.endDate + 1
@@ -1476,6 +1479,7 @@ class JsonController {
         render(["aaData": data] as JSON)
     }
 
+    @Transactional(readOnly = true)
     def getTransactionReportDetails(TransactionReportCommand command) {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)

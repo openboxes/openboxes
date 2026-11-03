@@ -252,7 +252,7 @@
 		right: 10px;
 	}
 
-	/* A row of figures, each a small label above a quantity, like a row of the report */
+	/* A row of figures, each a small label above a quantity */
 	.dialog-summary-equation {
 		display: flex;
 		align-items: flex-end;
@@ -280,12 +280,27 @@
 		font-size: 1.25em;
 	}
 
+	/* The opening and closing balances, set apart from the activity between them */
+	.dialog-stat-balance {
+		background-color: #f1f3f5;
+	}
+
+	.dialog-stat-balance .dialog-stat-value {
+		font-weight: 600;
+	}
+
 	.dialog-summary .credit {
 		color: #2e7d32;
 	}
 
 	.dialog-summary .debit {
 		color: #c62828;
+	}
+
+	/* The figures carry their own sign, so leave out the parentheses that .debit adds (openboxes.css) */
+	.dialog-summary .debit::before,
+	.dialog-summary .debit::after {
+		content: none;
 	}
 
 	.dialog-summary .zero {
@@ -305,10 +320,11 @@
 		font-weight: 600;
 	}
 
-	.dialog-stat-divider {
-		align-self: stretch;
-		margin: 0 8px;
-		border-left: 1px solid #ddd;
+	.dialog-stat-operator {
+		align-self: center;
+		padding-top: 12px;
+		font-size: 1.25em;
+		color: #999;
 	}
 
 	.internal-transfers-count,
@@ -606,8 +622,8 @@
 								</div>
 								<input type="text" id="reportPeriod" class="text filter" autocomplete="off"
 									   placeholder="${g.message(code: 'report.period.placeholder', default: 'e.g. 01/Jan/2026 - 31/Jan/2026')}"/>
-								<input type="hidden" id="startDate" name="startDate" value="${formatDate(date: command?.startDate, format: 'MM/dd/yyyy')}"/>
-								<input type="hidden" id="endDate" name="endDate" value="${formatDate(date: command?.endDate, format: 'MM/dd/yyyy')}"/>
+								<input type="hidden" id="startDate" name="startDate" value="${formatDate(date: startDate, format: 'MM/dd/yyyy')}"/>
+								<input type="hidden" id="endDate" name="endDate" value="${formatDate(date: endDate, format: 'MM/dd/yyyy')}"/>
 							</div>
 
 							<%-- Optional filters, ordered from broadest to narrowest. The report combines them with AND. --%>
@@ -625,12 +641,14 @@
 										    data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
 										    name="category"
 										    noSelection="['':'']"
-										    value="${params?.category?.id?:command?.rootCategory?.id}"
+										    value="${params?.category ?: command?.rootCategory?.id}"
 										/>
 									</p>
 									<p>
 										<label>
-											<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
+											<%-- Checked by default. A report link (run=true) leaves it out when it was unchecked. --%>
+											<g:checkBox name="includeCategoryChildren" value="true"
+														checked="${params.run == 'true' ? params.includeCategoryChildren != null : true}"/>
 											${warehouse.message(
 												code:'report.search.includeCategoryChildren.label',
 												default: 'Include all products in all subcategories',
@@ -668,7 +686,7 @@
 									<label><g:message code="products.label" default="Products"/></label>
 									<p>
 										<g:selectProductAjax id="products-select"
-															 value="${params?.products}"
+															 value="${products}"
 															 multiple="true"
 										/>
 									</p>
@@ -922,6 +940,31 @@
             .filter(function (text) { return text; });
     }
 
+    // The form's values, as the parameters of the report request (for the CSV download and the page's URL). Unchecked
+    // checkboxes and empty fields are left out.
+    function getFormParams() {
+        var params = {
+            "location.id": $("#locationId").val(),
+            startDate: $("#startDate").val(),
+            endDate: $("#endDate").val(),
+            category: $("#category").val(),
+            products: $("#products-select").val(),
+            tags: $("#tags").val(),
+            catalogs: $("#catalogs").val()
+        };
+        ["includeCategoryChildren", "includeProductsWithNoActivity", "includeInternalTransfers"].forEach(function (name) {
+            if ($("#" + name).is(":checked")) {
+                params[name] = true;
+            }
+        });
+        $.each(params, function (name, value) {
+            if (value == null || value === "" || ($.isArray(value) && !value.length)) {
+                delete params[name];
+            }
+        });
+        return params;
+    }
+
     // The settings of the report, read from the form when the report is run
     function getReportParams() {
         var labels = {
@@ -1052,7 +1095,6 @@
 			"bDestroy": true,
 			"bProcessing": false,  // The report overlay shows that the report is loading
 			"iDisplayLength": 100,
-			"bSearch": false,
 			"bScrollCollapse": true,
 			"bAutoWidth": false,  // The column widths are set in the styles
 			"bScrollInfinite": true,
@@ -1436,31 +1478,15 @@
 			if (validated && startReportRequest()) {
 				lastReportParams = getReportParams();
 				initializeDataTable(true);
+				// Put the report's settings in the URL, so that reloading the page or sharing the link runs it again
+				history.replaceState(null, "", window.location.pathname + "?" +
+					$.param($.extend(getFormParams(), { run: true }), true));
 			}
 		});
 
 		$(".download-button").click(function(event) {
 			event.preventDefault();
-			var params = {
-				"location.id": $("#locationId").val(),
-				startDate: $("#startDate").val(),
-				endDate: $("#endDate").val(),
-				category: $("#category").val(),
-                products: $("#products-select").val(),
-				tags: $("#tags").val(),
-				catalogs: $("#catalogs").val(),
-				format: "text/csv"
-			};
-			if ($('#includeProductsWithNoActivity').is(':checked')) {
-				params.includeProductsWithNoActivity = true;
-			}
-			if ($('#includeInternalTransfers').is(':checked')) {
-				params.includeInternalTransfers = true;
-			}
-			if($('#includeCategoryChildren').is(':checked')) {
-				params.includeCategoryChildren = $("#includeCategoryChildren").val();
-			}
-			var queryString = $.param(params, true);
+			var queryString = $.param($.extend(getFormParams(), { format: "text/csv" }), true);
 			downloadReport('${request.contextPath}/json/getTransactionReport?' + queryString);
 		});
 
@@ -1489,6 +1515,11 @@
 				openModalDialog("#dlgShowDialog", productCode + " " + productName, 1000, null, url);
 			}
 		});
+
+		// A link to a report (see the submit button) runs it when the page opens
+		if (${params.run == 'true'}) {
+			$(".submit-button").click();
+		}
 	});
 
 </script>
