@@ -275,9 +275,10 @@ class SelectTagLib {
     def selectTags = { attrs, body ->
         // Count the products in the database rather than loading every tag's products into the session
         def tags = Tag.executeQuery("""
-            select t.id, t.tag, count(p.id) from Tag t left join t.products p
+            select new map(t.id as id, t.tag as name, count(p.id) as productCount)
+            from Tag t left join t.products p
             group by t.id, t.tag order by t.tag
-        """).collect { [id: it[0], name: it[1], productCount: it[2]] }
+        """)
         attrs.from = tags
         attrs.multiple = true
         attrs.value = attrs.value
@@ -290,9 +291,10 @@ class SelectTagLib {
     def selectCatalogs = { attrs, body ->
         // Count the products in the database rather than loading every catalog's items into the session
         def catalogs = ProductCatalog.executeQuery("""
-            select c.id, c.name, count(i.id) from ProductCatalog c left join c.productCatalogItems i
+            select new map(c.id as id, c.name as name, count(i.id) as productCount)
+            from ProductCatalog c left join c.productCatalogItems i
             group by c.id, c.name order by c.name
-        """).collect { [id: it[0], name: it[1], productCount: it[2]] }
+        """)
         attrs.from = catalogs
         attrs.multiple = true
         attrs.value = attrs.value

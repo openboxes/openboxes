@@ -34,6 +34,7 @@ import util.ReportUtil
 
 import java.math.RoundingMode
 import java.text.DateFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 
 @Transactional
@@ -277,12 +278,33 @@ class ReportController {
         [transactions: transactions]
     }
 
+    // The page puts the report's settings in the URL when it runs, so that reloading or sharing the link runs the same
+    // report. The facility defaults to the current one, and the other settings to the page's defaults.
     def showTransactionReport() {
         InventoryReportCommand command = new InventoryReportCommand()
-        command.location = Location.get(session.warehouse.id)
+        command.location = (params['location.id'] ? Location.get(params['location.id']) : null) ?: Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
 
-        return [command: command]
+        return [
+                command: command,
+                startDate: parseTransactionReportDate(params.startDate),
+                endDate: parseTransactionReportDate(params.endDate),
+                products: params.products ? Product.getAll(params.list('products')).findAll() : []
+        ]
+    }
+
+    // A date from the transaction report page's URL (MM/dd/yyyy), or null if it isn't one
+    private static Date parseTransactionReportDate(String date) {
+        if (!date) {
+            return null
+        }
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy")
+        format.lenient = false
+        try {
+            return format.parse(date)
+        } catch (ParseException ignored) {
+            return null
+        }
     }
 
     def showTransactionReportDialog() {
