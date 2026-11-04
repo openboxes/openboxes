@@ -229,14 +229,6 @@ class CombinedShipmentItemsModal extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  getSortOrder() {
-    this.setState((prev) => ({
-      sortOrder: prev.sortOrder + 1,
-    }));
-
-    return this.state.sortOrder;
-  }
-
   getOrderNumberOptions() {
     const { vendor, destination } = this.props;
     const url = `/api/orderNumberOptions?vendor=${vendor}&destination=${destination}`;
@@ -263,16 +255,17 @@ class CombinedShipmentItemsModal extends Component {
       vendor,
       destination,
     };
-    return apiClient.post(url, payload).then((resp) => this.setState({
+    return apiClient.post(url, payload).then((resp) => this.setState((prev) => ({
       formValues: {
-        orderItems: _.map(resp.data.orderItems, (item) => ({
+        orderItems: _.map(resp.data.orderItems, (item, index) => ({
           ...item,
           checked: !!selectedOrderItems[item.orderItemId],
           quantityToShip: selectedOrderItems[item.orderItemId] ? selectedOrderItems[item.orderItemId].quantityToShip : '',
-          sortOrder: this.getSortOrder(),
+          sortOrder: prev.sortOrder + index + 1,
         })),
       },
-    }));
+      sortOrder: prev.sortOrder + resp.data.orderItems.length,
+    })));
   }
 
   selectRow(value, rowIndex) {

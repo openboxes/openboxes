@@ -226,14 +226,6 @@ class InvoiceItemsModal extends Component {
     this.setState({ selectedShipmentNumbers }, () => this.fetchInvoiceItemCandidates());
   }
 
-  getSortOrder() {
-    this.setState((prev) => ({
-      sortOrder: prev.sortOrder + 1,
-    }));
-
-    return this.state.sortOrder;
-  }
-
   selectRow(value, rowIndex) {
     const { formValues, selectedInvoiceItems } = this.state;
     let newState = {
@@ -299,16 +291,17 @@ class InvoiceItemsModal extends Component {
 
     return invoiceApi.saveInvoiceItemsCandidates(invoiceId, payload)
       .then((resp) => {
-        this.setState({
+        this.setState((prev) => ({
           formValues: {
-            invoiceItems: _.map(resp.data.data, (item) => ({
+            invoiceItems: _.map(resp.data.data, (item, index) => ({
               ...item,
               checked: selectedInvoiceItems && !!selectedInvoiceItems[item.id],
               quantityToInvoice: selectedInvoiceItems && selectedInvoiceItems[item.id] ? selectedInvoiceItems[item.id].quantityToInvoice : '',
-              sortOrder: this.getSortOrder(),
+              sortOrder: prev.sortOrder + index + 1,
             })),
           },
-        }, () => {
+          sortOrder: prev.sortOrder + resp.data.data.length,
+        }), () => {
           this.fetchOrderNumbers(invoiceId);
           this.fetchShipmentNumbers(invoiceId);
         });
