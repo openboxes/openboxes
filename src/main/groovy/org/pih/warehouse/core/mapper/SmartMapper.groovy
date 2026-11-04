@@ -1,7 +1,7 @@
 package org.pih.warehouse.core.mapper
 
 import grails.util.Holders
-import org.hibernate.proxy.HibernateProxy
+import org.hibernate.proxy.HibernateProxyHelper
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.Identifiable
@@ -94,10 +94,8 @@ class SmartMapper {
      * we determine the class without triggering a database query.
      */
     private <Source> Class<Source> determineSourceClass(Source source) {
-        if (source instanceof HibernateProxy) {
-            return source.hibernateLazyInitializer.persistentClass
-        }
-        return source.class as Class<Source>
+        // Must stay a Java call: a Groovy property read on a proxy initializes it and is forwarded to the entity
+        return HibernateProxyHelper.getClassWithoutInitializingProxy(source) as Class<Source>
     }
 
     private static SmartMapper getSmartMapperStatic() {
