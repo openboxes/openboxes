@@ -96,6 +96,7 @@ module.exports = {
           sentryConfig: '\${raw(org.pih.warehouse.monitoring.SentryConfigResolver.getWebConfigJson(session.user, session.warehouse))}',
           jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
+          scriptType: 'text/javascript',
           receivingIfStatement: '',
         }),
       }),
@@ -110,6 +111,7 @@ module.exports = {
           sentryConfig: '\${raw(org.pih.warehouse.monitoring.SentryConfigResolver.getWebConfigJson(session.user, session.warehouse))}',
           jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
+          scriptType: 'text/javascript',
           receivingIfStatement:
           // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
