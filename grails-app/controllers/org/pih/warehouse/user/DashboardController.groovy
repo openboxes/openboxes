@@ -23,6 +23,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.Order
@@ -56,12 +57,6 @@ class DashboardController {
 
     def globalSearch() {
 
-        def transaction = Transaction.findByTransactionNumber(params.searchTerms)
-        if (transaction) {
-            redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
-            return
-        }
-
         def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
         if (product) {
             redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
@@ -93,6 +88,13 @@ class DashboardController {
             redirect(controller: "receipt", action: "show", id: receipt.id)
             return
         }
+
+        Invoice invoice = Invoice.findByInvoiceNumber(params.searchTerms)
+        if (invoice) {
+            redirect(controller: "invoice", action: "show", id: invoice.id)
+            return
+        }
+
         List<Order> orders = Order.findAllByOrderNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
         if (orders) {
             Order order = orders.first()
@@ -100,7 +102,22 @@ class DashboardController {
                 redirect(controller: "stockMovement", action: "show", id: order.id)
                 return
             }
+            // Must stay above the order.isTransferOrder check because it is also true for putaway orders
+            if (order.isPutawayOrder) {
+                redirect(controller: "order", action: "show", id: order.id)
+                return
+            }
+            if (order.isTransferOrder) {
+                redirect(controller: "stockTransfer", action: "show", id: order.id)
+                return
+            }
             redirect(controller: "order", action: "show", id: order.id)
+            return
+        }
+
+        Transaction transaction = Transaction.findByTransactionNumber(params.searchTerms)
+        if (transaction) {
+            redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
             return
         }
 
