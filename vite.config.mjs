@@ -3,6 +3,7 @@ import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+import fixDependencyImportsPlugin from './vite-plugins/fixDependencyImportsPlugin.mjs';
 import grailsGspPlugin from './vite-plugins/grailsGspPlugin.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, 'src');
@@ -23,6 +24,7 @@ export default defineConfig({
   base: './',
   plugins: [
     react(),
+    fixDependencyImportsPlugin(),
     grailsGspPlugin({
       entry: ENTRY,
       templatePath: path.resolve(ROOT, 'assets/grails-template.html'),

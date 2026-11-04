@@ -1,4 +1,4 @@
-import ColorPalette from 'components/dashboard/ColorPalette.scss';
+import ColorPalette from 'components/dashboard/ColorPalette.module.scss';
 
 /* global _ */
 
