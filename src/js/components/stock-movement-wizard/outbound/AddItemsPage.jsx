@@ -1029,7 +1029,7 @@ class AddItemsPage extends Component {
               // When there is an error, we are adding items to
               // state for draft
               this.props.addStockMovementDraft({
-                lineItems: this.state.values.lineItems,
+                lineItems: lineItemsWithErrors,
                 id: this.state.values.stockMovementId,
                 statusCode: this.state.values.statusCode,
               });

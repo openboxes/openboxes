@@ -87,7 +87,7 @@
     "react": "19.2.4",
     "react-chartjs-2": "2.9.0",
     "react-color": "2.19.3",
-    "react-confirm-alert": "2.6.1",
+    "react-confirm-alert": "3.0.6",
     "react-datepicker": "9.1.0",
     "react-dom": "19.2.4",
     "react-dropzone": "14.2.3",

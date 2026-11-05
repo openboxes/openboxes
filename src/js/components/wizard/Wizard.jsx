@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, startTransition } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -37,15 +37,17 @@ class Wizard extends Component {
    */
   nextPage(values) {
     const { currentPage } = this.state;
-    if (this.props.pageList.length > currentPage) {
-      this.setState({
-        prevPage: currentPage, currentPage: currentPage + 1, values,
-      });
-      this.props.updateWizardValues(currentPage + 1, values);
-    } else {
+    startTransition(() => {
+      if (this.props.pageList.length > currentPage) {
+        this.setState({
+          prevPage: currentPage, currentPage: currentPage + 1, values,
+        });
+        this.props.updateWizardValues(currentPage + 1, values);
+        return;
+      }
       this.setState({ values });
       this.props.updateWizardValues(currentPage, values);
-    }
+    });
   }
 
   /**
@@ -55,15 +57,17 @@ class Wizard extends Component {
    */
   prevPage(values) {
     const { prevPage } = this.state;
-    if (prevPage > 0) {
-      this.setState({
-        prevPage: prevPage - 1, currentPage: prevPage, values,
-      });
-      this.props.updateWizardValues(prevPage, values);
-    } else {
+    startTransition(() => {
+      if (prevPage > 0) {
+        this.setState({
+          prevPage: prevPage - 1, currentPage: prevPage, values,
+        });
+        this.props.updateWizardValues(prevPage, values);
+        return;
+      }
       this.setState({ values });
       this.props.updateWizardValues(1, values);
-    }
+    });
   }
 
   /**
@@ -73,8 +77,10 @@ class Wizard extends Component {
    * @public
    */
   goToPage(currentPage, values) {
-    this.setState({ prevPage: currentPage - 1, currentPage, values });
-    this.props.updateWizardValues(currentPage, values);
+    startTransition(() => {
+      this.setState({ prevPage: currentPage - 1, currentPage, values });
+      this.props.updateWizardValues(currentPage, values);
+    });
   }
 
   render() {
