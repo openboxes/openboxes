@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCloseFill } from 'react-icons/all';
+import { RiCloseFill } from 'react-icons/ri';
 import Modal from 'react-modal';
 
 import DataTable from 'components/DataTable/v2/DataTable';

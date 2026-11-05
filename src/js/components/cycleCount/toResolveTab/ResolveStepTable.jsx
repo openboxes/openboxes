@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiAddCircleLine } from 'react-icons/all';
+import { RiAddCircleLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';

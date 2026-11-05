@@ -88,6 +88,7 @@ export default defineConfig({
     emptyOutDir: true,
     assetsDir: '',
     sourcemap: true,
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       input: {
         index: ENTRY,

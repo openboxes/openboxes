@@ -41,7 +41,7 @@
       left: 2px;
       bottom: 2px;
       transition: 0.4s;
-      @include slider-image("/openboxes/static/images/close-circle-fill.svg")
+      @include slider-image("../../../../main/webapp/images/close-circle-fill.svg")
     }
 
     &:before {
@@ -51,7 +51,7 @@
 
   input:checked + .slider:before {
     transform: translateX(26px);
-    @include slider-image("/openboxes/static/images/checkbox-circle-fill.svg")
+    @include slider-image("../../../../main/webapp/images/checkbox-circle-fill.svg")
   }
 
   .switch-title {

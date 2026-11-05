@@ -9,6 +9,11 @@ const FIXES = [
     search: "import { bpfrpt_proptype_WindowScroller } from '../WindowScroller.js';",
     replace: '',
   },
+  {
+    file: 'node_modules/uniqid/index.js',
+    search: "if(typeof __webpack_require__ !== 'function' && typeof require !== 'undefined'){",
+    replace: 'if(false){',
+  },
 ];
 
 const stripQuery = (id) => id.split('?')[0];

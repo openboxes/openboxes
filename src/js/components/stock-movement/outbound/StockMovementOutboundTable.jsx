@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCloseFill } from 'react-icons/all';
 import {
   RiArrowGoBackLine,
   RiArrowRightSLine, RiCheckFill,
+  RiCloseFill,
   RiDeleteBinLine,
   RiDownload2Line,
   RiInformationLine,
