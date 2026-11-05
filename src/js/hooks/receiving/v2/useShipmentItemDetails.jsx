@@ -1,9 +1,9 @@
 import React from 'react';
 
-import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale, getIsShipmentFromPurchaseOrder } from 'selectors';
 
+import locales from 'consts/dateFnsLocales';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useFormatNumber from 'hooks/useFormatNumber';
 import useTranslate from 'hooks/useTranslate';

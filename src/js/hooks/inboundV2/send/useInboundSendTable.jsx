@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getCurrentLocale } from 'selectors';
@@ -9,6 +8,7 @@ import { getCurrentLocale } from 'selectors';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import locales from 'consts/dateFnsLocales';
 import inboundColumns from 'consts/inboundColumns';
 import { OutboundWorkflowState } from 'consts/StockMovementState';
 import { DateFormatDateFns } from 'consts/timeFormat';

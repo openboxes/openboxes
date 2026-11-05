@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import * as locales from 'date-fns/locale';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import _ from 'lodash';
@@ -18,6 +17,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import ProductSelect from 'components/product-select/ProductSelect';
+import locales from 'consts/dateFnsLocales';
 import DateFormat from 'consts/dateFormat';
 import locationType from 'consts/locationType';
 import StockMovementStatus from 'consts/stockMovementStatus';

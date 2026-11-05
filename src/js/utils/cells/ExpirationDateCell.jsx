@@ -1,9 +1,9 @@
 import React from 'react';
 
-import * as locales from 'date-fns/locale';
 import PropTypes from 'prop-types';
 
 import { TableCell } from 'components/DataTable';
+import locales from 'consts/dateFnsLocales';
 import EXPIRY_BADGES from 'consts/expiryBadges';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';

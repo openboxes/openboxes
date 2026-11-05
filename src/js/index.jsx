@@ -1,8 +1,12 @@
 import React from 'react';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { fab } from '@fortawesome/free-brands-svg-icons';
-import { fas } from '@fortawesome/free-solid-svg-icons';
+import {
+  faExclamationCircle,
+  faExclamationTriangle,
+  faPrescriptionBottle,
+  faSnowflake,
+} from '@fortawesome/free-solid-svg-icons';
 import { createRoot } from 'react-dom/client';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { LocalizeProvider } from 'react-localize-redux';
@@ -23,7 +27,7 @@ import 'font-awesome/css/font-awesome.min.css';
 // eslint-disable-next-line import/no-unresolved
 import 'css/main.scss';
 
-library.add(fab, fas);
+library.add(faExclamationCircle, faExclamationTriangle, faPrescriptionBottle, faSnowflake);
 
 // Initialize Sentry as early as possible so that it can capture startup errors as well.
 initializeSentry();

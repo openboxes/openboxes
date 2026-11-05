@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import * as locales from 'date-fns/locale';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
@@ -8,6 +7,7 @@ import { RiCalendarLine, RiCloseLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import BaseField from 'components/form-elements/BaseField';
+import locales from 'consts/dateFnsLocales';
 import DateFormat from 'consts/dateFormat';
 import Translate from 'utils/Translate';
 import { formatDate, getLocaleCode } from 'utils/translation-utils';

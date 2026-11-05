@@ -5,7 +5,6 @@ import React, {
 } from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import * as locales from 'date-fns/locale';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Controller, useController } from 'react-hook-form';
@@ -25,6 +24,7 @@ import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import ProductSelectField from 'components/form-elements/v2/ProductSelectField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
+import locales from 'consts/dateFnsLocales';
 import inboundColumns from 'consts/inboundColumns';
 import requisitionStatus from 'consts/requisitionStatus';
 import { DateFormatDateFns } from 'consts/timeFormat';

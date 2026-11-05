@@ -9,9 +9,9 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns';
-import * as locales from 'date-fns/locale';
 import moment from 'moment';
 
+import locales from 'consts/dateFnsLocales';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 
 /**

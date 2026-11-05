@@ -1,10 +1,10 @@
 import React from 'react';
 
-import * as locales from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale, getInboundHeaderInfo, getInboundHeaderStatus } from 'selectors';
 
+import locales from 'consts/dateFnsLocales';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
