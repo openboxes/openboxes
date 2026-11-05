@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 let actionDots;
 let actions;
 
-// jest doesn't have access to bootstrap styles, so I included it here.
+// the test environment doesn't have access to bootstrap styles, so I included it here.
 const applyStyles = () => {
   const style = document.createElement('style');
   style.innerHTML = ` 

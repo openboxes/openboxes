@@ -5,7 +5,7 @@ import confirmBlankLinesAsZero from 'utils/receiving/confirmBlankLinesAsZero';
 
 import '@testing-library/jest-dom';
 
-jest.mock('react-confirm-alert', () => ({ confirmAlert: jest.fn() }));
+vi.mock('react-confirm-alert', () => ({ confirmAlert: vi.fn() }));
 
 const translate = (id, defaultMessage, data) => Object.entries(data ?? {}).reduce(
   (message, [key, value]) => message.replace(`\${${key}}`, value),
@@ -26,14 +26,14 @@ const buildRow = (rowId, overrides = {}) => ({
 const showModal = (blankRows) => {
   const confirmed = confirmBlankLinesAsZero({ blankRows, translate, localeKey: 'en' });
   const { customUI, afterClose } = confirmAlert.mock.calls[0][0];
-  const onClose = jest.fn();
+  const onClose = vi.fn();
   render(customUI({ onClose }));
   return { confirmed, onClose, afterClose };
 };
 
 describe('confirmBlankLinesAsZero()', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should list every blank line with its code, product, lot and expiration date', () => {

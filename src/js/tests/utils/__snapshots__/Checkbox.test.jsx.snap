@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`checkbox with label should match snapshot 1`] = `
+exports[`checkbox with label > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="d-flex align-items-center"
@@ -20,7 +20,7 @@ exports[`checkbox with label should match snapshot 1`] = `
 </DocumentFragment>
 `;
 
-exports[`custom checkbox should match snapshot 1`] = `
+exports[`custom checkbox > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="custom-checkbox"
@@ -38,7 +38,7 @@ exports[`custom checkbox should match snapshot 1`] = `
 </DocumentFragment>
 `;
 
-exports[`default checkbox should match snapshot 1`] = `
+exports[`default checkbox > should match snapshot 1`] = `
 <DocumentFragment>
   <input
     data-testid="checkbox"

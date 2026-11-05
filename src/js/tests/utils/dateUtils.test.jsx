@@ -323,13 +323,13 @@ describe('formatDateToDateOnlyString()', () => {
 
 describe('getFilenameDateString()', () => {
   it('returns exact formatted string for a fixed date', () => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date(2025, 8, 19, 15, 10, 5));
+    vi.useFakeTimers('modern');
+    vi.setSystemTime(new Date(2025, 8, 19, 15, 10, 5));
 
     const filename = getFilenameDateString();
     expect(filename).toBe('20250919-151005');
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('returns a string matching YYYYMMDD_HHMMSS pattern', () => {

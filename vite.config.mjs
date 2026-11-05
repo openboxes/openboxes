@@ -96,4 +96,13 @@ export default defineConfig({
       },
     },
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    environmentOptions: {
+      jsdom: { url: 'http://localhost/' },
+    },
+    include: ['src/js/**/*.test.{js,jsx}'],
+    setupFiles: ['src/js/tests/setupTests.js'],
+  },
 });

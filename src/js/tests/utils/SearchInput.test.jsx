@@ -12,7 +12,7 @@ let onChangeFunc;
 
 describe('search input', () => {
   beforeEach(() => {
-    onChangeFunc = jest.fn();
+    onChangeFunc = vi.fn();
     searchInput = (<SearchInput value="" onChange={onChangeFunc} />);
     searchInputWithValue = (<SearchInput value="test" onChange={onChangeFunc} />);
   });

@@ -12,6 +12,12 @@ import WizardTitle from 'components/wizard/WizardTitle';
 
 import store from '../../store';
 
+vi.mock('api/services/UnitOfMeasureApi', () => ({
+  default: {
+    getCurrenciesOptions: () => Promise.resolve({ data: [] }),
+  },
+}));
+
 let renderedWizard;
 let renderedWizardPage;
 let renderedWizardSteps;
