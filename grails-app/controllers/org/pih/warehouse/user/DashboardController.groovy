@@ -27,6 +27,7 @@ import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
@@ -83,7 +84,24 @@ class DashboardController {
             return
         }
 
-        def receipt = Receipt.findByReceiptNumber(params.searchTerms)
+        List<Order> orders = Order.findAllByOrderNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
+        if (orders) {
+            Order order = orders.first()
+            if (order.isReturnOrder) {
+                redirect(controller: "stockMovement", action: "show", id: order.id)
+                return
+            }
+            // Only stock transfers and bin replenishments should open the stock transfer page.
+            // order.isTransferOrder is not enough here, because it is also true for putaway and return orders
+            if (order.orderType?.code == OrderTypeCode.TRANSFER_ORDER.name()) {
+                redirect(controller: "stockTransfer", action: "show", id: order.id)
+                return
+            }
+            redirect(controller: "order", action: "show", id: order.id)
+            return
+        }
+
+        Receipt receipt = Receipt.findByReceiptNumber(params.searchTerms)
         if (receipt) {
             redirect(controller: "receipt", action: "show", id: receipt.id)
             return
@@ -92,26 +110,6 @@ class DashboardController {
         Invoice invoice = Invoice.findByInvoiceNumber(params.searchTerms)
         if (invoice) {
             redirect(controller: "invoice", action: "show", id: invoice.id)
-            return
-        }
-
-        List<Order> orders = Order.findAllByOrderNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
-        if (orders) {
-            Order order = orders.first()
-            if (order.isReturnOrder) {
-                redirect(controller: "stockMovement", action: "show", id: order.id)
-                return
-            }
-            // Must stay above the order.isTransferOrder check because it is also true for putaway orders
-            if (order.isPutawayOrder) {
-                redirect(controller: "order", action: "show", id: order.id)
-                return
-            }
-            if (order.isTransferOrder) {
-                redirect(controller: "stockTransfer", action: "show", id: order.id)
-                return
-            }
-            redirect(controller: "order", action: "show", id: order.id)
             return
         }
 
