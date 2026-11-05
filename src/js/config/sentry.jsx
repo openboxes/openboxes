@@ -1,10 +1,29 @@
-import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/browser';
+
+/**
+ * Tag all Sentry events with the current user. Does nothing if Sentry is disabled.
+ */
+export const setSentryUser = (user) => {
+  Sentry.setUser(user ? { id: user.id, username: user.username } : null);
+};
+
+/**
+ * Tag all Sentry events with the current location. Does nothing if Sentry is disabled.
+ */
+export const setSentryLocation = (location) => {
+  Sentry.setTag('location.id', location?.id);
+  Sentry.setTag('location.name', location?.name);
+};
 
 /**
  * Initialize Sentry for performance and error monitoring.
+ *
+ * Note that we import @sentry/browser instead of @sentry/react so that this file can be used with
+ * GSPs as well (see src/js/sentry.js). This is fine because we don't rely on any of the React
+ * specific Sentry features that @sentry/react provides.
  */
 const initializeSentry = () => {
-  // The server passes us its Sentry config at runtime (see ConfigHelper.sentryWebConfigJson).
+  // The server passes us its Sentry config at runtime (see SentryConfigResolver.webConfigJson).
   const config = window.SENTRY_CONFIG ?? {};
 
   if (!config.dsn) {
@@ -52,21 +71,11 @@ const initializeSentry = () => {
     replaysSessionSampleRate: config.replaysSampleRate ?? 0,
     replaysOnErrorSampleRate: config.replaysErrorSampleRate ?? 1.0,
   });
-};
 
-/**
- * Tag all Sentry events with the current user. Does nothing if Sentry is disabled.
- */
-export const setSentryUser = (user) => {
-  Sentry.setUser(user ? { id: user.id, username: user.username } : null);
-};
-
-/**
- * Tag all Sentry events with the current location. Does nothing if Sentry is disabled.
- */
-export const setSentryLocation = (location) => {
-  Sentry.setTag('location.id', location?.id);
-  Sentry.setTag('location.name', location?.name);
+  // The server includes the user and location from the session so that events are tagged from the
+  // very start of the page load. React pages will refresh these after fetching the session info.
+  setSentryUser(config.user);
+  setSentryLocation(config.location);
 };
 
 export default initializeSentry;
