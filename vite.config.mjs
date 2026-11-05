@@ -10,7 +10,7 @@ const ROOT = path.resolve(import.meta.dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
 const ENTRY = path.resolve(SRC, 'index.jsx');
 const VENDOR_CSS = path.resolve(ROOT, 'css/vendor.css');
-const OUTPUT = path.resolve(ROOT, 'main/webapp/webpack');
+const OUTPUT = path.resolve(ROOT, 'main/webapp/dist');
 const GRAILS_VIEWS = path.resolve(import.meta.dirname, 'grails-app/views');
 
 const SENTRY_ENV_VARIABLES = [
