@@ -61,7 +61,7 @@ const useCycleCountFilters = ({ filterFields }) => {
   const translate = useTranslate();
 
   const clearFilterValues = () => {
-    const queryProps = queryString.parse(location.search);
+    const queryProps = queryString.parse(window.location.search);
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), { tab: queryProps.tab });
     const transformedParams = transformFilterParams(defaultValues, {
