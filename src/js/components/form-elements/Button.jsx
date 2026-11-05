@@ -9,17 +9,17 @@ import Translate from 'utils/Translate';
 const Button = ({
   label,
   defaultLabel,
-  disabled,
-  variant,
-  type,
-  onClick,
-  EndIcon,
-  isDropdown,
-  StartIcon,
-  className,
-  customRef,
-  tooltipLabel,
-  defaultTooltipLabel,
+  disabled = false,
+  variant = 'primary',
+  type = 'button',
+  onClick = undefined,
+  EndIcon = null,
+  isDropdown = false,
+  StartIcon = null,
+  className = '',
+  customRef = null,
+  tooltipLabel = null,
+  defaultTooltipLabel = '',
 }) => {
   const buttonClass = 'd-flex justify-content-around align-items-center gap-8';
   const variantClass = `${variant}-button`;
@@ -80,18 +80,4 @@ Button.propTypes = {
   ]),
   tooltipLabel: PropTypes.string,
   defaultTooltipLabel: PropTypes.string,
-};
-
-Button.defaultProps = {
-  disabled: false,
-  isDropdown: false,
-  type: 'button',
-  variant: 'primary',
-  onClick: undefined,
-  EndIcon: null,
-  StartIcon: null,
-  className: '',
-  customRef: null,
-  tooltipLabel: null,
-  defaultTooltipLabel: '',
 };

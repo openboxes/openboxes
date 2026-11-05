@@ -13,8 +13,13 @@ import 'utils/cells/ProductNameCell.scss';
  * The product name cell, optionally with the product's handling icons displayed after the name.
  * Given maxLines, cutting the name down to them, so the name ends with ellipsis.
  */
-const ProductNameCell = React.memo(({
-  product = null, label, defaultLabel, className = '', showHandlingIcons = false, maxLines,
+const ProductNameCellComponent = ({
+  product = null,
+  label,
+  defaultLabel,
+  className = '',
+  showHandlingIcons = false,
+  maxLines = undefined,
 }) => {
   const translate = useTranslate();
   const textRef = useRef(null);
@@ -50,11 +55,13 @@ const ProductNameCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const ProductNameCell = React.memo(ProductNameCellComponent);
 
 ProductNameCell.displayName = 'ProductNameCell';
 
-ProductNameCell.propTypes = {
+ProductNameCellComponent.propTypes = {
   product: PropTypes.shape({
     name: PropTypes.string,
     handlingLabels: PropTypes.arrayOf(PropTypes.shape({
@@ -68,13 +75,6 @@ ProductNameCell.propTypes = {
   showHandlingIcons: PropTypes.bool,
   /** Number of lines the name is cut down to. Without it the name is displayed in full. */
   maxLines: PropTypes.number,
-};
-
-ProductNameCell.defaultProps = {
-  product: null,
-  className: '',
-  showHandlingIcons: false,
-  maxLines: undefined,
 };
 
 export default ProductNameCell;

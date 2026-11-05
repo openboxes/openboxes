@@ -7,7 +7,12 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/location/LocationChooser/LocationChooserButton/LocationChooserButton.scss';
 
-const LocationChooserButton = ({ onToggle, location, envTag }) => {
+const LocationChooserButton = ({
+  onToggle, location = {
+    name: 'Choose Location',
+    backgroundColor: undefined,
+  }, envTag = undefined,
+}) => {
   const buttonStyle = () => {
     if (!location.backgroundColor) return { '--location-color': 'unset' };
 
@@ -49,14 +54,6 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
       { envTag && <strong className="location-chooser__button-tag">{envTag}</strong> }
     </button>
   );
-};
-
-LocationChooserButton.defaultProps = {
-  location: {
-    name: 'Choose Location',
-    backgroundColor: undefined,
-  },
-  envTag: undefined,
 };
 
 LocationChooserButton.propTypes = {

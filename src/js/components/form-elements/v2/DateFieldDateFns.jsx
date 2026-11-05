@@ -19,29 +19,35 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import 'components/form-elements/v2/style.scss';
 
+const DEFAULT_FOCUS_PROPS = {};
+
 const DateFieldDateFns = ({
-  title,
-  required,
-  tooltip,
-  disabled,
-  errorMessage,
-  placeholder,
-  button,
-  className,
-  value,
-  onChange,
-  showTimeSelect,
-  hideErrorMessageWrapper,
-  customDateFormat,
-  outputDateFormat,
-  onChangeRaw,
-  clearable,
-  wrapperClassName,
-  focusProps = {},
-  customTooltip,
-  showCustomInput,
-  ariaLabel,
-  hasErrors,
+  title = null,
+  required = false,
+  tooltip = null,
+  disabled = false,
+  errorMessage = null,
+  placeholder = '',
+  button = null,
+  className = '',
+  value = null,
+  onChange = () => {},
+  showTimeSelect = false,
+  hideErrorMessageWrapper = false,
+  customDateFormat = null,
+  outputDateFormat = null,
+  onChangeRaw = null,
+  clearable = true,
+  wrapperClassName = '',
+  focusProps = DEFAULT_FOCUS_PROPS,
+  customTooltip = false,
+  // If false, the 'x' icon for clearing the date will be hidden,
+  // but the date can still be cleared using Backspace.
+  // Thanks to this, the E2E tests won't fail and we won't need to
+  // write new getters for the datePicker in the E2E tests.
+  showCustomInput = true,
+  ariaLabel = null,
+  hasErrors = false,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -209,33 +215,4 @@ DateFieldDateFns.propTypes = {
     defaultMessage: PropTypes.string,
   }),
   hasErrors: PropTypes.bool,
-};
-
-DateFieldDateFns.defaultProps = {
-  tooltip: null,
-  required: false,
-  title: null,
-  button: null,
-  errorMessage: null,
-  disabled: false,
-  placeholder: '',
-  className: '',
-  wrapperClassName: '',
-  value: null,
-  onChange: () => {},
-  showTimeSelect: false,
-  hideErrorMessageWrapper: false,
-  customDateFormat: null,
-  outputDateFormat: null,
-  focusProps: {},
-  onChangeRaw: null,
-  clearable: true,
-  customTooltip: false,
-  // If false, the 'x' icon for clearing the date will be hidden,
-  // but the date can still be cleared using Backspace.
-  // Thanks to this, the E2E tests won't fail and we won't need to
-  // write new getters for the datePicker in the E2E tests.
-  showCustomInput: true,
-  ariaLabel: null,
-  hasErrors: false,
 };

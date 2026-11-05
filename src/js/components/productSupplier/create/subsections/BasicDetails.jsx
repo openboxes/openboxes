@@ -17,7 +17,7 @@ import { DateFormat } from 'consts/timeFormat';
 import { debounceOrganizationsFetch, debounceProductsFetch } from 'utils/option-utils';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const BasicDetails = ({ control, errors, getValues }) => {
+const BasicDetails = ({ control, errors = {}, getValues }) => {
   const {
     debounceTime,
     minSearchLength,
@@ -223,8 +223,4 @@ BasicDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: basicDetailsFormErrors,
   getValues: PropTypes.func.isRequired,
-};
-
-BasicDetails.defaultProps = {
-  errors: {},
 };

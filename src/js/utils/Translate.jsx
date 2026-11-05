@@ -40,7 +40,7 @@ export const translateWithDefaultMessage = (translate) => (
  * @returns {JSX.Element} - The Translate component with default message handling.
  */
 const TranslateWrapper = ({
-  id, defaultMessage, options = {}, ...props
+  id, defaultMessage = '', options = {}, ...props
 }) => (
   <Translate
     id={id}
@@ -55,9 +55,4 @@ TranslateWrapper.propTypes = {
   id: PropTypes.string.isRequired,
   defaultMessage: PropTypes.string,
   options: PropTypes.shape({}),
-};
-
-TranslateWrapper.defaultProps = {
-  defaultMessage: '',
-  options: {},
 };

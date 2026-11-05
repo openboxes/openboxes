@@ -6,9 +6,17 @@ import { Field } from 'react-final-form';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-const LabelField = (props) => {
+const LabelField = ({
+  arrayField = false,
+  fieldValue = null,
+  numberField: numberFieldProp = false,
+  ...otherProps
+}) => {
+  const props = {
+    ...otherProps, arrayField, fieldValue, numberField: numberFieldProp,
+  };
   const {
-    fieldName, arrayField, fieldValue,
+    fieldName,
     fieldConfig: {
       attributes, getDynamicAttr, label: FieldLabel, defaultMessage,
     },
@@ -96,10 +104,4 @@ LabelField.propTypes = {
   fieldValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
   numberField: PropTypes.bool,
-};
-
-LabelField.defaultProps = {
-  arrayField: false,
-  fieldValue: null,
-  numberField: false,
 };

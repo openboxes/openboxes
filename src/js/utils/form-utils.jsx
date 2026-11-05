@@ -28,10 +28,10 @@ export const renderFormFields = ({
   attributes: {
     required, hidden, showError, subtext, tooltip, injectionData, ariaLabel, trigger = 'click', ...otherAttributes
   },
-  label: FieldLabel,
-  defaultMessage,
-  touched: fieldTouched,
-  arrayField,
+  label: FieldLabel = '',
+  defaultMessage = '',
+  touched: fieldTouched = false,
+  arrayField = false,
   input,
   translate,
   meta: { touched, error },
@@ -132,13 +132,6 @@ renderFormFields.propTypes = {
   input: PropTypes.shape({}).isRequired,
   meta: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
-};
-
-renderFormFields.defaultProps = {
-  touched: false,
-  arrayField: false,
-  label: '',
-  defaultMessage: '',
 };
 
 export const decimalParser = (value, precision) => {

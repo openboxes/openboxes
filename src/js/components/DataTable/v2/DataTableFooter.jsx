@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import TablePagination from 'components/DataTable/TablePagination';
 
 const DataTableFooter = ({
-  footerComponent,
+  footerComponent = null,
   pagination,
   onPageChange,
   onPageSizeChange,
@@ -54,8 +54,4 @@ DataTableFooter.propTypes = {
   pages: PropTypes.number.isRequired,
   totalData: PropTypes.number.isRequired,
   pageSizeSelectOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
-};
-
-DataTableFooter.defaultProps = {
-  footerComponent: null,
 };

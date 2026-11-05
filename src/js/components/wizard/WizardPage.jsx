@@ -2,16 +2,24 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-const WizardPage = (props) => {
-  const Component = props.pageList[props.currentPage - 1];
+const WizardPage = ({
+  pageList,
+  nextPage,
+  prevPage,
+  goToPage,
+  currentPage,
+  initialValues = {},
+  additionalProps = {},
+}) => {
+  const Component = pageList[currentPage - 1];
   return (
     <div className="panel-body m-4" data-testid="wizardPage">
       <Component
-        initialValues={props.initialValues}
-        nextPage={props.nextPage}
-        previousPage={props.prevPage}
-        goToPage={props.goToPage}
-        {...props.additionalProps}
+        initialValues={initialValues}
+        nextPage={nextPage}
+        previousPage={prevPage}
+        goToPage={goToPage}
+        {...additionalProps}
       />
     </div>
   );
@@ -27,9 +35,4 @@ WizardPage.propTypes = {
   currentPage: PropTypes.number.isRequired,
   initialValues: PropTypes.shape({}),
   additionalProps: PropTypes.shape({}),
-};
-
-WizardPage.defaultProps = {
-  initialValues: {},
-  additionalProps: {},
 };

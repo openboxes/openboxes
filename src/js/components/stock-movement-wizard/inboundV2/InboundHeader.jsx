@@ -10,7 +10,7 @@ import useTranslate from 'hooks/useTranslate';
 import { formatDateToString } from 'utils/dateUtils';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const InboundHeader = ({ showHeaderStatus }) => {
+const InboundHeader = ({ showHeaderStatus = false }) => {
   const headerInfo = useSelector(getInboundHeaderInfo);
   const headerStatus = useSelector(getInboundHeaderStatus);
   const currentLocale = useSelector(getCurrentLocale);
@@ -56,8 +56,4 @@ export default InboundHeader;
 
 InboundHeader.propTypes = {
   showHeaderStatus: PropTypes.bool,
-};
-
-InboundHeader.defaultProps = {
-  showHeaderStatus: false,
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiMapPinLine } from 'react-icons/ri';
 
-const LocationButton = ({ location, onClick }) => {
+const LocationButton = ({ location, onClick = undefined }) => {
   const buttonStyle = () => {
     if (!location.backgroundColor) return { '--location-color': 'unset' };
 
@@ -26,10 +26,6 @@ const LocationButton = ({ location, onClick }) => {
       </span>
     </button>
   );
-};
-
-LocationButton.defaultProps = {
-  onClick: undefined,
 };
 
 LocationButton.propTypes = {

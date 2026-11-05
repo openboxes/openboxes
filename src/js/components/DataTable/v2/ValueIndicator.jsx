@@ -7,7 +7,7 @@ import valueIndicatorVariant from 'consts/valueIndicatorVariant';
 import useTranslate from 'hooks/useTranslate';
 
 const ValueIndicator = ({
-  value, variant, showAbsoluteValue, className,
+  value = null, variant, showAbsoluteValue = false, className = '',
 }) => {
   const translate = useTranslate();
 
@@ -89,10 +89,4 @@ ValueIndicator.propTypes = {
   ).isRequired,
   showAbsoluteValue: PropTypes.bool,
   className: PropTypes.string,
-};
-
-ValueIndicator.defaultProps = {
-  value: null,
-  showAbsoluteValue: false,
-  className: '',
 };

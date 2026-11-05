@@ -8,7 +8,7 @@ import LoadingNumbers from 'components/dashboard/LoadingNumbers';
 
 const IndicatorNumberCards = ({
   loading,
-  tiles,
+  tiles = [],
 }) => (
   <div className="cards-container">
     {loading ? <LoadingNumbers numberOfLoadingCards={3} /> : <IndicatorCards data={tiles} />}
@@ -38,10 +38,6 @@ IndicatorNumberCards.propTypes = {
     showFirstValuePercentSign: PropTypes.bool,
     formatSecondValueAsCurrency: PropTypes.bool,
   })),
-};
-
-IndicatorNumberCards.defaultProps = {
-  tiles: [],
 };
 
 export default IndicatorNumberCards;

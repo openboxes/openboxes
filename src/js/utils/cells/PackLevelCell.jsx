@@ -8,8 +8,8 @@ import useTranslate from 'hooks/useTranslate';
 /**
  * Memoized cell rendering up to two pack levels with a tooltip.
  */
-const PackLevelCell = React.memo(({
-  packLevel1, packLevel2, label, defaultLabel,
+const PackLevelCellComponent = ({
+  packLevel1 = undefined, packLevel2 = undefined, label, defaultLabel,
 }) => {
   const translate = useTranslate();
 
@@ -25,20 +25,17 @@ const PackLevelCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const PackLevelCell = React.memo(PackLevelCellComponent);
 
 PackLevelCell.displayName = 'PackLevelCell';
 
-PackLevelCell.propTypes = {
+PackLevelCellComponent.propTypes = {
   packLevel1: PropTypes.string,
   packLevel2: PropTypes.string,
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
-};
-
-PackLevelCell.defaultProps = {
-  packLevel1: undefined,
-  packLevel2: undefined,
 };
 
 export default PackLevelCell;

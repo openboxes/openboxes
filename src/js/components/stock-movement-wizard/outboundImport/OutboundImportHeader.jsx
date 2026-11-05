@@ -6,7 +6,10 @@ import useTranslate from 'hooks/useTranslate';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
 const OutboundImportHeader = ({
-  origin, destination, description, dateRequested,
+  origin = undefined,
+  destination = undefined,
+  description = undefined,
+  dateRequested = undefined,
 }) => {
   const translate = useTranslate();
   return (
@@ -34,13 +37,6 @@ const OutboundImportHeader = ({
       </div>
     </HeaderWrapper>
   );
-};
-
-OutboundImportHeader.defaultProps = {
-  origin: undefined,
-  destination: undefined,
-  description: undefined,
-  dateRequested: undefined,
 };
 
 OutboundImportHeader.propTypes = {

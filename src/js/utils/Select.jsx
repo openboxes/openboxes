@@ -306,13 +306,14 @@ class Select extends Component {
       }
       return ReactSelect;
     })();
+    const { valueRenderer } = this.props;
     const SingleValue = (props) => (
       <components.SingleValue
         {...props}
         innerProps={{ ...props.innerProps, 'data-testid': 'custom-select-value' }}
       >
-        {this.props.valueRenderer ? (
-          this.props.valueRenderer({ ...props.data, showSelectedOptionColor })
+        {valueRenderer ? (
+          valueRenderer({ ...props.data, showSelectedOptionColor })
         ) : (
           <div>{props.data.label}</div>
         )}

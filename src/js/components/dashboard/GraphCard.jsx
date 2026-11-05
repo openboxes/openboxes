@@ -209,8 +209,8 @@ const GraphCard = (({
   size = null,
   translate,
   hideDraghandle,
-  sortableRef,
-  handleRef,
+  sortableRef = null,
+  handleRef = null,
 }) => {
   let graph;
   // eslint-disable-next-line no-template-curly-in-string
@@ -333,11 +333,6 @@ GraphCard.propTypes = {
   translate: PropTypes.func.isRequired,
   sortableRef: PropTypes.func,
   handleRef: PropTypes.func,
-};
-
-GraphCard.defaultProps = {
-  sortableRef: null,
-  handleRef: null,
 };
 
 FilterComponent.defaultProps = {

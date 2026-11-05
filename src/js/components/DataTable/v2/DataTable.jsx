@@ -31,29 +31,38 @@ import 'components/DataTable/DataTable.scss';
 //                      while scrolling, it has worse performance than hardcoded
 //                      row height
 // }
+const DEFAULT_FILTER_PARAMS = {};
+
 const DataTable = ({
   columns,
   data,
-  footerComponent,
-  loading,
-  loadingMessage,
-  emptyTableMessage,
-  totalCount,
-  filterParams,
-  paginationProps,
-  disablePagination,
+  footerComponent = null,
+  loading = false,
+  loadingMessage = null,
+  emptyTableMessage = null,
+  totalCount = 0,
+  filterParams = DEFAULT_FILTER_PARAMS,
+  paginationProps = {},
+  disablePagination = false,
   defaultColumn,
   meta,
-  tableWithPinnedColumns,
-  virtualize,
-  overflowVisible,
-  showFooter,
-  disabled,
-  getSubRows,
-  defaultExpandedSubRows,
-  arrowNavigationSettings,
-  initialHorizontalScroll,
-  showTopScrollbar,
+  tableWithPinnedColumns = false,
+  virtualize = {
+    enabled: false,
+    minSize: 20,
+    estimateSize: 50,
+    overscan: 10,
+    customRowsHeight: false,
+  },
+  // it allows tooltips to overflow outside the table
+  overflowVisible = false,
+  showFooter = false,
+  disabled = false,
+  getSubRows = undefined,
+  defaultExpandedSubRows = false,
+  arrowNavigationSettings = {},
+  initialHorizontalScroll = 'start',
+  showTopScrollbar = false,
 }) => {
   const bottomScrollbarRef = useRef(null);
   const hasRows = Boolean(data?.length) && !loading;
@@ -193,32 +202,4 @@ DataTable.propTypes = {
   initialHorizontalScroll: PropTypes.oneOf(['start', 'end']),
   // Adds a second horizontal scrollbar under the header row, synced with the table's own one.
   showTopScrollbar: PropTypes.bool,
-};
-
-DataTable.defaultProps = {
-  footerComponent: null,
-  loading: false,
-  loadingMessage: null,
-  emptyTableMessage: null,
-  paginationProps: {},
-  filterParams: {},
-  disablePagination: false,
-  totalCount: 0,
-  tableWithPinnedColumns: false,
-  virtualize: {
-    enabled: false,
-    minSize: 20,
-    estimateSize: 50,
-    overscan: 10,
-    customRowsHeight: false,
-  },
-  // it allows tooltips to overflow outside the table
-  overflowVisible: false,
-  showFooter: false,
-  disabled: false,
-  getSubRows: undefined,
-  defaultExpandedSubRows: false,
-  arrowNavigationSettings: {},
-  initialHorizontalScroll: 'start',
-  showTopScrollbar: false,
 };

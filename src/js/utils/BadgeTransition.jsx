@@ -43,10 +43,4 @@ BadgeTransition.propTypes = {
   tooltip: PropTypes.string,
 };
 
-BadgeTransition.defaultProps = {
-  next: null,
-  clickable: true,
-  tooltip: '',
-};
-
 export default BadgeTransition;

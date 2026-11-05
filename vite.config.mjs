@@ -24,7 +24,7 @@ const SENTRY_ENV_VARIABLES = [
 export default defineConfig({
   base: './',
   plugins: [
-    react({ jsxRuntime: 'classic' }),
+    react(),
     fixDependencyImportsPlugin(),
     grailsGspPlugin({
       entry: ENTRY,

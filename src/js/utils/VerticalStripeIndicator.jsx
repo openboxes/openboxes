@@ -28,7 +28,3 @@ export default VerticalStripeIndicator;
 VerticalStripeIndicator.propTypes = {
   status: PropTypes.oneOf(Object.values(VerticalStripeStatus)),
 };
-
-VerticalStripeIndicator.defaultProps = {
-  status: null,
-};

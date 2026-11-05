@@ -21,8 +21,4 @@ LoadingNumbers.propTypes = {
   numberOfLoadingCards: PropTypes.number,
 };
 
-LoadingNumbers.defaultProps = {
-  numberOfLoadingCards: 4,
-};
-
 export default LoadingNumbers;

@@ -12,8 +12,12 @@ import ValueCell from 'utils/cells/ValueCell';
  * The product code cell. In table view this column also hosts the changes toggle
  * and the green arrow of split item rows.
  */
-const ProductCodeCell = React.memo(({
-  item = null, isPackingListView = false, isExpanded = false, onToggle, className = '',
+const ProductCodeCellComponent = ({
+  item = null,
+  isPackingListView = false,
+  isExpanded = false,
+  onToggle,
+  className = '',
 }) => {
   // The changes toggle lives in the first pinned column: Code in table view,
   // the pack level group column in packing list view.
@@ -49,11 +53,13 @@ const ProductCodeCell = React.memo(({
       truncate
     />
   );
-});
+};
+
+const ProductCodeCell = React.memo(ProductCodeCellComponent);
 
 ProductCodeCell.displayName = 'ProductCodeCell';
 
-ProductCodeCell.propTypes = {
+ProductCodeCellComponent.propTypes = {
   item: PropTypes.shape({
     rowType: PropTypes.string,
     splitItemIds: PropTypes.arrayOf(PropTypes.string),
@@ -64,13 +70,6 @@ ProductCodeCell.propTypes = {
   isExpanded: PropTypes.bool,
   onToggle: PropTypes.func.isRequired,
   className: PropTypes.string,
-};
-
-ProductCodeCell.defaultProps = {
-  item: null,
-  isPackingListView: false,
-  isExpanded: false,
-  className: '',
 };
 
 export default ProductCodeCell;

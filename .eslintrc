@@ -22,6 +22,11 @@
   ],
   "rules": {
     "react/prop-types": "warn",
+    "react/require-default-props": ["error", {
+      "forbidDefaultForRequired": true,
+      "classes": "defaultProps",
+      "functions": "defaultArguments"
+    }],
     "arrow-parens": "warn",
     "implicit-arrow-linebreak": "off",
     "react/destructuring-assignment": "warn",

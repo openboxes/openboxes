@@ -14,8 +14,13 @@ import getExpiryStatus from 'utils/expirationStatus';
  * Memoized cell rendering a localized, formatted expiration date. When `showExpiryStatus` is set,
  * it also highlights the date and shows an "expiring"/"expired" badge.
  */
-const ExpirationDateCell = React.memo(({
-  value, localeKey, label, defaultLabel, showExpiryStatus = false, className = '',
+const ExpirationDateCellComponent = ({
+  value = undefined,
+  localeKey = undefined,
+  label,
+  defaultLabel,
+  showExpiryStatus = false,
+  className = '',
 }) => {
   const translate = useTranslate();
 
@@ -50,11 +55,13 @@ const ExpirationDateCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const ExpirationDateCell = React.memo(ExpirationDateCellComponent);
 
 ExpirationDateCell.displayName = 'ExpirationDateCell';
 
-ExpirationDateCell.propTypes = {
+ExpirationDateCellComponent.propTypes = {
   value: PropTypes.string,
   localeKey: PropTypes.string,
   label: PropTypes.string.isRequired,
@@ -62,13 +69,6 @@ ExpirationDateCell.propTypes = {
   // When true, highlights the date and shows an expiring/expired badge.
   showExpiryStatus: PropTypes.bool,
   className: PropTypes.string,
-};
-
-ExpirationDateCell.defaultProps = {
-  value: undefined,
-  localeKey: undefined,
-  showExpiryStatus: false,
-  className: '',
 };
 
 export default ExpirationDateCell;

@@ -48,6 +48,7 @@ export default (Component) => {
           </div>
         );
       }
+      // eslint-disable-next-line react/jsx-pascal-case
       return <Component.defaultProps.TrComponent {...rest} />;
     }
 

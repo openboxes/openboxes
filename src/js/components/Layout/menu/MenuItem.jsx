@@ -4,7 +4,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 
-const DropdownMenuItem = ({ section, active }) => (
+const DropdownMenuItem = ({ section, active = false }) => (
   <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} data-testid="dropdownMenuItem">
     <a role="menuitem" className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
       {section.label}
@@ -21,7 +21,7 @@ const DropdownMenuItem = ({ section, active }) => (
   </li>
 );
 
-const CollapseMenuItem = ({ section, active }) => {
+const CollapseMenuItem = ({ section, active = false }) => {
   const id = `collapse-${section?.label?.replaceAll(' ', '-')}`;
   return (
     <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none" data-testid="collapseMenuItem">
@@ -49,10 +49,10 @@ const CollapseMenuItem = ({ section, active }) => {
   );
 };
 
-const MenuItem = (props) => (
+const MenuItem = ({ section, active = false }) => (
   <>
-    <DropdownMenuItem {...props} />
-    <CollapseMenuItem {...props} />
+    <DropdownMenuItem section={section} active={active} />
+    <CollapseMenuItem section={section} active={active} />
   </>
 );
 
@@ -72,11 +72,5 @@ MenuItem.propTypes = {
 };
 
 DropdownMenuItem.propTypes = { ...MenuItem.propTypes };
-DropdownMenuItem.defaultProps = { ...MenuItem.defaultProps };
 
 CollapseMenuItem.propTypes = { ...MenuItem.propTypes };
-CollapseMenuItem.defaultProps = { ...MenuItem.defaultProps };
-
-MenuItem.defaultProps = {
-  active: false,
-};

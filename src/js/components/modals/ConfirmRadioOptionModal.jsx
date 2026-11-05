@@ -13,7 +13,7 @@ const ConfirmRadioOptionModal = ({
   initialValue,
   options,
   buttons,
-  className,
+  className = '',
 }) => {
   const [selectedOption, setSelectedOption] = useState(initialValue);
 
@@ -106,10 +106,6 @@ ConfirmRadioOptionModal.propTypes = {
   })).isRequired,
   buttons: PropTypes.func.isRequired,
   className: PropTypes.string,
-};
-
-ConfirmRadioOptionModal.defaultProps = {
-  className: '',
 };
 
 export default ConfirmRadioOptionModal;

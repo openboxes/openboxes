@@ -15,20 +15,26 @@ import { bytesToMB } from 'utils/number-utils';
 import './style.scss';
 
 const DropzoneFileSelect = ({
-  height,
-  width,
-  minHeight,
-  dropzoneText,
-  buttonLabel,
-  buttonVariant,
-  className,
-  multiple,
-  maxFiles,
-  allowedExtensions,
-  isFormDisabled,
-  showButtonOnly,
-  throwErrorOnInvalidFiles,
-  onChange,
+  height = 'auto',
+  width = 'auto',
+  minHeight = '200px',
+  dropzoneText = {
+    id: 'react.default.dragDropHere.label',
+    defaultMessage: 'Drag and drop file here.',
+  },
+  buttonLabel = {
+    id: 'react.default.fileDialog.label',
+    defaultMessage: 'OPEN FILE DIALOG',
+  },
+  buttonVariant = 'grayed',
+  className = '',
+  multiple = false,
+  maxFiles = null,
+  allowedExtensions = [],
+  isFormDisabled = false,
+  showButtonOnly = false,
+  throwErrorOnInvalidFiles = false,
+  onChange = () => {},
   ...fieldProps
 }) => {
   const maxFileSize = useSelector(getMaxUploadFileSize);
@@ -215,27 +221,4 @@ DropzoneFileSelect.propTypes = {
   throwErrorOnInvalidFiles: PropTypes.bool,
   // Called with the selected file(s) when the user picks files
   onChange: PropTypes.func,
-};
-
-DropzoneFileSelect.defaultProps = {
-  dropzoneText: {
-    id: 'react.default.dragDropHere.label',
-    defaultMessage: 'Drag and drop file here.',
-  },
-  buttonLabel: {
-    id: 'react.default.fileDialog.label',
-    defaultMessage: 'OPEN FILE DIALOG',
-  },
-  buttonVariant: 'grayed',
-  width: 'auto',
-  height: 'auto',
-  minHeight: '200px',
-  className: '',
-  multiple: false,
-  maxFiles: null,
-  allowedExtensions: [],
-  isFormDisabled: false,
-  showButtonOnly: false,
-  throwErrorOnInvalidFiles: false,
-  onChange: () => {},
 };

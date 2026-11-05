@@ -4,7 +4,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 const TableRow = ({
-  children, className, error,
+  children, className = undefined, error = {},
 }) => (
   <div
     role="row"
@@ -13,11 +13,6 @@ const TableRow = ({
     {children}
   </div>
 );
-
-TableRow.defaultProps = {
-  className: undefined,
-  error: {},
-};
 
 TableRow.propTypes = {
   children: PropTypes.oneOfType([

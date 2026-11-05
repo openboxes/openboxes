@@ -11,7 +11,7 @@ import 'components/receivingV2/receiving.scss';
  * The lines about to be received as zero, so the user can tell which ones they are without
  * leaving the modal. Scrolls once the shipment has more of them than the modal can show.
  */
-const ZeroLinesTable = ({ lines, translate, localeKey }) => (
+const ZeroLinesTable = ({ lines, translate, localeKey = undefined }) => (
   <div className="zero-lines-table">
     <table>
       <thead>
@@ -53,10 +53,6 @@ ZeroLinesTable.propTypes = {
   translate: PropTypes.func.isRequired,
   // Locale code the expiration dates are formatted with.
   localeKey: PropTypes.string,
-};
-
-ZeroLinesTable.defaultProps = {
-  localeKey: undefined,
 };
 
 export default ZeroLinesTable;

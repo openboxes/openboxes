@@ -28,10 +28,10 @@ const getButtonVariant = ({
 });
 
 const InvalidItemsIndicator = ({
-  className,
-  errorsCounter,
-  setIsFiltered,
-  isFiltered,
+  className = '',
+  errorsCounter = 0,
+  setIsFiltered = () => {},
+  isFiltered = false,
   handleOnFilterButtonClick,
 }) => {
   const { Icon, variant, wrapperClassName } = getButtonVariant({
@@ -76,11 +76,4 @@ InvalidItemsIndicator.propTypes = {
   setIsFiltered: PropTypes.func,
   isFiltered: PropTypes.bool,
   handleOnFilterButtonClick: PropTypes.func.isRequired,
-};
-
-InvalidItemsIndicator.defaultProps = {
-  className: '',
-  errorsCounter: 0,
-  setIsFiltered: () => {},
-  isFiltered: false,
 };

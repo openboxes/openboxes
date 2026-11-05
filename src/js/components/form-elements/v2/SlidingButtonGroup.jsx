@@ -89,9 +89,3 @@ SlidingButtonGroup.propTypes = {
   className: PropTypes.string,
   style: PropTypes.shape({}),
 };
-
-SlidingButtonGroup.defaultProps = {
-  onChange: () => {},
-  className: '',
-  style: {},
-};

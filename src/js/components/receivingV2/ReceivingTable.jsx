@@ -168,11 +168,4 @@ ReceivingTable.propTypes = {
   lineItemErrors: PropTypes.objectOf(PropTypes.objectOf(PropTypes.string)),
 };
 
-ReceivingTable.defaultProps = {
-  receiptId: null,
-  sort: null,
-  order: null,
-  lineItemErrors: {},
-};
-
 export default ReceivingTable;

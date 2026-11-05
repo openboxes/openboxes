@@ -8,7 +8,7 @@ import AddAttributeOptionModal from 'components/productSupplier/modals/AddAttrib
 import useProductSupplierAttributes from 'hooks/productSupplier/form/useProductSupplierAttributes';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const AttributesSection = ({ control, errors, setValue }) => {
+const AttributesSection = ({ control, errors = {}, setValue }) => {
   const {
     attributesWithInputTypes,
     isAttributeModalOpen,
@@ -69,8 +69,4 @@ AttributesSection.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.objectOf(FormErrorPropType),
   setValue: PropTypes.func.isRequired,
-};
-
-AttributesSection.defaultProps = {
-  errors: {},
 };

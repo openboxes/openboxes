@@ -8,7 +8,7 @@ import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 
 const DataTableHeader = ({
   headerGroups,
-  tableWithPinnedColumns,
+  tableWithPinnedColumns = false,
   isScreenWiderThanTable,
 }) => (
   <div
@@ -52,8 +52,4 @@ DataTableHeader.propTypes = {
   headerGroups: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
-};
-
-DataTableHeader.defaultProps = {
-  tableWithPinnedColumns: false,
 };

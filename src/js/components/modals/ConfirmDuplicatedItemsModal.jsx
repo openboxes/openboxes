@@ -8,7 +8,7 @@ import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
 
 const ConfirmDuplicatedItemsModal = ({
-  isOpen, data, onConfirm, onCancel,
+  isOpen, data = [], onConfirm, onCancel,
 }) => {
   useTranslation('stockMovement');
   const translate = useTranslate();
@@ -46,10 +46,6 @@ ConfirmDuplicatedItemsModal.propTypes = {
   ),
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-ConfirmDuplicatedItemsModal.defaultProps = {
-  data: [],
 };
 
 export default ConfirmDuplicatedItemsModal;

@@ -8,12 +8,23 @@ import translate from 'utils/Translate';
 
 import 'utils/utils.scss';
 
+const DEFAULT_LABELS = {
+  title: {
+    label: '',
+    content: '',
+  },
+  content: {
+    label: '',
+    content: '',
+  },
+};
+
 const ConfirmModal = ({
-  labels: { title, content },
+  labels: { title, content } = DEFAULT_LABELS,
   onClose,
-  buttons,
-  className,
-  hideCloseButton,
+  buttons = [],
+  className = '',
+  hideCloseButton = false,
 }) => (
   <div
     className={`d-flex flex-column custom-modal-content justify-content-between bg-white ${className}`}
@@ -88,20 +99,4 @@ ConfirmModal.propTypes = {
     onClick: PropTypes.func.isRequired,
   })),
   hideCloseButton: PropTypes.bool,
-};
-
-ConfirmModal.defaultProps = {
-  labels: {
-    title: {
-      label: '',
-      content: '',
-    },
-    content: {
-      label: '',
-      content: '',
-    },
-  },
-  buttons: [],
-  className: '',
-  hideCloseButton: false,
 };

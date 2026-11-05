@@ -36,7 +36,3 @@ ProductHandlingIcons.propTypes = {
     labelText: PropTypes.string,
   })),
 };
-
-ProductHandlingIcons.defaultProps = {
-  handlingLabels: [],
-};
