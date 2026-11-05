@@ -10,7 +10,10 @@
 package util
 
 import grails.util.Holders
+import groovy.json.JsonOutput
 import org.springframework.boot.info.GitProperties
+
+import org.pih.warehouse.core.parser.DoubleParser
 
 // See http://jira.codehaus.org/browse/GRAILS-6515
 class ConfigHelper {
@@ -47,6 +50,25 @@ class ConfigHelper {
     static getContextPath() {
         String contextPath = Holders.grailsApplication.config.server.contextPath
         return (contextPath != '/') ? contextPath : ''
+    }
+
+    /**
+     * Fetch the frontend (React web) Sentry config as JSON.
+     *
+     * We don't pass these settings via ApiController.getAppContext() because we need it as early as possible so that
+     * we can capture data from the true start of the session. See webpack.config.js for usages.
+     */
+    static String getSentryWebConfigJson() {
+        DoubleParser doubleParser = new DoubleParser()
+        Map config = [
+                dsn: Holders.config.getProperty('sentry.web.dsn') ?: null,
+                environment: Holders.config.getProperty('sentry.web.environment') ?: null,
+                tracesSampleRate: doubleParser.parse(Holders.config.getProperty('sentry.web.tracesSampleRate')),
+                replaysSampleRate: doubleParser.parse(Holders.config.getProperty('sentry.web.replaysSampleRate')),
+                replaysErrorSampleRate: doubleParser.parse(Holders.config.getProperty('sentry.web.replaysErrorSampleRate')),
+        ]
+        // Escape "</" so that config values can't close the <script> tag that the JSON is wrapped with.
+        return JsonOutput.toJson(config).replace('</', '<\\/')
     }
 
     static booleanValue(def value) {
