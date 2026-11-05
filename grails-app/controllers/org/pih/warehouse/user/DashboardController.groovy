@@ -23,9 +23,11 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
@@ -56,12 +58,6 @@ class DashboardController {
 
     def globalSearch() {
 
-        def transaction = Transaction.findByTransactionNumber(params.searchTerms)
-        if (transaction) {
-            redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
-            return
-        }
-
         def product = Product.findByProductCodeOrId(params.searchTerms, params.searchTerms)
         if (product) {
             redirect(controller: "inventoryItem", action: "showStockCard", id: product.id)
@@ -88,11 +84,6 @@ class DashboardController {
             return
         }
 
-        def receipt = Receipt.findByReceiptNumber(params.searchTerms)
-        if (receipt) {
-            redirect(controller: "receipt", action: "show", id: receipt.id)
-            return
-        }
         List<Order> orders = Order.findAllByOrderNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
         if (orders) {
             Order order = orders.first()
@@ -100,7 +91,31 @@ class DashboardController {
                 redirect(controller: "stockMovement", action: "show", id: order.id)
                 return
             }
+            // Only stock transfers and bin replenishments should open the stock transfer page.
+            // order.isTransferOrder is not enough here, because it is also true for putaway and return orders
+            if (order.orderType?.code == OrderTypeCode.TRANSFER_ORDER.name()) {
+                redirect(controller: "stockTransfer", action: "show", id: order.id)
+                return
+            }
             redirect(controller: "order", action: "show", id: order.id)
+            return
+        }
+
+        Receipt receipt = Receipt.findByReceiptNumber(params.searchTerms)
+        if (receipt) {
+            redirect(controller: "receipt", action: "show", id: receipt.id)
+            return
+        }
+
+        Invoice invoice = Invoice.findByInvoiceNumber(params.searchTerms)
+        if (invoice) {
+            redirect(controller: "invoice", action: "show", id: invoice.id)
+            return
+        }
+
+        Transaction transaction = Transaction.findByTransactionNumber(params.searchTerms)
+        if (transaction) {
+            redirect(controller: "inventory", action: "showTransaction", id: transaction.id)
             return
         }
 
