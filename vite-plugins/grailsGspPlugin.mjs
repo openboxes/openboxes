@@ -22,22 +22,36 @@ const findEntryCss = (entryChunk) => {
   return cssFiles[0];
 };
 
-export default function grailsGspPlugin({ entry, templatePath, pages }) {
-  const resolved = { outDir: '' };
+const findCssEntryAsset = (bundle, cssEntry) => {
+  const asset = Object.values(bundle)
+    .find((file) => file.type === 'asset' && file.originalFileNames?.includes(cssEntry));
+  if (!asset) {
+    throw new Error(`[grails-gsp] CSS asset for ${cssEntry} not found in bundle`);
+  }
+  return asset;
+};
+
+export default function grailsGspPlugin({
+  entry, vendorCss, templatePath, pages,
+}) {
+  const resolved = { outDir: '', root: '' };
 
   return {
     name: 'grails-gsp',
     apply: 'build',
     configResolved(config) {
       resolved.outDir = config.build.outDir;
+      resolved.root = config.root;
     },
     writeBundle(_, bundle) {
       const entryChunk = findEntryChunk(bundle, entry);
+      const vendorCssAsset = findCssEntryAsset(bundle, path.relative(resolved.root, vendorCss));
       const resourceDir = path.basename(resolved.outDir);
       const render = template(fs.readFileSync(templatePath, 'utf-8'));
       const assetParams = {
         jsSource: grailsResource(resourceDir, entryChunk.fileName),
         cssSource: grailsResource(resourceDir, findEntryCss(entryChunk)),
+        vendorCssSource: grailsResource(resourceDir, vendorCssAsset.fileName),
         scriptType: 'module',
       };
 

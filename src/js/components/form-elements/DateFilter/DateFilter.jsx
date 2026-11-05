@@ -12,7 +12,6 @@ import DateFormat from 'consts/dateFormat';
 import Translate from 'utils/Translate';
 import { formatDate, getLocaleCode } from 'utils/translation-utils';
 
-import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 
 const CustomInput = React.forwardRef((props, ref) => {

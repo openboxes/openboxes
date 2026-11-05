@@ -12,7 +12,6 @@ import useTableScrollToEnd from 'hooks/useTableScrollToEnd';
 import useTableTopScrollbar from 'hooks/useTableTopScrollbar';
 import useWindowWidthCheck from 'hooks/useWindowWidthCheck';
 
-import 'react-table/react-table.css';
 import 'components/DataTable/DataTable.scss';
 
 // To enable row virtualization pass the `virtualize` config object:

@@ -26,7 +26,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationDetails.scss';
 
 function validate(values) {

@@ -25,8 +25,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import 'react-table/react-table.css';
-
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
 function hasValidationError(quantity, quantityAvailable) {

@@ -34,8 +34,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 // Used for util function to calculate quantityRequested for requests from wards
 // where quantityRequested is calculated by subtracting one of below from QOH
 const RequestFromWardTypes = {

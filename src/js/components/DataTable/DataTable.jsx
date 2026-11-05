@@ -10,9 +10,6 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import TablePagination from 'components/DataTable/TablePagination';
 import TableRow from 'components/DataTable/TableRow';
 
-import 'react-table/react-table.css';
-// important: this line must be placed after react-table css import
-import 'react-table-hoc-fixed-columns/lib/styles.css';
 import 'components/DataTable/DataTable.scss';
 
 const ReactTableFixedColumns = withFixedColumns(ReactTable);

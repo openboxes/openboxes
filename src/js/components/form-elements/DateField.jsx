@@ -13,8 +13,6 @@ import DateFormat from 'consts/dateFormat';
 import { convertMomentFormatToDateFns } from 'utils/dateUtils';
 import { formatDate, getDateFormat, getLocaleCode } from 'utils/translation-utils';
 
-import 'react-datepicker/dist/react-datepicker.css';
-
 const CalendarContainer = ({ children }) => {
   const el = document.getElementById('root');
 

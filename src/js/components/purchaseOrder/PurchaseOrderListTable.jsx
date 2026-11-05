@@ -27,8 +27,6 @@ import ContextMenu from 'utils/ContextMenu';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const PurchaseOrderListTable = ({
   supportedActivities,
   highestRole,

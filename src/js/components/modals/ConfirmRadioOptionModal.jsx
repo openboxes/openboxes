@@ -6,7 +6,6 @@ import Button from 'components/form-elements/Button';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import translate from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'utils/utils.scss';
 
 const ConfirmRadioOptionModal = ({

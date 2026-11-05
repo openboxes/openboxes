@@ -1,8 +1,8 @@
 import React from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-/* global _ */
 const TableCard = (props) => {
   const {
     columnsSize,

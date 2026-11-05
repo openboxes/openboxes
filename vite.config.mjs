@@ -9,6 +9,7 @@ import grailsGspPlugin from './vite-plugins/grailsGspPlugin.mjs';
 const ROOT = path.resolve(import.meta.dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
 const ENTRY = path.resolve(SRC, 'index.jsx');
+const VENDOR_CSS = path.resolve(ROOT, 'css/vendor.css');
 const OUTPUT = path.resolve(ROOT, 'main/webapp/webpack');
 const GRAILS_VIEWS = path.resolve(import.meta.dirname, 'grails-app/views');
 
@@ -23,10 +24,11 @@ const SENTRY_ENV_VARIABLES = [
 export default defineConfig({
   base: './',
   plugins: [
-    react(),
+    react({ jsxRuntime: 'classic' }),
     fixDependencyImportsPlugin(),
     grailsGspPlugin({
       entry: ENTRY,
+      vendorCss: VENDOR_CSS,
       templatePath: path.resolve(ROOT, 'assets/grails-template.html'),
       pages: [
         {
@@ -87,7 +89,10 @@ export default defineConfig({
     assetsDir: '',
     sourcemap: true,
     rollupOptions: {
-      input: ENTRY,
+      input: {
+        index: ENTRY,
+        vendor: VENDOR_CSS,
+      },
     },
   },
 });

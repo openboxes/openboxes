@@ -31,9 +31,6 @@ import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate, getDateFormat, getLocaleCode } from 'utils/translation-utils';
 
-import 'react-table/react-table.css';
-import 'react-datepicker/dist/react-datepicker.css';
-
 const FIELDS = {
   returnItems: {
     type: ArrayField,

@@ -49,8 +49,6 @@ import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   defaultMessage: 'Delete',

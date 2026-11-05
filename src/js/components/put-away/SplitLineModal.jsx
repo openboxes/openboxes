@@ -15,8 +15,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 /**
  * Modal window where user can split put-away's line. It has details of the line
  * at the top, including total quantity to be put away. After clicking "add line",
