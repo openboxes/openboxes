@@ -71,6 +71,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     Boolean substitutable = false
     String comment
     Integer orderIndex = 0
+    String identifier
 
     Boolean autoAllocated
 
@@ -168,6 +169,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         lotNumber(nullable: true)
         expirationDate(nullable: true)
         orderIndex(nullable: true)
+        identifier(nullable: true)
         parentRequisitionItem(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
@@ -907,7 +909,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 isApproved            : isApproved(),
                 isCanceled            : isCanceled(),
                 isBackordered         : isBackordered(),
-                orderIndex            : orderIndex
+                orderIndex            : orderIndex,
+                identifier            : identifier
         ]
     }
 

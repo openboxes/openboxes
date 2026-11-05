@@ -526,6 +526,7 @@ class BootStrap {
                 quantityBackordered: requisitionItem.quantityBackordered,
                 backorderedReasonCode: requisitionItem.backorderedReasonCode,
                 orderIndex      : requisitionItem.orderIndex,
+                identifier      : requisitionItem.identifier,
                 changes         : requisitionItem.change ? [requisitionItem.change] : [],
                 modification    : requisitionItem.modificationItem,
                 substitution    : requisitionItem.substitutionItem,

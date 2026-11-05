@@ -68,4 +68,5 @@
     <include file="0.9.x/changelog-2026-08-31-0000-add-requisition-event-types.xml" />
     <include file="0.9.x/changelog-2026-09-14-1200-add-requisition-column-negative-allocation-allowed.xml" />
     <include file="0.9.x/changelog-2026-10-27-1200-add-shipment-column-receiving-location.xml" />
+    <include file="0.9.x/changelog-2026-11-05-1200-add-requisition-item-column-identifier.xml" />
 </databaseChangeLog>
