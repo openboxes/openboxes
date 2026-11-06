@@ -217,7 +217,7 @@ class CreateInvoicePage extends Component {
         onSubmit={(values) => this.nextPage(values)}
         validate={validate}
         initialValues={this.state.values}
-        render={({ form, handleSubmit }) => (
+        render={({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>
             <div className="classic-form with-description">
               {_.map(

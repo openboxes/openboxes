@@ -49,7 +49,7 @@ class Filter extends Component {
         listCategoryData: [],
         listCategoryDataFiltered: [],
       }));
-  }
+  };
 
   searchOnChange = (event) => {
     const { listCategoryData } = this.state;
@@ -61,12 +61,12 @@ class Filter extends Component {
       listCategoryDataFiltered: filteredList,
       searchTerm: event.target.value,
     });
-  }
+  };
 
   toggleAddingFilter = () => {
     // Popup add filter shows up or close
     this.setState((prev) => ({ addingFilter: !prev.addingFilter }));
-  }
+  };
 
   toggleCategorySelected = (nameCategory, categoryData) => {
     if (categoryData) this.getCategoryRows(categoryData.endpoint);
@@ -78,7 +78,7 @@ class Filter extends Component {
       // Popup filterSelection show up or close
       filterCategorySelected: !prev.filterCategorySelected,
     }));
-  }
+  };
 
   loadStoredFilters = () => {
     const { pageFilters, activeConfig } = this.props;
@@ -106,7 +106,7 @@ class Filter extends Component {
       });
       this.setState({ listFilterSelected, filterAvailable: true });
     } else { this.setState({ filterAvailable: false }); }
-  }
+  };
 
   addFilterToTheList = (nameCategory, valueCategory) => {
     const { activeConfig } = this.props;
@@ -139,7 +139,7 @@ class Filter extends Component {
 
     // Refresh data
     this.props.fetchData(activeConfig);
-  }
+  };
 
   removeFilterFromList = (key) => {
     const { activeConfig } = this.props;
@@ -166,7 +166,7 @@ class Filter extends Component {
 
     // Refresh data
     this.props.fetchData(activeConfig);
-  }
+  };
 
   render() {
     return (

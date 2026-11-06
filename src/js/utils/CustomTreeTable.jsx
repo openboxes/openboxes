@@ -21,9 +21,9 @@ export default (Component) => {
       if (!this.wrappedInstance) console.warn('RTTreeTable - No wrapped instance');
       if (this.wrappedInstance.getWrappedInstance) return this.wrappedInstance.getWrappedInstance();
       return this.wrappedInstance;
-    }
+    };
 
-    getTrProps = (state, ri, ci, instance) => ({ ri })
+    getTrProps = (state, ri, ci, instance) => ({ ri });
 
     getTdProps = (state, { index }, { name }) => ({ rowIndex: index, name });
 
@@ -50,7 +50,7 @@ export default (Component) => {
       }
       // eslint-disable-next-line react/jsx-pascal-case
       return <Component.defaultProps.TrComponent {...rest} />;
-    }
+    };
 
     TdComponent = (props) => {
       const {
@@ -76,7 +76,7 @@ export default (Component) => {
           {children}
         </div>
       );
-    }
+    };
 
     render() {
       const { columns, treeTableIndent, ...rest } = this.props;

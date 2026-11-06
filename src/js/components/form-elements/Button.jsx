@@ -37,11 +37,9 @@ const Button = ({
       aria-expanded={isDropdown && 'false'}
       ref={customRef}
     >
-      <>
-        {StartIcon && StartIcon}
-        <Translate id={label} defaultMessage={defaultLabel} />
-        {EndIcon && EndIcon}
-      </>
+      {StartIcon && StartIcon}
+      <Translate id={label} defaultMessage={defaultLabel} />
+      {EndIcon && EndIcon}
     </button>
   );
 

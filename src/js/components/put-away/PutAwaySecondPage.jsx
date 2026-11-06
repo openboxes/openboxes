@@ -72,8 +72,7 @@ class PutAwaySecondPage extends Component {
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
-      this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
+      this.props.translate, this.state.location, nextProps.location, () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
     );
 
     this.setState((prev) => ({

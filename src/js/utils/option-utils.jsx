@@ -248,7 +248,8 @@ export const fetchLocationById = async (id) => {
 };
 
 export const fetchBins = async (
-  locationId, ignoreActivityCodes = [], sort = null) => {
+  locationId, ignoreActivityCodes = [], sort = null,
+) => {
   const response = await apiClient.get(INTERNAL_LOCATIONS, {
     paramsSerializer: (parameters) => queryString.stringify(parameters),
     params: {

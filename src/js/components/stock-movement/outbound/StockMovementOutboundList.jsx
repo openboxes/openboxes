@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import StockMovementOutboundFilters from 'components/stock-movement/outbound/StockMovementOutboundFilters';
@@ -10,6 +9,7 @@ import StockMovementOutboundHeader from 'components/stock-movement/outbound/Stoc
 import StockMovementOutboundTable from 'components/stock-movement/outbound/StockMovementOutboundTable';
 import useOutboundFilters from 'hooks/list-pages/outbound/useOutboundFilters';
 import useTranslation from 'hooks/useTranslation';
+import withRouter from 'utils/withRouter';
 
 const StockMovementOutboundList = (props) => {
   const isRequestsList = props.sourceType === 'ELECTRONIC';

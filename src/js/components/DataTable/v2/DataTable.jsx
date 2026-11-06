@@ -31,7 +31,6 @@ import 'components/DataTable/DataTable.scss';
 //                      while scrolling, it has worse performance than hardcoded
 //                      row height
 // }
-const DEFAULT_FILTER_PARAMS = {};
 
 const DataTable = ({
   columns,
@@ -41,7 +40,7 @@ const DataTable = ({
   loadingMessage = null,
   emptyTableMessage = null,
   totalCount = 0,
-  filterParams = DEFAULT_FILTER_PARAMS,
+  filterParams = {},
   paginationProps = {},
   disablePagination = false,
   defaultColumn,

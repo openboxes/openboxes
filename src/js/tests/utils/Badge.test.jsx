@@ -6,7 +6,7 @@ import Badge from 'utils/Badge';
 
 import '@testing-library/jest-dom';
 
-const mockCustomTooltip = vi.fn(({ children }) => <>{children}</>);
+const mockCustomTooltip = vi.fn(({ children }) => children);
 
 vi.mock('wrappers/CustomTooltip', () => ({ default: (props) => mockCustomTooltip(props) }));
 

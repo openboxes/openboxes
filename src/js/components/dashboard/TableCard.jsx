@@ -3,28 +3,22 @@ import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-const DEFAULT_COLUMNS_SIZE = {
-  name: null,
-  number: null,
-  value: null,
-};
-
-const DEFAULT_TRUNCATION_LENGTH = {
-  name: null,
-  number: null,
-  value: null,
-};
-
-const DEFAULT_DISABLE_TRUNCATION = {
-  name: undefined,
-  number: undefined,
-  value: undefined,
-};
-
 const TableCard = ({
-  columnsSize = DEFAULT_COLUMNS_SIZE,
-  truncationLength = DEFAULT_TRUNCATION_LENGTH,
-  disableTruncation = DEFAULT_DISABLE_TRUNCATION,
+  columnsSize = {
+    name: null,
+    number: null,
+    value: null,
+  },
+  truncationLength = {
+    name: null,
+    number: null,
+    value: null,
+  },
+  disableTruncation = {
+    name: undefined,
+    number: undefined,
+    value: undefined,
+  },
   data,
 }) => {
   const displayItemData = ({

@@ -1,19 +1,17 @@
 {
-  "parser": "@babel/eslint-parser",
   "plugins": [
     "react",
     "simple-import-sort"
   ],
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 2022,
     "sourceType": "module",
-    "allowImportExportEverywhere": true,
     "ecmaFeatures": {
       "jsx": true
     }
   },
   "env": {
-    "es6":     true,
+    "es2022":  true,
     "browser": true,
     "node":    true
   },
@@ -21,6 +19,36 @@
     "airbnb"
   ],
   "rules": {
+    "react/function-component-definition": ["error", {
+      "namedComponents": ["arrow-function", "function-declaration"],
+      "unnamedComponents": "arrow-function"
+    }],
+    "function-paren-newline": ["error", "consistent"],
+    "react/no-unstable-nested-components": "warn",
+    "default-param-last": "warn",
+    "react/no-unused-class-component-methods": "warn",
+    "jsx-a11y/control-has-associated-label": "warn",
+    "class-methods-use-this": ["error", {
+      "enforceForClassFields": false,
+      "exceptMethods": [
+        "render",
+        "getInitialState",
+        "getDefaultProps",
+        "getChildContext",
+        "componentWillMount",
+        "UNSAFE_componentWillMount",
+        "componentDidMount",
+        "componentWillReceiveProps",
+        "UNSAFE_componentWillReceiveProps",
+        "shouldComponentUpdate",
+        "componentWillUpdate",
+        "UNSAFE_componentWillUpdate",
+        "componentDidUpdate",
+        "componentWillUnmount",
+        "componentDidCatch",
+        "getSnapshotBeforeUpdate"
+      ]
+    }],
     "react/prop-types": "warn",
     "react/require-default-props": ["error", {
       "forbidDefaultForRequired": true,

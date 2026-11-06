@@ -27,38 +27,36 @@ const CountStepTable = ({
   });
 
   return (
-    <>
-      <div className="list-page-list-section">
-        <ProductDataHeader
-          cycleCountId={id}
-        />
-        <div className="pt-3 pl-4 d-flex align-items-center">
-          <DateCountedHeader
-            isStepEditable={isStepEditable}
-            isFormDisabled={isFormDisabled}
-            cycleCountId={id}
-          />
-          <CountedByHeader
-            isStepEditable={isStepEditable}
-            isFormDisabled={isFormDisabled}
-            cycleCountId={id}
-          />
-        </div>
-        <div className="mx-4 count-step-table">
-          <DataTable
-            columns={columns}
-            data={cycleCountItemIds}
-            totalCount={cycleCountItemsTotalCount}
-            disablePagination
-          />
-        </div>
-        <AddNewRecordFooter
-          cycleCountId={id}
+    <div className="list-page-list-section">
+      <ProductDataHeader
+        cycleCountId={id}
+      />
+      <div className="pt-3 pl-4 d-flex align-items-center">
+        <DateCountedHeader
           isStepEditable={isStepEditable}
           isFormDisabled={isFormDisabled}
+          cycleCountId={id}
+        />
+        <CountedByHeader
+          isStepEditable={isStepEditable}
+          isFormDisabled={isFormDisabled}
+          cycleCountId={id}
         />
       </div>
-    </>
+      <div className="mx-4 count-step-table">
+        <DataTable
+          columns={columns}
+          data={cycleCountItemIds}
+          totalCount={cycleCountItemsTotalCount}
+          disablePagination
+        />
+      </div>
+      <AddNewRecordFooter
+        cycleCountId={id}
+        isStepEditable={isStepEditable}
+        isFormDisabled={isFormDisabled}
+      />
+    </div>
   );
 };
 

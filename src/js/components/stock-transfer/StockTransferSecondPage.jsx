@@ -173,8 +173,7 @@ class StockTransferSecondPage extends Component {
         if (!props.original.id || splitItems.length > 1) {
           const quantityToTransfer = _.reduce(
             splitItems, (sum, val) =>
-              (sum + (val.quantity ? _.toInteger(val.quantity) : 0)),
-            0,
+              (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0,
           );
           if (quantityToTransfer > props.original.quantityNotPicked) {
             _.forEach(stockTransferItems, (lineItem) => {
@@ -528,8 +527,7 @@ class StockTransferSecondPage extends Component {
       if (!item.id || splitItems.length > 1) {
         const quantityToTransfer = _.reduce(
           splitItems, (sum, val) =>
-            (sum + (val.quantity ? _.toInteger(val.quantity) : 0)),
-          0,
+            (sum + (val.quantity ? _.toInteger(val.quantity) : 0)), 0,
         );
         if (quantityToTransfer > quantityNotPicked) {
           return true;

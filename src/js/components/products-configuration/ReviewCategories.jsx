@@ -43,7 +43,7 @@ class ReviewCategories extends Component {
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
-  }
+  };
 
   render() {
     const {
