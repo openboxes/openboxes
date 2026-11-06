@@ -16,7 +16,7 @@ class EnumParserSpec extends Specification {
         parser = new EnumParser<PutawayStatus>()
     }
 
-    void "parseString should return #expectedResult when given #toParse and a defaultValue of #defaultValue"() {
+    void "parseString should return #expectedResult when given #toParse"() {
         expect:
         assert parser.parseString(toParse, PutawayStatus) == expectedResult
 
