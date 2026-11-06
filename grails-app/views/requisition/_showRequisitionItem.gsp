@@ -248,10 +248,10 @@
             </g:else>
         </td>
         <td class="middle center">
-            <g:set var="pickReasonCode" value="${requisitionItem?.modificationItem?.pickReasonCode ?: requisitionItem?.substitutionItem?.pickReasonCode ?: requisitionItem?.pickReasonCode}"/>
-            <g:if test="${requisitionItem?.cancelReasonCode || pickReasonCode }">
-                <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + requisitionItem?.cancelReasonCode : ''}
-${pickReasonCode ? 'Pick reason code: ' + pickReasonCode : ''}">
+            <g:set var="reasonCodes" value="${requisitionItem?.effectiveItems?.collect { it.picklistReasonCodes }?.flatten()?.unique() ?: []}"/>
+            <g:if test="${requisitionItem?.cancelReasonCode || reasonCodes}">
+                <div title="${requisitionItem?.cancelReasonCode ? 'Edit reason code: ' + warehouse.message(code:'enum.ReasonCode.' + requisitionItem?.getEffectiveCancelReasonCode()) : ''}
+${reasonCodes ? 'Picked item reason codes: ' + reasonCodes.collect { warehouse.message(code:'enum.ReasonCode.' + it) }.join(', ') : ''}">
                     <img src="${resource(dir:'images/icons/silk',file:'note.png')}" />
                 </div>
             </g:if>
