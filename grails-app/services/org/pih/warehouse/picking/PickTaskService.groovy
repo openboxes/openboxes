@@ -315,6 +315,9 @@ class PickTaskService {
         // A shortage is recorded only once (the first time a reason code is given). The stock that should have been
         // in the bin is held in the facility's lost and found location, so it is not allocated again and Inventory
         // can investigate it. Like putaway, refuse the shortage when the facility has no lost and found location.
+        if (quantityPicked == null || quantityPicked < 0) {
+            throw new IllegalArgumentException("Quantity picked must be a non-negative integer")
+        }
         boolean newShortage = reasonCode && !existingPickItem.reasonCode
         Location lostAndFound = newShortage ? findLostAndFoundLocation(task) : null
 
