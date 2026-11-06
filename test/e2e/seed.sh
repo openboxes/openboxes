@@ -12,5 +12,6 @@ compose_running exec -T db sh -c 'if command -v mariadb >/dev/null; then exec ma
   -uopenboxes -popenboxes openboxes < "$E2E_DIR/fixtures/seed.sql"
 log "applied fixtures/seed.sql"
 node_env
-(cd "$E2E_DIR" && npx playwright test --project=setup --reporter=line >&2)
+# the profile's reports directory: two stacks seeding at once must not share Playwright's output dir
+(cd "$E2E_DIR" && E2E_REPORTS_DIR="${E2E_REPORTS_DIR:-$E2E_REPORTS}" npx playwright test --project=setup --reporter=line >&2)
 log "seeded"
