@@ -32,9 +32,7 @@
   "dependencies": {
     "@dnd-kit/react": "0.3.2",
     "@fontsource/inter": "4.5.15",
-    "@fortawesome/fontawesome-free": "5.14.0",
     "@fortawesome/fontawesome-svg-core": "1.2.30",
-    "@fortawesome/free-regular-svg-icons": "5.14.0",
     "@fortawesome/free-solid-svg-icons": "5.14.0",
     "@fortawesome/react-fontawesome": "0.1.8",
     "@hookform/resolvers": "3.3.4",
