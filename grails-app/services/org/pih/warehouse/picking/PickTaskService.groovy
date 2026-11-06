@@ -581,7 +581,9 @@ class PickTaskService {
             return 0
         }
 
-        Integer quantityInBin = inventoryService.getQuantityFromBinLocation(task.facility, task.location, task.inventoryItem) ?: 0
+        Integer quantityInBin = inventoryService.getBinLocationsByInventoryItem(task.facility, task.inventoryItem).find {
+            it.binLocation == task.location
+        }?.quantity ?: 0
         if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
             quantityInBin -= quantityPicked
         }
