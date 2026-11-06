@@ -2,6 +2,7 @@ package org.pih.warehouse.allocation
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.StockMovementService
@@ -131,14 +132,33 @@ class OutboundOrderService {
 
     private void allocateOutstanding(RequisitionItem requisitionItem, List<AllocationSourceStrategy> strategies) {
         Integer quantityOutstanding = requisitionItem.calculateQuantityRequired() - requisitionItem.calculateQuantityAllocated()
-        if (quantityOutstanding > 0) {
-            allocationService.allocate(new AllocationRequest(
-                    quantityRequired: quantityOutstanding,
-                    requisitionItem: requisitionItem,
-                    allocationMode: AllocationMode.AUTO,
-                    allocationStrategies: strategies,
-                    keepExistingAllocation: true))
+        if (quantityOutstanding <= 0) {
+            return
         }
+
+        AllocationResult result = allocationService.allocate(new AllocationRequest(
+                quantityRequired: quantityOutstanding,
+                requisitionItem: requisitionItem,
+                allocationMode: AllocationMode.AUTO,
+                allocationStrategies: strategies,
+                keepExistingAllocation: true), false)
+
+        List<PicklistItem> picklistItems = PicklistItem.findAllByRequisitionItem(requisitionItem)
+        result.suggestedItems.each { SuggestedItem suggestedItem ->
+            // A task nobody has started yet is topped up rather than joined by a second one for the same bin
+            PicklistItem pendingItem = picklistItems.find {
+                (it.status ?: PickTaskStatus.PENDING.name()) == PickTaskStatus.PENDING.name() && !it.quantityPicked &&
+                        it.inventoryItem?.id == suggestedItem.inventoryItem?.id && it.binLocation?.id == suggestedItem.binLocation?.id
+            }
+            if (pendingItem) {
+                stockMovementService.createOrUpdatePicklistItem(requisitionItem, pendingItem, pendingItem.inventoryItem,
+                        pendingItem.binLocation, 0, null, pendingItem.comment, true,
+                        pendingItem.quantity + suggestedItem.quantityPicked.intValue())
+            } else {
+                stockMovementService.allocateSuggestedItems(requisitionItem, [suggestedItem])
+            }
+        }
+        stockMovementService.allocatePrepickItems(requisitionItem, result.prepickItems)
     }
 
     private void refreshStatus(Requisition requisition) {
