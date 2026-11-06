@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
@@ -81,7 +82,9 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
     /**
      * A receipt must have received something to be completed: at least one of its lines with a quantity received
      * above zero. Completing one that received nothing would record an inbound transaction carrying no entries at
-     * all (see {@link ReceiptTransactionManager#createInboundTransaction}).
+     * all (see {@link ReceiptTransactionManager#createInboundTransaction}). The exception is a subsequent receipt
+     * into a destination with partial receiving enabled that cancels some remaining quantity - it can be completed
+     * without receiving anything, even though its transaction then carries no entries.
      */
     private ObjectError validateSomethingWasReceived(ReceiptCompleteRequestCommand command) {
         if (!command.receipt) {
@@ -93,10 +96,23 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
             (receiptItem.quantityReceived ?: 0) > 0
         }
 
-        return nothingReceived ?
+        // With partial receiving, a later receipt may receive nothing and only cancel what will not arrive
+        boolean canceledOnSubsequentReceipt = command.itemsToComplete.any { it.cancelRemainingQuantity } &&
+                isSubsequentReceiptWithPartialReceiving(command.receipt)
+
+        return nothingReceived && !canceledOnSubsequentReceipt ?
                 rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.nothingReceived",
                         [command.receipt.receiptNumber]) :
                 null
+    }
+
+    /**
+     * Whether the receipt follows an already received receipt of its shipment (the one being completed is still
+     * pending, so a received one is always earlier) and its destination supports partial receiving.
+     */
+    private boolean isSubsequentReceiptWithPartialReceiving(Receipt receipt) {
+        return receipt.shipment?.destination?.supports(ActivityCode.PARTIAL_RECEIVING) &&
+                receipt.shipment.receipts?.any { it.receiptStatusCode == ReceiptStatusCode.RECEIVED }
     }
 
     /**
