@@ -74,6 +74,10 @@ class PickingContractSpec extends MobileContractSpec {
         o.tote = newBin('PK-TOTE', [ActivityCode.OUTBOUND_CONTAINER.id, ActivityCode.HOLD_STOCK.id, delivery], BIN_TYPE, o.dc)
         o.staging = newBin('PK-STAGE', [ActivityCode.STAGING_LOCATION.id, ActivityCode.HOLD_STOCK.id, delivery], BIN_TYPE, o.dc)
         o.packing = newBin('PK-PACK', [ActivityCode.PACK_STOCK.id], BIN_TYPE, o.dc)
+        // A short pick moves the shorted quantity to lost and found, so the facility needs one
+        if (!Location.withNewTransaction { Location.findAllByParentLocation(Location.get(o.dc.id)).any { it.supports(ActivityCode.LOST_AND_FOUND) } }) {
+            newBin('PK-LNF', [ActivityCode.LOST_AND_FOUND.id, ActivityCode.HOLD_STOCK.id], BIN_TYPE, o.dc)
+        }
         o.product = newProduct('PK')
         String lotNumber = "LOT-${uid()}".toString()
         Date expiry = new Date() + 365

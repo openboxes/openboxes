@@ -4,6 +4,8 @@ import org.springframework.transaction.TransactionStatus
 import spock.lang.PendingFeature
 
 import org.pih.warehouse.api.regression.obaf.events.support.ObafEventsIntegrationSpec
+import org.pih.warehouse.api.regression.obaf.support.ObafTaskIntegrationSpec.PickOrder
+import org.pih.warehouse.api.regression.obaf.support.ObafTaskIntegrationSpec.PickSite
 import org.pih.warehouse.api.regression.obaf.support.ObafTaskIntegrationSpec.PutawaySite
 import org.pih.warehouse.api.regression.obaf.events.support.RecordingMailService
 import org.pih.warehouse.api.regression.support.RegressionRoleFixtures
@@ -13,6 +15,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductBarcodeUpdatedEvent
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.stockTransfer.StockTransferEvent
 
 /**
@@ -23,7 +26,9 @@ import org.pih.warehouse.stockTransfer.StockTransferEvent
  * - ProductBarcodeUpdatedEventService (a plain ApplicationListener, synchronous): a UPC change
  *   e-mails the ROLE_PRODUCT_NOTIFICATION users with the old and new UPC;
  * - PutawayDiscrepancyEventService (also a plain ApplicationListener): completing a putaway task
- *   with "cancel remaining" e-mails the ROLE_DISCREPANCY_NOTIFICATION users.
+ *   with "cancel remaining" e-mails the ROLE_DISCREPANCY_NOTIFICATION users;
+ * - PickShortageEventService (also a plain ApplicationListener): a short pick with a reason code
+ *   e-mails the ROLE_DISCREPANCY_NOTIFICATION users and the creator of the order.
  * The e-mail bodies are GSP templates rendered through the taglib, so the publishing thread has a
  * (mock) web request, as the HTTP request that publishes them in production does.
  */
@@ -187,5 +192,43 @@ class NotificationEventsIntegrationSpec extends ObafEventsIntegrationSpec {
         then:
         r.error == null
         mail.sent*.to.flatten().count { it == to } == 1
+    }
+
+    // ------------------------------------------------------------------ pick shortage
+
+    void 'a short pick with a reason code e-mails each discrepancy recipient and the order creator once; a short pick without one e-mails nobody'() {
+        given:
+        String to = notified(RoleType.ROLE_DISCREPANCY_NOTIFICATION)
+        String creatorUsername = "test-creator-${uid().toLowerCase()}".toString()
+        String creatorId = RegressionRoleFixtures.ensureUser(creatorUsername, [RoleType.ROLE_ASSISTANT], [:]).id
+        PickSite s = pickSite('NT-SHORT')
+        PickOrder o = pickOrder(s, [5])
+        tx {
+            Requisition.executeUpdate('update Requisition r set r.createdBy = :creator where r.id = :id',
+                    [creator: User.get(creatorId), id: o.requisitionId])
+        }
+        String picker = person()
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+        RecordingMailService mail = recordMail()
+
+        when:
+        Throwable partial = withWebRequest {
+            pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 2, pickedById: picker])
+        } as Throwable
+
+        then:
+        partial == null
+        mail.sent.isEmpty()
+
+        when:
+        Throwable shortage = withWebRequest {
+            pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 1,
+                                     pickedById: picker, reasonCode: 'STOCKOUT'])
+        } as Throwable
+
+        then:
+        shortage == null
+        mail.sent*.to.flatten().count { it == to } == 1
+        mail.sent*.to.flatten().count { it == "${creatorUsername}@example.com".toString() } == 1
     }
 }
