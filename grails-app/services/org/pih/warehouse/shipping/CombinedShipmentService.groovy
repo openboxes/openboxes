@@ -106,8 +106,7 @@ class CombinedShipmentService {
             }
 
             if (!line.id) {
-                def codes = lineItems.findAll { it.productCode == line.productCode }
-                if (codes.size() > 1) {
+                if (OrderItem.countByOrderAndProduct(order, product) > 1) {
                     line.errors << "Product code ${line.productCode} appears more than once on PO. Must specify order item id"
                     valid = false
                 }
@@ -164,7 +163,7 @@ class CombinedShipmentService {
                 }
                 if (qtyParsed) {
                     def linesWithSameOrderItem = lineItems.findAll { it.id && it.id == line.id ||
-                            (!it.id && it.productCode == line.productCode && it.orderId == line.orderId) }
+                            (!it.id && it.productCode == line.productCode && it.orderNumber == line.orderNumber) }
                     def qtyToShipTotal
                     if (linesWithSameOrderItem.size() > 1) {
                         linesWithSameOrderItem.each { it ->
