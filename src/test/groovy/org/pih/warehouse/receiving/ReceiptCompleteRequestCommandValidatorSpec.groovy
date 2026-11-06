@@ -129,6 +129,26 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         assert result.valid
     }
 
+    void 'doValidate should return valid: #valid for a receipt that only canceled when #scenario'() {
+        given: 'a receipt that received nothing but canceled the remaining quantity'
+        Receipt receipt = buildPendingReceipt()
+        ReceiptItem receiptItem = buildReceiptItem(receipt, false, 0)
+        receiveInto(receipt, supportedActivity)
+        receipt.shipment.receipts = new TreeSet<Receipt>([new Receipt(receiptStatusCode: previousReceiptStatus)])
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(
+                receipt: receipt,
+                itemsToComplete: [new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemainingQuantity: true)],
+        )).valid == valid
+
+        where:
+        scenario                           | supportedActivity              | previousReceiptStatus     || valid
+        "a previous receipt was received"  | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || true
+        "no previous receipt was received" | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.PENDING  || false
+        "partial receiving is off"         | ActivityCode.MANAGE_INVENTORY  | ReceiptStatusCode.RECEIVED || false
+    }
+
     void 'doValidate should reject the cancel-remaining flag on a split item'() {
         given: 'a pending receipt with an original line and a split line'
         Receipt receipt = buildPendingReceipt()
