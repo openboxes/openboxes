@@ -29,6 +29,7 @@ class UserService {
     GrailsApplication grailsApplication
     MessageLocalizer messageLocalizer
 
+    @Transactional(readOnly = true)
     User getUser(String id) {
         return User.get(id)
     }
@@ -207,6 +208,9 @@ class UserService {
         params.remove('locationRolePairs')
     }
 
+    // Role checks are read-only because taglibs call them dozens of times per page render, and the commit of
+    // a read-write transaction flushes (dirty-checks) every entity in the request's session.
+    @Transactional(readOnly = true)
     Boolean isSuperuser(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -216,6 +220,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean isUserAdmin(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -225,6 +230,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean isUserManager(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -234,6 +240,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean isUserRequestor(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -243,6 +250,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean hasHighestRole(User u, String locationId, RoleType roleType) {
         if (u) {
             def user = User.get(u.id)
@@ -253,6 +261,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean canUserBrowse(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -262,14 +271,17 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean hasAllRoles(User user, List<RoleType> roleTypes) {
         return getEffectiveRoles(user).all { Role role -> roleTypes.contains(role.roleType) }
     }
 
+    @Transactional(readOnly = true)
     Boolean hasAnyRoles(User user, List<RoleType> roleTypes) {
         return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
     }
 
+    @Transactional(readOnly = true)
     Boolean hasRoleFinance(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -279,6 +291,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean hasRolePurchaseApprover(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -288,6 +301,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean hasRoleInvoice(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -298,6 +312,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean hasRoleProductManager(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -308,6 +323,7 @@ class UserService {
         return false
     }
 
+    @Transactional(readOnly = true)
     Boolean hasRoleBrowser(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -318,6 +334,7 @@ class UserService {
     }
 
     // Checks if requestor role exist for any location - for location chooser purposes
+    @Transactional(readOnly = true)
     Boolean hasRoleRequestorInAnyLocations(User u) {
         if (u) {
             def user = User.get(u.id)
@@ -330,6 +347,7 @@ class UserService {
     /**
      * Returns true if requestingUser has permission to assign or remove targetRole.
      */
+    @Transactional(readOnly = true)
     Boolean canAddOrRemoveRole(User requestingUser, Role targetRole) {
         if (!requestingUser) {
             return false
@@ -391,6 +409,7 @@ class UserService {
         checkCanAddOrRemoveRoles(requestingUser, targetUser, before, after)
     }
 
+    @Transactional(readOnly = true)
     boolean isUserInAllRoles(String userId, Collection roleTypes, String locationId) {
         User user = User.get(userId)
         Location location = Location.get(locationId)
@@ -398,14 +417,17 @@ class UserService {
         return user.hasRoles(location, roleTypes)
     }
 
+    @Transactional(readOnly = true)
     Boolean isUserInRole(User user, RoleType roleType) {
         return isUserInRole(user.id, [roleType])
     }
 
+    @Transactional(readOnly = true)
     Boolean isUserInRole(User user, Collection roleTypes) {
         return isUserInRole(user.id, roleTypes)
     }
 
+    @Transactional(readOnly = true)
     Boolean isUserInRole(String userId, Collection roleTypes) {
         Collection acceptedRoleTypes = RoleType.expand(roleTypes)
         User user = getUser(userId)
@@ -420,6 +442,7 @@ class UserService {
      * Whether the user holds the given role, or a higher one, at the location: as a global role or as a role at
      * that location. Unlike isUserInRole, it does not depend on the location the session is logged into.
      */
+    @Transactional(readOnly = true)
     boolean isUserInRoleAtLocation(User user, Location location, RoleType roleType) {
         if (!user?.id || !location || !roleType) {
             return false
@@ -428,11 +451,13 @@ class UserService {
         return getEffectiveRoles(User.get(user.id), location).any { Role role -> acceptedRoleTypes.contains(role.roleType) }
     }
 
+    @Transactional(readOnly = true)
     boolean hasRoleFinance() {
         User user = authService.currentUser
         return hasRoleFinance(user)
     }
 
+    @Transactional(readOnly = true)
     void assertCurrentUserHasRoleFinance() {
         User user = authService.currentUser
         if (!hasRoleFinance(user)) {
@@ -581,11 +606,13 @@ class UserService {
         return users
     }
 
+    @Transactional(readOnly = true)
     public def getEffectiveRoles(User user) {
         def currentLocation = authService.currentLocation
         return getEffectiveRoles(user, currentLocation)
     }
 
+    @Transactional(readOnly = true)
     public def getEffectiveRoles(User user, Location location) {
         return user.getEffectiveRoles(location)
     }
@@ -720,6 +747,7 @@ class UserService {
         return roles
     }
 
+    @Transactional(readOnly = true)
     Boolean canUserEditPassword(User currentUser, User userToEdit) {
         currentUser?.id == userToEdit.id || isUserAdmin(currentUser)
     }

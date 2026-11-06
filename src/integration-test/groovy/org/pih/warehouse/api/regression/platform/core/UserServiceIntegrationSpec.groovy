@@ -94,4 +94,31 @@ class UserServiceIntegrationSpec extends ServiceIntegrationSpec {
         grailsApplication.config.openboxes.signup.defaultRoles = previous
     }
 
+    void 'role checks do not write unsaved changes in the session to the database'() {
+        given: 'a session with no transaction, as while a page is rendered'
+        String lastName = manager.lastName
+
+        when: 'the user is changed but not saved, and then the role checks run'
+        Map answers = User.withNewSession {
+            authService.setCurrentLocation(Location.get(depot.id))
+            try {
+                User.get(manager.id).lastName = "Changed${marker}"
+                return [
+                        manager : userService.isUserManager(manager),
+                        inRole  : userService.isUserInRole(manager, RoleType.ROLE_MANAGER),
+                        browse  : userService.canUserBrowse(manager),
+                        admin   : userService.isUserAdmin(manager),
+                        finance : userService.hasRoleFinance(manager),
+                        atDepot : userService.isUserInRoleAtLocation(manager, depot, RoleType.ROLE_MANAGER),
+                ]
+            } finally {
+                authService.setCurrentLocation(null)
+            }
+        }
+
+        then: 'the answers are right and the change was not written'
+        answers == [manager: true, inRole: true, browse: true, admin: false, finance: false, atDepot: true]
+        committed { User.get(manager.id).lastName } == lastName
+    }
+
 }

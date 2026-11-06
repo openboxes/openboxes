@@ -170,6 +170,22 @@ class InventoryServiceLogicSpec extends Specification implements ServiceUnitTest
         row.error
     }
 
+    void 'saveRecordInventoryCommand drops the gaps left by rows removed on the page'() {
+        given: 'rows 0 and 2 were submitted, so row 1 is bound as a gap'
+        RecordInventoryCommand command = new RecordInventoryCommand(product: product('p1', 'Aspirin'))
+        RecordInventoryRowCommand kept = new RecordInventoryRowCommand(lotNumber: 'L1', newQuantity: 4)
+        RecordInventoryRowCommand invalid = new RecordInventoryRowCommand(lotNumber: null, expirationDate: new Date() + 30,
+                newQuantity: 2)
+        command.recordInventoryRows.addAll([kept, null, invalid])
+
+        when:
+        service.saveRecordInventoryCommand(command, [:])
+
+        then: 'the rows the page shows again after an error have no gap either'
+        command.recordInventoryRows == [kept, invalid]
+        command.errors.globalErrors*.code == ['inventoryItem.invalid']
+    }
+
     void 'saveRecordInventoryCommand requires both lot and expiration date for a lot and expiry controlled product'() {
         given:
         Product controlled = product('p1', 'Vaccine')

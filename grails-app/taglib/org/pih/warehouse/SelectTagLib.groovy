@@ -573,6 +573,47 @@ class SelectTagLib {
         }
     }
 
+    /**
+     * A bin location field of the current facility that searches bins via the internal locations API instead of
+     * listing them all. It renders markup only (the Select2 widget is attached by the "bin-location-ajax" initializer
+     * in the custom layout), so it can be used in jQuery templates and rows that are added after the page loads.
+     * An empty value means the default bin.
+     *
+     * @attr id Required. The id of the select element. May contain jQuery template expressions.
+     * @attr name Required. The name of the select element. May contain jQuery template expressions.
+     * @attr value The id of the selected bin location
+     * @attr class Additional CSS classes for the select element
+     */
+    def selectBinLocationAjax = { attrs, body ->
+        if (!attrs.id || !attrs.name) {
+            throwTagError("Attributes [id] and [name] are required.")
+        }
+        Location currentLocation = Location.read(session?.warehouse?.id)
+        if (!currentLocation?.hasBinLocationSupport()) {
+            out << g.message(code: "default.notSupported.label")
+            out << g.hiddenField(id: attrs.id, name: attrs.name, value: attrs.value)
+            return
+        }
+
+        // A value that is a jQuery template expression is filled in on the client, so there is nothing to look up
+        String value = attrs.value as String
+        Location selected = value && !value.contains("{{") ? Location.read(value) : null
+        String selectedOption = ""
+        if (selected) {
+            String label = selected.zone ? "${selected.zone.name}: ${selected.name}" : selected.name
+            selectedOption = "<option value=\"${selected.id.encodeAsHTML()}\" selected=\"selected\">${label.encodeAsHTML()}</option>"
+        }
+
+        out << """<select id="${attrs.id.encodeAsHTML()}" name="${attrs.name.encodeAsHTML()}" class="bin-location-ajax ${(attrs['class'] ?: '').encodeAsHTML()}"
+                data-url="${request.contextPath}/api/internalLocations/search"
+                data-parent-location-id="${currentLocation.id.encodeAsHTML()}"
+                data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option').encodeAsHTML()}"
+                data-min-length="${minSearchValueLength ?: '3'}"
+                data-delay="${searchDelay ?: '300'}">
+            <option value=""></option>${selectedOption}
+        </select>"""
+    }
+
     def selectBinLocationByLocation = { attrs, body ->
         Location location = Location.get(attrs.id)
 
