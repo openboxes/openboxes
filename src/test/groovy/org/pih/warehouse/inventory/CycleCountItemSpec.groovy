@@ -8,7 +8,7 @@ import spock.lang.Specification
 
 class CycleCountItemSpec extends Specification implements DomainUnitTest<CycleCountItem> {
 
-    void 'getQuantityVariance should return #quantityVariance when quantityCounted is #quantityCounted and qoh is #qoh'() {
+    void 'getQuantityVariance should return #quantityVariance when quantityCounted is #quantityCounted and qoh is #quantityOnHand'() {
         given:
         domain.quantityCounted = quantityCounted
         domain.quantityOnHand = quantityOnHand

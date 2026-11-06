@@ -20,6 +20,7 @@ import org.pih.warehouse.inventory.CycleCountDto
 import org.pih.warehouse.inventory.CycleCountRequest
 import org.pih.warehouse.inventory.CycleCountRequestBatchCommand
 import org.pih.warehouse.inventory.CycleCountRequestCommand
+import org.pih.warehouse.inventory.CycleCountRequestMapper
 import org.pih.warehouse.inventory.CycleCountRequestStatus
 import org.pih.warehouse.inventory.CycleCountService
 import org.pih.warehouse.inventory.CycleCountStartBatchCommand
@@ -27,6 +28,7 @@ import org.pih.warehouse.inventory.CycleCountStartCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
+import org.pih.warehouse.inventory.PendingCycleCountRequestMapper
 import org.pih.warehouse.product.Product
 import org.testcontainers.shaded.com.google.common.net.HttpHeaders
 import spock.lang.Shared
@@ -57,7 +59,7 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
     void setup() {
         cycleCountService = Stub(CycleCountService) {
             createRequests(_ as CycleCountRequestBatchCommand) >> { CycleCountRequestBatchCommand cycleCountRequestBatchCommand ->
-                return cycleCountRequestBatchCommand.requests.collect { Mock(CycleCountRequest) }
+                return cycleCountRequestBatchCommand.requests.collect { new CycleCountRequest() }
             }
             startCycleCount(_ as CycleCountStartBatchCommand) >> { CycleCountStartBatchCommand cycleCountStartBatchCommand ->
                 return cycleCountStartBatchCommand.requests.collect { Mock(CycleCountDto) }
@@ -77,7 +79,11 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
 
     @Override
     List<SerializationMapper> setupSerializationMappers() {
-        return [new CycleCountCandidateMapper()]
+        return [
+                new CycleCountCandidateMapper(),
+                new PendingCycleCountRequestMapper(),
+                new CycleCountRequestMapper(),
+        ]
     }
 
     void 'getCandidates should return JSON response when format is not csv'() {
@@ -140,8 +146,8 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
     void 'getPendingCycleCountRequests should return valid JSON'() {
         given:
         Query mockQuery = Stub(Query) {
-            list() >> [Mock(PendingCycleCountRequest),
-                       Mock(PendingCycleCountRequest)]
+            list() >> [new PendingCycleCountRequest(product: new Product()),
+                       new PendingCycleCountRequest(product: new Product())]
         }
         List<PendingCycleCountRequest> mockedPendingRequests = Spy(PagedResultList, constructorArgs: [mockQuery]) {
             getTotalCount() >> mockQuery.list().size()

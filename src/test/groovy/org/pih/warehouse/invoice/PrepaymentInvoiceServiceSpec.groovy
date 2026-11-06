@@ -347,7 +347,7 @@ class PrepaymentInvoiceServiceSpec extends Specification implements ServiceUnitT
         thrown(Exception)
     }
 
-    void 'getUnitPriceToInverse should calculate unitPrice to inverse #unitPriceToInverse when unitPrice invoiced is #unitPriceInvoiced and unitPrice inverseable is #unitPriceInverseable'() {
+    void 'getUnitPriceToInverse should calculate unitPrice to inverse #unitPriceToInverse when unitPrice invoiced is #unitPriceInvoiced and unitPrice inverseable is #unitPriceInversable'() {
         when:
         BigDecimal unitPriceToInverseCalc = service.getUnitPriceToInverse(unitPriceInvoiced, unitPriceInversable)
 
