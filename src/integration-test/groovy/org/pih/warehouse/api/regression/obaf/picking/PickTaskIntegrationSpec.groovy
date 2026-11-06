@@ -371,6 +371,78 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 2, LNF: 3]
     }
 
+    void 'after a rollback the order is picked again on new picklist items, and a new shortage goes to lost and found again'() {
+        given:
+        PickSite s = pickSite('PT-SPRR')
+        PickOrder o = pickOrder(s, [5])
+        String picker = person()
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+        pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 3,
+                                 pickedById: picker, reasonCode: 'STOCKOUT'])
+        tx { pickTaskService.rollbackPickTasks(Requisition.get(o.requisitionId)) }
+
+        when: 'the order is allocated again: a new picklist item (a new pick task) without a reason code'
+        String taskId = tx {
+            Requisition r = Requisition.get(o.requisitionId)
+            PicklistItem item = new PicklistItem(requisitionItem: r.requisitionItems.first(),
+                    inventoryItem: InventoryItem.get(s.lotId), binLocation: Location.get(s.bin),
+                    quantity: 5, quantityPicked: 0, sortOrder: 0)
+            r.picklist.addToPicklistItems(item)
+            r.picklist.save(flush: true, failOnError: true)
+            r.status = RequisitionStatus.PICKING
+            r.save(flush: true, failOnError: true)
+            return item.id
+        } as String
+        pickPatch(taskId, [action: 'start', assigneeId: picker])
+        Throwable e = pickPatch(taskId, [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 3,
+                                         pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        then:
+        taskId != o.taskIds[0]
+        e == null
+        pickTask(taskId).subMap(['status', 'quantityPicked', 'reasonCode']) == [status: 'PICKED', quantityPicked: 3, reasonCode: 'STOCKOUT']
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 3, LNF: 2]
+    }
+
+    void 'a second short pick of a task already short-picked moves nothing more to lost and found'() {
+        given:
+        PickSite s = pickSite('PT-SPTW')
+        PickOrder o = pickOrder(s, [5])
+        String picker = person()
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+        pickPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 3,
+                                 pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        when:
+        Throwable e = pickPatch(o.taskIds[0], [action: 'short-pick', quantityPicked: 0, pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        then:
+        e == null
+        pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked']) == [status: 'PICKED', quantityPicked: 3]
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 3, LNF: 2]
+    }
+
+    void 'a reason code stored by the web pick page (an allocation change) does not hide a short pick: the shortage goes to lost and found'() {
+        given:
+        PickSite s = pickSite('PT-SPWEB')
+        PickOrder o = pickOrder(s, [5])
+        String picker = person()
+        tx {
+            PicklistItem item = PicklistItem.get(o.taskIds[0])
+            item.reasonCode = 'SUBSTITUTION'
+            item.save(flush: true, failOnError: true)
+        }
+        pickPatch(o.taskIds[0], [action: 'start', assigneeId: picker])
+
+        when:
+        Throwable e = pickPatch(o.taskIds[0], [action: 'short-pick', quantityPicked: 0, pickedById: picker, reasonCode: 'STOCKOUT'])
+
+        then:
+        e == null
+        tx { PicklistItem.get(o.taskIds[0]).reasonCode } == 'STOCKOUT'
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, LNF: 5]
+    }
+
     void 'short pick of zero with no reason changes nothing'() {
         given:
         PickSite s = pickSite('PT-SP00')
