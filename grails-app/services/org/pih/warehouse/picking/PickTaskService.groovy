@@ -312,13 +312,17 @@ class PickTaskService {
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
 
-        // A shortage is recorded only once (the first time a reason code is given). The stock that should have been
-        // in the bin is held in the facility's lost and found location, so it is not allocated again and Inventory
-        // can investigate it. Like putaway, refuse the shortage when the facility has no lost and found location.
         if (quantityPicked == null || quantityPicked < 0) {
             throw new IllegalArgumentException("Quantity picked must be a non-negative integer")
         }
-        boolean newShortage = reasonCode && !existingPickItem.reasonCode
+
+        // A shortage is handled once: a short pick with a reason code ends the task (PICKED or STAGED), so a new
+        // shortage is one recorded on a task that is still open. The stored reason code is not a reliable signal,
+        // because the web pick page also stores the reason for an allocation change on the picklist item.
+        // The stock that should have been in the bin is held in the facility's lost and found location, so it is
+        // not allocated again and Inventory can investigate it. Like putaway, refuse the shortage when the facility
+        // has no lost and found location.
+        boolean newShortage = reasonCode && task.status in [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         Location lostAndFound = newShortage ? findLostAndFoundLocation(task) : null
 
         if (quantityPicked > 0) {

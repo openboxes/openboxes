@@ -324,8 +324,10 @@ class NotificationService {
             emails.each { String email ->
                 mailService.sendHtmlMail(subject, body.toString(), email)
             }
-        } catch (EmailException e) {
-            log.error("Unable to send an email: " + e.message, e)
+        } catch (Exception e) {
+            // Any failure here (mail, template, message lookup) must not reach the transactional event listener:
+            // it would mark the short pick's transaction rollback-only and silently undo the pick and stock moves.
+            log.error("Unable to send the pick shortage notification: " + e.message, e)
         }
     }
 
