@@ -13,8 +13,9 @@ SELECT
         WHEN 'SERVICE' THEN 2
         WHEN 'WILL_CALL' THEN 3
         WHEN 'STOCK_TRANSFER_IBT' THEN 3
+        WHEN 'VENDOR_RETURN' THEN 3
         WHEN 'SHIP_TO' THEN 4
-        ELSE 5
+        ELSE 6
     END AS priority,
     r.requested_by_id AS requested_by_id,
     r.status AS requisition_status,
@@ -45,6 +46,7 @@ SELECT
                            WHEN 'WILL_CALL' THEN 'DELIVERY_TYPE_WILL_CALL'
                            WHEN 'STOCK_TRANSFER_IBT' THEN 'DELIVERY_TYPE_STOCK_TRANSFER_IBT'
                            WHEN 'SHIP_TO' THEN 'DELIVERY_TYPE_SHIPPING'
+                           WHEN 'VENDOR_RETURN' THEN 'DELIVERY_TYPE_VENDOR_RETURN'
                            ELSE NULL
                        END
             THEN 1 ELSE 0 END) > 0
