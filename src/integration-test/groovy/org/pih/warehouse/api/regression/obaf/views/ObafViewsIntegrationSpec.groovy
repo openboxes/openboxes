@@ -94,7 +94,7 @@ class ObafViewsIntegrationSpec extends ObafTaskIntegrationSpec {
 
         then: 'priority = DeliveryTypeCode.priority; a lane needs STAGING_LOCATION + HOLD_STOCK + the DELIVERY_TYPE activity (none for DEFAULT)'
         byType == [PICK_UP           : [1, 'STAGE-PU'], LOCAL_DELIVERY: [2, null], SERVICE: [2, null], WILL_CALL: [3, null],
-                   STOCK_TRANSFER_IBT: [3, 'STAGE'], SHIP_TO: [4, 'STAGE-SH'], DEFAULT: [5, null]]
+                   STOCK_TRANSFER_IBT: [3, 'STAGE'], SHIP_TO: [4, 'STAGE-SH'], VENDOR_RETURN: [3, null], DEFAULT: [6, null]]
         DeliveryTypeCode.values().every { byType[it.name()][0] == it.priority }
     }
 
