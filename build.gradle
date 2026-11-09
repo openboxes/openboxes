@@ -402,9 +402,7 @@ jacocoTestReport {
         html.required = true
     }
 
-    doFirst {
-        classDirectories.setFrom(files(files('build/classes/groovy/main').collect {
-            fileTree(dir: it)
-        }))
-    }
+    // Only the compiled Groovy classes (the default is all of sourceSets.main.output, resources included).
+    // Keep this out of doFirst: Gradle 8 locks the task's settings when it starts, and changing them there fails the build.
+    classDirectories.setFrom(tasks.named('compileGroovy').flatMap { it.destinationDirectory })
 }
