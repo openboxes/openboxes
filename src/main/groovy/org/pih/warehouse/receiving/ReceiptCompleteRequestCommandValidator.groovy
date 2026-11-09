@@ -97,20 +97,21 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
         }
 
         // With partial receiving, a later receipt may receive nothing and only cancel what will not arrive
-        boolean canceledOnSubsequentReceipt = command.itemsToComplete.any { it.cancelRemainingQuantity } &&
-                isSubsequentReceiptWithPartialReceiving(command.receipt)
+        boolean completableByCancelingOnly = command.itemsToComplete.any { it.cancelRemainingQuantity } &&
+                allowsCompletingByCancelingOnly(command.receipt)
 
-        return nothingReceived && !canceledOnSubsequentReceipt ?
+        return nothingReceived && !completableByCancelingOnly ?
                 rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.nothingReceived",
                         [command.receipt.receiptNumber]) :
                 null
     }
 
     /**
-     * Whether the receipt follows an already received receipt of its shipment (the one being completed is still
-     * pending, so a received one is always earlier) and its destination supports partial receiving.
+     * Canceling the remaining quantity without receiving anything is allowed only when the shipment already has a
+     * received receipt (the one being completed is still pending, so a received one is always earlier) and its
+     * destination supports partial receiving.
      */
-    private boolean isSubsequentReceiptWithPartialReceiving(Receipt receipt) {
+    private boolean allowsCompletingByCancelingOnly(Receipt receipt) {
         return receipt.shipment?.destination?.supports(ActivityCode.PARTIAL_RECEIVING) &&
                 receipt.shipment.receipts?.any { it.receiptStatusCode == ReceiptStatusCode.RECEIVED }
     }
