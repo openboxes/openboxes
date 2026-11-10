@@ -17,7 +17,8 @@
     "bundle": "vite build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "eslint": "eslint --fix --ext .js,.jsx ./src/js/"
+    "eslint": "eslint --fix --ext .js,.jsx ./src/js/",
+    "lint": "eslint --quiet --ext .js,.jsx ./src/js/"
   },
   "repository": {
     "type": "git",
