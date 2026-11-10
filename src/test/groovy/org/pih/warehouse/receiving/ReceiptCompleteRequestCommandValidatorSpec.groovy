@@ -21,8 +21,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 class ReceiptCompleteRequestCommandValidatorSpec extends Specification implements DataTest {
 
     static final String NOTHING_RECEIVED = "receiptCompleteRequestCommand.receipt.nothingReceived"
-    static final String ONLY_CANCELED_WITHOUT_PRIOR_RECEIPT =
-            "receiptCompleteRequestCommand.receipt.onlyCanceledWithoutPriorReceipt"
 
     ReceiptCompleteRequestCommandValidator validator = new ReceiptCompleteRequestCommandValidator(
             shipmentReceivingCalculator: new ShipmentReceivingCalculator())
@@ -142,7 +140,6 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
             buildReceiptItem(receipt, false, quantityReceived)
         }
         receiveInto(receipt, supportedActivity)
-        receipt.shipment.receipts = new TreeSet<Receipt>([new Receipt(receiptStatusCode: previousReceiptStatus)])
         receiptItems.eachWithIndex { ReceiptItem receiptItem, int index ->
             receiptItem.shipmentItem = buildShipmentItem(quantitiesRemaining[index])
         }
@@ -156,14 +153,13 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         )).errors*.code == errorCodes
 
         where:
-        scenario                                                          | quantitiesReceived | quantitiesRemaining | canceled | supportedActivity              | previousReceiptStatus      || errorCodes
-        "receives nothing and cancels all remaining"                      | [0]                | [4]                 | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || []
-        "receives nothing and cancels with some lines fully received"     | [0, 0]             | [0, 4]              | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || []
-        "receives some and cancels all remaining"                         | [2, 0]             | [4, 4]              | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || []
-        "receives nothing and cancels nothing"                            | [0]                | [4]                 | false    | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || [NOTHING_RECEIVED]
-        "receives nothing and cancels only lines with nothing left"       | [0]                | [0]                 | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || [NOTHING_RECEIVED]
-        "receives nothing and cancels after partial receiving turned off" | [0]                | [4]                 | true     | ActivityCode.MANAGE_INVENTORY  | ReceiptStatusCode.RECEIVED || []
-        "receives nothing and cancels with no earlier receipt received"   | [0]                | [4]                 | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.PENDING  || [ONLY_CANCELED_WITHOUT_PRIOR_RECEIPT]
+        scenario                                                          | quantitiesReceived | quantitiesRemaining | canceled | supportedActivity              || errorCodes
+        "receives nothing and cancels all remaining"                      | [0]                | [4]                 | true     | ActivityCode.PARTIAL_RECEIVING || []
+        "receives nothing and cancels with some lines fully received"     | [0, 0]             | [0, 4]              | true     | ActivityCode.PARTIAL_RECEIVING || []
+        "receives some and cancels all remaining"                         | [2, 0]             | [4, 4]              | true     | ActivityCode.PARTIAL_RECEIVING || []
+        "receives nothing and cancels nothing"                            | [0]                | [4]                 | false    | ActivityCode.PARTIAL_RECEIVING || [NOTHING_RECEIVED]
+        "receives nothing and cancels only lines with nothing left"       | [0]                | [0]                 | true     | ActivityCode.PARTIAL_RECEIVING || [NOTHING_RECEIVED]
+        "receives nothing and cancels after partial receiving turned off" | [0]                | [4]                 | true     | ActivityCode.MANAGE_INVENTORY  || []
     }
 
     void 'doValidate should reject the cancel-remaining flag on a split item'() {

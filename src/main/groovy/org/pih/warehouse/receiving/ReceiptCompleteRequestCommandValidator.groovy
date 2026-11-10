@@ -85,9 +85,9 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
     /**
      * A receipt must have received something to be completed: at least one of its lines with a quantity received
      * above zero. Completing one that received nothing would record an inbound transaction carrying no entries at
-     * all (see {@link ReceiptTransactionManager#createInboundTransaction}). The exception is a subsequent receipt
-     * that cancels some remaining quantity - it can be completed without receiving anything, even though its
-     * transaction then carries no entries.
+     * all (see {@link ReceiptTransactionManager#createInboundTransaction}). The exception is a receipt that cancels
+     * some remaining quantity - it can be completed without receiving anything, even though its transaction then
+     * carries no entries.
      */
     private ObjectError validateSomethingWasReceived(ReceiptCompleteRequestCommand command) {
         if (!command.receipt) {
@@ -103,19 +103,6 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
         boolean hasLinesWithQuantityToCancel = command.itemsToComplete.any { ReceiptItemCompleteRequest item ->
             item.cancelRemainingQuantity && item.receiptItem?.shipmentItem &&
                     shipmentReceivingCalculator.getShipmentItemQuantityRemaining(item.receiptItem.shipmentItem) > 0
-        }
-
-        // The shipment already has a received receipt (the one being completed is still pending, so a received one
-        // is always earlier)
-        boolean hasPriorReceipt = command.receipt.shipment?.receipts?.any {
-            it.receiptStatusCode == ReceiptStatusCode.RECEIVED
-        }
-
-        // A receipt that only cancels needs an earlier received receipt on the shipment
-        if (hasNoReceivedLines && hasLinesWithQuantityToCancel && !hasPriorReceipt) {
-            return rejectField("receipt", command.receipt,
-                    "receiptCompleteRequestCommand.receipt.onlyCanceledWithoutPriorReceipt",
-                    [command.receipt.receiptNumber])
         }
 
         if (hasNoReceivedLines && !hasLinesWithQuantityToCancel) {
