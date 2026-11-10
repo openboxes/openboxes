@@ -195,15 +195,43 @@ class CombinedShipmentServiceSpec extends Specification implements ServiceUnitTe
         assert line.errors*.toString().contains("Both lot number and expiry date are required for the 'P2 Product P2' product.")
     }
 
-    void 'validateItemsFromTemplateImport should fail when product code appears more than once without order item id'() {
+    void 'validateItemsFromTemplateImport should fail when product appears more than once on PO without order item id'() {
         given:
-        List<Map<String, Object>> lines = [buildLine(quantityToShip: '1'), buildLine(quantityToShip: '1')]
+        createOrderItem(order, product)
+        Map<String, Object> line = buildLine(quantityToShip: '1')
+
+        expect:
+        assert !service.validateItemsFromTemplateImport(shipment, [line])
+        assert line.errors*.toString() == ["Product code P1 appears more than once on PO. Must specify order item id"]
+    }
+
+    void 'validateItemsFromTemplateImport should pass when product appears once on PO and more than once on import without order item id'() {
+        given:
+        List<Map<String, Object>> lines = [buildLine(quantityToShip: '4'), buildLine(quantityToShip: '6')]
+
+        expect:
+        assert service.validateItemsFromTemplateImport(shipment, lines)
+        assert lines*.errors == [[], []]
+    }
+
+    void 'validateItemsFromTemplateImport should fail when total quantity of lines without order item id exceeds quantity to ship'() {
+        given:
+        List<Map<String, Object>> lines = [buildLine(quantityToShip: '6'), buildLine(quantityToShip: '6')]
 
         expect:
         assert !service.validateItemsFromTemplateImport(shipment, lines)
-        assert lines.every { line ->
-            line.errors*.toString().contains("Product code P1 appears more than once on PO. Must specify order item id")
-        }
+        assert lines.every { line -> line.errors.any { it.toString().contains("is greater than qty available to ship(10)") } }
+    }
+
+    void 'validateItemsFromTemplateImport should not sum quantities of the same product from different POs without order item id'() {
+        given:
+        Order otherOrder = createOrder('PO-2', supplier)
+        createOrderItem(otherOrder, product)
+        List<Map<String, Object>> lines = [buildLine(quantityToShip: '6'), buildLine(orderNumber: otherOrder.orderNumber, quantityToShip: '6')]
+
+        expect:
+        assert service.validateItemsFromTemplateImport(shipment, lines)
+        assert lines*.errors == [[], []]
     }
 
     void 'validateItemsFromTemplateImport should pass when product code appears more than once with order item ids'() {
