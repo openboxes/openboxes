@@ -51,7 +51,7 @@ abstract class BulkDataImportConfigurer<I extends Importable, E> implements
     abstract protected BulkDataImportExportConfig getImportExportConfig()
 
     protected BulkDataImportExportConfig.BulkDataImportExportConfigBuilder configBuilder() {
-        return BulkDataImportExportConfig.builder(getExportableType())
+        return BulkDataImportExportConfig.builder(getImportableType())
     }
 
     @Override

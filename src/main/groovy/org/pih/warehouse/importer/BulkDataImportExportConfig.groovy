@@ -1,5 +1,8 @@
 package org.pih.warehouse.importer
 
+import java.lang.reflect.Field
+import org.springframework.util.ReflectionUtils
+
 import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.parser.ParserContext
 import org.pih.warehouse.exporter.BulkDataWriterFieldConfig
@@ -15,8 +18,8 @@ class BulkDataImportExportConfig {
     private Map<String, BulkDataBinderFieldConfig> binderFieldConfigs = [:]
     private List<BulkDataWriterFieldConfig> writerFieldConfigs = []
 
-    static BulkDataImportExportConfigBuilder builder(final Class exportableType) {
-        return new BulkDataImportExportConfigBuilder(exportableType)
+    static BulkDataImportExportConfigBuilder builder(final Class importableType) {
+        return new BulkDataImportExportConfigBuilder(importableType)
     }
 
     /**
@@ -50,11 +53,11 @@ class BulkDataImportExportConfig {
 
     static class BulkDataImportExportConfigBuilder {
 
-        Class exportableType
+        Class importableType
         BulkDataImportExportConfig config
 
-        BulkDataImportExportConfigBuilder(final Class exportableType) {
-            this.exportableType = exportableType
+        BulkDataImportExportConfigBuilder(final Class importableType) {
+            this.importableType = importableType
             this.config = new BulkDataImportExportConfig()
         }
 
@@ -79,8 +82,14 @@ class BulkDataImportExportConfig {
                 binderConfig = new BulkDataBinderFieldConfig(parser: parser, parserContext: parserContext)
             }
             else {
+                Field field = ReflectionUtils.findField(importableType, fieldName)
+                if (!field) {
+                    throw new IllegalArgumentException(
+                            "No field '${fieldName}' on ${importableType.name} or its superclasses")
+                }
+
                 // We have custom data-binding handling for when the field is an enum.
-                Class fieldType = exportableType.getDeclaredField(fieldName).type
+                Class fieldType = field.type
                 binderConfig = fieldType.isEnum()
                         ? BulkDataBinderFieldConfigDefaults.buildDefaultEnumFieldConfig(fieldType)
                         : BulkDataBinderFieldConfigDefaults.DEFAULT_CONFIG
