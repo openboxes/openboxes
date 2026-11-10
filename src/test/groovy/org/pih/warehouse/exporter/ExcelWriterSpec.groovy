@@ -15,6 +15,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
@@ -41,6 +42,9 @@ class ExcelWriterSpec extends Specification {
     @Shared
     SessionManager sessionManagerStub
 
+    @Shared
+    ConfigService configServiceStub
+
     // Tests can override this to change the timezone of the requesting user.
     TimeZone userTimezone = USER_TIMEZONE
 
@@ -56,6 +60,10 @@ class ExcelWriterSpec extends Specification {
             getTimezone() >> { userTimezone }
         }
 
+        configServiceStub = Stub(ConfigService) {
+            getProperty("openboxes.export.defaultSheetName") >> "Sheet1"
+        }
+
         writer = new ExcelWriter(
                 applicationContextStub,
                 Stub(BulkDataExportComponentResolver),
@@ -63,7 +71,8 @@ class ExcelWriterSpec extends Specification {
                 new DefaultTypeFormatter(Optional.empty()),
                 new DoubleParser(),
                 MessageLocalizerStub.MESSAGE_LOCALIZER_STUB,
-                sessionManagerStub)
+                sessionManagerStub,
+                configServiceStub)
     }
 
     void cleanup() {
@@ -168,6 +177,36 @@ class ExcelWriterSpec extends Specification {
                 [1d, "A"],
                 [2d, "B"],
         ]
+    }
+
+    void "write orders fields by columnIndex for #scenario indexes"() {
+        given:
+        List<Map> toWrite = [
+                declaredIndexes.collectEntries { [(it): "value ${it}"] },
+        ]
+
+        and: "a valid config with the fields defined out of order"
+        ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
+                addHeaderRow: true,
+                fields: declaredIndexes.collect {
+                    new BulkDataWriterFieldConfig(fieldName: it, headerPlainText: it, columnIndex: it)
+                },
+        ))
+
+        when:
+        BulkDataWriterResult<Workbook> result = writer.write(toWrite, ContentType.XLS, config)
+
+        then: "columns are ordered by their numerical index, not alphabetically"
+        assert readRows(result) == [
+                expectedIndexes,
+                expectedIndexes.collect { "value ${it}" },
+        ]
+
+        where:
+        scenario    | declaredIndexes                  || expectedIndexes
+        "letter"    | ["AA", "B", "Z", "A", "AB"]      || ["A", "B", "Z", "AA", "AB"]
+        "lowercase" | ["aa", "b", "a"]                 || ["a", "b", "aa"]
+        "numeric"   | ["10", "2", "0", "1", "11"]      || ["0", "1", "2", "10", "11"]
     }
 
     void "write succeeds with a custom formatter"() {
@@ -384,6 +423,24 @@ class ExcelWriterSpec extends Specification {
         assert readRows(result) == [
                 ["String Header"],
         ]
+    }
+
+    void "write sets a custom sheet name"() {
+        given:
+        List<Map> toWrite = []
+
+        and: "a valid config"
+        ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
+                addHeaderRow: false,
+                fields: [],
+                sheetName: "OVERRIDE"
+        ))
+
+        when:
+        BulkDataWriterResult<Workbook> result = writer.write(toWrite, ContentType.XLS, config)
+
+        then:
+        assert result.result.getSheet("OVERRIDE") != null
     }
 
     void "write succeeds with an empty dataset and no header"() {
