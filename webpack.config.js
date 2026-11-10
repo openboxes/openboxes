@@ -39,6 +39,8 @@ module.exports = {
     },
     entry: {
       app: `${SRC}/index.jsx`,
+      // A standalone Sentry bundle for GSPs. See grails-app/views/common/_sentry.gsp
+      sentry: `${SRC}/sentry.js`,
     },
     output: {
       path: WEBPACK_OUTPUT,
@@ -47,7 +49,7 @@ module.exports = {
        * application context at bundle time. Instead, we rely on
        * __webpack_public_path__, specified in src/js/index.jsx, q.v.
        */
-      filename: 'bundle.[hash].js',
+      filename: (pathData) => (pathData.chunk.name === 'app' ? 'bundle.[hash].js' : 'bundle.[hash].[name].js'),
       chunkFilename: 'bundle.[hash].[name].js',
     },
     stats: {
@@ -91,7 +93,7 @@ module.exports = {
           // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
           contextPath: '\${util.ConfigHelper.contextPath}',
           // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
-          sentryConfig: '\${raw(util.ConfigHelper.sentryWebConfigJson)}',
+          sentryConfig: '\${raw(org.pih.warehouse.monitoring.SentryConfigResolver.getWebConfigJson(session.user, session.warehouse))}',
           jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
           receivingIfStatement: '',
@@ -105,7 +107,7 @@ module.exports = {
           // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
           contextPath: '\${util.ConfigHelper.contextPath}',
           // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
-          sentryConfig: '\${raw(util.ConfigHelper.sentryWebConfigJson)}',
+          sentryConfig: '\${raw(org.pih.warehouse.monitoring.SentryConfigResolver.getWebConfigJson(session.user, session.warehouse))}',
           jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
           receivingIfStatement:
@@ -114,6 +116,11 @@ module.exports = {
           'You can access the Partial Receiving feature through the details page for an inbound shipment.' +
           '</g:if>',
       }),
+    }),
+    new HtmlWebpackPlugin({
+      filename: `${COMMON_VIEW}/_sentryBundle.gsp`,
+      inject: false,
+      templateContent: ({ compilation }) => `<script src="\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.sentry.js')}" type="text/javascript"></script>`,
     }),
   ],
   module: {
