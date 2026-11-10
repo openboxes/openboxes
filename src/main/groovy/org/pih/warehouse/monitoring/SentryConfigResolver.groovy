@@ -3,6 +3,8 @@ package org.pih.warehouse.monitoring
 import grails.util.Holders
 import groovy.json.JsonOutput
 import io.sentry.Sentry
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -32,11 +34,29 @@ class SentryConfigResolver {
                 tracesSampleRate: doubleParser.parse(Holders.config.getProperty('sentry.web.tracesSampleRate')),
                 replaysSampleRate: doubleParser.parse(Holders.config.getProperty('sentry.web.replaysSampleRate')),
                 replaysErrorSampleRate: doubleParser.parse(Holders.config.getProperty('sentry.web.replaysErrorSampleRate')),
-                user: user ? [id: user.id, username: user.username] : null,
-                location: location ? [id: location.id, name: location.name] : null,
+                user: user ? [
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        locale: user.locale,
+                        timezone: user.timezone,
+
+                ] : null,
+                location: location ? [
+                        id: location.id,
+                        name: location.name
+                ] : null,
+                sessionId: getSessionId(),
         ]
         // Escape "</" so that config values can't close the <script> tag that the JSON is wrapped with.
         return JsonOutput.toJson(config).replace('</', '<\\/')
+    }
+
+    /**
+     * The id of the current HTTP session (if any).
+     */
+    private static String getSessionId() {
+        return (RequestContextHolder.requestAttributes as ServletRequestAttributes)?.request?.getSession(false)?.id
     }
 
     /**

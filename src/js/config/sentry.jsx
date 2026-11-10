@@ -76,6 +76,8 @@ const initializeSentry = () => {
   // very start of the page load. React pages will refresh these after fetching the session info.
   setSentryUser(config.user);
   setSentryLocation(config.location);
+
+  Sentry.setTag('sessionId', config.sessionId);
 };
 
 export default initializeSentry;
