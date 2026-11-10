@@ -57,4 +57,9 @@ abstract class BaseDomain implements Serializable, Identifiable, Auditable {
     static mapping = {
         id generator: 'uuid'
     }
+
+    static constraints = {
+        createdBy(nullable: true)
+        updatedBy(nullable: true)
+    }
 }
