@@ -15,10 +15,6 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.User
-import org.pih.warehouse.requisition.Requisition
 
 /**
  * Represents a plan of action for issuing items from inventory.  The

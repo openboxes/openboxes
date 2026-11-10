@@ -11,8 +11,6 @@ package org.pih.warehouse.core
 
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.product.Product
 
 class Synonym implements Serializable {
 

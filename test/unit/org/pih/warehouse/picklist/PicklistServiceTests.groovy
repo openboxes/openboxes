@@ -11,7 +11,6 @@ import org.pih.warehouse.product.*
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
-import org.pih.warehouse.product.*
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.context.ApplicationEvent
