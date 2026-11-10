@@ -2,7 +2,6 @@ package org.pih.warehouse.exporter
 
 import grails.testing.gorm.DataTest
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
-import spock.lang.PendingFeature
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -11,7 +10,7 @@ import spock.lang.Unroll
  * BulkDataWriterConfigValidatorSpec covers the validator's rules; this covers how it is hooked in.
  */
 @Unroll
-class ExcelWriterConfigValidationSpec extends Specification implements DataTest {
+class ExcelWriterConfigSpec extends Specification implements DataTest {
 
     void setupSpec() {
         // ObjectValidatable.validate() fetches the javax "defaultValidator" bean and the config's ObjectValidator
@@ -51,10 +50,6 @@ class ExcelWriterConfigValidationSpec extends Specification implements DataTest 
         assert config.validate()
     }
 
-    // Separate scope (already broken on develop): Validateable's private static findConstraintsEvaluator() is only
-    // woven into BulkDataWriterConfig, where the trait is applied, so validate() on the subclass throws a
-    // MissingMethodException. Remove @PendingFeature once fixed.
-    @PendingFeature
     void "validate rejects a CsvWriterConfig whose fields have duplicate column indexes"() {
         given:
         CsvWriterConfig config = new CsvWriterConfig(

@@ -1,9 +1,11 @@
 package org.pih.warehouse.exporter
 
+import org.pih.warehouse.core.validation.ObjectValidatable
+
 /**
  * Configuration for writing data to CSV.
  */
-class CsvWriterConfig extends BulkDataWriterConfig {
+class CsvWriterConfig extends BulkDataWriterConfig implements ObjectValidatable<BulkDataWriterConfigValidator> {
 
     private static final String DEFAULT_DELIMITER = ","
 

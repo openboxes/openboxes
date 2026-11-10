@@ -1,9 +1,11 @@
 package org.pih.warehouse.exporter
 
+import org.pih.warehouse.core.validation.ObjectValidatable
+
 /**
  * Configuration for writing data to Excel files.
  */
-class ExcelWriterConfig extends BulkDataWriterConfig {
+class ExcelWriterConfig extends BulkDataWriterConfig implements ObjectValidatable<BulkDataWriterConfigValidator> {
 
     /**
      * The default sheet name that Excel uses when you create a new file.

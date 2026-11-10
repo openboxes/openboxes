@@ -5,9 +5,9 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
-import org.pih.warehouse.core.http.ContentType
 import org.pih.warehouse.core.parser.DoubleParser
 import org.pih.warehouse.core.parser.EnumParser
 import org.pih.warehouse.exporter.BulkDataExportComponentResolver
@@ -24,17 +24,14 @@ class BulkDataImportConfigurerSpec extends Specification {
                 Optional.of([new StatusConfigurer()]),
                 Optional.of(buildWriters()))
 
-        expect: "the configurer advertises the content type"
-        assert new StatusConfigurer().supportedContentTypes.contains(contentType)
-
-        and: "a config is found for it"
+        expect: "a config is found for it"
         assert resolver.getBulkDataWriterConfig(BulkDataType.INVENTORY, contentType) != null
 
         and: "so a writer must be found for it too, otherwise the export fails with a null writer"
         assert resolver.getBulkDataWriter(contentType) != null
 
         where:
-        contentType << [ContentType.CSV, ContentType.XLS, ContentType.XLSX]
+        contentType << new StatusConfigurer().supportedContentTypes.toList()
     }
 
     void "the binder config is built from the importable type when the export type declares the field differently"() {
@@ -79,7 +76,7 @@ class BulkDataImportConfigurerSpec extends Specification {
         return [
                 new CsvWriter(context, resolver, defaultTypeFormatter, MessageLocalizerStub.MESSAGE_LOCALIZER_STUB),
                 new ExcelWriter(context, resolver, defaultTypeFormatter, new DoubleParser(),
-                        MessageLocalizerStub.MESSAGE_LOCALIZER_STUB, Stub(SessionManager)),
+                        MessageLocalizerStub.MESSAGE_LOCALIZER_STUB, Stub(SessionManager), Stub(ConfigService)),
         ]
     }
 

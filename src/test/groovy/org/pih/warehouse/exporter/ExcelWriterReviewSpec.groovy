@@ -14,6 +14,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
+import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
 import org.pih.warehouse.core.formatter.Formatter
@@ -40,7 +41,8 @@ class ExcelWriterReviewSpec extends Specification {
                 new DefaultTypeFormatter(Optional.empty()),
                 new DoubleParser(),
                 MessageLocalizerStub.MESSAGE_LOCALIZER_STUB,
-                Stub(SessionManager) { getTimezone() >> TimeZone.getDefault() })
+                Stub(SessionManager) { getTimezone() >> TimeZone.getDefault() },
+                Stub(ConfigService) { getProperty("openboxes.export.defaultSheetName") >> "Sheet1" })
     }
 
     void "write succeeds for content type XLS"() {
@@ -49,7 +51,6 @@ class ExcelWriterReviewSpec extends Specification {
     }
 
     // XLSX is not supported until we upgrade Apache POI (see the TODO in ExcelWriter.getSupportedContentTypes).
-    // The bug is that ConfiguresExcelWriter advertises XLSX anyway, which BulkDataImportConfigurerSpec covers.
     // Remove @PendingFeature once the POI upgrade adds an XLSX writer.
     @PendingFeature
     void "write succeeds for content type XLSX"() {
