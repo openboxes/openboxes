@@ -160,4 +160,71 @@ class BulkDataWriterConfigValidatorSpec extends Specification {
         assert error.defaultMessage == "All field configs must either define a unique columnIndex, or all must " +
                 "leave the field null."
     }
+
+    void "validate fails when columnIndex values #index1 and #index2 refer to the same column"() {
+        given:
+        BulkDataWriterConfig config = new CsvWriterConfig(
+                fields: [
+                        new BulkDataWriterFieldConfig(fieldName: "field1", columnIndex: index1),
+                        new BulkDataWriterFieldConfig(fieldName: "field2", columnIndex: index2),
+                ],
+        )
+
+        when:
+        ObjectValidationResult result = validator.validate(config, false)
+
+        then:
+        assert result.errors.size() == 1
+
+        FieldError error = result.errors[0] as FieldError
+        assert error.field == "fields"
+        assert error.defaultMessage == "Fields config contains duplicate columnIndex values: [${index2}]."
+
+        where:
+        index1 | index2
+        "A"    | "A"
+        "A"    | "0"
+        "a"    | "A"
+        "AA"   | "26"
+        "1"    | " 1"
+    }
+
+    void "validate succeeds with a mix of letter and numerical columnIndex values"() {
+        given:
+        BulkDataWriterConfig config = new CsvWriterConfig(
+                fields: [
+                        new BulkDataWriterFieldConfig(fieldName: "field1", columnIndex: "A"),
+                        new BulkDataWriterFieldConfig(fieldName: "field2", columnIndex: "1"),
+                        new BulkDataWriterFieldConfig(fieldName: "field3", columnIndex: "AA"),
+                ],
+        )
+
+        expect:
+        assert validator.validate(config).isValid()
+    }
+
+    void "validate fails with invalid columnIndex #columnIndex"() {
+        given:
+        BulkDataWriterConfig config = new CsvWriterConfig(
+                fields: [
+                        new BulkDataWriterFieldConfig(fieldName: "field1", columnIndex: columnIndex),
+                ],
+        )
+
+        when:
+        ObjectValidationResult result = validator.validate(config, false)
+
+        then:
+        assert result.errors.size() == 1
+
+        FieldError error = result.errors[0] as FieldError
+        assert error.field == "fields"
+        assert error.defaultMessage.startsWith("Invalid column index: '${columnIndex}'")
+
+        where:
+        columnIndex << [
+                "A1",
+                "-1",
+        ]
+    }
 }

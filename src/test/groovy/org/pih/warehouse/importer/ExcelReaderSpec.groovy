@@ -71,6 +71,47 @@ class ExcelReaderSpec extends Specification {
         5        || "苹果"         | "Special characters"
     }
 
+    void 'read should map columns using columnMapping key: #columnIndex'() {
+        given:
+        ExcelReaderConfig config = new ExcelReaderConfig(
+                sheetName: "string",
+                linesToSkip: 1,
+                columnMapping: [(columnIndex): "string"],
+        )
+
+        when:
+        BulkDataReaderResult result = reader.read(xlsFile, config)
+
+        then:
+        BulkDataCell cell = result.rows[0]["string"]
+        assert cell.value == "ABC"
+        assert cell.column == 0
+
+        where:
+        columnIndex << ["A", "a", "0", " A "]
+    }
+
+    void 'read should fail when columnMapping keys #key1 and #key2 refer to the same column'() {
+        given:
+        ExcelReaderConfig config = new ExcelReaderConfig(
+                sheetName: "string",
+                linesToSkip: 1,
+                columnMapping: [(key1): "field1", (key2): "field2"],
+        )
+
+        when:
+        reader.read(xlsFile, config)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        key1 | key2
+        "A"  | "a"
+        "A"  | "0"
+        "b"  | "1"
+    }
+
     @Ignore("The Grails plugin makes it hard to add the dependencies required to support XLSX files. Once we remove the plugin and upgrade POI, we can re-enable this test")
     void 'read should successfully import strings from xlsx file for case: #scenario'() {
         given:
@@ -248,5 +289,20 @@ class ExcelReaderSpec extends Specification {
 
         then:
         thrown(IllegalArgumentException)
+    }
+
+    void 'read should ask which sheet to use when the file has multiple sheets and no sheet name is configured'() {
+        given: "a config that leaves sheetName at its default"
+        ExcelReaderConfig config = new ExcelReaderConfig(
+                linesToSkip: 1,
+                columnMapping: ["A": "string"],
+        )
+
+        when: "reading a file whose sheets are 'string', 'numeric' and 'boolean'"
+        reader.read(xlsFile, config)
+
+        then: "the user is told to pick a sheet, not that a sheet they never named is missing"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        assert e.message.contains("multiple sheets")
     }
 }

@@ -14,12 +14,13 @@ trait ConfiguresExcelReader implements ConfiguresBulkDataReader {
 
     @Override
     BulkDataReaderConfig getBulkDataReaderConfig(ContentType contentType) {
-        // Ignore the given content type. We're an Excel writer so always return the Excel config
+        // Ignore the given content type. We're an Excel reader so always return the Excel config
         return getExcelReaderConfig()
     }
 
     @Override
-    List<ContentType> getSupportedContentTypes() {
-        return [ContentType.XLS, ContentType.XLSX]
+    Set<ContentType> getSupportedContentTypes() {
+        // TODO: Add ContentType.XLSX back in once ExcelReader supports it (see ExcelReader.getSupportedContentTypes).
+        return [ContentType.XLS]
     }
 }
