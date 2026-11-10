@@ -38,7 +38,7 @@ class SentryConfigResolver {
                         id: user.id,
                         username: user.username,
                         email: user.email,
-                        locale: user.locale,
+                        locale: user.locale?.toString(),
                         timezone: user.timezone,
 
                 ] : null,
