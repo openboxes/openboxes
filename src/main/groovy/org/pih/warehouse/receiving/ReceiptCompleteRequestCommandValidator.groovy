@@ -2,11 +2,11 @@ package org.pih.warehouse.receiving
 
 import java.time.Instant
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
@@ -15,6 +15,9 @@ import org.pih.warehouse.product.Product
 
 @Component
 class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptCompleteRequestCommand> {
+
+    @Autowired
+    ShipmentReceivingCalculator shipmentReceivingCalculator
 
     @Override
     protected ObjectValidationResult doValidate(ReceiptCompleteRequestCommand command) {
@@ -83,37 +86,44 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
      * A receipt must have received something to be completed: at least one of its lines with a quantity received
      * above zero. Completing one that received nothing would record an inbound transaction carrying no entries at
      * all (see {@link ReceiptTransactionManager#createInboundTransaction}). The exception is a subsequent receipt
-     * into a destination with partial receiving enabled that cancels some remaining quantity - it can be completed
-     * without receiving anything, even though its transaction then carries no entries.
+     * that cancels some remaining quantity - it can be completed without receiving anything, even though its
+     * transaction then carries no entries.
      */
     private ObjectError validateSomethingWasReceived(ReceiptCompleteRequestCommand command) {
         if (!command.receipt) {
             return null
         }
 
-        // The same lines the transaction credits: a null quantity received is a line that was never given one.
-        boolean nothingReceived = !(command.receipt.receiptItems ?: []).any { ReceiptItem receiptItem ->
+        // No line on this receipt has a quantity received above zero (null counts as zero)
+        boolean hasNoReceivedLines = !(command.receipt.receiptItems ?: []).any { ReceiptItem receiptItem ->
             (receiptItem.quantityReceived ?: 0) > 0
         }
 
-        // With partial receiving, a later receipt may receive nothing and only cancel what will not arrive
-        boolean completableByCancelingOnly = command.itemsToComplete.any { it.cancelRemainingQuantity } &&
-                allowsCompletingByCancelingOnly(command.receipt)
+        // The request flags at least one line to cancel that still has a remaining quantity
+        boolean hasLinesWithQuantityToCancel = command.itemsToComplete.any { ReceiptItemCompleteRequest item ->
+            item.cancelRemainingQuantity && item.receiptItem?.shipmentItem &&
+                    shipmentReceivingCalculator.getShipmentItemQuantityRemaining(item.receiptItem.shipmentItem) > 0
+        }
 
-        return nothingReceived && !completableByCancelingOnly ?
-                rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.nothingReceived",
-                        [command.receipt.receiptNumber]) :
-                null
-    }
+        // The shipment already has a received receipt (the one being completed is still pending, so a received one
+        // is always earlier)
+        boolean hasPriorReceipt = command.receipt.shipment?.receipts?.any {
+            it.receiptStatusCode == ReceiptStatusCode.RECEIVED
+        }
 
-    /**
-     * Canceling the remaining quantity without receiving anything is allowed only when the shipment already has a
-     * received receipt (the one being completed is still pending, so a received one is always earlier) and its
-     * destination supports partial receiving.
-     */
-    private boolean allowsCompletingByCancelingOnly(Receipt receipt) {
-        return receipt.shipment?.destination?.supports(ActivityCode.PARTIAL_RECEIVING) &&
-                receipt.shipment.receipts?.any { it.receiptStatusCode == ReceiptStatusCode.RECEIVED }
+        // A receipt that only cancels needs an earlier received receipt on the shipment
+        if (hasNoReceivedLines && hasLinesWithQuantityToCancel && !hasPriorReceipt) {
+            return rejectField("receipt", command.receipt,
+                    "receiptCompleteRequestCommand.receipt.onlyCanceledWithoutPriorReceipt",
+                    [command.receipt.receiptNumber])
+        }
+
+        if (hasNoReceivedLines && !hasLinesWithQuantityToCancel) {
+            return rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.nothingReceived",
+                    [command.receipt.receiptNumber])
+        }
+
+        return null
     }
 
     /**

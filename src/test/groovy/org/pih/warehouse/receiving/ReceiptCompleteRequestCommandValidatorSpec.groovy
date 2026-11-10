@@ -15,14 +15,20 @@ import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
 @Unroll
 class ReceiptCompleteRequestCommandValidatorSpec extends Specification implements DataTest {
 
-    ReceiptCompleteRequestCommandValidator validator = new ReceiptCompleteRequestCommandValidator()
+    static final String NOTHING_RECEIVED = "receiptCompleteRequestCommand.receipt.nothingReceived"
+    static final String ONLY_CANCELED_WITHOUT_PRIOR_RECEIPT =
+            "receiptCompleteRequestCommand.receipt.onlyCanceledWithoutPriorReceipt"
+
+    ReceiptCompleteRequestCommandValidator validator = new ReceiptCompleteRequestCommandValidator(
+            shipmentReceivingCalculator: new ShipmentReceivingCalculator())
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptItem, Product, Shipment, Location)
+        mockDomains(Receipt, ReceiptItem, Product, Shipment, ShipmentItem, Location)
 
         // ReceiptItemCompleteRequest implements ObjectValidatable, whose validate() performs javax validation
         // through the "defaultValidator" bean. A running app gets that bean from Boot's autoconfiguration, but
@@ -129,24 +135,35 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         assert result.valid
     }
 
-    void 'doValidate should return valid: #valid for a receipt that only canceled when #scenario'() {
-        given: 'a receipt that received nothing but canceled the remaining quantity'
+    void 'doValidate should return errors #errorCodes for a receipt that #scenario'() {
+        given: 'a receipt whose lines each still had the given quantity remaining before it'
         Receipt receipt = buildPendingReceipt()
-        ReceiptItem receiptItem = buildReceiptItem(receipt, false, 0)
+        List<ReceiptItem> receiptItems = quantitiesReceived.collect { Integer quantityReceived ->
+            buildReceiptItem(receipt, false, quantityReceived)
+        }
         receiveInto(receipt, supportedActivity)
         receipt.shipment.receipts = new TreeSet<Receipt>([new Receipt(receiptStatusCode: previousReceiptStatus)])
+        receiptItems.eachWithIndex { ReceiptItem receiptItem, int index ->
+            receiptItem.shipmentItem = buildShipmentItem(quantitiesRemaining[index])
+        }
 
         expect:
         assert validator.doValidate(new ReceiptCompleteRequestCommand(
                 receipt: receipt,
-                itemsToComplete: [new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemainingQuantity: true)],
-        )).valid == valid
+                itemsToComplete: receiptItems.collect { ReceiptItem receiptItem ->
+                    new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemainingQuantity: canceled)
+                },
+        )).errors*.code == errorCodes
 
         where:
-        scenario                           | supportedActivity              | previousReceiptStatus     || valid
-        "a previous receipt was received"  | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || true
-        "no previous receipt was received" | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.PENDING  || false
-        "partial receiving is off"         | ActivityCode.MANAGE_INVENTORY  | ReceiptStatusCode.RECEIVED || false
+        scenario                                                          | quantitiesReceived | quantitiesRemaining | canceled | supportedActivity              | previousReceiptStatus      || errorCodes
+        "receives nothing and cancels all remaining"                      | [0]                | [4]                 | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || []
+        "receives nothing and cancels with some lines fully received"     | [0, 0]             | [0, 4]              | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || []
+        "receives some and cancels all remaining"                         | [2, 0]             | [4, 4]              | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || []
+        "receives nothing and cancels nothing"                            | [0]                | [4]                 | false    | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || [NOTHING_RECEIVED]
+        "receives nothing and cancels only lines with nothing left"       | [0]                | [0]                 | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.RECEIVED || [NOTHING_RECEIVED]
+        "receives nothing and cancels after partial receiving turned off" | [0]                | [4]                 | true     | ActivityCode.MANAGE_INVENTORY  | ReceiptStatusCode.RECEIVED || []
+        "receives nothing and cancels with no earlier receipt received"   | [0]                | [4]                 | true     | ActivityCode.PARTIAL_RECEIVING | ReceiptStatusCode.PENDING  || [ONLY_CANCELED_WITHOUT_PRIOR_RECEIPT]
     }
 
     void 'doValidate should reject the cancel-remaining flag on a split item'() {
@@ -430,6 +447,17 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
                 name: "Destination",
                 supportedActivities: [supportedActivity.id] as Set,
         ))
+    }
+
+    /**
+     * A shipment item of 10 whose earlier received receipt took everything but the given quantity remaining.
+     */
+    private static ShipmentItem buildShipmentItem(Integer quantityRemaining) {
+        ReceiptItem earlierReceiptItem = new ReceiptItem(
+                receipt: new Receipt(receiptStatusCode: ReceiptStatusCode.RECEIVED),
+                quantityReceived: 10 - quantityRemaining,
+        )
+        return new ShipmentItem(quantity: 10, receiptItems: [earlierReceiptItem] as Set)
     }
 
     /**
