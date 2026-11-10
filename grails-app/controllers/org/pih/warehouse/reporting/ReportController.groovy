@@ -10,6 +10,7 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import grails.plugins.quartz.GrailsJobClassConstants
@@ -55,10 +56,24 @@ class ReportController {
     def shipmentService
     def orderService
     def userService
+    def inventoryCountService
     StdScheduler quartzScheduler
 
     def refreshProductDemand() {
         reportService.refreshProductDemandData()
+        render([success: true] as JSON)
+    }
+
+    // The refresh runs DDL, which commits on its own; the class-level transaction has nothing to add here.
+    @NotTransactional
+    def refreshInventoryCountCandidates() {
+        try {
+            inventoryCountService.refreshInventoryCountCandidates(params.table)
+        } catch (IllegalArgumentException e) {
+            response.status = 400
+            render([success: false, message: e.message] as JSON)
+            return
+        }
         render([success: true] as JSON)
     }
 
