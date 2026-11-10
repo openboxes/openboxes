@@ -315,8 +315,6 @@ class Product extends BaseDomain implements Comparable, DomainValidatable<Produc
         //dosageForm(nullable:true)
         pricePerUnit(nullable: true)
         costPerUnit(nullable: true)
-        createdBy(nullable: true)
-        updatedBy(nullable: true)
         glAccount(nullable: true)
         color(nullable: true)
         productFamily(nullable: true)
