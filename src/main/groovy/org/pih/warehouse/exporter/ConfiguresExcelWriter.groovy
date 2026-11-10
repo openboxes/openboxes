@@ -20,6 +20,7 @@ trait ConfiguresExcelWriter implements ConfiguresBulkDataWriter {
 
     @Override
     Set<ContentType> getSupportedContentTypes() {
-        return [ContentType.XLS, ContentType.XLSX]
+        // TODO: Add ContentType.XLSX back in once ExcelWriter supports it (see ExcelWriter.getSupportedContentTypes).
+        return [ContentType.XLS]
     }
 }

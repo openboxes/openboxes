@@ -20,6 +20,7 @@ trait ConfiguresExcelReader implements ConfiguresBulkDataReader {
 
     @Override
     Set<ContentType> getSupportedContentTypes() {
-        return [ContentType.XLS, ContentType.XLSX]
+        // TODO: Add ContentType.XLSX back in once ExcelReader supports it (see ExcelReader.getSupportedContentTypes).
+        return [ContentType.XLS]
     }
 }
