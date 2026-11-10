@@ -19,8 +19,8 @@ class BaseDomainSpec extends Specification implements DataTest {
     void setup() {
         GroovySpy(AuthService, global: true)
 
-        userA = new User(username: 'userA')
-        userB = new User(username: 'userB')
+        userA = new User(email: 'userA@mail.com')
+        userB = new User(email: 'userB@mail.com')
     }
 
     void 'saving a new entity should generate an id and populate the audit fields'() {
@@ -40,18 +40,21 @@ class BaseDomainSpec extends Specification implements DataTest {
     }
 
     void 'updating an existing entity should change updatedBy and lastUpdated but not createdBy or dateCreated'() {
-        given:
-        AuthService.getCurrentUser() >> userA
+        given: 'the entity is created by some user'
+        User currentUser = userA
+        AuthService.getCurrentUser() >> { currentUser }
+
         BaseDomainTestEntity entity = new BaseDomainTestEntity(name: 'test')
         entity.save(flush: true, failOnError: true)
 
         Instant originalDateCreated = entity.dateCreated
         Instant originalLastUpdated = entity.lastUpdated
 
-        AuthService.getCurrentUser() >> userB
+        and: 'a new user becomes active'
+        sleep(5)  // Ensure the lastUpdated timestamp moves forward
+        currentUser = userB
 
         when:
-        sleep(5)  // Ensure the lastUpdated timestamp moves forward
         entity.name = 'changed'
         entity.save(flush: true, failOnError: true)
 
@@ -60,6 +63,22 @@ class BaseDomainSpec extends Specification implements DataTest {
         assert entity.updatedBy == userB
         assert entity.dateCreated == originalDateCreated
         assert entity.lastUpdated.isAfter(originalLastUpdated)
+    }
+
+    void 'saving a new entity when there is no authenticated user succeeds'() {
+        given:
+        AuthService.getCurrentUser() >> null
+        BaseDomainTestEntity entity = new BaseDomainTestEntity(name: 'test')
+
+        when:
+        entity.save(flush: true, failOnError: true)
+
+        then:
+        assert entity.id != null
+        assert entity.dateCreated != null
+        assert entity.lastUpdated != null
+        assert entity.createdBy == null
+        assert entity.updatedBy == null
     }
 }
 
