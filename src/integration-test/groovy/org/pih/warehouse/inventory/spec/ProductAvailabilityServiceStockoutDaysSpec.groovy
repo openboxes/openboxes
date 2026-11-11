@@ -15,6 +15,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.report.ReportService
 
 /**
  * Tests ProductAvailabilityService.getStockoutDays, which must agree with getQuantityOnHandAtDate at the end of every
@@ -40,6 +41,9 @@ class ProductAvailabilityServiceStockoutDaysSpec extends IntegrationSpec {
 
     @Autowired
     SessionFactory sessionFactory
+
+    @Autowired
+    ReportService reportService
 
     Location facility
     Location binA
@@ -246,6 +250,121 @@ class ProductAvailabilityServiceStockoutDaysSpec extends IntegrationSpec {
         then: 'every product has transactions before the period, so every day of the period counts'
         assert stockoutDays() == expected
         assert expected.values().any { it > 0 } && expected.values().any { it < DAYS }
+    }
+
+    void 'getOutOfStockSince leaves out products that are in stock at the end of the period'() {
+        given:
+        insertTransaction(CREDIT, day(1), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(DEBIT, day(13), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(CREDIT, day(20, 3600), [transactionEntry(item: itemA1, bin: binA, quantity: 1)])
+
+        expect:
+        assert outOfStockSince() == [:]
+    }
+
+    void 'getOutOfStockSince finds the day that the current stockout started'() {
+        given: 'a product that ran out, was restocked, then ran out again'
+        insertTransaction(CREDIT, day(1), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(DEBIT, day(12), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(CREDIT, day(14), [transactionEntry(item: itemA1, bin: binA, quantity: 5)])
+        insertTransaction(DEBIT, day(16, 3600), [transactionEntry(item: itemA1, bin: binA, quantity: 3)])
+        insertTransaction(DEBIT, day(17, 3600), [transactionEntry(item: itemA1, bin: binA, quantity: 2)])
+
+        and: 'transactions that keep it out of stock, and a restock that is reversed on the same day'
+        insertTransaction(DEBIT, day(18), [transactionEntry(item: itemA1, bin: binA, quantity: 1)])
+        insertTransaction(CREDIT, day(19, 3600), [transactionEntry(item: itemA1, bin: binA, quantity: 1)])
+        insertTransaction(DEBIT, day(19, 7200), [transactionEntry(item: itemA1, bin: binA, quantity: 1)])
+
+        expect:
+        assert outOfStockSince() == [A: [since: day(17), onOrBefore: false, neverInStockDuringPeriod: false]]
+    }
+
+    void 'getOutOfStockSince returns the start of the period when the product was out of stock before it'() {
+        given:
+        insertTransaction(CREDIT, day(1), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(DEBIT, day(5), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(DEBIT, day(15), [transactionEntry(item: itemB1, bin: binA, quantity: 1)])
+
+        expect: 'B never had stock, so it has been out of stock since its first transaction'
+        assert outOfStockSince() == [A: [since: day(START), onOrBefore: true, neverInStockDuringPeriod: true], B: [since: day(15), onOrBefore: false, neverInStockDuringPeriod: true]]
+    }
+
+    void 'getStockEvents returns the opening stock, then the stock after each transaction'() {
+        given:
+        insertTransaction(CREDIT, day(1), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(DEBIT, day(13, 3600), [transactionEntry(item: itemA1, bin: binA, quantity: 4)])
+        insertTransaction(CREDIT, day(15, 3600), [transactionEntry(item: itemA2, bin: binB, quantity: 3)])
+
+        when:
+        List<Map> events = productAvailabilityService.getStockEvents(facility, productA, day(START), DAYS)
+
+        then:
+        assert events*.dayIndex == [0, 2, 4]
+        assert events*.quantityChange == [10, -4, 3]
+        assert events*.balance == [10, 6, 9]
+        assert events[0].transactionId == null
+        assert events[1].transactionId && events[2].transactionId
+    }
+
+    void 'getStockoutHistory finds each stockout, what caused it and what ended it'() {
+        given: 'stock from 20 days ago, out of stock from 10 days ago until 5 days ago'
+        Date today = new Date().clearTime()
+        insertTransaction(CREDIT, today - 20, [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(DEBIT, new Date((today - 10).time + 3600000), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(CREDIT, new Date((today - 5).time + 3600000), [transactionEntry(item: itemA1, bin: binA, quantity: 5)])
+
+        when:
+        Map history = reportService.getStockoutHistory(facility, productA, 30)
+
+        then:
+        assert history.days.size() == 30
+        assert history.days.count { it.status == "noData" } == 9
+        assert history.days.count { it.status == "outOfStock" } == 5
+        assert history.days.last().balance == 5
+
+        assert history.episodes.size() == 1
+        Map episode = history.episodes[0]
+        assert episode.start == today - 10
+        assert episode.end == today - 6
+        assert episode.days == 5
+        assert !episode.ongoing && !episode.onOrBefore
+        assert episode.startTransaction.quantityChange == -10
+        assert episode.endTransaction.quantityChange == 5
+
+        assert history.summary.stockoutDays == 5
+        assert history.summary.daysWithData == 21
+        assert history.summary.availability == Math.round(100.0 * 16 / 21)
+        assert history.summary.averageDaysToRestock == 5
+        assert history.summary.daysSinceLastStockout == 6
+        assert !history.summary.outOfStockNow
+        assert history.months*.stockoutDays.sum() == 5
+    }
+
+    void 'getStockoutHistory reports a stockout that is still going on'() {
+        given:
+        Date today = new Date().clearTime()
+        insertTransaction(CREDIT, today - 40, [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+        insertTransaction(DEBIT, new Date((today - 3).time + 3600000), [transactionEntry(item: itemA1, bin: binA, quantity: 10)])
+
+        when:
+        Map history = reportService.getStockoutHistory(facility, productA, 30)
+
+        then:
+        assert history.episodes.size() == 1
+        assert history.episodes[0].ongoing
+        assert history.episodes[0].days == 4
+        assert history.summary.outOfStockNow
+        assert history.summary.outOfStockSince == today - 3
+        assert history.summary.averageDaysToRestock == null
+    }
+
+    /**
+     * @return the current stockout of each product at the end of the period, keyed on "A" or "B"
+     */
+    private Map<String, Map> outOfStockSince(Collection<Product> products = [productA, productB]) {
+        Map<String, String> names = [(productA.id): "A", (productB.id): "B"]
+        return productAvailabilityService.getOutOfStockSince(facility, products, day(START), DAYS)
+                .collectEntries { String productId, Map stockout -> [names[productId], stockout] }
     }
 
     /**

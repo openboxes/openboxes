@@ -42,6 +42,7 @@ class InventoryItemController {
     def forecastingService
     def userService
     def productAvailabilityService
+    def reportService
     GrailsApplication grailsApplication
     InventoryItemDataService inventoryItemDataService
     StockHistoryAssembler stockHistoryAssembler
@@ -366,6 +367,23 @@ class InventoryItemController {
 
     }
 
+
+    // SPIKE (OBPIH-7375): prototype visualizations of a product's stockout history at the current location
+    def showStockoutHistory() {
+        Location location = Location.get(session.warehouse.id)
+        Product product = Product.get(params.id)
+        int days = params.int("days") ?: 365
+        Map history = reportService.getStockoutHistory(location, product, days)
+        // Dates as yyyy-MM-dd strings so the charts don't shift them by time zone
+        Map chartData = [
+                days: history.days.collect { [it.date.format("yyyy-MM-dd"), it.balance, it.received, it.issued, it.status] },
+                months: history.months,
+                episodes: history.episodes.collect { [it.start.format("yyyy-MM-dd"), it.end.format("yyyy-MM-dd")] },
+                inventoryLevel: history.inventoryLevel,
+        ]
+        render(template: "showStockoutHistory", model: [product: product, history: history, days: days,
+                                                        chartJson: (chartData as JSON).toString()])
+    }
 
     def showDocuments() {
         def productInstance = Product.get(params.id)

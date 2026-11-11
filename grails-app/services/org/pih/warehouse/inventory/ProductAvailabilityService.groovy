@@ -984,6 +984,95 @@ class ProductAvailabilityService {
     }
 
     /**
+     * Finds the day that each product that is out of stock at the end of the period (quantity on hand, summed over
+     * every inventory item and bin, of zero or less) ran out, i.e. the first day of its current stockout. See
+     * endOfDaySql for how the stock at the end of each day is calculated.
+     *
+     * We only look as far back as the start of the period, so when a product was already out of stock at the start of
+     * the period (or ran out on its first day), the stockout started on or before that day: onOrBefore is true and
+     * since is the start of the period.
+     *
+     * @param facility The location to look for stockouts at.
+     * @param products The products to look for stockouts of. If null or empty, looks at all products.
+     * @param startDate The first day of the period (from midnight).
+     * @param days The number of days in the period. Include today to take today's transactions into account.
+     * @return [since: Date, onOrBefore: boolean, neverInStockDuringPeriod: boolean] for each product that is out of
+     *         stock at the end of the period, keyed on product id. neverInStockDuringPeriod is true when the product
+     *         wasn't in stock at the end of any day of the period (it may have been in stock before the period).
+     *         Products that are in stock, or have no transactions, are left out.
+     */
+    Map<String, Map> getOutOfStockSince(Location facility, Collection<Product> products, Date startDate, int days) {
+        List<Map> rows = queryEndOfDay(facility, products, startDate, days, """
+            , last_in_stock AS (
+                SELECT e.*, MAX(CASE WHEN balance > 0 THEN day_index END) OVER (PARTITION BY product_id) AS last_in_stock_day
+                FROM end_of_day e
+            )
+            -- Every day with transactions after the last one that ended in stock ended out of stock, so the first of
+            -- them is when the current stockout started. No rows means the product is in stock.
+            SELECT product_id, MIN(day_index) AS since_day_index, MAX(last_in_stock_day) AS last_in_stock_day
+            FROM last_in_stock
+            WHERE day_index > COALESCE(last_in_stock_day, -1)
+            GROUP BY product_id
+        """, [since_day_index: StandardBasicTypes.INTEGER, last_in_stock_day: StandardBasicTypes.INTEGER])
+
+        Date start = new Date(startDate.time).clearTime()
+        return rows.collectEntries { Map row ->
+            int sinceDayIndex = row.since_day_index as int
+            [row.product_id, [
+                    since: start + sinceDayIndex,
+                    onOrBefore: sinceDayIndex == 0,
+                    neverInStockDuringPeriod: row.last_in_stock_day == null,
+            ]]
+        }
+    }
+
+    /**
+     * @return the date of the first transaction of the product at the facility, or null if it has none
+     */
+    Date getFirstTransactionDate(Location facility, Product product) {
+        if (!facility?.inventory || !product) {
+            return null
+        }
+        return sessionFactory.currentSession.createSQLQuery("""
+                SELECT MIN(t.transaction_date) AS first_transaction_date
+                FROM inventory_item ii
+                JOIN transaction_entry te ON te.inventory_item_id = ii.id
+                JOIN transaction t ON t.id = te.transaction_id
+                WHERE ii.product_id = :productId
+                AND t.inventory_id = :inventoryId
+            """)
+                .addScalar("first_transaction_date", StandardBasicTypes.TIMESTAMP)
+                .setString("productId", product.id)
+                .setString("inventoryId", facility.inventory.id)
+                .uniqueResult() as Date
+    }
+
+    /**
+     * SPIKE (OBPIH-7375): the stock of a product at a facility after each transaction in a period, for the stockout
+     * history tab. The first event (transactionId null) is the stock at the start of the period.
+     *
+     * @return [dayIndex, transactionId, quantityChange, balance] for each transaction, in order. Empty if the product
+     *         has no transactions at the facility before the end of the period.
+     */
+    List<Map> getStockEvents(Location facility, Product product, Date startDate, int days) {
+        List<Map> rows = queryEndOfDay(facility, [product], startDate, days, """
+            SELECT product_id, day_index, event_key, quantity_change, balance
+            FROM product_balances
+            ORDER BY event_key
+        """, [day_index: StandardBasicTypes.INTEGER, event_key: StandardBasicTypes.STRING,
+              quantity_change: StandardBasicTypes.INTEGER, balance: StandardBasicTypes.INTEGER])
+        return rows.collect { Map row ->
+            [
+                    dayIndex: row.day_index,
+                    // The event key is the 40 character sort key, a 0 or 1, then the transaction id
+                    transactionId: row.event_key ? row.event_key.substring(41) : null,
+                    quantityChange: row.quantity_change,
+                    balance: row.balance,
+            ]
+        }
+    }
+
+    /**
      * Runs a query on the stock of each product at the end of each day of a period that had transactions (see
      * endOfDaySql). The select follows the CTEs, so it can add more of its own (starting with a comma).
      *
