@@ -578,18 +578,16 @@ class ReportService implements ApplicationContextAware {
     }
 
 
+    /**
+     * Stockout data for the stock card, calculated from the transaction history (see
+     * ProductAvailabilityService.getStockoutDays) rather than from stockout_fact:
+     * - stockoutDays: the number of days in the given number of days before today (excluding today) that the product
+     *   was out of stock at the location (quantity on hand of zero or less at the end of the day).
+     */
     def getStockoutData(Location location, Product product, int days) {
-        String query = """
-            SELECT count(*) as stockoutDays
-            FROM stockout_fact 
-            JOIN location_dimension ON location_dimension.id = stockout_fact.location_dimension_id
-            JOIN product_dimension ON product_dimension.id = stockout_fact.product_dimension_id
-            JOIN date_dimension ON date_dimension.id = stockout_fact.date_dimension_id
-            WHERE product_id = :productId
-            AND location_id = :locationId
-            AND date BETWEEN (CURDATE() - INTERVAL :days DAY) AND NOW();
-        """
-        return dataService.executeQuery(query, [locationId:location.id,productId:product.id, days: days])
+        Date today = new Date().clearTime()
+        Integer stockoutDays = productAvailabilityService.getStockoutDays(location, [product], today - days, days)[product.id]
+        return [[stockoutDays: stockoutDays ?: 0]]
     }
 
     void createStockoutFact() {
