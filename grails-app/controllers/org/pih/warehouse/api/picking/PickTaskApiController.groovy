@@ -46,6 +46,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
         Integer offset = params.int('offset') ?: 0
 
         def tasks = pickTaskService.search(command, params)
+        pickTaskService.populateDerivedFields(tasks)
 
         render ([
                 data: tasks,
@@ -80,6 +81,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
             render (status: HttpStatus.NOT_FOUND.value(), [errorCode: 404, message: "Pick task not found"] as JSON)
             return
         }
+        pickTaskService.populateDerivedFields([task])
 
         render ([data: task.toJson()] as JSON)
     }
@@ -95,6 +97,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
         if (!task) {
             return render(status: HttpStatus.NOT_FOUND.value())
         }
+        pickTaskService.populateDerivedFields([task])
 
         render([data: task.toJson()] as JSON)
     }
@@ -113,6 +116,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
         }
 
         List<PickTask> newTasks = pickTaskService.reallocate(task, jsonBody.picklistItems as List)
+        pickTaskService.populateDerivedFields(newTasks)
 
         render([data: newTasks.collect { it.toJson() }] as JSON)
     }

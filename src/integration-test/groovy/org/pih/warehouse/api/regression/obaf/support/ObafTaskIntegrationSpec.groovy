@@ -150,6 +150,7 @@ abstract class ObafTaskIntegrationSpec extends ObafIntegrationSpec {
             if (!t) {
                 return null
             }
+            pickTaskService.populateDerivedFields([t])
             [id                 : t.id, identifier: t.identifier, status: t.status?.name(), requisitionId: t.requisition?.id,
              requisitionNumber  : t.requisitionNumber, requisitionStatus: t.requisitionStatus?.name(),
              deliveryTypeCode   : t.deliveryTypeCode?.name(), priority: t.priority, facility: t.facility?.id,
