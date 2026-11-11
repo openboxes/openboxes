@@ -17,6 +17,19 @@
     color: var(--blue-700) !important;
     padding: 8px 16px !important;
     line-height: 30px;
+
+    // Unified design: a small-caps label, clearly distinct from the
+    // clickable items beneath it. `.unified-layout &` resolves to the full
+    // selector with the body class in front, so the override is gated
+    // without repeating the nesting.
+    .unified-layout & {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gray-350) !important;
+      padding: 8px 16px 4px !important;
+      line-height: 24px;
+    }
   }
 
   .subsection-section-item {

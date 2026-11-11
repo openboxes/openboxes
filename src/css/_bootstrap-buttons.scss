@@ -1,0 +1,219 @@
+/* =========================================================================
+   Bootstrap button palette -> OpenBoxes tokens
+   -------------------------------------------------------------------------
+   The React wizard pages predate the design system and use raw Bootstrap 4
+   button classes (~290 of them: btn-outline-primary x101, outline-secondary
+   x100, outline-success x34, outline-danger x30, btn-primary x22). They
+   render in Bootstrap's stock palette — #007bff primary, #6c757d secondary —
+   which is a different blue from --blue-primary #0052CC, so a wizard's
+   Next button did not match a primary button anywhere else in the app.
+
+   This file only repaints them. It deliberately does NOT change which
+   buttons are emphasised: an outline button stays an outline button, so the
+   visual hierarchy of every wizard is exactly as its author left it. Sizing
+   and padding are left alone too — these buttons sit in dense wizard tables
+   where changing heights would move the layout around.
+
+   Loaded from main.scss, which index.jsx imports after bootstrap.css, so
+   equal-specificity rules here win on order. Bootstrap's active/disabled
+   selectors carry :not(:disabled):not(.disabled), so those are matched
+   rather than relying on order alone.
+   ========================================================================= */
+
+/* Shared shape. The compact .btn-xs keeps its own .2rem radius — that is
+   the app's documented compact variant, defined later in main.scss, and
+   it deliberately wins over this. */
+.btn {
+  border-radius: 4px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Bootstrap's focus glow is its own blue; use the app's. */
+.btn:focus,
+.btn.focus {
+  box-shadow: 0 0 0 4px rgba(1, 178, 237, 0.36);
+}
+
+/* ---- primary (filled) ------------------------------------------------- */
+
+.btn-primary {
+  background-color: var(--blue-primary);
+  border-color: var(--blue-primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: var(--blue-500);
+  border-color: var(--blue-500);
+  color: #fff;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+  background-color: var(--blue-500);
+  border-color: var(--blue-500);
+  color: #fff;
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--blue-400);
+  border-color: var(--blue-400);
+  color: #fff;
+}
+
+/* ---- primary (outline) ------------------------------------------------ */
+
+.btn-outline-primary {
+  background-color: #fff;
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--blue-100);
+  border-color: var(--blue-primary);
+  color: var(--blue-primary);
+}
+
+.btn-outline-primary:not(:disabled):not(.disabled):active,
+.btn-outline-primary:not(:disabled):not(.disabled).active,
+.show > .btn-outline-primary.dropdown-toggle {
+  background-color: var(--blue-primary);
+  border-color: var(--blue-primary);
+  color: #fff;
+}
+
+.btn-outline-primary:disabled,
+.btn-outline-primary.disabled {
+  background-color: var(--blue-300);
+  border-color: var(--blue-300);
+  color: var(--blue-400);
+}
+
+/* ---- secondary (outline) ----------------------------------------------
+   Bootstrap's is a mid-grey (#6c757d). Keep it neutral rather than
+   promoting it to the app's filled secondary, which would change the
+   emphasis this file is meant to leave alone. */
+
+.btn-outline-secondary {
+  background-color: #fff;
+  border-color: var(--gray-300);
+  color: var(--gray-600);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--blue-100);
+  border-color: var(--gray-300);
+  color: var(--blue-primary);
+}
+
+.btn-outline-secondary:not(:disabled):not(.disabled):active,
+.btn-outline-secondary:not(:disabled):not(.disabled).active,
+.show > .btn-outline-secondary.dropdown-toggle {
+  background-color: var(--blue-200);
+  border-color: var(--gray-300);
+  color: var(--blue-primary);
+}
+
+.btn-outline-secondary:disabled,
+.btn-outline-secondary.disabled {
+  background-color: #fff;
+  border-color: var(--gray-300);
+  color: var(--gray-350);
+}
+
+/* ---- success ---------------------------------------------------------- */
+
+.btn-success {
+  background-color: var(--color-green);
+  border-color: var(--color-green);
+  color: #fff;
+}
+
+.btn-success:hover,
+.btn-success:not(:disabled):not(.disabled):active {
+  background-color: var(--green-500);
+  border-color: var(--green-500);
+  color: #fff;
+}
+
+.btn-outline-success {
+  background-color: #fff;
+  border-color: var(--color-green);
+  color: var(--color-green);
+}
+
+.btn-outline-success:hover {
+  background-color: rgba(19, 173, 96, 0.08);
+  border-color: var(--color-green);
+  color: var(--color-green);
+}
+
+.btn-outline-success:not(:disabled):not(.disabled):active,
+.btn-outline-success:not(:disabled):not(.disabled).active {
+  background-color: var(--color-green);
+  border-color: var(--color-green);
+  color: #fff;
+}
+
+/* ---- danger ------------------------------------------------------------ */
+
+.btn-danger {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+  color: #fff;
+}
+
+.btn-danger:hover,
+.btn-danger:not(:disabled):not(.disabled):active {
+  background-color: var(--red-500);
+  border-color: var(--red-500);
+  color: #fff;
+}
+
+.btn-outline-danger {
+  background-color: #fff;
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--red-100);
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.btn-outline-danger:not(:disabled):not(.disabled):active,
+.btn-outline-danger:not(:disabled):not(.disabled).active {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+  color: #fff;
+}
+
+/* ---- warning ----------------------------------------------------------- */
+
+.btn-outline-warning {
+  background-color: #fff;
+  border-color: var(--color-yellow);
+  color: #8a5620;
+}
+
+.btn-outline-warning:hover {
+  background-color: rgba(243, 161, 87, 0.12);
+  border-color: var(--color-yellow);
+  color: #8a5620;
+}
+
+/* ---- link -------------------------------------------------------------- */
+
+.btn-link {
+  color: var(--blue-primary);
+  font-weight: 500;
+}
+
+.btn-link:hover {
+  color: var(--blue-500);
+}
