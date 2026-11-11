@@ -1660,8 +1660,17 @@ class JsonController {
         int days = params.int("days")?:30
         Product product = Product.get(params.product.id)
         Location location = Location.get(params.location.id)
-        def stockoutData = reportService.getStockoutData(location, product, days)
-        render stockoutData[0] as JSON
+        Map stockoutData = reportService.getStockoutData(location, product, days)[0]
+        Date outOfStockSince = stockoutData.outOfStockSince
+        if (stockoutData.neverInStock) {
+            stockoutData.outOfStockSinceLabel = g.message(code: "forecasting.outOfStockSince.never.label")
+        } else if (outOfStockSince) {
+            String date = g.formatDate(date: outOfStockSince)
+            int daysOutOfStock = new Date().clearTime() - outOfStockSince
+            stockoutData.outOfStockSinceLabel = g.message(code: "forecasting.outOfStockSince.value.label",
+                    args: [date, daysOutOfStock])
+        }
+        render stockoutData as JSON
     }
 
     def productChanged() {

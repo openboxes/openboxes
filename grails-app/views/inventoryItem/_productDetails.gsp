@@ -83,6 +83,14 @@
                         <g:message code="default.days.label" default="Days" />
                     </td>
                 </tr>
+                <tr class="prop">
+                    <td class="label">
+                        <label><warehouse:message code="forecasting.outOfStockSince.label" default="Out of Stock Since"/></label>
+                    </td>
+                    <td class="value" id="outOfStockSince">
+                        <img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/>
+                    </td>
+                </tr>
             </g:if>
             <g:set var="inventoryLevel" value="${productInstance?.getInventoryLevel(session.warehouse.id)}"/>
             <g:if test="${inventoryLevel}">
@@ -409,6 +417,7 @@
       fetchData("${request.contextPath}/json/getStockoutData", data,
         function (data) {
           $('#stockoutDays').prepend(data.stockoutDays).children().remove(".spinner")
+          $('#outOfStockSince').text(data.outOfStockSinceLabel || '${g.message(code: "forecasting.outOfStockSince.inStock.label", default: "In stock").encodeAsJavaScript()}')
         }
       )
 

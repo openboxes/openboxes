@@ -580,14 +580,164 @@ class ReportService implements ApplicationContextAware {
 
     /**
      * Stockout data for the stock card, calculated from the transaction history (see
-     * ProductAvailabilityService.getStockoutDays) rather than from stockout_fact:
+     * ProductAvailabilityService.getStockoutDays and getOutOfStockSince) rather than from stockout_fact:
      * - stockoutDays: the number of days in the given number of days before today (excluding today) that the product
      *   was out of stock at the location (quantity on hand of zero or less at the end of the day).
+     * - neverInStock: if the product has never been in stock at the location at the end of a day (including when it
+     *   has no transactions there at all).
+     * - outOfStockSince: if the product is out of stock now (including today's transactions), the day it ran out.
+     *   We look back over the product's whole history at the location, so this can be years ago.
      */
     def getStockoutData(Location location, Product product, int days) {
         Date today = new Date().clearTime()
         Integer stockoutDays = productAvailabilityService.getStockoutDays(location, [product], today - days, days)[product.id]
-        return [[stockoutDays: stockoutDays ?: 0]]
+
+        Date firstTransactionDate = productAvailabilityService.getFirstTransactionDate(location, product)
+        Map outOfStock = null
+        if (firstTransactionDate) {
+            Date start = new Date(firstTransactionDate.time).clearTime()
+            outOfStock = productAvailabilityService.getOutOfStockSince(location, [product], start, (today - start) + 1)[product.id]
+        }
+        boolean neverInStock = !firstTransactionDate || outOfStock?.neverInStockDuringPeriod
+        return [[
+                stockoutDays: stockoutDays ?: 0,
+                neverInStock: neverInStock,
+                outOfStockSince: neverInStock ? null : outOfStock?.since,
+        ]]
+    }
+
+    /**
+     * SPIKE (OBPIH-7375): the stockout history of a product at a facility over the given number of days up to and
+     * including today, for the stock card's stockout history tab. Calculated from the transaction history.
+     *
+     * @return a map with:
+     * - days: [date, balance, received, issued, status] for each day (balance is null before the first transaction)
+     * - episodes: [start, end, days, ongoing, startTransaction, endTransaction] for each run of days out of stock
+     * - months: [month, stockoutDays, daysWithData] for each month
+     * - summary: the totals shown above the charts
+     * - inventoryLevel: [min, reorder, max]
+     */
+    Map getStockoutHistory(Location location, Product product, int days) {
+        Date today = new Date().clearTime()
+        Date start = today - (days - 1)
+        List<Map> events = productAvailabilityService.getStockEvents(location, product, start, days)
+
+        def inventoryLevel = product.getInventoryLevel(location.id)
+        Integer minQuantity = inventoryLevel?.minQuantity
+        Integer reorderQuantity = inventoryLevel?.reorderQuantity
+        Integer maxQuantity = inventoryLevel?.maxQuantity
+
+        Map<String, Transaction> transactions = [:]
+        List<String> transactionIds = events*.transactionId.findAll().unique()
+        if (transactionIds) {
+            transactionIds.collate(500).each { List<String> ids ->
+                Transaction.getAll(ids).findAll().each { transactions[it.id] = it }
+            }
+        }
+        Closure describe = { Map event ->
+            Transaction transaction = event ? transactions[event.transactionId] : null
+            transaction ? [
+                    id: transaction.id,
+                    number: transaction.transactionNumber,
+                    type: transaction.transactionType?.name,
+                    date: transaction.transactionDate,
+                    quantityChange: event.quantityChange,
+                    balance: event.balance,
+            ] : null
+        }
+
+        // The events on each day, and the stock at the end of each day (carried forward over days without any)
+        Map<Integer, List<Map>> eventsByDay = events.groupBy { it.dayIndex as Integer }
+        List<Map> dailyRows = []
+        Integer balance = null
+        (0..<days).each { int dayIndex ->
+            List<Map> dayEvents = eventsByDay[dayIndex] ?: []
+            if (dayEvents) {
+                balance = dayEvents.last().balance
+            }
+            List<Map> transactionEvents = dayEvents.findAll { it.transactionId }
+            String status = balance == null ? "noData" :
+                    balance <= 0 ? "outOfStock" :
+                            (minQuantity && balance < minQuantity) ? "low" : "inStock"
+            dailyRows << [
+                    dayIndex: dayIndex,
+                    date: start + dayIndex,
+                    balance: balance,
+                    received: transactionEvents.findAll { it.quantityChange > 0 }.sum { it.quantityChange } ?: 0,
+                    issued: transactionEvents.findAll { it.quantityChange < 0 }.sum { -it.quantityChange } ?: 0,
+                    status: status,
+            ]
+        }
+
+        // Runs of days that ended out of stock
+        List<Map> episodes = []
+        Map current = null
+        dailyRows.each { Map day ->
+            if (day.status == "outOfStock") {
+                if (!current) {
+                    List<Map> dayEvents = eventsByDay[day.dayIndex] ?: []
+                    // The last transaction that day that took the stock from above zero to zero or below
+                    Map cause = null
+                    Integer previous = day.dayIndex > 0 ? dailyRows[day.dayIndex - 1].balance : null
+                    dayEvents.each { Map event ->
+                        if (event.transactionId && event.balance <= 0 && (previous == null || previous > 0)) {
+                            cause = event
+                        }
+                        previous = event.balance
+                    }
+                    current = [startIndex: day.dayIndex, start: day.date, startTransaction: describe(cause),
+                               onOrBefore: day.dayIndex == 0]
+                }
+                current.end = day.date
+                current.days = day.dayIndex - current.startIndex + 1
+            } else if (current) {
+                // The first transaction that day that took the stock above zero
+                Map restock = (eventsByDay[day.dayIndex] ?: []).find { it.transactionId && it.balance > 0 }
+                current.endTransaction = describe(restock)
+                current.ongoing = false
+                episodes << current
+                current = null
+            }
+        }
+        if (current) {
+            current.ongoing = true
+            episodes << current
+        }
+
+        // Stockout days per month
+        List<Map> months = dailyRows.findAll { it.status != "noData" }
+                .groupBy { it.date.format("yyyy-MM") }
+                .collect { String month, List<Map> rows ->
+                    [month: month, stockoutDays: rows.count { it.status == "outOfStock" }, daysWithData: rows.size()]
+                }
+
+        List<Map> rowsWithData = dailyRows.findAll { it.status != "noData" }
+        int stockoutDays = rowsWithData.count { it.status == "outOfStock" }
+        List<Map> closedEpisodes = episodes.findAll { !it.ongoing && !it.onOrBefore }
+        Map lastEpisode = episodes ? episodes.last() : null
+        Map summary = [
+                daysWithData: rowsWithData.size(),
+                stockoutDays: stockoutDays,
+                lowStockDays: rowsWithData.count { it.status == "low" },
+                availability: rowsWithData ? Math.round(100.0 * (rowsWithData.size() - stockoutDays) / rowsWithData.size()) : null,
+                episodes: episodes.size(),
+                longestEpisode: episodes ? episodes*.days.max() : 0,
+                averageDaysToRestock: closedEpisodes ? Math.round(closedEpisodes*.days.sum() / closedEpisodes.size() * 10) / 10 : null,
+                outOfStockNow: lastEpisode?.ongoing ?: false,
+                outOfStockSince: lastEpisode?.ongoing ? lastEpisode.start : null,
+                daysSinceLastStockout: lastEpisode && !lastEpisode.ongoing ? (today - lastEpisode.end) : null,
+                quantityOnHand: dailyRows ? dailyRows.last().balance : null,
+        ]
+
+        return [
+                startDate: start,
+                endDate: today,
+                days: dailyRows,
+                episodes: episodes.reverse(),
+                months: months,
+                summary: summary,
+                inventoryLevel: [min: minQuantity, reorder: reorderQuantity, max: maxQuantity],
+        ]
     }
 
     void createStockoutFact() {
