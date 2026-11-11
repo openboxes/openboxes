@@ -6,6 +6,7 @@ import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.PickStatusCode
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.auth.AuthService
@@ -50,6 +51,7 @@ class PickTaskService {
     RequisitionService requisitionService
     UserService userService
     LocationService locationService
+    def sessionFactory
 
     @Transactional(readOnly = true)
     List<PickTask> search(SearchPickTaskCommand command, Map params = [:]) {
@@ -124,6 +126,14 @@ class PickTaskService {
             order("dateCreated", "asc")
             createAlias("location", "l", CriteriaSpecification.LEFT_JOIN)
             order("l.name", "asc")
+
+            // Avoid an N+1 when PickTask.toJson() walks these for every row on the page
+            if (!command.requisitionId) {
+                // already joined via the "r" alias above when filtering by requisition
+                join("requisition")
+            }
+            join("product")
+            join("inventoryItem")
         }
 
         // PickTask is a denormalized snapshot (see the pick_task DB view), not live-linked to the stock
@@ -136,6 +146,122 @@ class PickTaskService {
         }
 
         return tasks
+    }
+
+    /**
+     * Fills the fields that used to be computed by the pick_task view for every row it scanned
+     * (order progress and suggested staging lane). Runs one grouped query for the requisitions on the
+     * page and one lane lookup per facility, instead of per row.
+     */
+    @Transactional(readOnly = true)
+    void populateDerivedFields(Collection<PickTask> tasks) {
+        List<PickTask> loaded = tasks?.findAll { it } as List<PickTask>
+        if (!loaded) {
+            return
+        }
+        populateOrderProgress(loaded)
+        populateStagingLocations(loaded)
+    }
+
+    private void populateOrderProgress(List<PickTask> tasks) {
+        List<String> requisitionIds = tasks.collect { it.requisition?.id }.findAll().unique()
+        if (!requisitionIds) {
+            return
+        }
+        String sql = """
+            SELECT pl.requisition_id,
+                   SUM(CASE WHEN NOT (COALESCE(pli.status, 'PENDING') = 'STAGED'
+                                      AND COALESCE(pli.quantity_picked, 0) = 0)
+                            THEN 1 ELSE 0 END),
+                   SUM(CASE WHEN COALESCE(pli.status, 'PENDING') NOT IN ('PICKED', 'STAGED')
+                            THEN 1 ELSE 0 END),
+                   MAX(CASE WHEN COALESCE(pli.status, 'PENDING') IN ('PICKING', 'PICKED')
+                              OR (COALESCE(pli.status, 'PENDING') = 'STAGED'
+                                  AND COALESCE(pli.quantity_picked, 0) > 0)
+                            THEN 1 ELSE 0 END)
+            FROM picklist_item pli
+                     JOIN picklist pl ON pl.id = pli.picklist_id
+            WHERE pl.requisition_id IN (:requisitionIds)
+            GROUP BY pl.requisition_id
+        """
+        List<Object[]> rows = sessionFactory.currentSession.createNativeQuery(sql)
+                .setParameterList("requisitionIds", requisitionIds)
+                .list()
+        Map<String, Object[]> progressByRequisition = rows.collectEntries { Object[] row -> [(row[0] as String): row] }
+
+        tasks.each { PickTask task ->
+            Object[] row = progressByRequisition[task.requisition?.id]
+            if (!row) {
+                return
+            }
+            Integer total = (row[1] as Number)?.intValue() ?: 0
+            Integer open = (row[2] as Number)?.intValue() ?: 0
+            boolean hasProgress = ((row[3] as Number)?.intValue() ?: 0) == 1
+            task.orderTotalTaskCount = total
+            task.orderOpenTaskCount = open
+            task.orderPickStatusCode = open == 0 ? PickStatusCode.PICKED :
+                    (hasProgress ? PickStatusCode.PARTIALLY_PICKED : PickStatusCode.NOT_PICKED)
+        }
+    }
+
+    private void populateStagingLocations(List<PickTask> tasks) {
+        tasks.groupBy { it.facility?.id }.each { String facilityId, List<PickTask> facilityTasks ->
+            if (!facilityId) {
+                return
+            }
+            Map<DeliveryTypeCode, Location> laneByDeliveryType = findStagingLanesByDeliveryType(facilityId)
+            facilityTasks.each { PickTask task ->
+                task.stagingLocation = task.deliveryTypeCode ? laneByDeliveryType[task.deliveryTypeCode] : null
+            }
+        }
+    }
+
+    /**
+     * Active child locations of the facility that support STAGING_LOCATION + HOLD_STOCK + the delivery
+     * type's activity, using effective activities (the location's own, else its location type's).
+     * Queries the base tables directly rather than location_effective_supported_activities, since that
+     * view is a UNION ALL that MySQL would materialize in full.
+     */
+    private Map<DeliveryTypeCode, Location> findStagingLanesByDeliveryType(String facilityId) {
+        List<DeliveryTypeCode> deliveryTypes = DeliveryTypeCode.values().findAll { it.activityCode }
+        List<String> activities = [ActivityCode.STAGING_LOCATION.id, ActivityCode.HOLD_STOCK.id] +
+                deliveryTypes*.activityCode*.id
+        String sql = """
+            SELECT l.id, la.supported_activities_string
+            FROM location l
+                     JOIN location_supported_activities la ON la.location_id = l.id
+            WHERE l.parent_location_id = :facilityId
+              AND l.active = true
+              AND la.supported_activities_string IN (:activities)
+            UNION ALL
+            SELECT l.id, lta.supported_activities_string
+            FROM location l
+                     JOIN location_type_supported_activities lta ON lta.location_type_id = l.location_type_id
+            WHERE l.parent_location_id = :facilityId
+              AND l.active = true
+              AND lta.supported_activities_string IN (:activities)
+              AND NOT EXISTS (SELECT 1 FROM location_supported_activities la2 WHERE la2.location_id = l.id)
+        """
+        List<Object[]> rows = sessionFactory.currentSession.createNativeQuery(sql)
+                .setParameter("facilityId", facilityId)
+                .setParameterList("activities", activities)
+                .list()
+
+        Map<String, Set<String>> activitiesByLocation = [:].withDefault { [] as Set<String> }
+        rows.each { Object[] row -> activitiesByLocation[row[0] as String] << (row[1] as String) }
+        // Sorted for a stable pick when several lanes qualify (the old view's LIMIT 1 had no ORDER BY)
+        List<String> laneIds = activitiesByLocation.findAll { String id, Set<String> acts ->
+            acts.contains(ActivityCode.STAGING_LOCATION.id) && acts.contains(ActivityCode.HOLD_STOCK.id)
+        }.keySet().sort()
+
+        Map<DeliveryTypeCode, String> laneIdByType = deliveryTypes.collectEntries { DeliveryTypeCode code ->
+            [(code): laneIds.find { activitiesByLocation[it].contains(code.activityCode.id) }]
+        }.findAll { it.value }
+        if (!laneIdByType) {
+            return [:]
+        }
+        Map<String, Location> lanes = Location.getAll(laneIdByType.values().unique()).findAll().collectEntries { [(it.id): it] }
+        return laneIdByType.collectEntries { code, id -> [(code): lanes[id]] }
     }
 
     private void annotateStockIssues(List<PickTask> tasks) {
