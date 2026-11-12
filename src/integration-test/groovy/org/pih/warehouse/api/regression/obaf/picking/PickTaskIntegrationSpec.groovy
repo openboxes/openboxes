@@ -234,7 +234,7 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         status(o.requisitionId) == RequisitionStatus.PICKED
     }
 
-    void 'short pick with a reason code at a facility without a lost and found location is refused and nothing moves'() {
+    void 'short pick with a reason code at a facility without a lost and found location records the shortage without moving the shorted quantity'() {
         given:
         PickSite s = pickSite('PT-SPNL', DeliveryTypeCode.LOCAL_DELIVERY, true, 20, false)
         PickOrder o = pickOrder(s, [5])
@@ -246,10 +246,9 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
                                                pickedById: picker, reasonCode: 'STOCKOUT'])
 
         then:
-        e instanceof IllegalStateException
-        e.message == 'No discrepancy location found'
-        pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) == [status: 'PICKING', quantityPicked: 0, reasonCode: null]
-        onHand(s.dc, s.product) == [BIN: 20, ALT: 20]
+        e == null
+        pickTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) == [status: 'PICKED', quantityPicked: 3, reasonCode: 'STOCKOUT']
+        onHand(s.dc, s.product) == [BIN: 17, ALT: 20, TOTE: 3]
     }
 
     void 'short pick with a reason code without internal transactions: nothing goes to a tote, the shorted quantity still goes to lost and found'() {

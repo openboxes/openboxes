@@ -11,7 +11,9 @@
         <strong>Quantity Requested:</strong> ${picklistItem?.quantity}<br/>
         <strong>Quantity Picked:</strong> ${picklistItem?.quantityPicked ?: 0}<br/>
         <strong>Quantity Shorted:</strong> ${picklistItem?.quantityCanceled}<br/>
-        <strong>Moved to ${lostAndFound?.name}:</strong> ${quantityMovedToLostAndFound}<br/>
+        <g:if test="${lostAndFound}">
+            <strong>Moved to ${lostAndFound.name}:</strong> ${quantityMovedToLostAndFound}<br/>
+        </g:if>
         <strong>Shortage Reason:</strong> ${picklistItem?.reasonCode}<br/>
         <strong>Reported By:</strong> ${reportedBy?.firstName} ${reportedBy?.lastName}<br/>
         <strong>Date:</strong> <g:formatDate date="${new Date()}" format="yyyy-MM-dd HH:mm:ss" />

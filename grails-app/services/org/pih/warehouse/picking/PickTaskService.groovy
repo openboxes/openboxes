@@ -320,20 +320,14 @@ class PickTaskService {
         // shortage is one recorded on a task that is still open. The stored reason code is not a reliable signal,
         // because the web pick page also stores the reason for an allocation change on the picklist item.
         // The stock that should have been in the bin is held in the facility's lost and found location, so it is
-        // not allocated again and Inventory can investigate it. Like putaway, refuse the shortage when the facility
-        // has no lost and found location.
+        // not allocated again and Inventory can investigate it. When the facility has no lost and found location,
+        // the shortage is still recorded, but nothing is moved.
         boolean newShortage = reasonCode && task.status in [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
-        Location lostAndFound = newShortage ? findLostAndFoundLocation(task) : null
 
         if (quantityPicked > 0) {
             picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
             transferToContainer(task, outboundContainer, quantityPicked)
             existingPickItem.outboundContainer = outboundContainer
-        }
-
-        Integer quantityMovedToLostAndFound = 0
-        if (newShortage) {
-            quantityMovedToLostAndFound = transferShortageToLostAndFound(task, existingPickItem, lostAndFound)
         }
 
         def isFullyPicked = task.quantityRequired.toInteger() == existingPickItem.quantityPicked
@@ -354,6 +348,8 @@ class PickTaskService {
         save(task)
 
         if (newShortage) {
+            Location lostAndFound = findLostAndFoundLocation(task)
+            Integer quantityMovedToLostAndFound = lostAndFound ? transferShortageToLostAndFound(task, existingPickItem, lostAndFound) : 0
             sendShortageNotification(existingPickItem, quantityMovedToLostAndFound, lostAndFound)
         }
 
@@ -573,7 +569,7 @@ class PickTaskService {
     private Location findLostAndFoundLocation(PickTask task) {
         Location lostAndFound = task.facility?.internalLocations?.find { it.supports(ActivityCode.LOST_AND_FOUND) }
         if (!lostAndFound) {
-            throw new IllegalStateException("No discrepancy location found")
+            log.warn("Skipping transfer to lost and found for pick task ${task.identifier}: facility ${task.facility?.name} has no lost and found location")
         }
         return lostAndFound
     }
