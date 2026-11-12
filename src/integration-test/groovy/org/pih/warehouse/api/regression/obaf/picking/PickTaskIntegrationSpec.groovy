@@ -10,8 +10,10 @@ import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picking.PickTask
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 
@@ -347,6 +349,46 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         then:
         thrown(IllegalArgumentException)
         pickTask(o.taskIds[0]) != null
+    }
+
+    void 'reallocate refuses a picklist item without an inventory item and keeps the task'() {
+        given:
+        PickSite s = pickSite('PT-RANI')
+        PickOrder o = pickOrder(s, [5])
+
+        when:
+        tx {
+            pickTaskService.reallocate(PickTask.get(o.taskIds[0]), [
+                    [inventoryItem: [id: s.lotId], binLocation: [id: s.alt], quantity: 3],
+                    [binLocation: [id: s.bin], quantity: 2],
+            ])
+        }
+
+        then:
+        IllegalArgumentException e = thrown()
+        e.message.contains('inventory item')
+        tx { PicklistItem.get(o.taskIds[0]) } != null
+    }
+
+    void 'refreshing availability tolerates an allocated picklist item without an inventory item'() {
+        given: 'a pending order with a pick that has no lot (picklist_item.inventory_item_id is nullable)'
+        PickSite s = pickSite('PT-NOII')
+        PickOrder o = pickOrder(s, [5])
+        tx {
+            Picklist picklist = Picklist.get(o.picklistId)
+            PicklistItem item = new PicklistItem(requisitionItem: RequisitionItem.get(o.requisitionItemId),
+                    binLocation: Location.get(s.alt), quantity: 2, quantityPicked: 0, sortOrder: 1)
+            item.disableRefresh = Boolean.TRUE
+            picklist.addToPicklistItems(item)
+            picklist.save(flush: true, failOnError: true)
+        }
+
+        when:
+        tx { productAvailabilityService.refreshProductsAvailability(s.dc, [s.product], true) }
+
+        then: 'the refresh completes and the pick with a lot is still allocated; the one without a lot matches no stock'
+        notThrown(Exception)
+        availability(s.dc, s.product).collectEntries { k, v -> [(k[0]): v] } == [BIN: [20, 15], ALT: [20, 20]]
     }
 
     void 'reallocate does not check the new quantities against the line (characterised)'() {
