@@ -400,6 +400,7 @@ nav:
 #   - Developer Guide:
 #     - Getting Started: developer-guide/getting-started.md
 #     - Architecture: developer-guide/architecture/index.md
+#     - Authorization: developer-guide/architecture/authorization.md
 #     - Contributing: developer-guide/contributing.md
 #     - Forking: developer-guide/syncing-a-fork.md
 #     - Tagging a Release: developer-guide/tagging.md
