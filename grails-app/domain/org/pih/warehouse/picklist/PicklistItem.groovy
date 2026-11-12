@@ -107,7 +107,9 @@ class PicklistItem implements Serializable {
     }
 
     List getAssociatedProducts() {
-        return [inventoryItem?.product?.id]
+        // A pick may have no lot yet (inventoryItem is nullable); fall back to the line's product so the
+        // refresh stays scoped to one product instead of recalculating the whole location
+        return [inventoryItem?.product?.id ?: requisitionItem?.product?.id ?: orderItem?.product?.id]
     }
 
     Boolean isPickable() {

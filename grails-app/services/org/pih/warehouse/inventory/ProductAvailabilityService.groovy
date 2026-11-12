@@ -420,7 +420,7 @@ class ProductAvailabilityService {
         // Group picked items by inventory item/bin location pair to use the advantage of O(1) for read operations of Map
         // instead of O(n) for List in the collect below (OBGM-508)
         Map<List<String>, List<AllocatedItem>> pickedItemsGrouped =
-                pickedItems.groupBy{ [it.inventoryItem.id, it.binLocation?.id ]}
+                pickedItems.groupBy{ [it.inventoryItem?.id, it.binLocation?.id ]}
         List<Map<String, Object>> binLocationsTransformed = binLocations.collect { it ->
             [
                 product          : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
