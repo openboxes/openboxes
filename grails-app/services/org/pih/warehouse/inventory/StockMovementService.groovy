@@ -2162,7 +2162,10 @@ class StockMovementService {
         }
         picklist.save(flush: true)
 
-        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [inventoryItem?.product?.id], [binLocation?.id], false)
+        // A pick may have no lot (inventoryItem is nullable); fall back to the line's product so the refresh
+        // stays scoped to one product instead of refreshing with a null product id
+        String productId = inventoryItem?.product?.id ?: requisitionItem?.product?.id
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [productId], [binLocation?.id], false)
     }
 
     void createOrUpdatePicklistItem(StockMovement stockMovement, List<PickPageItem> pickPageItems) {

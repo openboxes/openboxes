@@ -1,6 +1,7 @@
 package org.pih.warehouse.api.regression.obaf.picking
 
 import grails.validation.ValidationException
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.PendingFeature
 
 import org.pih.warehouse.api.PickTaskStatus
@@ -9,6 +10,8 @@ import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.picking.PickTask
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
@@ -23,6 +26,9 @@ import org.pih.warehouse.shipping.Shipment
  * transactions (bin -> tote on pick, tote -> staging lane on drop).
  */
 class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
+
+    @Autowired
+    StockMovementService stockMovementService
 
     // ------------------------------------------------------------------ start
 
@@ -390,6 +396,28 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         notThrown(Exception)
         availability(s.dc, s.product).findAll { k, v -> k[0] }.collectEntries { k, v -> [(k[0]): v] } ==
                 [BIN: [20, 15], ALT: [20, 20]]
+    }
+
+    void 'a pick without a lot refreshes availability for the line product, not a null product'() {
+        given:
+        PickSite s = pickSite('PT-NOIP')
+        PickOrder o = pickOrder(s, [5])
+        ProductAvailabilityService realService = stockMovementService.productAvailabilityService
+        ProductAvailabilityService refresh = Mock()
+        stockMovementService.productAvailabilityService = refresh
+
+        when:
+        try {
+            tx {
+                stockMovementService.createOrUpdatePicklistItem(RequisitionItem.get(o.requisitionItemId), null,
+                        null, Location.get(s.alt), 0, null, null, false, 2)
+            }
+        } finally {
+            stockMovementService.productAvailabilityService = realService
+        }
+
+        then:
+        1 * refresh.refreshProductsAvailability(s.dc, [s.product], [s.alt], false)
     }
 
     void 'reallocate does not check the new quantities against the line (characterised)'() {
