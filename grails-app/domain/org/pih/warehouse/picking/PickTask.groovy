@@ -33,6 +33,7 @@ class PickTask {
 
     Location location
     Location outboundContainer
+    // Suggested staging lane for the order's delivery type (transient, see below)
     Location stagingLocation
     InventoryItem inventoryItem
     BigDecimal quantityRequired = 0
@@ -55,8 +56,11 @@ class PickTask {
     // (see the pick_task DB view). Null/absent for any other search.
     Boolean hasStockIssue
 
-    static transients = ["hasStockIssue"]
-    // Order level pick progress, aggregated across the whole requisition by the pick_task view.
+    // Not backed by columns - computed for the loaded page by PickTaskService.populateDerivedFields().
+    // Kept out of the pick_task view because aggregating/correlating them per row made every query
+    // against the view materialize all open picklist items. Null until populated.
+    static transients = ["hasStockIssue", "stagingLocation", "orderTotalTaskCount", "orderOpenTaskCount", "orderPickStatusCode"]
+    // Order level pick progress, aggregated across the whole requisition.
     Integer orderTotalTaskCount
     Integer orderOpenTaskCount
     PickStatusCode orderPickStatusCode
@@ -75,7 +79,6 @@ class PickTask {
         product nullable: false
         location nullable: true
         outboundContainer nullable: true
-        stagingLocation nullable: true
         inventoryItem nullable: false
         quantityRequired nullable: false
         quantityPicked nullable: true
@@ -88,9 +91,6 @@ class PickTask {
         dateStaged nullable: true
         reasonCode nullable: true
         status nullable: false
-        orderTotalTaskCount nullable: true
-        orderOpenTaskCount nullable: true
-        orderPickStatusCode nullable: true
     }
 
     static mapping = {

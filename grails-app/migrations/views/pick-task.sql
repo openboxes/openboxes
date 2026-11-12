@@ -1,3 +1,7 @@
+-- Keep this view mergeable (no GROUP BY / derived tables / correlated subqueries) so MySQL can push
+-- the caller's WHERE / ORDER BY / LIMIT down to the base tables and use their indexes.
+-- Order level progress (order_total_task_count, order_open_task_count, order_pick_status_code) and
+-- the suggested staging_location are computed per page in PickTaskService.populateDerivedFields().
 CREATE OR REPLACE VIEW pick_task AS
 SELECT
     pli.id AS id,
@@ -26,30 +30,6 @@ SELECT
 
     pli.bin_location_id AS location_id,
     pli.outbound_container_id AS outbound_container_id,
-    (SELECT loc.id
-     FROM location loc
-     JOIN location_effective_supported_activities lesa ON lesa.location_id = loc.id
-     WHERE loc.parent_location_id = r.origin_id
-       AND loc.active = true
-     GROUP BY loc.id
-     HAVING
-         SUM(CASE WHEN lesa.supported_activities_string = 'STAGING_LOCATION' THEN 1 ELSE 0 END) > 0
-         AND
-         SUM(CASE WHEN lesa.supported_activities_string = 'HOLD_STOCK' THEN 1 ELSE 0 END) > 0
-         AND
-         SUM(CASE WHEN lesa.supported_activities_string =
-                       CASE r.delivery_type_code
-                           WHEN 'PICK_UP' THEN 'DELIVERY_TYPE_PICKUP'
-                           WHEN 'LOCAL_DELIVERY' THEN 'DELIVERY_TYPE_LOCAL_DELIVERY'
-                           WHEN 'SERVICE' THEN 'DELIVERY_TYPE_SERVICE'
-                           WHEN 'WILL_CALL' THEN 'DELIVERY_TYPE_WILL_CALL'
-                           WHEN 'STOCK_TRANSFER_IBT' THEN 'DELIVERY_TYPE_STOCK_TRANSFER_IBT'
-                           WHEN 'SHIP_TO' THEN 'DELIVERY_TYPE_SHIPPING'
-                           ELSE NULL
-                       END
-            THEN 1 ELSE 0 END) > 0
-     LIMIT 1
-    ) AS staging_location_id,
     pli.inventory_item_id AS inventory_item_id,
     pli.quantity AS quantity_required,
     pli.quantity_picked AS quantity_picked,
@@ -70,34 +50,9 @@ SELECT
     END AS status,
 
     pli.date_created AS date_created,
-    pli.last_updated AS last_updated,
-
-    CAST(progress.order_total_task_count AS SIGNED) AS order_total_task_count,
-    CAST(progress.order_open_task_count AS SIGNED) AS order_open_task_count,
-    CASE
-        WHEN progress.order_open_task_count = 0 THEN 'PICKED'
-        WHEN progress.has_pick_progress = 1 THEN 'PARTIALLY_PICKED'
-        ELSE 'NOT_PICKED'
-    END AS order_pick_status_code
+    pli.last_updated AS last_updated
 FROM picklist_item pli
          JOIN picklist pl ON pl.id = pli.picklist_id
          JOIN requisition r ON r.id = pl.requisition_id
          LEFT JOIN requisition_item ri ON ri.id = pli.requisition_item_id
-         LEFT JOIN (
-             SELECT pl.requisition_id AS requisition_id,
-                    SUM(CASE WHEN NOT (COALESCE(pli.status, 'PENDING') = 'STAGED'
-                                       AND COALESCE(pli.quantity_picked, 0) = 0)
-                             THEN 1 ELSE 0 END) AS order_total_task_count,
-                    SUM(CASE WHEN COALESCE(pli.status, 'PENDING') NOT IN ('PICKED', 'STAGED')
-                             THEN 1 ELSE 0 END) AS order_open_task_count,
-                    MAX(CASE WHEN COALESCE(pli.status, 'PENDING') IN ('PICKING', 'PICKED')
-                               OR (COALESCE(pli.status, 'PENDING') = 'STAGED'
-                                   AND COALESCE(pli.quantity_picked, 0) > 0)
-                             THEN 1 ELSE 0 END) AS has_pick_progress
-             FROM picklist_item pli
-                      JOIN picklist pl ON pl.id = pli.picklist_id
-                      JOIN requisition r ON r.id = pl.requisition_id
-             WHERE r.status IN ('PICKING', 'PICKED', 'STAGED')
-             GROUP BY pl.requisition_id
-         ) progress ON progress.requisition_id = r.id
 WHERE r.status IN ('PICKING', 'PICKED', 'STAGED');

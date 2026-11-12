@@ -54,6 +54,59 @@
         $ref: ../components/responses.yaml#/StubNoContent
       default:
         $ref: ../components/responses.yaml#/Error
+/api/outbound-orders/{id}/items/{itemId}/amend:
+  post:
+    operationId: outboundOrderApi_amend
+    summary: Amend the quantity of an outbound order line
+    description: >-
+      Changes the requested quantity of an outbound order line after allocation, picking or
+      staging, adjusting the existing pick task instead of creating a new one (OBLS-1046).
+    tags:
+    - Outbound Order
+    x-doc-status: curated
+    x-openboxes-controller: outboundOrderApi
+    x-openboxes-action: amend
+    x-openboxes-source: explicit
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: Outbound order (requisition) id
+      schema:
+        type: string
+    - name: itemId
+      in: path
+      required: true
+      description: Outbound order line (requisition item) id
+      schema:
+        type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              quantity:
+                type: integer
+                description: New quantity for the line
+              reasonCode:
+                type: string
+                description: Reason code recorded for the change
+              crossDock:
+                type: boolean
+                description: Whether an increase may be sourced by cross-dock
+              strategies:
+                type: array
+                description: Allocation source strategies to use for an increase; unknown values are ignored
+                items:
+                  type: string
+                  enum: [STORAGE_FIRST, DISPLAY_FIRST, STORAGE_ONLY, DISPLAY_ONLY]
+    responses:
+      '200':
+        $ref: ../components/responses.yaml#/StubSuccess
+      default:
+        $ref: ../components/responses.yaml#/Error
 /api/outboundOrders/{id}:
   get:
     operationId: outboundOrderApi_read_get
