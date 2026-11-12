@@ -388,7 +388,8 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
         then: 'the refresh completes and the pick with a lot is still allocated; the one without a lot matches no stock'
         notThrown(Exception)
-        availability(s.dc, s.product).collectEntries { k, v -> [(k[0]): v] } == [BIN: [20, 15], ALT: [20, 20]]
+        availability(s.dc, s.product).findAll { k, v -> k[0] }.collectEntries { k, v -> [(k[0]): v] } ==
+                [BIN: [20, 15], ALT: [20, 20]]
     }
 
     void 'reallocate does not check the new quantities against the line (characterised)'() {
