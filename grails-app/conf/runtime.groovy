@@ -124,6 +124,10 @@ openboxes.security.rbac.rules = [
     [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
     [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
     [controller: 'user', actions: ['changePassword'], accessRules: [ minimumRequiredRole: RoleType.ROLE_AUTHENTICATED]],
+
+    // Facility-scoped API rules. "locationParam" names the request param that holds the facility id, and
+    // the user's roles are checked at THAT facility instead of the session location.
+    [controller: 'productAvailabilityApi', actions: ['list'], accessRules: [ minimumRequiredRole: RoleType.ROLE_BROWSER, locationParam: 'facilityId']],
     // Other controller actions that might need explicit rules
     //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]

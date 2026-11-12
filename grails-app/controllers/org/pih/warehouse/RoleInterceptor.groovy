@@ -1,5 +1,7 @@
 package org.pih.warehouse
 
+import org.pih.warehouse.core.AuthorizationService
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 
 /**
@@ -13,6 +15,7 @@ import org.pih.warehouse.core.RoleType
  * */
 class RoleInterceptor {
     def userService
+    AuthorizationService authorizationService
 
     // this interceptor depends on SecurityInterceptor
     int order = LOWEST_PRECEDENCE
@@ -122,20 +125,17 @@ class RoleInterceptor {
 
             Boolean isAnonymous = minimumRequiredRole == RoleType.ROLE_ANONYMOUS
 
-            Boolean isMinimumRequiredRole = true
-            if (session.user && minimumRequiredRole) {
-                isMinimumRequiredRole = userService.isUserInRole(session.user, minimumRequiredRole)
-            }
+            // Roles are evaluated at the location the request acts on. If the rule names a request
+            // param (e.g. the facilityId path variable), that location is used instead of the session
+            // location, so a user can't read or write a facility they hold no role at just by putting
+            // its id in the URL.
+            Location location = resolveLocation(rule.accessRules?.locationParam as String)
 
-            Boolean isUserInRole = true
-            if (session.user && supplementalRoles.size() > 0) {
-                isUserInRole = userService.isUserInRole(session.user, supplementalRoles)
-            }
-
-            if (isAnonymous || (session.user && isMinimumRequiredRole && isUserInRole)) {
-                log.debug "User has access to ${controllerName}.${actionName}"
+            if (isAnonymous || authorizationService.hasRole(session.user, location, minimumRequiredRole, supplementalRoles)) {
+                log.debug "User has access to ${controllerName}.${actionName} at location ${location?.id}"
                 return true
             }
+            log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${location?.id}")
             redirect(controller: "errors", action: "handleForbidden")
             return false
         }
@@ -163,6 +163,19 @@ class RoleInterceptor {
             return false
         }
         return true
+    }
+
+    /**
+     * @param locationParam name of the request param holding the target location id, or null to use the
+     *        session location. A param that is present but blank or unknown resolves to null, which means
+     *        only the user's global roles are considered.
+     */
+    private Location resolveLocation(String locationParam) {
+        if (!locationParam) {
+            return session.warehouse
+        }
+        String locationId = params[locationParam]
+        return locationId ? Location.get(locationId) : null
     }
 
     static Boolean needSuperuser(controllerName, actionName) {
