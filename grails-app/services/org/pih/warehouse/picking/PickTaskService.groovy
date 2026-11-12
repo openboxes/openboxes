@@ -132,8 +132,11 @@ class PickTaskService {
                 // already joined via the "r" alias above when filtering by requisition
                 join("requisition")
             }
-            join("product")
-            join("inventoryItem")
+            // product and inventoryItem are mapped non-nullable on PickTask, so join() would make
+            // Hibernate use an INNER JOIN and silently drop tasks without them (e.g. a reallocated
+            // picklist item with no lot). Explicit LEFT JOIN aliases fetch them and keep those rows.
+            createAlias("product", "p", CriteriaSpecification.LEFT_JOIN)
+            createAlias("inventoryItem", "ii", CriteriaSpecification.LEFT_JOIN)
         }
 
         // PickTask is a denormalized snapshot (see the pick_task DB view), not live-linked to the stock

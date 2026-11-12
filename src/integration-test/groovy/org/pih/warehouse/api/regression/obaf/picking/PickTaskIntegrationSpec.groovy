@@ -547,6 +547,21 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         search(s.dc, [excludeAssignedRequisitions: true]) as Set == (a.taskIds + c.taskIds) as Set
     }
 
+    void 'search: a task without an inventory item (e.g. reallocated with no lot) is still listed'() {
+        given:
+        PickSite s = pickSite('PT-SN')
+        PickOrder o = pickOrder(s, [1, 1])
+        tx {
+            PicklistItem item = PicklistItem.get(o.taskIds[1])
+            item.inventoryItem = null
+            item.save(flush: true, failOnError: true)
+        }
+
+        expect:
+        search(s.dc) as Set == o.taskIds as Set
+        search(s.dc, [requisitionId: o.requisitionId]) as Set == o.taskIds as Set
+    }
+
     void 'search: a PICKED-only search flags tasks whose picked stock is no longer in the tote'() {
         given:
         PickSite s = pickSite('PT-SI')
