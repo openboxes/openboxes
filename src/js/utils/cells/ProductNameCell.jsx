@@ -14,7 +14,7 @@ import 'utils/cells/ProductNameCell.scss';
  * Given maxLines, cutting the name down to them, so the name ends with ellipsis.
  */
 const ProductNameCell = React.memo(({
-  product, label, defaultLabel, className, showHandlingIcons, maxLines,
+  product = null, label, defaultLabel, className = '', showHandlingIcons = false, maxLines,
 }) => {
   const translate = useTranslate();
   const textRef = useRef(null);

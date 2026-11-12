@@ -1,19 +1,35 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`ButtonField component is correctly rendering component label 1`] = `
-<button
-  className="text-truncate btn btn-xs btn-outline-primary"
-  type="button"
->
-  <span>
-    test label
-  </span>
-</button>
+<DocumentFragment>
+  <button
+    class="text-truncate btn btn-xs btn-outline-primary"
+    type="button"
+  >
+    <span>
+      test label
+    </span>
+  </button>
+</DocumentFragment>
 `;
 
 exports[`ButtonField component is correctly rendering string label 1`] = `
-<button
-  className="text-truncate btn btn-xs btn-outline-primary"
-  type="button"
-/>
+<DocumentFragment>
+  <button
+    class="text-truncate btn btn-xs btn-outline-primary"
+    type="button"
+  >
+    <div
+      class=""
+      role="tooltip"
+    >
+      <div
+        class="flex items-center w-100"
+        data-tooltip-id="_r_0_"
+      >
+         button label
+      </div>
+    </div>
+  </button>
+</DocumentFragment>
 `;

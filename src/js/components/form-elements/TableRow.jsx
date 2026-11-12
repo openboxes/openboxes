@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
 
 import { renderFormField } from 'utils/form-utils';
 import RowSaveIndicator from 'utils/RowSaveIndicator';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 class TableRow extends Component {
   shouldComponentUpdate(nextProps) {
@@ -87,13 +87,7 @@ class TableRow extends Component {
     return (
       <div {...dynamicRowAttr} className={className} role="row">
         {tooltip && (
-          <Tooltip
-            title={tooltip}
-            theme="transparent"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          >
+          <CustomTooltip content={tooltip}>
             <div className="d-flex flex-row border-bottom table-inner-row">
               {properties.isAutosaveEnabled
                 && <RowSaveIndicator lineItemSaveStatus={rowValues.rowSaveStatus} />}
@@ -102,7 +96,7 @@ class TableRow extends Component {
                 removeRow, index, rowValues, rowRef,
               )}
             </div>
-          </Tooltip>
+          </CustomTooltip>
         )}
         {!tooltip && (
           <div className="d-flex flex-row border-bottom table-inner-row">

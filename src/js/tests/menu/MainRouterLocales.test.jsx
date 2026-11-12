@@ -9,7 +9,10 @@ import MainRouter from '../../MainRouter';
 
 jest.mock('components/Router', () => () => null);
 jest.mock('actions', () => ({}));
-jest.mock('react-redux/es/connect/connect', () => () => (component) => component);
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  connect: () => (component) => component,
+}));
 jest.mock('react-localize-redux', () => ({
   ...jest.requireActual('react-localize-redux'),
   withLocalize: (component) => component,

@@ -2,14 +2,14 @@ import { useLayoutEffect, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import useQueryParams from 'hooks/useQueryParams';
 import useScrollbar from 'hooks/useScrollbar';
 
 const useWizard = ({ initialKey, steps }) => {
   const parsedQueryParams = useQueryParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   /**
@@ -32,10 +32,9 @@ const useWizard = ({ initialKey, steps }) => {
 
     // Now we check if we passed a pathId and if it's different from the last segment
     // of the current path to avoid duplicating the id in the URL.
-    const targetPath =
-      pathId && lastSegment !== pathId ? `${trimmedPath}/${pathId}` : currentPath;
+    const targetPath = pathId && lastSegment !== pathId ? `${trimmedPath}/${pathId}` : currentPath;
 
-    history.push(
+    navigate(
       queryString.stringifyUrl(
         {
           url: targetPath,

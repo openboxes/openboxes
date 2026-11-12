@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
+
+import PortalTooltip from 'wrappers/PortalTooltip';
 
 const NavbarIcon = ({ tooltip, component, name }) => {
   const [isTooltipDisabled, setIsTooltipDisabled] = useState(false);
+  const tooltipId = `tooltip-${name}`;
 
   return (
-    <Tooltip
-      html={<div className="custom-tooltip">{tooltip}</div>}
-      theme="transparent"
-      disabled={isTooltipDisabled}
-    >
-      <div data-testid="navbar-icon" aria-label={name}>
+    <>
+      <div
+        data-testid="navbar-icon"
+        aria-label={name}
+        data-tooltip-id={isTooltipDisabled ? undefined : tooltipId}
+        data-tooltip-content={tooltip}
+      >
         {component({ setIsTooltipDisabled })}
       </div>
-    </Tooltip>
+      <PortalTooltip
+        id={tooltipId}
+        content={tooltip}
+        className="custom-tooltip"
+        place="bottom"
+      />
+    </>
   );
 };
 

@@ -4,15 +4,15 @@ import PropTypes from 'prop-types';
 import { Controller, useWatch } from 'react-hook-form';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
 import { FormErrorPropType } from 'utils/propTypes';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const DefaultPreferenceType = ({
   control,
@@ -93,14 +93,14 @@ const DefaultPreferenceType = ({
             name="defaultPreferenceType.validityStartDate"
             control={control}
             render={({ field }) => (
-              <DateField
+              <DateFieldDateFns
                 title={{
                   id: 'react.productSupplier.form.validFrom.title',
                   defaultMessage: 'Valid From',
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  default: 'Select a date',
+                  defaultMessage: 'Select a date',
                 }}
                 errorMessage={errors.validityStartDate?.message}
                 {...field}
@@ -117,14 +117,14 @@ const DefaultPreferenceType = ({
             name="defaultPreferenceType.validityEndDate"
             control={control}
             render={({ field }) => (
-              <DateField
+              <DateFieldDateFns
                 title={{
                   id: 'react.productSupplier.form.validUntil.title',
                   defaultMessage: 'Valid Until',
                 }}
                 placeholder={{
                   id: 'react.default.dateInput.placeholder.label',
-                  default: 'Select a date',
+                  defaultMessage: 'Select a date',
                 }}
                 errorMessage={errors.validityEndDate?.message}
                 {...field}
@@ -161,9 +161,9 @@ const DefaultPreferenceType = ({
           />
         </div>
         <div className="p-2 d-flex align-items-center">
-          <Tooltip
+          <CustomTooltip
             className="d-flex align-items-center"
-            html={(
+            content={(
               <span className="p-1">
                 <Translate
                   id="react.productSupplier.form.deleteGlobalPreference"
@@ -176,7 +176,7 @@ const DefaultPreferenceType = ({
               onClick={() => !isPreferenceTypeEmpty && openConfirmationModal()}
               className={`preference-type-bin ${isPreferenceTypeEmpty ? 'disabled' : 'active'}`}
             />
-          </Tooltip>
+          </CustomTooltip>
         </div>
       </div>
     </Subsection>

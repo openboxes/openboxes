@@ -1,81 +1,80 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`menu component should match snapshot 1`] = `
-<div
-  className="menu-wrapper"
-  id="navbarSupportedContent"
->
-  <ul
-    className="d-flex align-items-center navbar-nav mr-auto flex-wrap"
-  />
-</div>
+<DocumentFragment>
+  <div
+    class="menu-wrapper"
+    id="navbarSupportedContent"
+  >
+    <ul
+      class="d-flex align-items-center navbar-nav mr-auto flex-wrap"
+    />
+  </div>
+</DocumentFragment>
 `;
 
 exports[`menuConfigurationSubsection component should match snapshot 1`] = `
-<div
-  className="padding-8"
->
-  <span
-    className="subsection-section-title"
+<DocumentFragment>
+  <div
+    class="padding-8"
   >
-    Administration
-  </span>
-  <a
-    className="dropdown-item"
-    href="/openboxes/admin/showSettings"
-    role="menuitem"
-  >
-    Settings
-  </a>
-</div>
+    <span
+      class="subsection-section-title"
+    >
+      Administration
+    </span>
+    <a
+      class="dropdown-item"
+      href="/openboxes/admin/showSettings"
+      role="menuitem"
+    >
+      Settings
+    </a>
+  </div>
+</DocumentFragment>
 `;
 
 exports[`menuItem component should match snapshot 1`] = `
-[
+<DocumentFragment>
   <li
-    className="nav-item dropdown d-none d-md-flex justify-content-center align-items-center false"
+    class="nav-item dropdown d-none d-md-flex justify-content-center align-items-center false"
     data-testid="dropdownMenuItem"
   >
     <a
       aria-expanded="false"
       aria-haspopup="true"
-      className="nav-link dropdown-toggle"
+      class="nav-link dropdown-toggle"
       href="#"
       id="navbarDropdown"
       role="menuitem"
     />
     <div
       aria-labelledby="navbarDropdown"
-      className="dropdown-menu dropdown-menu-wrapper"
+      class="dropdown-menu dropdown-menu-wrapper"
     >
       <div
-        className="dropdown-menu-content padding-8"
+        class="dropdown-menu-content padding-8"
       />
     </div>
-  </li>,
+  </li>
   <li
-    className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none"
+    class="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none"
     data-testid="collapseMenuItem"
   >
     <a
       aria-controls="collapse-undefined"
       aria-expanded="false"
-      className="nav-link d-flex justify-content-between align-items-center w-100 false"
+      class="nav-link d-flex justify-content-between align-items-center w-100 false"
       data-toggle="collapse"
       href="#collapse-undefined"
       role="button"
     >
       <svg
-        className="collapse-arrow-icon"
+        class="collapse-arrow-icon"
         fill="currentColor"
         height="1em"
         stroke="currentColor"
-        strokeWidth="0"
-        style={
-          {
-            "color": undefined,
-          }
-        }
+        stroke-width="0"
         viewBox="0 0 24 24"
         width="1em"
         xmlns="http://www.w3.org/2000/svg"
@@ -92,13 +91,13 @@ exports[`menuItem component should match snapshot 1`] = `
       </svg>
     </a>
     <div
-      className="collapse w-100"
+      class="collapse w-100"
       id="collapse-undefined"
     >
       <div
-        className="d-flex flex-row flex-wrap"
+        class="d-flex flex-row flex-wrap"
       />
     </div>
-  </li>,
-]
+  </li>
+</DocumentFragment>
 `;

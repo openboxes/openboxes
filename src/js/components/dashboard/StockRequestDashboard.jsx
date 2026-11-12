@@ -5,7 +5,6 @@ import { RiStickyNoteFill } from 'react-icons/ri';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
-import { Tooltip } from 'react-tippy';
 
 import { fetchTranslations } from 'actions';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
@@ -14,6 +13,7 @@ import apiClient from 'utils/apiClient';
 import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 import { getCurrentEventComment } from 'utils/list-utils';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-table/react-table.css';
 import './StockRequestDashboard.scss';
@@ -44,15 +44,9 @@ const getColumns = ({ currentLocale }) => [
             {row.original.displayStatus?.label}
           </span>
           {comment && (
-            <Tooltip
-              html={comment}
-              theme="transparent"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-            >
+            <CustomTooltip content={comment}>
               <RiStickyNoteFill className="text-warning mr-1" />
-            </Tooltip>
+            </CustomTooltip>
           )}
         </span>
       );
@@ -110,7 +104,8 @@ class StockRequestDashboard extends Component {
     this.props.fetchTranslations('', 'stockMovement');
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockMovement');
     }

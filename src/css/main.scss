@@ -341,6 +341,10 @@ body {
   line-height: 1.5;
 }
 
+.react-select__value-container {
+  text-align: left;
+}
+
 .select-xs {
   font-size: .875rem;
   border-radius: .2rem;
@@ -363,7 +367,6 @@ body {
     }
 
     .react-select__value-container, .react-select__indicators {
-      display: flex;
       align-items: center;
       height: inherit;
 
@@ -383,14 +386,7 @@ body {
     }
 
     .react-select__input {
-      display: flex !important;
-      align-items: center;
-      height: 24px;
-
-      input {
-        padding: 0;
-        line-height: 26px;
-      }
+      height: auto !important;
     }
   }
 
@@ -428,29 +424,24 @@ body {
 
   .react-select__control {
     height: 32px;
+    min-height: 32px;
 
     .react-select__value-container {
-      line-height: 32px !important;
+      padding: 0 8px;
+    }
+
+    .react-select__input-container {
+      margin: 0;
+      padding: 0;
     }
 
     .react-select__indicators {
-      line-height: 32px;
-
       .react-select__indicator {
         padding: 0 !important;
         cursor: pointer;
       }
       .react-select__indicator:last-child {
         padding-right: 5px !important;
-      }
-    }
-
-    .react-select__input {
-      height: 30px;
-
-      input {
-        padding: 0;
-        line-height: 32px;
       }
     }
   }
@@ -640,18 +631,64 @@ tr.crossed-out td:before {
   white-space: normal;
 }
 
-.spinner-container>div {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  z-index: 110;
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  animation: page-loader-fade-in 0.3s ease 0.2s both;
 }
 
-.spinner-container>div>div {
-  top: 40%;
+@keyframes page-loader-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.chunk-load-error {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 16px;
+  text-align: center;
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    color: var(--color-red);
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+    color: var(--gray-600);
+  }
+
+  &__description {
+    max-width: 420px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--gray-500);
+  }
+}
+
+.global-spinner {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 110;
 }
 
 .ReactTable .-pagination .-btn {
@@ -707,8 +744,9 @@ div.crossed-out .table-inner-row:before {
   z-index: 9999 !important;
 }
 
-.react-select__loading-zone {
-  display: none !important;
+// react-datepicker v9 points the arrow at the middle of the input, keep the position from v1.8
+.force-on-top .react-datepicker__triangle {
+  left: 43px !important;
 }
 
 .dropzone {
@@ -965,6 +1003,12 @@ div.crossed-out .table-inner-row:before {
   font-size: 12px;
   line-height: 15px;
   color: #FFFFFF;
+}
+
+.custom-tooltip-popup {
+  padding: 0 !important;
+  background-color: transparent !important;
+  z-index: 9999;
 }
 
 .tooltip-dark-blue {
@@ -1399,100 +1443,91 @@ div.search-input:focus-within {
   }
 }
 
-// Styling of custom alerts
+// Styling of notifications (react-toastify)
 
-.s-alert-box {
-  width: 388px;
-  max-width: 388px;
+.Toastify__toast-container {
+  --toastify-toast-width: 388px;
+  --toastify-toast-offset: 20px;
+}
+
+.Toastify__toast {
+  align-items: flex-start;
+  min-height: auto;
+  padding: 12px 16px;
   color: var(--gray-600);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+  border: 1px solid var(--gray-500);
   border-radius: 4px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   background-color: #FFFFFF;
-}
-
-.no-details {
-  padding-bottom: 4px;
-}
-
-.s-alert-info {
-  border: 1px solid var(--gray-500);
-}
-
-.s-alert-success {
-  border: 1px solid var(--color-green);
-
-  svg {
-    color: var(--color-green);
-  }
-}
-
-.s-alert-warning {
-  border: 1px solid var(--color-yellow);
-
-  svg {
-    color: var(--color-yellow);
-  }
-}
-
-.s-alert-error {
-  border: 1px solid var(--color-red);
-
-  svg {
-    color: var(--color-red);
-  }
-}
-
-
-.s-alert-box-inner {
-  display: grid;
-  grid-template-columns: 1fr 8fr 1fr;
-  grid-template-rows: auto auto;
-  row-gap: 13px;
-  font-size: 14px;
 
   svg {
     width: 22px;
     height: 22px;
   }
 
-  .alert-start-icon {
-    grid-column: 1;
-  }
+  &--success {
+    border-color: var(--color-green);
 
-  .alert-title {
-    grid-column: 2;
-    grid-row: 1;
-    font-weight: 600;
-    line-height: 16px;
-    display: flex;
-    align-items: center;
-  }
-
-  .alert-details {
-    grid-column: 2;
-    grid-row: 2;
-    font-weight: 400;
-    line-height: 21px;
-  }
-
-  .alert-close-icon {
-    grid-column: 3;
-    display: flex;
-    justify-content: flex-end;
-
-    svg {
-      cursor: pointer;
-      color: var(--gray-600);
+    .Toastify__toast-icon svg {
+      color: var(--color-green);
     }
   }
 
-  .array-errors-wrapper {
-    grid-column: span 2;
-    grid-row: 2;
+  &--warning {
+    border-color: var(--color-yellow);
 
-    p {
-      padding: 4px;
+    .Toastify__toast-icon svg {
+      color: var(--color-yellow);
     }
+  }
+
+  &--error {
+    border-color: var(--color-red);
+
+    .Toastify__toast-icon svg {
+      color: var(--color-red);
+    }
+  }
+}
+
+.Toastify__toast-icon {
+  width: auto;
+  margin-inline-end: 12px;
+}
+
+.notification-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  row-gap: 13px;
+}
+
+.notification-details {
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.notification-details-array {
+  font-weight: 400;
+
+  p {
+    padding: 4px;
+    margin: 0;
+  }
+}
+
+.notification-close-icon {
+  display: flex;
+  margin-left: auto;
+  padding-left: 12px;
+
+  svg {
+    cursor: pointer;
+    color: var(--gray-600);
   }
 }
 
@@ -1930,6 +1965,11 @@ div.search-input:focus-within {
     flex: 1;
     display: flex;
     flex-direction: column;
+
+    .page-loader {
+      flex: 1;
+      height: auto;
+    }
   }
 }
 

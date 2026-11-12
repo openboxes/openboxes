@@ -4,15 +4,15 @@ import _ from 'lodash';
 import { Controller } from 'react-hook-form';
 import { RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { fetchBuyers } from 'actions';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import useDeletePreferenceType from 'hooks/productSupplier/form/useDeletePreferenceType';
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const usePreferenceTypeVariationsColumns = ({
   errors,
@@ -171,7 +171,7 @@ const usePreferenceTypeVariationsColumns = ({
           control={control}
           key={row.original.id}
           render={({ field }) => (
-            <DateField
+            <DateFieldDateFns
               errorMessage={errors?.[row.index]?.validityStartDate?.message}
               {...field}
               onChange={(val) => {
@@ -194,7 +194,7 @@ const usePreferenceTypeVariationsColumns = ({
           control={control}
           key={row.original.id}
           render={({ field }) => (
-            <DateField
+            <DateFieldDateFns
               errorMessage={errors?.[row.index]?.validityEndDate?.message}
               {...field}
               onChange={(val) => {
@@ -236,9 +236,9 @@ const usePreferenceTypeVariationsColumns = ({
       headerClassName: 'justify-content-center',
       className: 'd-flex justify-content-center align-items-center',
       Cell: (row) => (
-        <Tooltip
+        <CustomTooltip
           className="d-flex align-items-center"
-          html={(
+          content={(
             <span className="p-1">
               <Translate
                 id="react.productSupplier.form.delete"
@@ -253,7 +253,7 @@ const usePreferenceTypeVariationsColumns = ({
             }}
             className="preference-type-bin"
           />
-        </Tooltip>
+        </CustomTooltip>
       ),
     },
   ], [errors, buyers, preferenceTypes]);

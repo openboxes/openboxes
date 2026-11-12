@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import { flushSync } from 'react-dom';
+
 import navigationKey from 'consts/navigationKey';
 import { CELL_SELECTOR, FIELD_SELECTOR, getColumnId } from 'utils/arrowNavigation';
 import closeCalendarIfOpen from 'utils/datePickerUtils';
@@ -83,7 +85,8 @@ const useTableArrowNavigation = ({ onNavigatePastLastField, verticalOnly } = {})
       && isLastNavigableFieldOfTable(table, event.target);
 
     if (hasNavigatedPastLastField) {
-      onNavigatePastLastField(columnId);
+      // The new row has to be in the DOM before the fields are read again
+      flushSync(() => onNavigatePastLastField(columnId));
     }
 
     const targetField = hasNavigatedPastLastField

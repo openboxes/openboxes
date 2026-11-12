@@ -7,7 +7,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import { fetchCurrencies, hideSpinner, showSpinner } from 'actions';
 import invoiceApi from 'api/services/InvoiceApi';
@@ -18,6 +17,7 @@ import { INVOICE_URL } from 'consts/applicationUrls';
 import { renderFormField } from 'utils/form-utils';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -66,11 +66,7 @@ const FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedOrganizationsFetch }) => ({
       loadOptions: debouncedOrganizationsFetch,
@@ -165,7 +161,7 @@ class CreateInvoicePage extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(INVOICE_URL.edit(resp.id));
+            this.props.navigate(INVOICE_URL.edit(resp.id));
             this.props.nextPage({
               ...values,
               id: resp.id,
@@ -268,9 +264,7 @@ CreateInvoicePage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   currencies: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   debounceTime: PropTypes.number.isRequired,

@@ -11,7 +11,7 @@ import ValueCell from 'utils/cells/ValueCell';
  * The pack level group cell in packing list view. Besides the pack level value,
  * this column hosts the changes toggle and the green arrow of split item rows.
  */
-const PackLevelGroupCell = React.memo(({ item, isExpanded, onToggle }) => {
+const PackLevelGroupCell = React.memo(({ item = null, isExpanded = false, onToggle }) => {
   if (item?.rowType === ReceivingRowType.TOGGLE) {
     return (
       <ChangesToggleCell

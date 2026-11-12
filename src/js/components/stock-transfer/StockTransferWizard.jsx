@@ -4,7 +4,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import {
   fetchTranslations,
@@ -17,6 +16,7 @@ import StockTransferSecondPage from 'components/stock-transfer/StockTransferSeco
 import Wizard from 'components/wizard/Wizard';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-transfer/StockTransfer.scss';
 
@@ -43,7 +43,8 @@ class StockTransferWizard extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockTransfer');
     }
@@ -108,7 +109,7 @@ class StockTransferWizard extends Component {
 
   render() {
     const { page, stockTransfer } = this.state;
-    const { location, history, match } = this.props;
+    const { location, navigate, match } = this.props;
     const locationId = location.id;
     const additionalTitle = null;
     const pageList = [CreateStockTransfer, StockTransferSecondPage, StockTransferCheckPage];
@@ -125,7 +126,7 @@ class StockTransferWizard extends Component {
           prevPage={page === 1 ? 1 : page - 1}
           updateWizardValues={this.updateWizardValues}
           additionalProps={{
-            locationId, location, history, match,
+            locationId, location, navigate, match,
           }}
         />
       );
@@ -162,6 +163,6 @@ StockTransferWizard.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({ stockTransferId: PropTypes.string }),
   }).isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
 };

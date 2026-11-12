@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import Button from 'components/form-elements/Button';
 import SummaryInfo from 'utils/SummaryInfo';
 
-const EditLineItemModalFooter = ({ summaryData, onClose, isSaveDisabled }) => (
+const EditLineItemModalFooter = ({ summaryData, onClose, isSaveDisabled = false }) => (
   <>
     <div className="mt-4">
       <SummaryInfo data={summaryData} />

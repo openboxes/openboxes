@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { withLocalize } from 'react-localize-redux';
-import connect from 'react-redux/es/connect/connect';
+import { connect } from 'react-redux';
 
 import { fetchMenuConfig, fetchSessionInfo, fetchTranslations } from 'actions';
 import Router from 'components/Router';
@@ -37,7 +37,8 @@ class MainRouter extends React.Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale !== nextProps.locale) {
       this.props.setActiveLanguage(nextProps.locale);
 

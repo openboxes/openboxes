@@ -3,62 +3,29 @@ import React from 'react';
 import {
   RiAlertLine, RiCheckboxCircleLine, RiErrorWarningFill, RiErrorWarningLine, RiInformationLine,
 } from 'react-icons/ri';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
+import NotificationContent from 'components/Layout/notifications/NotificationContent';
 import NotificationType from 'consts/notificationTypes';
+
+const notificationConfig = {
+  [NotificationType.SUCCESS]: { showToast: toast.success, icon: <RiCheckboxCircleLine /> },
+  [NotificationType.WARNING]: { showToast: toast.warning, icon: <RiAlertLine /> },
+  [NotificationType.ERROR]: { showToast: toast.error, icon: <RiErrorWarningFill /> },
+  [NotificationType.ERROR_OUTLINED]: { showToast: toast.error, icon: <RiErrorWarningLine /> },
+  [NotificationType.ERROR_FILLED]: { showToast: toast.error, icon: <RiErrorWarningFill /> },
+  [NotificationType.INFO]: { showToast: toast.info, icon: <RiInformationLine /> },
+};
 
 const notification = (type) => ({
   message, details, icon, detailsArray,
 }) => {
-  const alertsProps = {
-    customFields: {
-      details,
-      icon,
-      detailsArray,
-    },
-  };
-  switch (type) {
-    case NotificationType.SUCCESS:
-      return Alert.success(message, {
-        ...alertsProps,
-        customFields: {
-          ...alertsProps.customFields,
-          icon: alertsProps.customFields.icon ?? <RiCheckboxCircleLine />,
-        },
-      });
-    case NotificationType.WARNING:
-      return Alert.warning(message, {
-        ...alertsProps,
-        customFields: {
-          ...alertsProps.customFields,
-          icon: alertsProps.customFields.icon ?? <RiAlertLine />,
-        },
-      });
-    case NotificationType.ERROR_OUTLINED:
-      return Alert.error(message, {
-        ...alertsProps,
-        customFields: {
-          ...alertsProps.customFields,
-          icon: alertsProps.customFields.icon ?? <RiErrorWarningLine />,
-        },
-      });
-    case NotificationType.ERROR_FILLED:
-      return Alert.error(message, {
-        ...alertsProps,
-        customFields: {
-          ...alertsProps.customFields,
-          icon: alertsProps.customFields.icon ?? <RiErrorWarningFill />,
-        },
-      });
-    default:
-      return Alert.info(message, {
-        ...alertsProps,
-        customFields: {
-          ...alertsProps.customFields,
-          icon: alertsProps.customFields.icon ?? <RiInformationLine />,
-        },
-      });
-  }
+  const config = notificationConfig[type] ?? notificationConfig[NotificationType.INFO];
+
+  return config.showToast(NotificationContent, {
+    data: { message, details, detailsArray },
+    icon: icon ?? config.icon,
+  });
 };
 
 export default notification;

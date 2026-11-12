@@ -8,7 +8,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import { hideSpinner, showSpinner } from 'actions';
 import userApi from 'api/services/UserApi';
@@ -24,6 +23,7 @@ import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -73,12 +73,8 @@ const DEFAULT_FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
       disabled: true,
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
@@ -97,11 +93,7 @@ const DEFAULT_FIELDS = {
       required: true,
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedLocationsFetch,
@@ -127,12 +119,8 @@ const DEFAULT_FIELDS = {
       async: true,
       required: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: (options) => options,
     },
     getDynamicAttr: (props) => ({
       loadOptions: props.debouncedPeopleFetch,
@@ -255,7 +243,8 @@ class CreateStockMovement extends Component {
     this.fetchRequisitionTypes();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.props.match.params.stockMovementId && this.state.setInitialValues
       && nextProps.location.id) {
       this.setInitialValues(nextProps.location, nextProps.user);
@@ -419,7 +408,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(STOCK_MOVEMENT_URL.editRequest(resp.id));
+            this.props.navigate(STOCK_MOVEMENT_URL.editRequest(resp.id));
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,
@@ -574,10 +563,8 @@ CreateStockMovement.propTypes = {
    * is fired from within the form component.
    */
   nextPage: PropTypes.func.isRequired,
-  /** React router's object used to manage session history */
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  /** React router's function used to navigate between pages */
+  navigate: PropTypes.func.isRequired,
   /** Current location */
   location: PropTypes.shape({
     name: PropTypes.string,

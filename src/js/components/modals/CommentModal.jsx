@@ -17,7 +17,7 @@ const COMMENT_MAX_LENGTH = 255;
  * on each open. Presentational only: saving is delegated to `onSave`, which also closes it.
  */
 const CommentModal = ({
-  onClose, anchor, initialValue, onSave,
+  onClose, anchor = null, initialValue = '', onSave,
 }) => {
   const translate = useTranslate();
   const [value, setValue] = useState(initialValue);

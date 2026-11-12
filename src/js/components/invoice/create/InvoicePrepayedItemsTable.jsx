@@ -3,7 +3,6 @@ import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { RiCopyrightLine } from 'react-icons/all';
-import { Tooltip } from 'react-tippy';
 
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
@@ -13,6 +12,7 @@ import ContextMenu from 'utils/ContextMenu';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const INVOICE_ITEMS = {
   invoiceItems: {
@@ -42,16 +42,10 @@ const INVOICE_ITEMS = {
           if (isPrepLine) {
             return (
               <div className="d-flex align-items-center justify-content-center">
-                <Tooltip
-                  html="Prepayment"
-                  theme="transparent"
-                  delay="150"
-                  duration="250"
-                  hideDelay="50"
-                >
+                <CustomTooltip content="Prepayment">
                   {/* &#x24C5; = hexadecimal circled letter P */}
                   <b>&#x24C5;</b>
-                </Tooltip>
+                </CustomTooltip>
               </div>
             );
           }
@@ -126,10 +120,9 @@ const INVOICE_ITEMS = {
           return (
             params.isEditable(invoiceItem?.id) && !invoiceItem?.orderAdjustment
               ? (
-                <Tooltip
-                  html={<div className="custom-tooltip">{errors}</div>}
-                  theme="transparent"
-                  disabled={!errors}
+                <CustomTooltip
+                  content={<div className="custom-tooltip">{errors}</div>}
+                  show={!!errors}
                 >
                   <TextInput
                     type="number"
@@ -140,7 +133,7 @@ const INVOICE_ITEMS = {
                     }
                     {...params}
                   />
-                </Tooltip>
+                </CustomTooltip>
               )
               : <LabelField {...params} />
           );
@@ -173,10 +166,9 @@ const INVOICE_ITEMS = {
           return (
             params.isEditable(invoiceItem?.id) && invoiceItem?.orderAdjustment
               ? (
-                <Tooltip
-                  html={<div className="custom-tooltip">{errors}</div>}
-                  theme="transparent"
-                  disabled={!errors}
+                <CustomTooltip
+                  content={<div className="custom-tooltip">{errors}</div>}
+                  show={!!errors}
                 >
                   <TextInput
                     type="number"
@@ -187,7 +179,7 @@ const INVOICE_ITEMS = {
                     }
                     {...params}
                   />
-                </Tooltip>
+                </CustomTooltip>
               )
               : <LabelField {...params} />
           );

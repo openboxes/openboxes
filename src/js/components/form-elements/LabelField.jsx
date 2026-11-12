@@ -2,11 +2,9 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { Field } from 'react-final-form';
-import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
-
-import 'react-tippy/dist/tippy.css';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const LabelField = (props) => {
   const {
@@ -53,14 +51,9 @@ const LabelField = (props) => {
     const formattedValue = formatValue ? formatValue(fieldValue) : fieldValue;
     return (
       <div className="form-group my-0" data-testid="label-field" aria-label={defaultMessage}>
-        <Tooltip
-          html={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)}
-          disabled={!showValueTooltip}
-          theme="dark"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          arrow
+        <CustomTooltip
+          content={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)}
+          show={Boolean(showValueTooltip)}
         >
           {url
             ? (
@@ -79,7 +72,7 @@ const LabelField = (props) => {
                 {formattedValue}
               </div>
             )}
-        </Tooltip>
+        </CustomTooltip>
       </div>
     );
   }

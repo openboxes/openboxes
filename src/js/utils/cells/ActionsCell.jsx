@@ -12,7 +12,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
  * The whole cell can be disabled through the `disabled` prop.
  */
 const ActionsCell = React.memo(({
-  actions, label, defaultLabel, disabled,
+  actions, label, defaultLabel, disabled = false,
 }) => {
   const translate = useTranslate();
 

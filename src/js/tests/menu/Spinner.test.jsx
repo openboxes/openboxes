@@ -1,14 +1,13 @@
 import React from 'react';
 
 import { render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import Spinner from 'components/spinner/Spinner';
 
 describe('spinner component', () => {
   it('should match snapshot', () => {
-    const renderedSpinner = renderer.create(<Spinner />)
-      .toJSON();
+    const renderedSpinner = render(<Spinner />)
+      .asFragment();
     expect(renderedSpinner)
       .toMatchSnapshot();
   });

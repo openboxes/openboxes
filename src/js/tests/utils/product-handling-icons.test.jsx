@@ -20,6 +20,6 @@ describe('product-handling-icons', () => {
 
   it('should render properly', () => {
     render(renderHandlingIcons(icon));
-    expect(screen.findByTestId('product-handling-icons'));
+    expect(screen.getByTestId('product-handling-icons')).toBeTruthy();
   });
 });

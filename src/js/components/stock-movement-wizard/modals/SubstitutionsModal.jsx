@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -17,6 +16,7 @@ import apiClient from 'utils/apiClient';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const FIELDS = {
   reasonCode: {
@@ -170,7 +170,8 @@ class SubstitutionsModal extends Component {
     );
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: {
         attributes,
@@ -364,11 +365,10 @@ class SubstitutionsModal extends Component {
             {this.state.attr.lineItem.productCode}
           </div>
           <div className="font-weight-bold">
-            <Tooltip
-              html={<div className="text-truncate">{this.state.attr.lineItem.product.name}</div>}
-              theme="dark"
-              disabled={!this.state.attr.lineItem.product.displayNames?.default}
-              position="top-start"
+            <CustomTooltip
+              content={<div className="text-truncate">{this.state.attr.lineItem.product.name}</div>}
+              show={!!this.state.attr.lineItem.product.displayNames?.default}
+              place="top-start"
             >
               <Translate
                 id="react.stockMovement.productName.label"
@@ -379,7 +379,7 @@ class SubstitutionsModal extends Component {
               this.state.attr.lineItem.product.displayNames?.default
               ?? this.state.attr.lineItem.product.name
               }
-            </Tooltip>
+            </CustomTooltip>
           </div>
           <div className="font-weight-bold">
             <Translate

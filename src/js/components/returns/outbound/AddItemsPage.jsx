@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import * as locales from 'date-fns/locale';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import _ from 'lodash';
@@ -10,7 +11,7 @@ import DatePicker from 'react-datepicker';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -22,6 +23,7 @@ import locationType from 'consts/locationType';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
+import { convertMomentFormatToDateFns } from 'utils/dateUtils';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
@@ -221,7 +223,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.outboundReturnsTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;
@@ -341,7 +344,7 @@ class AddItemsPage extends Component {
   saveAndTransition(callback, status) {
     const errors = validate({ returnItems: _.values(this.state.selectedItems) });
     if (errors && errors.returnItems.length) {
-      Alert.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
+      toast.error(this.props.translate('react.outboundReturns.errors.quantityToReturn.label'));
       this.setState({
         selectedProductId: '',
         selectedLotNumber: '',
@@ -511,16 +514,18 @@ class AddItemsPage extends Component {
                   className="form-control"
                   selected={moment(selectedExpirationDate, 'MM/DD/YYYY').isValid() ? moment(selectedExpirationDate, 'MM/DD/YYYY') : null}
                   highlightDates={[!moment(selectedExpirationDate, 'MM/DD/YYYY').isValid()
-                    ? moment(new Date(), 'MM/DD/YYYY') : {}]}
+                    ? new Date() : {}]}
                   onChange={(date) => this.setSelectedExpirationDate(date)}
                   popperClassName="force-on-top"
+                  popperPlacement="bottom-start"
                   showYearDropdown
                   scrollableYearDropdown
-                  dateFormat={this.props.dateFormat(DateFormat.COMMON)}
+                  dateFormat={
+                    convertMomentFormatToDateFns(this.props.dateFormat(DateFormat.COMMON))
+                  }
                   yearDropdownItemNumber={3}
-                  utcOffset={0}
                   placeholderText={this.props.translate('react.outboundReturns.selectExpirationDate.label', 'Select expiration date...')}
-                  locale={this.props.localeCode}
+                  locale={locales[this.props.localeCode]}
                 />
               </div>
               &nbsp;

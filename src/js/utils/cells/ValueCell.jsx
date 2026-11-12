@@ -9,7 +9,7 @@ import useTranslate from 'hooks/useTranslate';
  * Memoized cell rendering a single value with an optional tooltip and truncation.
  */
 const ValueCell = React.memo(({
-  value, label, defaultLabel, tooltipLabel, truncate, className,
+  value = null, label, defaultLabel, tooltipLabel, truncate = false, className = '',
 }) => {
   const translate = useTranslate();
 

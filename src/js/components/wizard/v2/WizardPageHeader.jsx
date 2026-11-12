@@ -11,7 +11,7 @@ import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
  * Generic header bar for v2 wizard pages. Renders a prefix label followed by
  * colored, delimited info segments and an optional status badge.
  */
-const WizardPageHeader = ({ label, info, status }) => {
+const WizardPageHeader = ({ label = '', info = [], status = '' }) => {
   const currentLocale = useSelector(getCurrentLocale);
 
   return (

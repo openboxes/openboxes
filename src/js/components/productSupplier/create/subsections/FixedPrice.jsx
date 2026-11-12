@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 
 import CheckBox from 'components/form-elements/v2/Checkbox';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import TextInput from 'components/form-elements/v2/TextInput';
 import Subsection from 'components/Layout/v2/Subsection';
 import { FormErrorPropType } from 'utils/propTypes';
@@ -49,7 +49,7 @@ const FixedPrice = ({
           name="fixedPrice.contractPriceValidUntil"
           control={control}
           render={({ field }) => (
-            <DateField
+            <DateFieldDateFns
               title={{
                 id: 'react.productSupplier.form.contractPriceValidUntil.title',
                 defaultMessage: 'Price Valid Until',

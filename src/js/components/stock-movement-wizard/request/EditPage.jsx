@@ -8,9 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
-import { Tooltip } from 'react-tippy';
+import { toast } from 'react-toastify';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -30,6 +28,8 @@ import { formatProductDisplayName, showOutboundEditValidationErrors } from 'util
 import canEditRequest from 'utils/permissionUtils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -102,11 +102,10 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Product name',
         attributes: {
           formatValue: (value) => (
-            <Tooltip
-              html={<div className="text-truncate">{value.name}</div>}
-              theme="dark"
-              disabled={!value.displayNames?.default}
-              position="top-start"
+            <CustomTooltip
+              content={<div className="text-truncate">{value.name}</div>}
+              show={!!value.displayNames?.default}
+              place="top-start"
             >
               <span className="d-flex align-items-center">
                 <span className="text-truncate">
@@ -114,7 +113,7 @@ const AD_HOCK_FIELDS = {
                 </span>
                 {renderHandlingIcons(value ? value.handlingIcons : null)}
               </span>
-            </Tooltip>
+            </CustomTooltip>
           ),
         },
         getDynamicAttr: ({ fieldValue, subfield }) => ({
@@ -154,15 +153,9 @@ const AD_HOCK_FIELDS = {
                 <div className="d-flex align-items-center">
                   {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
                   <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
-                  <Tooltip
-                    html={rowValues.comments}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
+                  <CustomTooltip content={rowValues.comments}>
                     <i className="fa fa-sticky-note pr-2" />
-                  </Tooltip>
+                  </CustomTooltip>
                 </div>
               );
             }
@@ -454,15 +447,9 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
                 <div className="d-flex align-items-center">
                   {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
                   <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
-                  <Tooltip
-                    html={rowValues.comments}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
+                  <CustomTooltip content={rowValues.comments}>
                     <i className="fa fa-sticky-note pr-2" />
-                  </Tooltip>
+                  </CustomTooltip>
                 </div>
               );
             }
@@ -754,15 +741,9 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
                 <div className="d-flex align-items-center">
                   {/* flex: 1 to center qty label, marginLeft: 14px to mitigate icon font size */}
                   <div style={{ flex: 1, marginLeft: '14px' }}><LabelField {...params} /></div>
-                  <Tooltip
-                    html={rowValues.comments}
-                    theme="transparent"
-                    delay="150"
-                    duration="250"
-                    hideDelay="50"
-                  >
+                  <CustomTooltip content={rowValues.comments}>
                     <i className="fa fa-sticky-note pr-2" />
-                  </Tooltip>
+                  </CustomTooltip>
                 </div>
               );
             }
@@ -1019,7 +1000,8 @@ class EditItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -1334,7 +1316,7 @@ class EditItemsPage extends Component {
         }
 
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -1619,9 +1601,9 @@ class EditItemsPage extends Component {
                   type="button"
                   onClick={() => {
                     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                      this.props.history.push(DASHBOARD_URL.base);
+                      this.props.navigate(DASHBOARD_URL.base);
                     } else {
-                      this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                      this.props.navigate(STOCK_MOVEMENT_URL.listInbound());
                     }
                   }}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
@@ -1665,8 +1647,8 @@ class EditItemsPage extends Component {
                     defaultLabel="Edit request items"
                     variant="primary-outline"
                     onClick={() => {
-                      const { history } = this.props;
-                      history.push(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id));
+                      const { navigate } = this.props;
+                      navigate(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id));
                     }}
                   />
                   )}
@@ -1735,9 +1717,7 @@ EditItemsPage.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,

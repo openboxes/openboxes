@@ -183,7 +183,7 @@ describe('formatDateToZonedDateTimeString()', () => {
     // examples that should pass the following comparison:
     // 09/19/2025 00:00 +02:00
     // 09/19/2025 00:00 -05:00
-    expect(date).toBe(`09/19/2025 00:00 ${displayTimezoneOffset()}`);
+    expect(date).toBe(`09/19/2025 00:00 ${displayTimezoneOffset(DATE_WITH_DAY.getTimezoneOffset())}`);
   });
 });
 

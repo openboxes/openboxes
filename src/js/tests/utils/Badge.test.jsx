@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import Badge from 'utils/Badge';
 
@@ -13,7 +12,7 @@ jest.mock('wrappers/CustomTooltip', () => (props) => mockCustomTooltip(props));
 
 describe('Badge component', () => {
   it('should match snapshot', () => {
-    const badge = renderer.create(<Badge label="Tooltip Badge" variant="warning" tooltip />).toJSON();
+    const badge = render(<Badge label="Tooltip Badge" variant="warning" tooltip />).asFragment();
     expect(badge).toMatchSnapshot();
   });
 

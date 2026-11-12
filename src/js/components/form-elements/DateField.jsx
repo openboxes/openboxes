@@ -1,13 +1,16 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 
+import { Portal } from '@restart/ui';
+import * as locales from 'date-fns/locale';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
-import { Portal } from 'react-overlays';
 import { connect } from 'react-redux';
+import { getDefaultTranslationsFetched } from 'selectors';
 
 import BaseField from 'components/form-elements/BaseField';
 import DateFormat from 'consts/dateFormat';
+import { convertMomentFormatToDateFns } from 'utils/dateUtils';
 import { formatDate, getDateFormat, getLocaleCode } from 'utils/translation-utils';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -36,6 +39,11 @@ class DateField extends Component {
     localizedDateFormat = DateFormat.COMMON, showLocalizedPlaceholder, ...attributes
   }) {
     const onChangeRaw = (e) => {
+      // onChangeRaw is also called when a day is clicked in the calendar, and then the event
+      // target is not the input, so the selected date is handled by onChange
+      if (!(e?.target instanceof HTMLInputElement)) {
+        return;
+      }
       attributes.onChange(e.target.value);
     };
 
@@ -48,21 +56,26 @@ class DateField extends Component {
     };
 
     const getFormat = () => {
-      if (localizeDate) {
-        return this.props.dateFormat(localizedDateFormat);
+      if (localizeDate && this.props.defaultTranslationsFetched && this.props.localeCode) {
+        const localizedFormat = this.props.dateFormat(localizedDateFormat);
+        // Right after a language change its translations may not be loaded yet, then the key
+        // comes back instead, which date-fns cannot parse, so the default format is used
+        if (localizedFormat !== localizedDateFormat) {
+          return localizedFormat;
+        }
       }
 
       return dateFormat;
     };
 
     const onChange = (date) => {
-      const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
+      const val = !date || typeof date === 'string' ? date : moment(date).format(dateFormat);
       attributes.onChange(val);
     };
 
     const getLocale = () => {
       if (localizeDate) {
-        return this.props.localeCode;
+        return locales[this.props.localeCode];
       }
 
       return null;
@@ -74,9 +87,9 @@ class DateField extends Component {
           className={`form-control form-control-xs ${className}`}
           {...attributes}
           placeholderText={getPlaceholder()}
-          selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat) : null}
+          selected={moment(value, dateFormat).isValid() ? moment(value, dateFormat).toDate() : null}
           highlightDates={[!moment(value, dateFormat).isValid()
-            ? moment(new Date(), dateFormat) : {}]}
+            ? new Date() : {}]}
           onChange={(date) => onChange(date)}
           onChangeRaw={onChangeRaw}
           onSelect={() => {
@@ -128,14 +141,14 @@ class DateField extends Component {
           }}
           disabledKeyboardNavigation
           popperClassName="force-on-top"
+          popperPlacement="bottom-start"
           showYearDropdown
           scrollableYearDropdown
-          dateFormat={getFormat()}
+          dateFormat={convertMomentFormatToDateFns(getFormat())}
           locale={getLocale()}
           timeFormat={timeFormat}
           timeIntervals={15}
           yearDropdownItemNumber={3}
-          utcOffset={0}
           ref={(el) => {
             this.dateInput = el;
             if (el && fieldRef) {
@@ -161,6 +174,7 @@ const mapStateToProps = (state) => ({
   formatDate: formatDate(state.localize),
   dateFormat: getDateFormat(state.localize),
   localeCode: getLocaleCode(state.localize),
+  defaultTranslationsFetched: getDefaultTranslationsFetched(state),
 });
 
 export default connect(mapStateToProps)(DateField);

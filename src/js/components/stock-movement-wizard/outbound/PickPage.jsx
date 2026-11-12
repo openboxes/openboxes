@@ -8,7 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import picklistApi from 'api/services/PicklistApi';
@@ -37,6 +37,7 @@ import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -189,7 +190,7 @@ const FIELDS = {
         getDynamicAttr: ({ subfield, translate, showOnly }) => ({
           hidden: subfield,
           disabled: showOnly,
-          onClick: () => Alert.error(translate('react.stockMovement.alert.disabledAdjustment.label', 'This feature is not available yet. Please adjust stock on the electronic stock card page.')),
+          onClick: () => toast.error(translate('react.stockMovement.alert.disabledAdjustment.label', 'This feature is not available yet. Please adjust stock on the electronic stock card page.')),
         }),
       },
       revert: {
@@ -271,7 +272,8 @@ class PickPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -1027,7 +1029,7 @@ class PickPage extends Component {
               : (
                 <button
                   type="button"
-                  onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listRequest())}
+                  onClick={() => this.props.navigate(STOCK_MOVEMENT_URL.listRequest())}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >
                   <span>
@@ -1095,7 +1097,9 @@ const mapStateToProps = (state) => ({
   formatLocalizedDate: formatDate(state.localize),
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
+export default withRouter(connect(mapStateToProps, {
+  showSpinner, hideSpinner, fetchReasonCodes,
+})(PickPage));
 
 PickPage.propTypes = {
   /** Initial component's data */
@@ -1125,8 +1129,6 @@ PickPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   currentLocale: PropTypes.string.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
   formatLocalizedDate: PropTypes.func.isRequired,
 };

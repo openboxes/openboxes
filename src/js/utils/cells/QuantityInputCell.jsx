@@ -15,7 +15,7 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  * caller decides where to store it; pass `value` to keep the input in sync with that store.
  */
 const QuantityInputCell = React.memo(({
-  value, onCommit, onBlur, label, defaultLabel, disabled, errorMessage, className,
+  value = null, onCommit, onBlur, label, defaultLabel, disabled = false, errorMessage, className = '',
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
 

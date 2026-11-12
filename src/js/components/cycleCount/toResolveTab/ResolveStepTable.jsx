@@ -3,16 +3,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiAddCircleLine } from 'react-icons/all';
 import { useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
 import HeaderSelect from 'components/cycleCount/HeaderSelect';
 import DataTable from 'components/DataTable/v2/DataTable';
 import Button from 'components/form-elements/Button';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useResolveStepHeader from 'hooks/cycleCount/useResolveStepHeader';
 import useResolveStepTable from 'hooks/cycleCount/useResolveStepTable';
 import useTranslate from 'hooks/useTranslate';
@@ -118,11 +117,11 @@ const ResolveStepTable = ({
             <HeaderSelect
               label={translate('react.cycleCount.dateRecounted.label', 'Date recounted')}
             >
-              <DateField
+              <DateFieldDateFns
                 className="date-counted-date-picker date-field-input"
                 onChangeRaw={handleDateRecountedChange}
                 value={dateRecounted}
-                customDateFormat={DateFormat.DD_MMM_YYYY}
+                customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
                 clearable={false}
                 hideErrorMessageWrapper
                 disabled={isFormDisabled}
@@ -180,9 +179,9 @@ const ResolveStepTable = ({
         className={`ml-4 mb-3 d-flex ${isStepEditable ? '' : 'pt-3'}`}
       >
         {isStepEditable && (
-        <Tooltip
+        <CustomTooltip
           className="d-flex align-items-center"
-          html={(
+          content={(
             <span className="p-1">
               {translate('react.cycleCount.addNewRecord.tooltip', 'Use this button to change lot number or bin location.')}
             </span>
@@ -198,7 +197,7 @@ const ResolveStepTable = ({
             StartIcon={<RiAddCircleLine size={18} />}
             disabled={isFormDisabled}
           />
-        </Tooltip>
+        </CustomTooltip>
         )}
       </div>
     </div>

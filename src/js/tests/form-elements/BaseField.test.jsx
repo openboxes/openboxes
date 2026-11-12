@@ -1,8 +1,12 @@
 import React from 'react';
 
-import renderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import store from 'tests/__mocks__/formStore';
 
 import BaseField from 'components/form-elements/BaseField';
+
+import '@testing-library/jest-dom';
 
 jest.mock('react-final-form', () => ({
   Field: (props) => {
@@ -14,6 +18,7 @@ jest.mock('react-final-form', () => ({
 }));
 
 jest.mock('react-localize-redux', () => ({
+  ...jest.requireActual('react-localize-redux'),
   Translate: (props) => {
     const { id } = props;
 
@@ -21,19 +26,20 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-xdescribe('BaseField component is correctly rendering', () => {
+describe('BaseField component is correctly rendering', () => {
   it('text label', () => {
     const props = {
       fieldName: 'test',
       fieldConfig: {
         label: 'test label',
       },
-      renderInput: () => (<input />),
+      renderInput: (attr) => (<input id={attr.id} />),
     };
 
-    const rendered = renderer.create(<BaseField {...props} />);
+    render(<Provider store={store}><BaseField {...props} /></Provider>);
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(screen.getByRole('textbox', { name: 'test label' })).toBeInTheDocument();
+    expect(screen.getByTestId('form-field')).toHaveAttribute('aria-label', 'test label');
   });
 
   it('component label', () => {
@@ -45,9 +51,10 @@ xdescribe('BaseField component is correctly rendering', () => {
       renderInput: () => (<input />),
     };
 
-    const rendered = renderer.create(<BaseField {...props} />);
+    render(<Provider store={store}><BaseField {...props} /></Provider>);
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(screen.getByText('test').tagName).toBe('SPAN');
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('attributes', () => {
@@ -57,16 +64,21 @@ xdescribe('BaseField component is correctly rendering', () => {
         label: 'test label',
         attributes: {
           required: true,
-          testAttr: true,
+          placeholder: 'test placeholder',
         },
-        getDynamicAttr: ({ dynamicProp }) => ({ hidden: true, dynamicAttr: dynamicProp }),
+        getDynamicAttr: ({ dynamicProp }) => ({ hidden: true, title: dynamicProp }),
       },
       dynamicProp: 'dynamic property',
       renderInput: (attr) => (<input {...attr} />),
     };
 
-    const rendered = renderer.create(<BaseField {...props} />);
+    render(<Provider store={store}><BaseField {...props} /></Provider>);
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    const formField = screen.getByTestId('form-field');
+    expect(formField).toHaveClass('required', 'd-none');
+    const input = formField.querySelector('input');
+    expect(input).toHaveAttribute('id', 'test');
+    expect(input).toHaveAttribute('placeholder', 'test placeholder');
+    expect(input).toHaveAttribute('title', 'dynamic property');
   });
 });

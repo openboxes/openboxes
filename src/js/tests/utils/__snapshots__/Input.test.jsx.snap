@@ -1,16 +1,11 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`input should match snapshot 1`] = `
-<input
-  className="  "
-  data-testid="input"
-  onChange={[Function]}
-  onDragStart={[Function]}
-  onFocus={[Function]}
-  onKeyDown={[Function]}
-  onKeyPress={[Function]}
-  onKeyUp={[Function]}
-  onWheel={[Function]}
-  type="text"
-/>
+<DocumentFragment>
+  <input
+    class="  "
+    data-testid="input"
+    type="text"
+  />
+</DocumentFragment>
 `;

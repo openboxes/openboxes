@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
@@ -25,6 +24,7 @@ import { renderFormField } from 'utils/form-utils';
 import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationDetails.scss';
@@ -93,13 +93,9 @@ const FIELDS = {
       async: true,
       required: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       withTooltip: true,
       tooltip: 'react.locationsConfiguration.organization.tooltip.label',
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: ({
       debouncedOrganizationsFetch,
@@ -121,13 +117,9 @@ const FIELDS = {
       defaultMessage: 'Add new Location Group',
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       withTooltip: true,
       tooltip: 'react.locationsConfiguration.locationGroup.tooltip.label',
       options: [],
-      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedLocationGroupsFetch, openNewLocationGroupModal }) => ({
       loadOptions: debouncedLocationGroupsFetch,
@@ -141,12 +133,8 @@ const FIELDS = {
     attributes: {
       async: true,
       showValueTooltip: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       options: [],
       labelKey: 'name',
-      filterOptions: (options) => options,
     },
     getDynamicAttr: ({ debouncedPeopleFetch }) => ({
       loadOptions: debouncedPeopleFetch,
@@ -230,7 +218,8 @@ class LocationDetails extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.dataFetched && nextProps.locConfTranslationsFetched) {
       this.dataFetched = true;
       this.fetchSupportedActivities();
@@ -271,7 +260,7 @@ class LocationDetails extends Component {
     apiClient.get(url).then((response) => {
       const location = response.data.data;
       if (!location) {
-        this.props.history.push(LOCATION_CONFIGURATION_URL.create());
+        this.props.navigate(LOCATION_CONFIGURATION_URL.create());
         return;
       }
       this.setState((prev) => ({
@@ -370,9 +359,9 @@ class LocationDetails extends Component {
       apiClient.post(locationUrl, payload)
         .then((response) => {
           this.props.hideSpinner();
-          Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
+          toast.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { autoClose: 3000 });
           const resp = response.data.data;
-          this.props.history.push(LOCATION_CONFIGURATION_URL.edit(resp.id));
+          this.props.navigate(LOCATION_CONFIGURATION_URL.edit(resp.id));
           this.props.nextPage({
             ...values,
             locationId: resp.id,
@@ -605,7 +594,5 @@ LocationDetails.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({ locationId: PropTypes.string }),
   }).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

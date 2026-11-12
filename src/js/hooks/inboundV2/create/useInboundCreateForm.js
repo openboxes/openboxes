@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import queryString from 'query-string';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentLocation, getDebounceTime, getMinSearchLength } from 'selectors';
 
 import { fetchUsers, updateWorkflowHeader } from 'actions';
@@ -49,7 +49,7 @@ const useInboundCreateForm = ({ next }) => {
   const spinner = useSpinner();
   const { validationSchema } = useInboundCreateValidation();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { stockMovementId } = useParams();
 
   const debouncedOriginLocationsFetch = useCallback(
@@ -269,7 +269,7 @@ const useInboundCreateForm = ({ next }) => {
       // Any error during fetching means we cannot continue the edit flow.
       // In that case, redirect the user to the create inbound flow.
       dispatch(updateWorkflowHeader([], null));
-      history.push({
+      navigate({
         pathname: '/openboxes/stockMovement/createInbound',
         search: queryString.stringify({ direction: 'INBOUND' }),
       });

@@ -12,6 +12,7 @@ import DateFormat from 'consts/dateFormat';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -40,7 +41,8 @@ class StockMovementsRequest extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'stockMovement');
     }
@@ -207,9 +209,9 @@ const mapStateToProps = (state) => ({
   formatLocalizedDate: formatDate(state.localize),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(StockMovementsRequest);
+})(StockMovementsRequest));
 
 StockMovementsRequest.propTypes = {
   /** React router's object which contains information about url variables and params */

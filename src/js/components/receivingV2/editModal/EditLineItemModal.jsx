@@ -16,7 +16,7 @@ import useShipmentItemDetails from 'hooks/receiving/v2/useShipmentItemDetails';
 import ItemDetails from 'utils/ItemDetails';
 
 const EditLineItemModal = ({
-  onClose, lineItem, initialLineItems, receiptId, loadReceipt, hasPreviousReceipts,
+  onClose, lineItem, initialLineItems, receiptId = null, loadReceipt, hasPreviousReceipts,
 }) => {
   const {
     fields,

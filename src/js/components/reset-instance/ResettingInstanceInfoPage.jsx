@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useTranslation from 'hooks/useTranslation';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 // eslint-disable-next-line no-shadow
-const ResettingInstanceInfoPage = ({ history }) => {
+const ResettingInstanceInfoPage = ({ navigate }) => {
   const [resettingInstanceCommand, setResettingInstanceCommand] = useState('');
 
   useTranslation('resetInstance');
@@ -31,7 +31,7 @@ const ResettingInstanceInfoPage = ({ history }) => {
         </p>
         <p className="font-weight-bold">{resettingInstanceCommand}</p>
         <button
-          onClick={() => history.push(DASHBOARD_URL.base)}
+          onClick={() => navigate(DASHBOARD_URL.base)}
           type="button"
           className="btn btn-outline-primary w-25 align-self-end"
         >
@@ -43,7 +43,7 @@ const ResettingInstanceInfoPage = ({ history }) => {
 };
 
 ResettingInstanceInfoPage.propTypes = {
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };
 
 export default withRouter(ResettingInstanceInfoPage);

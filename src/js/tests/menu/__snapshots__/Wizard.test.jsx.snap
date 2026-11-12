@@ -1,285 +1,220 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`wizard component should match snapshot 1`] = `
-<div
-  className="content-wrap"
-  data-testid="content-wrap"
->
+<DocumentFragment>
   <div
-    className="panel-heading movement-number"
-    data-testid="wizardTitle"
-  >
-    <div>
-      <span
-        style={
-          {
-            "color": undefined,
-          }
-        }
-      >
-        <span
-          style={
-            {
-              "color": "black",
-            }
-          }
-        />
-      </span>
-    </div>
-  </div>
-  <div
-    className="steps-main-box"
+    class="content-wrap"
+    data-testid="content-wrap"
   >
     <div
-      className="steps-inside-wrapper"
+      class="panel-heading movement-number"
+      data-testid="wizardTitle"
     >
-      <div
-        className="step-container active"
-        data-stepstate="active"
-        data-testid="wizard-step"
-      >
-        <div
-          className="circle"
-          disabled={true}
-          onClick={[Function]}
-          onKeyPress={[Function]}
-          role="button"
-          tabIndex="0"
-        />
-        <div
-          className="step-name"
-        >
-          Create
-        </div>
-      </div>
-      <div
-        className="step-container "
-        data-stepstate="inactive"
-        data-testid="wizard-step"
-      >
-        <div
-          className="circle"
-          disabled={true}
-          onClick={[Function]}
-          onKeyPress={[Function]}
-          role="button"
-          tabIndex="0"
-        />
-        <div
-          className="step-name"
-        >
-          Add items
-        </div>
-      </div>
-      <div
-        className="step-container "
-        data-stepstate="inactive"
-        data-testid="wizard-step"
-      >
-        <div
-          className="circle"
-          disabled={true}
-          onClick={[Function]}
-          onKeyPress={[Function]}
-          role="button"
-          tabIndex="0"
-        />
-        <div
-          className="step-name"
-        >
-          Confirm
-        </div>
+      <div>
+        <span>
+          <span
+            style="color: black;"
+          />
+        </span>
       </div>
     </div>
-  </div>
-  <div
-    className="panel panel-primary"
-  >
     <div
-      className="panel-body m-4"
-      data-testid="wizardPage"
+      class="steps-main-box"
     >
-      <form
-        onSubmit={[Function]}
+      <div
+        class="steps-inside-wrapper"
       >
         <div
-          className="classic-form with-description"
+          class="step-container active"
+          data-stepstate="active"
+          data-testid="wizard-step"
         >
           <div
-            aria-label="Invoice number"
-            className="mt-2  mb-0 mx-1 form-group   "
-            data-testid="form-field"
+            class="circle"
+            disabled=""
+            role="button"
+            tabindex="0"
+          />
+          <div
+            class="step-name"
+          >
+            Create
+          </div>
+        </div>
+        <div
+          class="step-container "
+          data-stepstate="inactive"
+          data-testid="wizard-step"
+        >
+          <div
+            class="circle"
+            disabled=""
+            role="button"
+            tabindex="0"
+          />
+          <div
+            class="step-name"
+          >
+            Add items
+          </div>
+        </div>
+        <div
+          class="step-container "
+          data-stepstate="inactive"
+          data-testid="wizard-step"
+        >
+          <div
+            class="circle"
+            disabled=""
+            role="button"
+            tabindex="0"
+          />
+          <div
+            class="step-name"
+          >
+            Confirm
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="panel panel-primary"
+    >
+      <div
+        class="panel-body m-4"
+        data-testid="wizardPage"
+      >
+        <form>
+          <div
+            class="classic-form with-description"
           >
             <div
-              className="row"
+              aria-label="Invoice number"
+              class="mt-2  mb-0 mx-1 form-group   "
+              data-testid="form-field"
             >
-              <label
-                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-                htmlFor="invoiceNumber"
-              >
-                Invoice number
-              </label>
               <div
-                className="form-element-container col-md-4 col-7"
+                class="row"
               >
-                <input
-                  className="form-control form-control-xs  "
-                  data-testid="input"
-                  disabled={true}
-                  id="invoiceNumber"
-                  onBlur={[Function]}
-                  onChange={[Function]}
-                  onDragStart={[Function]}
-                  onFocus={[Function]}
-                  onKeyDown={[Function]}
-                  onKeyPress={[Function]}
-                  onKeyUp={[Function]}
-                  onWheel={[Function]}
-                  type="text"
-                  value=""
+                <label
+                  class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                  for="invoiceNumber"
+                >
+                  Invoice number
+                </label>
+                <div
+                  class="form-element-container col-md-4 col-7"
+                >
+                  <input
+                    class="form-control form-control-xs  "
+                    data-testid="input"
+                    disabled=""
+                    id="invoiceNumber"
+                    type="text"
+                    value=""
+                  />
+                </div>
+              </div>
+              <div
+                aria-label="subtext"
+                class="row"
+              >
+                <div
+                  class="col-md-2 hidden"
+                />
+                <div
+                  class="help-block"
+                  style="float: left;"
                 />
               </div>
             </div>
             <div
-              aria-label="subtext"
-              className="row"
+              aria-label="Vendor"
+              class="mt-2  mb-0 mx-1 form-group required  "
+              data-testid="form-field"
             >
               <div
-                className="col-md-2 hidden"
-              />
-              <div
-                className="help-block"
-                style={
-                  {
-                    "float": "left",
-                  }
-                }
-              />
-            </div>
-          </div>
-          <div
-            aria-label="Vendor"
-            className="mt-2  mb-0 mx-1 form-group required  "
-            data-testid="form-field"
-          >
-            <div
-              className="row"
-            >
-              <label
-                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-                htmlFor="vendor"
+                class="row"
               >
-                Vendor
-              </label>
-              <div
-                className="form-element-container col-md-4 col-7"
-              >
+                <label
+                  class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                  for="vendor"
+                >
+                  Vendor
+                </label>
                 <div
-                  data-testid="custom-select-element"
-                  id="select-id_1-container"
+                  class="form-element-container col-md-4 col-7"
                 >
                   <div
-                    className=""
-                    style={
-                      {
-                        "display": "inline",
-                      }
-                    }
-                    title=" "
+                    data-testid="custom-select-element"
+                    id="select-id_1-container"
                   >
                     <div
-                      className="css-1pcexqc-container select-xs undefined"
+                      class="select-xs css-b62m3t-container"
                       id="select-id_1"
-                      onKeyDown={[Function]}
                     >
+                      <span
+                        class="css-1f43avz-a11yText-A11yText"
+                        id="react-select-2-live-region"
+                      />
+                      <span
+                        aria-atomic="false"
+                        aria-live="polite"
+                        aria-relevant="additions text"
+                        class="css-1f43avz-a11yText-A11yText"
+                        role="log"
+                      />
                       <div
-                        className="css-bg1rzq-control react-select__control"
-                        onMouseDown={[Function]}
-                        onTouchEnd={[Function]}
+                        class="react-select__control css-13cymwt-control"
                       >
                         <div
-                          className="css-1hwfws3 react-select__value-container"
+                          class="react-select__value-container css-hlgwow"
                         >
                           <div
-                            className="css-151xaom-placeholder react-select__placeholder"
+                            class="react-select__placeholder css-1jqq78o-placeholder"
+                            id="react-select-2-placeholder"
                           />
                           <div
-                            className="css-1g6gooi"
+                            class="react-select__input-container css-19bb58m"
+                            data-value=""
                           >
-                            <div
-                              className="react-select__input"
-                              style={
-                                {
-                                  "display": "inline-block",
-                                }
-                              }
-                            >
-                              <input
-                                aria-autocomplete="list"
-                                autoCapitalize="none"
-                                autoComplete="off"
-                                autoCorrect="off"
-                                disabled={false}
-                                id="react-select-2-input"
-                                onBlur={[Function]}
-                                onChange={[Function]}
-                                onFocus={[Function]}
-                                spellCheck="false"
-                                style={
-                                  {
-                                    "background": 0,
-                                    "border": 0,
-                                    "boxSizing": "content-box",
-                                    "color": "inherit",
-                                    "fontSize": "inherit",
-                                    "label": "input",
-                                    "opacity": 1,
-                                    "outline": 0,
-                                    "padding": 0,
-                                    "width": "1px",
-                                  }
-                                }
-                                tabIndex="0"
-                                type="text"
-                                value=""
-                              />
-                              <div
-                                style={
-                                  {
-                                    "height": 0,
-                                    "left": 0,
-                                    "overflow": "scroll",
-                                    "position": "absolute",
-                                    "top": 0,
-                                    "visibility": "hidden",
-                                    "whiteSpace": "pre",
-                                  }
-                                }
-                              >
-                                
-                              </div>
-                            </div>
+                            <input
+                              aria-activedescendant=""
+                              aria-autocomplete="list"
+                              aria-describedby="react-select-2-placeholder"
+                              aria-expanded="false"
+                              aria-haspopup="true"
+                              autocapitalize="none"
+                              autocomplete="off"
+                              autocorrect="off"
+                              class="react-select__input"
+                              id="react-select-2-input"
+                              role="combobox"
+                              spellcheck="false"
+                              style="color: inherit; background: 0px; opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                              tabindex="0"
+                              type="text"
+                              value=""
+                            />
                           </div>
                         </div>
                         <div
-                          className="css-1wy0on6 react-select__indicators"
+                          class="react-select__indicators css-1wy0on6"
                         >
                           <span
-                            className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                            class="react-select__indicator-separator css-1u9des2-indicatorSeparator"
                           />
                           <div
                             aria-hidden="true"
-                            className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
-                            onMouseDown={[Function]}
-                            onTouchEnd={[Function]}
+                            class="react-select__indicator react-select__dropdown-indicator css-1xc3v61-indicatorContainer"
                           >
                             <svg
                               aria-hidden="true"
-                              className="css-19bqh2r"
+                              class="css-tj5bde-Svg"
                               focusable="false"
-                              height={20}
+                              height="20"
                               viewBox="0 0 20 20"
-                              width={20}
+                              width="20"
                             >
                               <path
                                 d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
@@ -297,260 +232,196 @@ exports[`wizard component should match snapshot 1`] = `
                   </div>
                 </div>
               </div>
-            </div>
-            <div
-              aria-label="subtext"
-              className="row"
-            >
               <div
-                className="col-md-2 hidden"
-              />
-              <div
-                className="help-block"
-                style={
-                  {
-                    "float": "left",
-                  }
-                }
-              />
-            </div>
-          </div>
-          <div
-            aria-label="Vendor Invoice Number"
-            className="mt-2  mb-0 mx-1 form-group required  "
-            data-testid="form-field"
-          >
-            <div
-              className="row"
-            >
-              <label
-                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-                htmlFor="vendorInvoiceNumber"
+                aria-label="subtext"
+                class="row"
               >
-                Vendor Invoice Number
-              </label>
-              <div
-                className="form-element-container col-md-4 col-7"
-              >
-                <input
-                  className="form-control form-control-xs  "
-                  data-testid="input"
-                  id="vendorInvoiceNumber"
-                  onBlur={[Function]}
-                  onChange={[Function]}
-                  onDragStart={[Function]}
-                  onFocus={[Function]}
-                  onKeyDown={[Function]}
-                  onKeyPress={[Function]}
-                  onKeyUp={[Function]}
-                  onWheel={[Function]}
-                  type="text"
-                  value=""
+                <div
+                  class="col-md-2 hidden"
+                />
+                <div
+                  class="help-block"
+                  style="float: left;"
                 />
               </div>
             </div>
             <div
-              aria-label="subtext"
-              className="row"
+              aria-label="Vendor Invoice Number"
+              class="mt-2  mb-0 mx-1 form-group required  "
+              data-testid="form-field"
             >
               <div
-                className="col-md-2 hidden"
-              />
-              <div
-                className="help-block"
-                style={
-                  {
-                    "float": "left",
-                  }
-                }
-              />
-            </div>
-          </div>
-          <div
-            aria-label="Invoice Date"
-            className="mt-2  mb-0 mx-1 form-group required  "
-            data-testid="form-field"
-          >
-            <div
-              className="row"
-            >
-              <label
-                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-                htmlFor="dateInvoiced"
+                class="row"
               >
-                Invoice Date
-              </label>
+                <label
+                  class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                  for="vendorInvoiceNumber"
+                >
+                  Vendor Invoice Number
+                </label>
+                <div
+                  class="form-element-container col-md-4 col-7"
+                >
+                  <input
+                    class="form-control form-control-xs  "
+                    data-testid="input"
+                    id="vendorInvoiceNumber"
+                    type="text"
+                    value=""
+                  />
+                </div>
+              </div>
               <div
-                className="form-element-container col-md-4 col-7"
+                aria-label="subtext"
+                class="row"
               >
                 <div
-                  className="date-field"
+                  class="col-md-2 hidden"
+                />
+                <div
+                  class="help-block"
+                  style="float: left;"
+                />
+              </div>
+            </div>
+            <div
+              aria-label="Invoice Date"
+              class="mt-2  mb-0 mx-1 form-group required  "
+              data-testid="form-field"
+            >
+              <div
+                class="row"
+              >
+                <label
+                  class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                  for="dateInvoiced"
+                >
+                  Invoice Date
+                </label>
+                <div
+                  class="form-element-container col-md-4 col-7"
                 >
                   <div
-                    className="react-datepicker-wrapper"
+                    class="date-field"
                   >
                     <div
-                      className="react-datepicker__input-container"
+                      class="react-datepicker-wrapper"
                     >
-                      <input
-                        autoComplete="off"
-                        className="form-control form-control-xs "
-                        disabled={false}
-                        id="dateInvoiced"
-                        onBlur={[Function]}
-                        onChange={[Function]}
-                        onClick={[Function]}
-                        onFocus={[Function]}
-                        onKeyDown={[Function]}
-                        readOnly={false}
-                        type="text"
-                        value=""
-                      />
+                      <div
+                        class="react-datepicker__input-container"
+                      >
+                        <input
+                          autocomplete="off"
+                          class="form-control form-control-xs "
+                          id="dateInvoiced"
+                          type="text"
+                          value=""
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div
-              aria-label="subtext"
-              className="row"
-            >
               <div
-                className="col-md-2 hidden"
-              />
-              <div
-                className="help-block"
-                style={
-                  {
-                    "float": "left",
-                  }
-                }
-              />
-            </div>
-          </div>
-          <div
-            aria-label="Currency"
-            className="mt-2  mb-0 mx-1 form-group required  "
-            data-testid="form-field"
-          >
-            <div
-              className="row"
-            >
-              <label
-                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-                htmlFor="currencyUom"
-              >
-                Currency
-              </label>
-              <div
-                className="form-element-container col-md-4 col-7"
+                aria-label="subtext"
+                class="row"
               >
                 <div
-                  data-testid="custom-select-element"
-                  id="select-id_2-container"
+                  class="col-md-2 hidden"
+                />
+                <div
+                  class="help-block"
+                  style="float: left;"
+                />
+              </div>
+            </div>
+            <div
+              aria-label="Currency"
+              class="mt-2  mb-0 mx-1 form-group required  "
+              data-testid="form-field"
+            >
+              <div
+                class="row"
+              >
+                <label
+                  class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                  for="currencyUom"
+                >
+                  Currency
+                </label>
+                <div
+                  class="form-element-container col-md-4 col-7"
                 >
                   <div
-                    className=""
-                    style={
-                      {
-                        "display": "inline",
-                      }
-                    }
-                    title=" "
+                    data-testid="custom-select-element"
+                    id="select-id_2-container"
                   >
                     <div
-                      className="css-1pcexqc-container select-xs undefined"
+                      class="select-xs css-b62m3t-container"
                       id="select-id_2"
-                      onKeyDown={[Function]}
                     >
+                      <span
+                        class="css-1f43avz-a11yText-A11yText"
+                        id="react-select-3-live-region"
+                      />
+                      <span
+                        aria-atomic="false"
+                        aria-live="polite"
+                        aria-relevant="additions text"
+                        class="css-1f43avz-a11yText-A11yText"
+                        role="log"
+                      />
                       <div
-                        className="css-bg1rzq-control react-select__control"
-                        onMouseDown={[Function]}
-                        onTouchEnd={[Function]}
+                        class="react-select__control css-13cymwt-control"
                       >
                         <div
-                          className="css-1hwfws3 react-select__value-container"
+                          class="react-select__value-container css-hlgwow"
                         >
                           <div
-                            className="css-151xaom-placeholder react-select__placeholder"
+                            class="react-select__placeholder css-1jqq78o-placeholder"
+                            id="react-select-3-placeholder"
                           />
                           <div
-                            className="css-1g6gooi"
+                            class="react-select__input-container css-19bb58m"
+                            data-value=""
                           >
-                            <div
-                              className="react-select__input"
-                              style={
-                                {
-                                  "display": "inline-block",
-                                }
-                              }
-                            >
-                              <input
-                                aria-autocomplete="list"
-                                autoCapitalize="none"
-                                autoComplete="off"
-                                autoCorrect="off"
-                                disabled={false}
-                                id="react-select-3-input"
-                                onBlur={[Function]}
-                                onChange={[Function]}
-                                onFocus={[Function]}
-                                spellCheck="false"
-                                style={
-                                  {
-                                    "background": 0,
-                                    "border": 0,
-                                    "boxSizing": "content-box",
-                                    "color": "inherit",
-                                    "fontSize": "inherit",
-                                    "label": "input",
-                                    "opacity": 1,
-                                    "outline": 0,
-                                    "padding": 0,
-                                    "width": "1px",
-                                  }
-                                }
-                                tabIndex="0"
-                                type="text"
-                                value=""
-                              />
-                              <div
-                                style={
-                                  {
-                                    "height": 0,
-                                    "left": 0,
-                                    "overflow": "scroll",
-                                    "position": "absolute",
-                                    "top": 0,
-                                    "visibility": "hidden",
-                                    "whiteSpace": "pre",
-                                  }
-                                }
-                              >
-                                
-                              </div>
-                            </div>
+                            <input
+                              aria-activedescendant=""
+                              aria-autocomplete="list"
+                              aria-describedby="react-select-3-placeholder"
+                              aria-expanded="false"
+                              aria-haspopup="true"
+                              autocapitalize="none"
+                              autocomplete="off"
+                              autocorrect="off"
+                              class="react-select__input"
+                              id="react-select-3-input"
+                              role="combobox"
+                              spellcheck="false"
+                              style="color: inherit; background: 0px; opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                              tabindex="0"
+                              type="text"
+                              value=""
+                            />
                           </div>
                         </div>
                         <div
-                          className="css-1wy0on6 react-select__indicators"
+                          class="react-select__indicators css-1wy0on6"
                         >
                           <span
-                            className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                            class="react-select__indicator-separator css-1u9des2-indicatorSeparator"
                           />
                           <div
                             aria-hidden="true"
-                            className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
-                            onMouseDown={[Function]}
-                            onTouchEnd={[Function]}
+                            class="react-select__indicator react-select__dropdown-indicator css-1xc3v61-indicatorContainer"
                           >
                             <svg
                               aria-hidden="true"
-                              className="css-19bqh2r"
+                              class="css-tj5bde-Svg"
                               focusable="false"
-                              height={20}
+                              height="20"
                               viewBox="0 0 20 20"
-                              width={20}
+                              width="20"
                             >
                               <path
                                 d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
@@ -568,227 +439,174 @@ exports[`wizard component should match snapshot 1`] = `
                   </div>
                 </div>
               </div>
-            </div>
-            <div
-              aria-label="subtext"
-              className="row"
-            >
               <div
-                className="col-md-2 hidden"
-              />
-              <div
-                className="help-block"
-                style={
-                  {
-                    "float": "left",
-                  }
-                }
-              />
+                aria-label="subtext"
+                class="row"
+              >
+                <div
+                  class="col-md-2 hidden"
+                />
+                <div
+                  class="help-block"
+                  style="float: left;"
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          className="submit-buttons"
-        >
-          <button
-            className="btn btn-outline-primary float-right btn-xs"
-            type="submit"
+          <div
+            class="submit-buttons"
           >
-            Next
-          </button>
-        </div>
-      </form>
+            <button
+              class="btn btn-outline-primary float-right btn-xs"
+              type="submit"
+            >
+              Next
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+</DocumentFragment>
 `;
 
 exports[`wizardPage component should match snapshot 1`] = `
-<div
-  className="panel-body m-4"
-  data-testid="wizardPage"
->
-  <form
-    onSubmit={[Function]}
+<DocumentFragment>
+  <div
+    class="panel-body m-4"
+    data-testid="wizardPage"
   >
-    <div
-      className="classic-form with-description"
-    >
+    <form>
       <div
-        aria-label="Invoice number"
-        className="mt-2  mb-0 mx-1 form-group   "
-        data-testid="form-field"
+        class="classic-form with-description"
       >
         <div
-          className="row"
+          aria-label="Invoice number"
+          class="mt-2  mb-0 mx-1 form-group   "
+          data-testid="form-field"
         >
-          <label
-            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-            htmlFor="invoiceNumber"
-          >
-            Invoice number
-          </label>
           <div
-            className="form-element-container col-md-4 col-7"
+            class="row"
           >
-            <input
-              className="form-control form-control-xs  "
-              data-testid="input"
-              disabled={true}
-              id="invoiceNumber"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onKeyUp={[Function]}
-              onWheel={[Function]}
-              type="text"
-              value=""
+            <label
+              class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+              for="invoiceNumber"
+            >
+              Invoice number
+            </label>
+            <div
+              class="form-element-container col-md-4 col-7"
+            >
+              <input
+                class="form-control form-control-xs  "
+                data-testid="input"
+                disabled=""
+                id="invoiceNumber"
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
+          <div
+            aria-label="subtext"
+            class="row"
+          >
+            <div
+              class="col-md-2 hidden"
+            />
+            <div
+              class="help-block"
+              style="float: left;"
             />
           </div>
         </div>
         <div
-          aria-label="subtext"
-          className="row"
+          aria-label="Vendor"
+          class="mt-2  mb-0 mx-1 form-group required  "
+          data-testid="form-field"
         >
           <div
-            className="col-md-2 hidden"
-          />
-          <div
-            className="help-block"
-            style={
-              {
-                "float": "left",
-              }
-            }
-          />
-        </div>
-      </div>
-      <div
-        aria-label="Vendor"
-        className="mt-2  mb-0 mx-1 form-group required  "
-        data-testid="form-field"
-      >
-        <div
-          className="row"
-        >
-          <label
-            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-            htmlFor="vendor"
+            class="row"
           >
-            Vendor
-          </label>
-          <div
-            className="form-element-container col-md-4 col-7"
-          >
+            <label
+              class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+              for="vendor"
+            >
+              Vendor
+            </label>
             <div
-              data-testid="custom-select-element"
-              id="select-id_5-container"
+              class="form-element-container col-md-4 col-7"
             >
               <div
-                className=""
-                style={
-                  {
-                    "display": "inline",
-                  }
-                }
-                title=" "
+                data-testid="custom-select-element"
+                id="select-id_5-container"
               >
                 <div
-                  className="css-1pcexqc-container select-xs undefined"
+                  class="select-xs css-b62m3t-container"
                   id="select-id_5"
-                  onKeyDown={[Function]}
                 >
+                  <span
+                    class="css-1f43avz-a11yText-A11yText"
+                    id="react-select-6-live-region"
+                  />
+                  <span
+                    aria-atomic="false"
+                    aria-live="polite"
+                    aria-relevant="additions text"
+                    class="css-1f43avz-a11yText-A11yText"
+                    role="log"
+                  />
                   <div
-                    className="css-bg1rzq-control react-select__control"
-                    onMouseDown={[Function]}
-                    onTouchEnd={[Function]}
+                    class="react-select__control css-13cymwt-control"
                   >
                     <div
-                      className="css-1hwfws3 react-select__value-container"
+                      class="react-select__value-container css-hlgwow"
                     >
                       <div
-                        className="css-151xaom-placeholder react-select__placeholder"
+                        class="react-select__placeholder css-1jqq78o-placeholder"
+                        id="react-select-6-placeholder"
                       />
                       <div
-                        className="css-1g6gooi"
+                        class="react-select__input-container css-19bb58m"
+                        data-value=""
                       >
-                        <div
-                          className="react-select__input"
-                          style={
-                            {
-                              "display": "inline-block",
-                            }
-                          }
-                        >
-                          <input
-                            aria-autocomplete="list"
-                            autoCapitalize="none"
-                            autoComplete="off"
-                            autoCorrect="off"
-                            disabled={false}
-                            id="react-select-6-input"
-                            onBlur={[Function]}
-                            onChange={[Function]}
-                            onFocus={[Function]}
-                            spellCheck="false"
-                            style={
-                              {
-                                "background": 0,
-                                "border": 0,
-                                "boxSizing": "content-box",
-                                "color": "inherit",
-                                "fontSize": "inherit",
-                                "label": "input",
-                                "opacity": 1,
-                                "outline": 0,
-                                "padding": 0,
-                                "width": "1px",
-                              }
-                            }
-                            tabIndex="0"
-                            type="text"
-                            value=""
-                          />
-                          <div
-                            style={
-                              {
-                                "height": 0,
-                                "left": 0,
-                                "overflow": "scroll",
-                                "position": "absolute",
-                                "top": 0,
-                                "visibility": "hidden",
-                                "whiteSpace": "pre",
-                              }
-                            }
-                          >
-                            
-                          </div>
-                        </div>
+                        <input
+                          aria-activedescendant=""
+                          aria-autocomplete="list"
+                          aria-describedby="react-select-6-placeholder"
+                          aria-expanded="false"
+                          aria-haspopup="true"
+                          autocapitalize="none"
+                          autocomplete="off"
+                          autocorrect="off"
+                          class="react-select__input"
+                          id="react-select-6-input"
+                          role="combobox"
+                          spellcheck="false"
+                          style="color: inherit; background: 0px; opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                          tabindex="0"
+                          type="text"
+                          value=""
+                        />
                       </div>
                     </div>
                     <div
-                      className="css-1wy0on6 react-select__indicators"
+                      class="react-select__indicators css-1wy0on6"
                     >
                       <span
-                        className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                        class="react-select__indicator-separator css-1u9des2-indicatorSeparator"
                       />
                       <div
                         aria-hidden="true"
-                        className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
-                        onMouseDown={[Function]}
-                        onTouchEnd={[Function]}
+                        class="react-select__indicator react-select__dropdown-indicator css-1xc3v61-indicatorContainer"
                       >
                         <svg
                           aria-hidden="true"
-                          className="css-19bqh2r"
+                          class="css-tj5bde-Svg"
                           focusable="false"
-                          height={20}
+                          height="20"
                           viewBox="0 0 20 20"
-                          width={20}
+                          width="20"
                         >
                           <path
                             d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
@@ -806,260 +624,196 @@ exports[`wizardPage component should match snapshot 1`] = `
               </div>
             </div>
           </div>
-        </div>
-        <div
-          aria-label="subtext"
-          className="row"
-        >
           <div
-            className="col-md-2 hidden"
-          />
-          <div
-            className="help-block"
-            style={
-              {
-                "float": "left",
-              }
-            }
-          />
-        </div>
-      </div>
-      <div
-        aria-label="Vendor Invoice Number"
-        className="mt-2  mb-0 mx-1 form-group required  "
-        data-testid="form-field"
-      >
-        <div
-          className="row"
-        >
-          <label
-            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-            htmlFor="vendorInvoiceNumber"
+            aria-label="subtext"
+            class="row"
           >
-            Vendor Invoice Number
-          </label>
-          <div
-            className="form-element-container col-md-4 col-7"
-          >
-            <input
-              className="form-control form-control-xs  "
-              data-testid="input"
-              id="vendorInvoiceNumber"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onDragStart={[Function]}
-              onFocus={[Function]}
-              onKeyDown={[Function]}
-              onKeyPress={[Function]}
-              onKeyUp={[Function]}
-              onWheel={[Function]}
-              type="text"
-              value=""
+            <div
+              class="col-md-2 hidden"
+            />
+            <div
+              class="help-block"
+              style="float: left;"
             />
           </div>
         </div>
         <div
-          aria-label="subtext"
-          className="row"
+          aria-label="Vendor Invoice Number"
+          class="mt-2  mb-0 mx-1 form-group required  "
+          data-testid="form-field"
         >
           <div
-            className="col-md-2 hidden"
-          />
-          <div
-            className="help-block"
-            style={
-              {
-                "float": "left",
-              }
-            }
-          />
-        </div>
-      </div>
-      <div
-        aria-label="Invoice Date"
-        className="mt-2  mb-0 mx-1 form-group required  "
-        data-testid="form-field"
-      >
-        <div
-          className="row"
-        >
-          <label
-            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-            htmlFor="dateInvoiced"
+            class="row"
           >
-            Invoice Date
-          </label>
+            <label
+              class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+              for="vendorInvoiceNumber"
+            >
+              Vendor Invoice Number
+            </label>
+            <div
+              class="form-element-container col-md-4 col-7"
+            >
+              <input
+                class="form-control form-control-xs  "
+                data-testid="input"
+                id="vendorInvoiceNumber"
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
           <div
-            className="form-element-container col-md-4 col-7"
+            aria-label="subtext"
+            class="row"
           >
             <div
-              className="date-field"
+              class="col-md-2 hidden"
+            />
+            <div
+              class="help-block"
+              style="float: left;"
+            />
+          </div>
+        </div>
+        <div
+          aria-label="Invoice Date"
+          class="mt-2  mb-0 mx-1 form-group required  "
+          data-testid="form-field"
+        >
+          <div
+            class="row"
+          >
+            <label
+              class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+              for="dateInvoiced"
+            >
+              Invoice Date
+            </label>
+            <div
+              class="form-element-container col-md-4 col-7"
             >
               <div
-                className="react-datepicker-wrapper"
+                class="date-field"
               >
                 <div
-                  className="react-datepicker__input-container"
+                  class="react-datepicker-wrapper"
                 >
-                  <input
-                    autoComplete="off"
-                    className="form-control form-control-xs "
-                    disabled={false}
-                    id="dateInvoiced"
-                    onBlur={[Function]}
-                    onChange={[Function]}
-                    onClick={[Function]}
-                    onFocus={[Function]}
-                    onKeyDown={[Function]}
-                    readOnly={false}
-                    type="text"
-                    value=""
-                  />
+                  <div
+                    class="react-datepicker__input-container"
+                  >
+                    <input
+                      autocomplete="off"
+                      class="form-control form-control-xs "
+                      id="dateInvoiced"
+                      type="text"
+                      value=""
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div
-          aria-label="subtext"
-          className="row"
-        >
           <div
-            className="col-md-2 hidden"
-          />
-          <div
-            className="help-block"
-            style={
-              {
-                "float": "left",
-              }
-            }
-          />
-        </div>
-      </div>
-      <div
-        aria-label="Currency"
-        className="mt-2  mb-0 mx-1 form-group required  "
-        data-testid="form-field"
-      >
-        <div
-          className="row"
-        >
-          <label
-            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
-            htmlFor="currencyUom"
-          >
-            Currency
-          </label>
-          <div
-            className="form-element-container col-md-4 col-7"
+            aria-label="subtext"
+            class="row"
           >
             <div
-              data-testid="custom-select-element"
-              id="select-id_6-container"
+              class="col-md-2 hidden"
+            />
+            <div
+              class="help-block"
+              style="float: left;"
+            />
+          </div>
+        </div>
+        <div
+          aria-label="Currency"
+          class="mt-2  mb-0 mx-1 form-group required  "
+          data-testid="form-field"
+        >
+          <div
+            class="row"
+          >
+            <label
+              class="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+              for="currencyUom"
+            >
+              Currency
+            </label>
+            <div
+              class="form-element-container col-md-4 col-7"
             >
               <div
-                className=""
-                style={
-                  {
-                    "display": "inline",
-                  }
-                }
-                title=" "
+                data-testid="custom-select-element"
+                id="select-id_6-container"
               >
                 <div
-                  className="css-1pcexqc-container select-xs undefined"
+                  class="select-xs css-b62m3t-container"
                   id="select-id_6"
-                  onKeyDown={[Function]}
                 >
+                  <span
+                    class="css-1f43avz-a11yText-A11yText"
+                    id="react-select-7-live-region"
+                  />
+                  <span
+                    aria-atomic="false"
+                    aria-live="polite"
+                    aria-relevant="additions text"
+                    class="css-1f43avz-a11yText-A11yText"
+                    role="log"
+                  />
                   <div
-                    className="css-bg1rzq-control react-select__control"
-                    onMouseDown={[Function]}
-                    onTouchEnd={[Function]}
+                    class="react-select__control css-13cymwt-control"
                   >
                     <div
-                      className="css-1hwfws3 react-select__value-container"
+                      class="react-select__value-container css-hlgwow"
                     >
                       <div
-                        className="css-151xaom-placeholder react-select__placeholder"
+                        class="react-select__placeholder css-1jqq78o-placeholder"
+                        id="react-select-7-placeholder"
                       />
                       <div
-                        className="css-1g6gooi"
+                        class="react-select__input-container css-19bb58m"
+                        data-value=""
                       >
-                        <div
-                          className="react-select__input"
-                          style={
-                            {
-                              "display": "inline-block",
-                            }
-                          }
-                        >
-                          <input
-                            aria-autocomplete="list"
-                            autoCapitalize="none"
-                            autoComplete="off"
-                            autoCorrect="off"
-                            disabled={false}
-                            id="react-select-7-input"
-                            onBlur={[Function]}
-                            onChange={[Function]}
-                            onFocus={[Function]}
-                            spellCheck="false"
-                            style={
-                              {
-                                "background": 0,
-                                "border": 0,
-                                "boxSizing": "content-box",
-                                "color": "inherit",
-                                "fontSize": "inherit",
-                                "label": "input",
-                                "opacity": 1,
-                                "outline": 0,
-                                "padding": 0,
-                                "width": "1px",
-                              }
-                            }
-                            tabIndex="0"
-                            type="text"
-                            value=""
-                          />
-                          <div
-                            style={
-                              {
-                                "height": 0,
-                                "left": 0,
-                                "overflow": "scroll",
-                                "position": "absolute",
-                                "top": 0,
-                                "visibility": "hidden",
-                                "whiteSpace": "pre",
-                              }
-                            }
-                          >
-                            
-                          </div>
-                        </div>
+                        <input
+                          aria-activedescendant=""
+                          aria-autocomplete="list"
+                          aria-describedby="react-select-7-placeholder"
+                          aria-expanded="false"
+                          aria-haspopup="true"
+                          autocapitalize="none"
+                          autocomplete="off"
+                          autocorrect="off"
+                          class="react-select__input"
+                          id="react-select-7-input"
+                          role="combobox"
+                          spellcheck="false"
+                          style="color: inherit; background: 0px; opacity: 1; width: 100%; grid-area: 1 / 2; min-width: 2px; border: 0px; margin: 0px; outline: 0; padding: 0px;"
+                          tabindex="0"
+                          type="text"
+                          value=""
+                        />
                       </div>
                     </div>
                     <div
-                      className="css-1wy0on6 react-select__indicators"
+                      class="react-select__indicators css-1wy0on6"
                     >
                       <span
-                        className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                        class="react-select__indicator-separator css-1u9des2-indicatorSeparator"
                       />
                       <div
                         aria-hidden="true"
-                        className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
-                        onMouseDown={[Function]}
-                        onTouchEnd={[Function]}
+                        class="react-select__indicator react-select__dropdown-indicator css-1xc3v61-indicatorContainer"
                       >
                         <svg
                           aria-hidden="true"
-                          className="css-19bqh2r"
+                          class="css-tj5bde-Svg"
                           focusable="false"
-                          height={20}
+                          height="20"
                           viewBox="0 0 20 20"
-                          width={20}
+                          width="20"
                         >
                           <path
                             d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
@@ -1077,109 +831,95 @@ exports[`wizardPage component should match snapshot 1`] = `
               </div>
             </div>
           </div>
-        </div>
-        <div
-          aria-label="subtext"
-          className="row"
-        >
           <div
-            className="col-md-2 hidden"
-          />
-          <div
-            className="help-block"
-            style={
-              {
-                "float": "left",
-              }
-            }
-          />
+            aria-label="subtext"
+            class="row"
+          >
+            <div
+              class="col-md-2 hidden"
+            />
+            <div
+              class="help-block"
+              style="float: left;"
+            />
+          </div>
         </div>
       </div>
-    </div>
-    <div
-      className="submit-buttons"
-    >
-      <button
-        className="btn btn-outline-primary float-right btn-xs"
-        type="submit"
+      <div
+        class="submit-buttons"
       >
-        Next
-      </button>
-    </div>
-  </form>
-</div>
+        <button
+          class="btn btn-outline-primary float-right btn-xs"
+          type="submit"
+        >
+          Next
+        </button>
+      </div>
+    </form>
+  </div>
+</DocumentFragment>
 `;
 
 exports[`wizardSteps component should match snapshot 1`] = `
-<div
-  className="steps-main-box"
->
+<DocumentFragment>
   <div
-    className="steps-inside-wrapper"
+    class="steps-main-box"
   >
     <div
-      className="step-container active"
-      data-stepstate="active"
-      data-testid="wizard-step"
+      class="steps-inside-wrapper"
     >
       <div
-        className="circle"
-        disabled={true}
-        onClick={[Function]}
-        onKeyPress={[Function]}
-        role="button"
-        tabIndex="0"
-      />
-      <div
-        className="step-name"
+        class="step-container active"
+        data-stepstate="active"
+        data-testid="wizard-step"
       >
-        firstTestStep
+        <div
+          class="circle"
+          disabled=""
+          role="button"
+          tabindex="0"
+        />
+        <div
+          class="step-name"
+        >
+          firstTestStep
+        </div>
       </div>
-    </div>
-    <div
-      className="step-container "
-      data-stepstate="inactive"
-      data-testid="wizard-step"
-    >
       <div
-        className="circle"
-        disabled={true}
-        onClick={[Function]}
-        onKeyPress={[Function]}
-        role="button"
-        tabIndex="0"
-      />
-      <div
-        className="step-name"
+        class="step-container "
+        data-stepstate="inactive"
+        data-testid="wizard-step"
       >
-        secondTestStep
+        <div
+          class="circle"
+          disabled=""
+          role="button"
+          tabindex="0"
+        />
+        <div
+          class="step-name"
+        >
+          secondTestStep
+        </div>
       </div>
     </div>
   </div>
-</div>
+</DocumentFragment>
 `;
 
 exports[`wizardTitle component should match snapshot 1`] = `
-<div
-  className="panel-heading movement-number"
-  data-testid="wizardTitle"
->
-  <div>
-    <span
-      style={
-        {
-          "color": undefined,
-        }
-      }
-    >
-      <span
-        style={
-          {
-            "color": "black",
-          }
-        }
-      />
-    </span>
+<DocumentFragment>
+  <div
+    class="panel-heading movement-number"
+    data-testid="wizardTitle"
+  >
+    <div>
+      <span>
+        <span
+          style="color: black;"
+        />
+      </span>
+    </div>
   </div>
-</div>
+</DocumentFragment>
 `;

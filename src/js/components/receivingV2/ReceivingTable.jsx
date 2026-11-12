@@ -15,16 +15,16 @@ const ReceivingTable = ({
   lineItemsState,
   columns,
   loading,
-  receiptId,
+  receiptId = null,
   updateLineItem,
   updateLineItemComment,
   removeSplitItem,
   loadReceipt,
   onLocationAutofill,
   onPackLevelLocationChange,
-  sort,
-  order,
-  lineItemErrors,
+  sort = null,
+  order = null,
+  lineItemErrors = {},
 }) => {
   const commentModal = useCommentModal({ updateLineItemComment });
   const {

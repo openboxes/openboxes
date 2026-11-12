@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import * as locales from 'date-fns/locale';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
@@ -67,7 +68,7 @@ const DateFilter = (props) => {
     formatLocalizedDate: formatDate(state.localize),
   }));
   const [isFocused, setIsFocused] = useState(false);
-  const onChangeHandler = (date) => onChange(date.format(dateFormat));
+  const onChangeHandler = (date) => onChange(moment(date).format(dateFormat));
 
   const onClear = (e) => {
     e.stopPropagation();
@@ -94,9 +95,9 @@ const DateFilter = (props) => {
   const isValidClass = value ? 'date-picker__wrapper--valid' : '';
 
   const selectedDate = value ? moment(value, dateFormat) : null;
-  const highlightedDates = [selectedDate || moment(new Date(), dateFormat)];
+  const highlightedDates = [selectedDate?.toDate() || new Date()];
 
-  const localeCodeToDisplay = localizeDate ? localeCode : null;
+  const localeCodeToDisplay = localizeDate ? locales[localeCode] : null;
   return (
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`} data-testid="date-filter">
       <DatePicker
@@ -119,6 +120,7 @@ const DateFilter = (props) => {
         onClickOutside={onBlur}
         disabledKeyboardNavigation
         popperClassName="force-on-top"
+        popperPlacement="bottom-start"
         showYearDropdown
         locale={localeCodeToDisplay}
         scrollableYearDropdown

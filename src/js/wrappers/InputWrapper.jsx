@@ -2,11 +2,11 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiQuestionLine } from 'react-icons/ri';
-import { Tooltip } from 'react-tippy';
 
 import useTranslate from 'hooks/useTranslate';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
+import PortalTooltip from 'wrappers/PortalTooltip';
 
 import 'wrappers/style.scss';
 
@@ -21,7 +21,7 @@ const InputWrapper = ({
   inputId,
   labelPosition,
   hideErrorMessageWrapper,
-  customTooltip,
+  customTooltip = false,
   value,
   ariaLabel,
   hasErrors,
@@ -40,17 +40,20 @@ const InputWrapper = ({
             {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
           </label>
           {tooltip && (
-            <Tooltip
-              html={(
+            <>
+              <span
+                className="input-wrapper-tooltip"
+                data-tooltip-id={`tooltip-${tooltip.id}`}
+              >
+                <RiQuestionLine className="ml-1" />
+              </span>
+
+              <PortalTooltip id={`tooltip-${tooltip.id}`} place="top" className="custom-tooltip">
                 <span className="p-1">
                   <Translate id={tooltip.id} defaultMessage={tooltip.defaultMessage} />
                 </span>
-              )}
-            >
-              <span className="input-wrapper-tooltip">
-                <RiQuestionLine className="ml-1" />
-              </span>
-            </Tooltip>
+              </PortalTooltip>
+            </>
           )}
           {required && <span className="input-wrapper-asterisk ml-1">&#42;</span>}
         </div>

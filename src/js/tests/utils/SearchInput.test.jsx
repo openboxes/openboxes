@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import SearchInput from 'utils/SearchInput';
 
@@ -19,8 +18,8 @@ describe('search input', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedInput = renderer.create(searchInput);
-    expect(renderedInput.toJSON())
+    const renderedInput = render(searchInput);
+    expect(renderedInput.asFragment())
       .toMatchSnapshot();
   });
 

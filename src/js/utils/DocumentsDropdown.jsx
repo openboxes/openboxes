@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import DocumentButton from 'components/DocumentButton';
 import Translate from 'utils/Translate';
 
-const DocumentsDropdown = ({ documents }) => {
+const DocumentsDropdown = ({ documents = [] }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const toggleDocumentDropdown = () => setIsDropdownVisible((prev) => !prev);
