@@ -260,7 +260,9 @@ class PickTaskService {
         if (!laneIdByType) {
             return [:]
         }
-        Map<String, Location> lanes = Location.getAll(laneIdByType.values().unique()).findAll().collectEntries { [(it.id): it] }
+        // Copy before de-duplicating: Groovy's unique() mutates in place, which a Map's values() view does not support
+        List<String> uniqueLaneIds = (laneIdByType.values() as Set<String>).toList()
+        Map<String, Location> lanes = Location.getAll(uniqueLaneIds).findAll().collectEntries { [(it.id): it] }
         return laneIdByType.collectEntries { code, id -> [(code): lanes[id]] }
     }
 
