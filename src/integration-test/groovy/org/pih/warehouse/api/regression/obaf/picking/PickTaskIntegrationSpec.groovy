@@ -552,9 +552,9 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         PickSite s = pickSite('PT-SN')
         PickOrder o = pickOrder(s, [1, 1])
         tx {
-            PicklistItem item = PicklistItem.get(o.taskIds[1])
-            item.inventoryItem = null
-            item.save(flush: true, failOnError: true)
+            // Bulk update: a regular save fires PicklistItem.afterUpdate, whose availability refresh
+            // does not handle a null inventory item. Such rows can still exist in the database.
+            PicklistItem.executeUpdate('update PicklistItem set inventoryItem = null where id = :id', [id: o.taskIds[1]])
         }
 
         expect:
