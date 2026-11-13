@@ -352,8 +352,15 @@ class PickTaskService {
             throw new IllegalStateException("Pick task ${task.id} has no associated requisition item")
         }
 
-        // The new bins must exist at the task's facility; check them all before anything is deleted
+        // Every new pick must name an existing inventory item (a picklist item without one breaks the product
+        // availability refresh) and its bin must exist at the task's facility; check them all before anything is deleted
         picklistItems.each { item ->
+            if (!item.inventoryItem?.id) {
+                throw new IllegalArgumentException("Each picklist item must specify an inventory item")
+            }
+            if (!InventoryItem.get(item.inventoryItem.id)) {
+                throw new IllegalArgumentException("Inventory item ${item.inventoryItem.id} does not exist")
+            }
             if (item.binLocation?.id && !findInFacility(item.binLocation.id as String, task.facility)) {
                 throw new IllegalArgumentException("Bin location ${item.binLocation.id} is not a location of facility ${task.facility?.name}")
             }
@@ -382,8 +389,7 @@ class PickTaskService {
 
         // Create new picklist items for each selected bin location
         picklistItems.each { item ->
-            InventoryItem inventoryItem = item.inventoryItem?.id ?
-                    InventoryItem.get(item.inventoryItem.id) : null
+            InventoryItem inventoryItem = InventoryItem.get(item.inventoryItem.id)
 
             Location binLocation = item.binLocation?.id ?
                     findInFacility(item.binLocation.id as String, task.facility) : null
