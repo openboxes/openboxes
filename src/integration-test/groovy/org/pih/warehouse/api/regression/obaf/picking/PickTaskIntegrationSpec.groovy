@@ -437,7 +437,8 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
         then:
         dropError(s.tote, [action: 'drop', stagingLocationId: s.alt]).message.contains('STAGING_LOCATION')
-        dropError(s.tote, [action: 'drop', stagingLocationId: 'no-such-lane']).message.contains('does not exist')
+        dropError(s.tote, [action: 'drop', stagingLocationId: 'no-such-lane']).message == 'Staging location no-such-lane not found'
+        dropError(s.tote, [action: 'drop', stagingLocationId: '']).message == 'Staging location is required'
         dropError(s.tote, [action: 'stack']) instanceof UnsupportedOperationException
         dropError('no-such-tote', [action: 'drop']) instanceof IllegalArgumentException
         pickTask(o.taskIds[0]).status == 'PICKED'

@@ -9,6 +9,7 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.picking.PickTask
 import org.pih.warehouse.picking.PickTaskService
+import org.pih.warehouse.picking.StagingLocationNotFoundException
 import org.springframework.http.HttpStatus
 
 class PickTaskApiController extends RestfulController<PickTask> {
@@ -130,8 +131,23 @@ class PickTaskApiController extends RestfulController<PickTask> {
                     [errorCode: 404, errorMessage: "Outbound container ${outboundContainerId} not found"] as JSON)
             return
         }
-        pickTaskService.drop(outboundContainer, jsonBody)
+        if (jsonBody.action == 'drop' && isBlank(jsonBody.stagingLocationId)) {
+            render(status: HttpStatus.BAD_REQUEST.value(),
+                    [errorCode: 400, errorMessage: "Staging location is required"] as JSON)
+            return
+        }
+        try {
+            pickTaskService.drop(outboundContainer, jsonBody)
+        } catch (StagingLocationNotFoundException e) {
+            render(status: HttpStatus.NOT_FOUND.value(), [errorCode: 404, errorMessage: e.message] as JSON)
+            return
+        }
         render status: 200
+    }
+
+    // Missing, JSON null (Grails' JSONObject holds it as a Java null) or only whitespace.
+    private static boolean isBlank(Object value) {
+        return value == null || !value.toString().trim()
     }
 
     /**
