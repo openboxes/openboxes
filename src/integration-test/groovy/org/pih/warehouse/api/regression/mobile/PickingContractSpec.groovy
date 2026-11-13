@@ -11,6 +11,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -423,6 +424,142 @@ class PickingContractSpec extends MobileContractSpec {
         then:
         r.holds()
         PicklistItem.withNewTransaction { PicklistItem.get(o.taskIds[0]).status?.toString() } == 'STAGED'
+    }
+
+    /** A picked tote whose stock has reached the availability table, so a drop can move it. */
+    PickOrder pickedTote() {
+        PickOrder o = pickOrder()
+        call('src/apis/picking.ts#patchPickTaskApi', [facilityId: o.dc.id, taskId: o.taskIds[0]], [action: 'start', assigneeId: '1']).holds()
+        call('src/apis/picking.ts#patchPickTaskApi', [facilityId: o.dc.id, taskId: o.taskIds[0]],
+                [action: 'pick', outboundContainerId: o.tote.id, pickedById: '1']).holds()
+        refreshAvailability(o)
+        return o
+    }
+
+    CallResult drop(PickOrder o, Map body) {
+        return call('src/apis/picking.ts#dropPickTaskApi', [facilityId: o.dc.id, outboundContainerId: o.tote.id], body)
+    }
+
+    /**
+     * What a drop writes: the task's staging fields and status, the order status, the stock in the tote, and the
+     * inventory transaction entries on the tote and the staging bin (the ledger, not the availability cache).
+     */
+    Map dropState(PickOrder o) {
+        return PicklistItem.withNewTransaction {
+            PicklistItem item = PicklistItem.get(o.taskIds[0])
+            [status        : item.status?.toString(),
+             stagingLocation: item.stagingLocation?.id,
+             dateStaged    : item.dateStaged,
+             stagedBy      : item.stagedBy?.id,
+             requisition   : Requisition.get(o.requisition.id).status?.toString(),
+             tote          : productAvailabilityService.getAvailableItems(Location.get(o.tote.id))
+                     .collect { [it.inventoryItem.id, it.quantityOnHand] },
+             entries       : [o.tote, o.staging].collect { TransactionEntry.countByBinLocation(Location.get(it.id)) }]
+        }
+    }
+
+    @Covers('src/apis/picking.ts#dropPickTaskApi')
+    void 'PATCH pick-tasks/containers/{tote} drop stages the picked tote at the staging location number the scanner reads'() {
+        given:
+        PickOrder o = pickedTote()
+
+        when:
+        CallResult r = drop(o, [action: 'drop', stagingLocationId: o.staging.locationNumber, stagedById: '1'])
+
+        then:
+        r.holds()
+        dropState(o).status == 'STAGED'
+        dropState(o).stagingLocation == o.staging.id
+    }
+
+    void 'drop at a staging location that does not exist answers 404 naming the scanned value, and stages nothing'() {
+        given:
+        PickOrder o = pickedTote()
+        Map before = dropState(o)
+
+        when:
+        CallResult r = drop(o, [action: 'drop', stagingLocationId: 'NO-SUCH-LANE', stagedById: '1'])
+
+        then:
+        r.status == 404
+        r.data.errorCode == 404
+        r.data.errorMessage == 'Staging location NO-SUCH-LANE not found'
+        before.status == 'PICKED'
+        dropState(o) == before
+    }
+
+    void 'drop at a staging location of another facility answers 404, by id and by location number'() {
+        given:
+        PickOrder o = pickedTote()
+        Location elsewhere = newDepot('PK-OTHER')
+        Location foreign = newBin('PK-FSTAGE', [ActivityCode.STAGING_LOCATION.id, ActivityCode.HOLD_STOCK.id,
+                                                ActivityCode.DELIVERY_TYPE_LOCAL_DELIVERY.id], BIN_TYPE, elsewhere)
+        Map before = dropState(o)
+
+        when:
+        CallResult r = drop(o, [action: 'drop', stagingLocationId: value(foreign), stagedById: '1'])
+
+        then:
+        r.status == 404
+        r.data.errorMessage == "Staging location ${value(foreign)} not found".toString()
+        dropState(o) == before
+
+        where:
+        value << [{ Location l -> l.id }, { Location l -> l.locationNumber }]
+    }
+
+    void 'drop without a staging location answers 400, and stages nothing'() {
+        given:
+        PickOrder o = pickedTote()
+        Map before = dropState(o)
+
+        when:
+        CallResult r = drop(o, body)
+
+        then:
+        r.status == 400
+        r.data.errorCode == 400
+        r.data.errorMessage == 'Staging location is required'
+        dropState(o) == before
+
+        where:
+        body << [[action: 'drop', stagingLocationId: '', stagedById: '1'],
+                 [action: 'drop', stagingLocationId: '  ', stagedById: '1'],
+                 [action: 'drop', stagingLocationId: null, stagedById: '1'],
+                 [action: 'drop', stagedById: '1']]
+    }
+
+    void 'drop of an empty tote keeps its 500 and message'() {
+        given: 'an order whose task was never picked, so the tote holds nothing'
+        PickOrder o = pickOrder()
+        Map before = dropState(o)
+
+        when:
+        CallResult r = drop(o, [action: 'drop', stagingLocationId: o.staging.id, stagedById: '1'])
+
+        then:
+        r.status == 500
+        r.data.errorMessage.contains('is empty')
+        dropState(o) == before
+    }
+
+    void 'drop errors other than a missing staging location keep their 500 and message'() {
+        given:
+        PickOrder o = pickedTote()
+        Map before = dropState(o)
+
+        when:
+        CallResult r = drop(o, body(o))
+
+        then:
+        r.status == 500
+        r.data.errorMessage.contains(message)
+        dropState(o) == before
+
+        where:
+        body                                                                         | message
+        ({ PickOrder p -> [action: 'drop', stagingLocationId: p.bin.id, stagedById: '1'] }) | 'does not support STAGING_LOCATION'
+        ({ PickOrder p -> [action: 'stack', stagingLocationId: p.staging.id] })            | 'Unsupported action: stack'
     }
 
     @Covers('src/apis/picking.ts#reallocatePickTaskApi')
