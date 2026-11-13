@@ -8,12 +8,20 @@
     .recalled {
         background-color: #ffcccb;
     }
+    #packingList .table-container {
+        overflow-x: auto;
+    }
+    #packingList .table-container table {
+        width: max-content;
+        min-width: 100%;
+    }
 </style>
 <section id="packingList" class="box dialog" aria-label="Packing List">
     <h2>
         <img src="${resource(dir:'images/icons/silk',file:'package.png')}" alt="contents" style="vertical-align: middle"/>
         ${warehouse.message(code:'shipping.packingList.label')}
     </h2>
+    <div class="table-container">
     <table>
         <tr>
             <th></th>
@@ -237,4 +245,5 @@
         </g:else>
 
     </table>
+    </div>
 </section>
