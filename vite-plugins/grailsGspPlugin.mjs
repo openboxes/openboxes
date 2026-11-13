@@ -32,7 +32,7 @@ const findCssEntryAsset = (bundle, cssEntry) => {
 };
 
 export default function grailsGspPlugin({
-  entry, vendorCss, templatePath, pages,
+  entry, vendorCss, templatePath, pages, scriptPartials = [],
 }) {
   const resolved = { outDir: '', root: '' };
 
@@ -58,6 +58,12 @@ export default function grailsGspPlugin({
       pages.forEach(({ output, params }) => {
         fs.mkdirSync(path.dirname(output), { recursive: true });
         fs.writeFileSync(output, render({ ...assetParams, ...params }));
+      });
+
+      scriptPartials.forEach(({ entry: partialEntry, output }) => {
+        const src = grailsResource(resourceDir, findEntryChunk(bundle, partialEntry).fileName);
+        fs.mkdirSync(path.dirname(output), { recursive: true });
+        fs.writeFileSync(output, `<script src="${src}" type="module" async></script>\n`);
       });
     },
   };

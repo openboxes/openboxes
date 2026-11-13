@@ -9,17 +9,13 @@ import grailsGspPlugin from './vite-plugins/grailsGspPlugin.mjs';
 const ROOT = path.resolve(import.meta.dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
 const ENTRY = path.resolve(SRC, 'index.jsx');
+const SENTRY_ENTRY = path.resolve(SRC, 'sentry.js');
 const VENDOR_CSS = path.resolve(ROOT, 'css/vendor.css');
 const OUTPUT = path.resolve(ROOT, 'main/webapp/dist');
 const GRAILS_VIEWS = path.resolve(import.meta.dirname, 'grails-app/views');
 
-const SENTRY_ENV_VARIABLES = [
-  'REACT_APP_WEB_SENTRY_DSN',
-  'REACT_APP_SENTRY_ENVIRONMENT',
-  'REACT_APP_WEB_SENTRY_TRACES_SAMPLE_RATE',
-  'REACT_APP_WEB_SENTRY_REPLAYS_SAMPLE_RATE',
-  'REACT_APP_WEB_SENTRY_REPLAYS_ERROR_SAMPLE_RATE',
-];
+const CONTEXT_PATH = '${util.ConfigHelper.contextPath}';
+const SENTRY_CONFIG = '${raw(org.pih.warehouse.monitoring.SentryConfigResolver.getWebConfigJson(session.user, session.warehouse))}';
 
 export default defineConfig({
   base: './',
@@ -34,31 +30,37 @@ export default defineConfig({
         {
           output: path.resolve(GRAILS_VIEWS, 'common/react.gsp'),
           params: {
-            contextPath: '${util.ConfigHelper.contextPath}',
+            contextPath: CONTEXT_PATH,
+            sentryConfig: SENTRY_CONFIG,
             receivingIfStatement: '',
           },
         },
         {
           output: path.resolve(GRAILS_VIEWS, 'partialReceiving/create.gsp'),
           params: {
-            contextPath: '${util.ConfigHelper.contextPath}',
+            contextPath: CONTEXT_PATH,
+            sentryConfig: SENTRY_CONFIG,
             receivingIfStatement: '<g:if test="${!params.id}">'
               + 'You can access the Partial Receiving feature through the details page for an inbound shipment.'
               + '</g:if>',
           },
         },
       ],
+      // A standalone Sentry bundle for GSPs, see grails-app/views/common/_sentry.gsp
+      scriptPartials: [
+        {
+          entry: SENTRY_ENTRY,
+          output: path.resolve(GRAILS_VIEWS, 'common/_sentryBundle.gsp'),
+        },
+      ],
     }),
   ],
-  define: Object.fromEntries(SENTRY_ENV_VARIABLES.map((name) => [
-    `process.env.${name}`,
-    JSON.stringify(process.env[name]),
-  ])),
   resolve: {
     alias: {
       root: ROOT,
       src: SRC,
       components: path.resolve(SRC, 'components'),
+      config: path.resolve(SRC, 'config'),
       hooks: path.resolve(SRC, 'hooks'),
       reducers: path.resolve(SRC, 'reducers'),
       selectors: path.resolve(SRC, 'selectors'),
@@ -92,6 +94,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: ENTRY,
+        sentry: SENTRY_ENTRY,
         vendor: VENDOR_CSS,
       },
     },
