@@ -84,10 +84,9 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
 
     /**
      * A receipt must have received something to be completed: at least one of its lines with a quantity received
-     * above zero. Completing one that received nothing would record an inbound transaction carrying no entries at
-     * all (see {@link ReceiptTransactionManager#createInboundTransaction}). The exception is a receipt that cancels
-     * some remaining quantity - it can be completed without receiving anything, even though its transaction then
-     * carries no entries.
+     * above zero. The exception is a receipt that cancels some remaining quantity - it can be completed without
+     * receiving anything, and then no transaction is recorded for it (see
+     * {@link org.pih.warehouse.api.receiving.v2.ReceiptV2Service#completeReceipt}).
      */
     private ObjectError validateSomethingWasReceived(ReceiptCompleteRequestCommand command) {
         if (!command.receipt) {
@@ -101,8 +100,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
 
         // The request flags at least one line to cancel that still has a remaining quantity
         boolean hasLinesWithQuantityToCancel = command.itemsToComplete.any { ReceiptItemCompleteRequest item ->
-            item.cancelRemainingQuantity && item.receiptItem?.shipmentItem &&
-                    shipmentReceivingCalculator.getShipmentItemQuantityRemaining(item.receiptItem.shipmentItem) > 0
+            item.cancelRemainingQuantity && shipmentReceivingCalculator.getShipmentItemQuantityRemaining(item.receiptItem?.shipmentItem) > 0
         }
 
         if (hasNoReceivedLines && !hasLinesWithQuantityToCancel) {
