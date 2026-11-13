@@ -710,6 +710,44 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
+    /**
+     * The quantity on hand of each product at the location (over all its lots and bins), with the product fields the
+     * dashboard alerts use, as plain values: productId, reconditioned, pricePerUnit and quantityOnHand.
+     */
+    List<Map> getQuantityOnHandSummaryByProduct(Location location) {
+        if (!location) {
+            return []
+        }
+        List results = ProductAvailability.executeQuery("""
+                select p.id, p.reconditioned, p.pricePerUnit, sum(pa.quantityOnHand)
+                from ProductAvailability pa
+                join pa.product p
+                where pa.location = :location
+                group by p.id, p.reconditioned, p.pricePerUnit
+                """, [location: location])
+        return results.collect { row ->
+            [productId: row[0], reconditioned: row[1], pricePerUnit: row[2], quantityOnHand: row[3]]
+        }
+    }
+
+    /**
+     * The expiration date of each lot with stock at the location (its quantity on hand over all bins is above zero),
+     * or null for a lot without one.
+     */
+    List<Date> getExpirationDatesOfLotsInStock(Location location) {
+        if (!location) {
+            return []
+        }
+        return ProductAvailability.executeQuery("""
+                select ii.expirationDate
+                from ProductAvailability pa
+                join pa.inventoryItem ii
+                where pa.location = :location
+                group by ii.id, ii.expirationDate
+                having sum(pa.quantityOnHand) > 0
+                """, [location: location])
+    }
+
     Map<Product, Integer> getQuantityOnHandByProduct(Location location, List<Product> products) {
         def quantityMap = [:]
         if (location) {

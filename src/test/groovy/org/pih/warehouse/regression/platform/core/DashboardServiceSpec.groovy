@@ -12,6 +12,7 @@ import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelService
 import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.ProductAvailabilityService
@@ -28,6 +29,7 @@ import org.pih.warehouse.product.Product
 class DashboardServiceSpec extends Specification implements ServiceUnitTest<DashboardService>, DataTest {
 
     ProductAvailabilityService productAvailabilityService = Mock()
+    InventoryLevelService inventoryLevelService = Mock()
     ForecastingService forecastingService = Mock()
     UserService userService = Mock()
     MessageLocalizer messageLocalizer = Stub() {
@@ -48,6 +50,7 @@ class DashboardServiceSpec extends Specification implements ServiceUnitTest<Dash
 
     void setup() {
         service.productAvailabilityService = productAvailabilityService
+        service.inventoryLevelService = inventoryLevelService
         service.forecastingService = forecastingService
         service.userService = userService
         service.messageLocalizer = messageLocalizer
@@ -91,6 +94,21 @@ class DashboardServiceSpec extends Specification implements ServiceUnitTest<Dash
         return [(outOfStock): 0, (low): 3, (reorder): 8, (healthy): 15, (over): 30, (unmanaged): 7]
     }
 
+    /** The quantities as getDashboardAlerts reads them: plain values per product. */
+    private List<Map> quantitySummary() {
+        return quantities().collect { Product product, Integer quantity ->
+            [productId: product.id, reconditioned: product.reconditioned, pricePerUnit: product.pricePerUnit, quantityOnHand: quantity]
+        }
+    }
+
+    /** The inventory levels of the depot as getDashboardAlerts reads them: plain values by product id. */
+    private Map<String, Map> levelsByProduct() {
+        return InventoryLevel.findAllByInventory(depot.inventory).collectEntries { InventoryLevel level ->
+            [(level.product.id): [status: level.status, minQuantity: level.minQuantity, reorderQuantity: level.reorderQuantity,
+                                  maxQuantity: level.maxQuantity, abcClass: level.abcClass]]
+        }
+    }
+
     private Map inventoryByProduct() {
         return quantities().collectEntries { Product product, Integer quantity ->
             [(product): [quantityOnHand: quantity, quantityAvailableToPromise: quantity - 1]]
@@ -102,7 +120,8 @@ class DashboardServiceSpec extends Specification implements ServiceUnitTest<Dash
         Map alerts = service.getDashboardAlerts(depot)
 
         then:
-        1 * productAvailabilityService.getCurrentInventory(depot) >> quantities()
+        1 * productAvailabilityService.getQuantityOnHandSummaryByProduct(depot) >> quantitySummary()
+        1 * inventoryLevelService.getFirstInventoryLevelByProduct(depot.inventory) >> levelsByProduct()
         alerts.totalStock == 6
         alerts.outOfStock == 1
         alerts.outOfStockClassA == 1
@@ -122,7 +141,8 @@ class DashboardServiceSpec extends Specification implements ServiceUnitTest<Dash
         Map alerts = service.getDashboardAlerts(depot)
 
         then:
-        1 * productAvailabilityService.getCurrentInventory(depot) >> quantities()
+        1 * productAvailabilityService.getQuantityOnHandSummaryByProduct(depot) >> quantitySummary()
+        1 * inventoryLevelService.getFirstInventoryLevelByProduct(depot.inventory) >> levelsByProduct()
         alerts.totalStockCost == 203.0
         alerts.inStockCost == 203.0
         alerts.healthyStockCost == 45.0
@@ -210,17 +230,11 @@ class DashboardServiceSpec extends Specification implements ServiceUnitTest<Dash
 
     void 'getExpirationSummary buckets lots by days to expiry'() {
         given:
-        DashboardService spied = Spy(DashboardService)
-        spied.getExpirationAlerts(depot) >> [
-                [daysToExpiry: -2, inventoryItem: [expires: 'expired']],
-                [daysToExpiry: 20, inventoryItem: [expires: 'within30Days']],
-                [daysToExpiry: 100, inventoryItem: [expires: 'within180Days']],
-                [daysToExpiry: 400, inventoryItem: [expires: 'greaterThan365Days']],
-                [daysToExpiry: null, inventoryItem: [expires: 'never']],
-        ]
+        Date today = new Date()
+        productAvailabilityService.getExpirationDatesOfLotsInStock(depot) >> [today - 2, today + 20, today + 100, today + 400, null]
 
         when:
-        Map summary = spied.getExpirationSummary(depot)
+        Map summary = service.getExpirationSummary(depot)
 
         then:
         summary.expired == 1
