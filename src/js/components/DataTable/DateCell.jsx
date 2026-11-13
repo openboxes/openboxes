@@ -12,9 +12,9 @@ import { formatDate } from 'utils/translation-utils';
 const DateCell = ({
   displayDateFormat,
   displayDateDefaultValue,
-  defaultValue,
-  localizeDate,
-  formatLocalizedDate,
+  defaultValue = undefined,
+  localizeDate = false,
+  formatLocalizedDate = DateFormat.COMMON,
   formatLocalizedDateToDisplay,
   ...row
 }) => {
@@ -47,12 +47,6 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps)(DateCell);
-
-DateCell.defaultProps = {
-  localizeDate: false,
-  formatLocalizedDate: DateFormat.COMMON,
-  defaultValue: undefined,
-};
 
 DateCell.propTypes = {
   displayDateFormat: PropTypes.string.isRequired,

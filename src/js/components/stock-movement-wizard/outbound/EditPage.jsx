@@ -27,8 +27,6 @@ import { formatProductDisplayName, matchesProductCodeOrName, showOutboundEditVal
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const BTN_CLASS_MAPPER = {
   YES: 'btn btn-outline-success',
   NO: 'btn btn-outline-secondary',

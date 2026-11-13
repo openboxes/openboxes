@@ -2,18 +2,16 @@
 import React, { Component } from 'react';
 
 import { Portal } from '@restart/ui';
-import * as locales from 'date-fns/locale';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import { connect } from 'react-redux';
 import { getDefaultTranslationsFetched } from 'selectors';
 
 import BaseField from 'components/form-elements/BaseField';
+import locales from 'consts/dateFnsLocales';
 import DateFormat from 'consts/dateFormat';
 import { convertMomentFormatToDateFns } from 'utils/dateUtils';
 import { formatDate, getDateFormat, getLocaleCode } from 'utils/translation-utils';
-
-import 'react-datepicker/dist/react-datepicker.css';
 
 const CalendarContainer = ({ children }) => {
   const el = document.getElementById('root');

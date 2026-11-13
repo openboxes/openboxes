@@ -17,7 +17,7 @@ const OutboundImportConfirm = ({
   errors,
   previous,
   data,
-  tableErrors,
+  tableErrors = {},
   hasErrors,
 }) => {
   const dispatch = useDispatch();
@@ -53,10 +53,6 @@ const OutboundImportConfirm = ({
 };
 
 export default OutboundImportConfirm;
-
-OutboundImportConfirm.defaultProps = {
-  tableErrors: {},
-};
 
 OutboundImportConfirm.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,

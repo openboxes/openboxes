@@ -150,8 +150,7 @@ function validate(values) {
 
   const pickedSum = _.reduce(
     values.availableItems, (sum, val) =>
-      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)),
-    0,
+      (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)), 0,
   );
 
   if (_.some(values.availableItems, (val) => !_.isNil(val.quantityPicked))

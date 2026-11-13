@@ -13,7 +13,6 @@ import PageWrapper from 'wrappers/PageWrapper';
 
 import 'utils/utils.scss';
 import 'components/stock-movement-wizard/inboundV2/inbound.scss';
-import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const Inbound = () => {
   useTranslation('stockMovement');

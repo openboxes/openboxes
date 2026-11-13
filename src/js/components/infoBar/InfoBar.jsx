@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCloseFill } from 'react-icons/all';
+import { RiCloseFill } from 'react-icons/ri';
 import { useDispatch } from 'react-redux';
 
 import { closeInfoBar } from 'actions';
@@ -12,11 +12,11 @@ import useTranslation from 'hooks/useTranslation';
 
 const InfoBar = ({
   name,
-  versionLabel,
+  versionLabel = null,
   title,
-  isCloseable,
-  hasModalToDisplay,
-  redirect,
+  isCloseable = true,
+  hasModalToDisplay = true,
+  redirect = null,
 }) => {
   useTranslation('infoBar');
   const dispatch = useDispatch();
@@ -52,11 +52,4 @@ InfoBar.propTypes = {
     defaultLabel: PropTypes.string.isRequired,
     link: PropTypes.string,
   }),
-};
-
-InfoBar.defaultProps = {
-  isCloseable: true,
-  hasModalToDisplay: true,
-  versionLabel: null,
-  redirect: null,
 };

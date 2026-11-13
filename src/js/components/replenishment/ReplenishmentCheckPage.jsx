@@ -16,8 +16,6 @@ import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const FIELDS = {
   replenishmentItems: {
     type: ArrayField,

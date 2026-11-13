@@ -5,12 +5,12 @@ import { RiCalendarLine, RiCloseLine } from 'react-icons/ri';
 
 import './style.scss';
 
-const DateFieldInput = forwardRef(({
-  value,
-  placeholder,
+const DateFieldInputComponent = ({
+  value = null,
+  placeholder = '',
   onClear,
-  className,
-  disabled,
+  className = '',
+  disabled = false,
   clearable,
   ...props
 }, ref) => {
@@ -55,22 +55,17 @@ const DateFieldInput = forwardRef(({
         )}
     </div>
   );
-});
+};
+
+const DateFieldInput = forwardRef(DateFieldInputComponent);
 
 export default DateFieldInput;
 
-DateFieldInput.propTypes = {
+DateFieldInputComponent.propTypes = {
   value: PropTypes.string,
   placeholder: PropTypes.string,
   onClear: PropTypes.func.isRequired,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   clearable: PropTypes.bool.isRequired,
-};
-
-DateFieldInput.defaultProps = {
-  value: null,
-  placeholder: '',
-  disabled: false,
-  className: '',
 };

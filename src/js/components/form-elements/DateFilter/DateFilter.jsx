@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import * as locales from 'date-fns/locale';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
@@ -8,11 +7,11 @@ import { RiCalendarLine, RiCloseLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import BaseField from 'components/form-elements/BaseField';
+import locales from 'consts/dateFnsLocales';
 import DateFormat from 'consts/dateFormat';
 import Translate from 'utils/Translate';
 import { formatDate, getLocaleCode } from 'utils/translation-utils';
 
-import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 
 const CustomInput = React.forwardRef((props, ref) => {
@@ -58,11 +57,18 @@ const CustomInput = React.forwardRef((props, ref) => {
   );
 });
 
-const DateFilter = (props) => {
-  const {
-    value, onChange, dateFormat, placeholder, label, timeFormat, defaultMessage,
-    localizeDate, localizedDateFormat,
-  } = props;
+const DateFilter = ({
+  value = null,
+  onChange = undefined,
+  dateFormat = 'MM/DD/YYYY',
+  placeholder = '',
+  label = '',
+  timeFormat = 'HH:mm',
+  defaultMessage = '',
+  localizeDate = false,
+  localizedDateFormat = DateFormat.DEFAULT,
+  ...props
+}) => {
   const { localeCode, formatLocalizedDate } = useSelector((state) => ({
     localeCode: getLocaleCode(state.localize),
     formatLocalizedDate: formatDate(state.localize),
@@ -102,6 +108,7 @@ const DateFilter = (props) => {
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`} data-testid="date-filter">
       <DatePicker
         {...props}
+        value={value}
         customInput={(
           <CustomInput
             formatDateToDisplay={formatDateToDisplay}
@@ -140,18 +147,6 @@ const DateFilterBaseInput = (props) => (
     renderInput={DateFilter}
   />
 );
-
-DateFilter.defaultProps = {
-  onChange: undefined,
-  label: '',
-  defaultMessage: '',
-  placeholder: '',
-  dateFormat: 'MM/DD/YYYY',
-  timeFormat: 'HH:mm',
-  value: null,
-  localizeDate: false,
-  localizedDateFormat: DateFormat.DEFAULT,
-};
 
 DateFilter.propTypes = {
   onChange: PropTypes.func,

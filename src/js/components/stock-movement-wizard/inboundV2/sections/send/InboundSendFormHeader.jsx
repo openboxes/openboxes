@@ -13,14 +13,14 @@ import DropdownButton from 'utils/DropdownButton';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-const InboundSendFormHeader = memo(({
+const InboundSendFormHeaderComponent = ({
   saveAndExit,
   onSave,
   isValid,
-  documents,
+  documents = [],
   handleExportFile,
   handleDownloadFiles,
-  files,
+  files = [],
   handleRemoveFile,
   isDispatched,
 }) => {
@@ -101,11 +101,13 @@ const InboundSendFormHeader = memo(({
       </div>
     </div>
   );
-});
+};
+
+const InboundSendFormHeader = memo(InboundSendFormHeaderComponent);
 
 export default InboundSendFormHeader;
 
-InboundSendFormHeader.propTypes = {
+InboundSendFormHeaderComponent.propTypes = {
   saveAndExit: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   isValid: PropTypes.bool.isRequired,
@@ -115,9 +117,4 @@ InboundSendFormHeader.propTypes = {
   files: PropTypes.arrayOf(PropTypes.shape({})),
   handleRemoveFile: PropTypes.func.isRequired,
   isDispatched: PropTypes.bool.isRequired,
-};
-
-InboundSendFormHeader.defaultProps = {
-  documents: [],
-  files: [],
 };

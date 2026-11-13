@@ -277,7 +277,7 @@ const TABLE_FIELDS = {
             {},
           );
           const packsReceived = shipmentItem?.quantityReceived
-            ? _.round(shipmentItem?.quantityReceived / shipmentItem?.packSize, 2)
+            ? _.round(shipmentItem.quantityReceived / shipmentItem.packSize, 2)
             : 0;
 
           const packsRequested = _.round(shipmentItem?.packsRequested, 2);
@@ -855,7 +855,7 @@ class PartialReceivingPage extends Component {
       rowId: _.uniqueId(),
       packSize: shipmentItemsGrouped.originalItem?.packSize,
       packsRequested: shipmentItemsGrouped.originalItem?.packSize
-        ? item.quantityShipped / shipmentItemsGrouped.originalItem?.packSize
+        ? item.quantityShipped / shipmentItemsGrouped.originalItem.packSize
         : null,
     }));
 

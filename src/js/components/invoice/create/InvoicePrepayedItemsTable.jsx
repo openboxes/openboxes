@@ -2,7 +2,7 @@ import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { RiCopyrightLine } from 'react-icons/all';
+import { RiCopyrightLine } from 'react-icons/ri';
 
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';

@@ -5,17 +5,17 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import useCycleCountFilters from 'hooks/cycleCount/useCycleCountFilters';
 import useSwitchTabs from 'hooks/useSwitchTabs';
 
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn().mockImplementation(() => ({
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn().mockImplementation(() => ({
     currentLocation: { id: 'loc-123' },
     debounceTime: 500,
     minSearchLength: 3,
     shouldRebuildParams: false,
   })),
-  useDispatch: () => jest.fn(),
-  connect: jest.fn(() => (Component) => Component),
+  useDispatch: () => vi.fn(),
+  connect: vi.fn(() => (Component) => Component),
 }));
-jest.mock('hooks/useTranslate', () => jest.fn(() => (key) => key));
+vi.mock('hooks/useTranslate', () => ({ default: vi.fn(() => (key) => key) }));
 
 const useCycleCountTabs = () => {
   const { switchTab } = useSwitchTabs({ defaultTab: 'ALL_PRODUCTS' });

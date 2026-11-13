@@ -7,7 +7,10 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 import './utils.scss';
 
 const Badge = ({
-  label, variant, tooltip = false, clickable = true,
+  label,
+  variant,
+  tooltip = false,
+  clickable = true,
 }) => {
   if (!label) {
     return null;
@@ -32,11 +35,6 @@ Badge.propTypes = {
   variant: PropTypes.string.isRequired,
   tooltip: PropTypes.bool,
   clickable: PropTypes.bool,
-};
-
-Badge.defaultProps = {
-  tooltip: false,
-  clickable: true,
 };
 
 export default Badge;

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { locales } from 'moment';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale } from 'selectors';
 
@@ -11,7 +10,7 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import confirmExpirationDateColumn from 'consts/confirmExpirationDateColumn';
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
-import { formatDateToString } from 'utils/dateUtils';
+import { formatDateToString, getDateFnsLocale } from 'utils/dateUtils';
 
 const useConfirmExpirationDateModal = () => {
   const translate = useTranslate();
@@ -26,7 +25,7 @@ const useConfirmExpirationDateModal = () => {
     formatDateToString({
       date,
       dateFormat: DateFormatDateFns.DD_MMM_YYYY,
-      options: { locale: locales[currentLocale] },
+      options: { locale: getDateFnsLocale(currentLocale) },
     });
 
   const columns = [

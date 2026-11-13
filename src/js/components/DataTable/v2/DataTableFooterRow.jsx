@@ -56,7 +56,3 @@ DataTableFooterRow.propTypes = {
   tableWithPinnedColumns: PropTypes.bool,
   isScreenWiderThanTable: PropTypes.bool.isRequired,
 };
-
-DataTableFooterRow.defaultProps = {
-  tableWithPinnedColumns: false,
-};

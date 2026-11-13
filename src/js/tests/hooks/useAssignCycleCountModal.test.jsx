@@ -9,23 +9,23 @@ import cycleCountColumn from 'consts/cycleCountColumn';
 import NotificationType from 'consts/notificationTypes';
 import useAssignCycleCountModal from 'hooks/cycleCount/useAssignCycleCountModal';
 
-const mockDispatch = jest.fn();
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn().mockImplementation(() => ({
+const mockDispatch = vi.fn();
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn().mockImplementation(() => ({
     currentLocation: { id: 'loc-123' },
     cycleCountIds: ['req-1'],
   })),
   useDispatch: () => mockDispatch,
-  connect: jest.fn(() => (Component) => Component),
+  connect: vi.fn(() => (Component) => Component),
 }));
-jest.mock('hooks/useTranslate', () => jest.fn(() => (key) => key));
-const mockSpinner = { show: jest.fn(), hide: jest.fn() };
-jest.mock('hooks/useSpinner', () => jest.fn(() => mockSpinner));
-jest.mock('utils/dateUtils', () => jest.fn());
-jest.mock('api/services/CycleCountApi', () => ({
-  updateCycleCountRequests: jest.fn().mockResolvedValue({ status: 200 }),
+vi.mock('hooks/useTranslate', () => ({ default: vi.fn(() => (key) => key) }));
+const mockSpinner = { show: vi.fn(), hide: vi.fn() };
+vi.mock('hooks/useSpinner', () => ({ default: vi.fn(() => mockSpinner) }));
+vi.mock('utils/dateUtils', () => ({ default: vi.fn() }));
+vi.mock('api/services/CycleCountApi', () => ({
+  default: { updateCycleCountRequests: vi.fn().mockResolvedValue({ status: 200 }) },
 }));
-jest.mock('components/Layout/notifications/notification', () => jest.fn(() => jest.fn()));
+vi.mock('components/Layout/notifications/notification', () => ({ default: vi.fn(() => vi.fn()) }));
 
 describe('useAssignCycleCountModal', () => {
   const selectedCycleCounts = {
@@ -42,13 +42,13 @@ describe('useAssignCycleCountModal', () => {
   const defaultProps = {
     selectedCycleCounts,
     isRecount: false,
-    refetchData: jest.fn(),
-    closeModal: jest.fn(),
+    refetchData: vi.fn(),
+    closeModal: vi.fn(),
     assignDataDirectly: false,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should initialize with correct columns', () => {

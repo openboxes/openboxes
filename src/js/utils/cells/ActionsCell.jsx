@@ -11,7 +11,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
  * icon, click handler and aria label, plus an optional badge, disabled state and tooltip.
  * The whole cell can be disabled through the `disabled` prop.
  */
-const ActionsCell = React.memo(({
+const ActionsCellComponent = ({
   actions, label, defaultLabel, disabled = false,
 }) => {
   const translate = useTranslate();
@@ -52,11 +52,13 @@ const ActionsCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const ActionsCell = React.memo(ActionsCellComponent);
 
 ActionsCell.displayName = 'ActionsCell';
 
-ActionsCell.propTypes = {
+ActionsCellComponent.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.shape({
     key: PropTypes.string.isRequired,
     icon: PropTypes.node.isRequired,
@@ -71,10 +73,6 @@ ActionsCell.propTypes = {
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
-};
-
-ActionsCell.defaultProps = {
-  disabled: false,
 };
 
 export default ActionsCell;

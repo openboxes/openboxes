@@ -77,7 +77,12 @@ const DropdownIndicator = (props) => {
 };
 
 const GlobalSearch = ({
-  className, visible, renderButton, debounceTime, minSearchLength, translate,
+  className = '',
+  visible = false,
+  renderButton = undefined,
+  debounceTime,
+  minSearchLength,
+  translate,
 }) => {
   const [isVisible, setIsVisible] = useState(visible);
 
@@ -150,10 +155,4 @@ GlobalSearch.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   className: PropTypes.string,
   translate: PropTypes.func.isRequired,
-};
-
-GlobalSearch.defaultProps = {
-  renderButton: undefined,
-  visible: false,
-  className: '',
 };

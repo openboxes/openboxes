@@ -21,7 +21,7 @@ const renderWithStore = (
   return render(<Provider store={store}>{ui}</Provider>);
 };
 
-jest.mock('hooks/useTranslate');
+vi.mock('hooks/useTranslate', () => import('tests/__mocks__/hooks/useTranslate'));
 
 describe('DateFieldDateFns', () => {
   it('renders without crashing and shows placeholder text', () => {
@@ -48,7 +48,7 @@ describe('DateFieldDateFns', () => {
   });
 
   it('calls onChange when date selected', () => {
-    const handleChange = jest.fn();
+    const handleChange = vi.fn();
     renderWithStore(<DateFieldDateFns onChange={handleChange} />);
     const date = new Date('2025-09-22T18:15:00Z');
     handleChange(date);
@@ -56,7 +56,7 @@ describe('DateFieldDateFns', () => {
   });
 
   it('calls onChange(null) when cleared', () => {
-    const handleChange = jest.fn();
+    const handleChange = vi.fn();
     renderWithStore(
       <DateFieldDateFns
         clearable
@@ -91,7 +91,7 @@ describe('DateFieldDateFns', () => {
 
   it('calls onChange when date with time selected', () => {
     const date = 'Sep 23, 2025 15:07:09';
-    const handleChange = jest.fn();
+    const handleChange = vi.fn();
     renderWithStore(<DateFieldDateFns showTimeSelect onChange={handleChange} />);
     handleChange(date);
     expect(handleChange).toHaveBeenCalledWith(date);

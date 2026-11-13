@@ -16,7 +16,7 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 
 const DefaultPreferenceType = ({
   control,
-  errors,
+  errors = {},
   setValue,
   triggerValidation,
 }) => {
@@ -197,8 +197,4 @@ DefaultPreferenceType.propTypes = {
   errors: defaultPreferenceTypeFormErrors,
   setValue: PropTypes.func.isRequired,
   triggerValidation: PropTypes.func.isRequired,
-};
-
-DefaultPreferenceType.defaultProps = {
-  errors: {},
 };

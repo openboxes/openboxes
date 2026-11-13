@@ -130,9 +130,4 @@ ConfirmReceiptTable.propTypes = {
   order: PropTypes.string,
 };
 
-ConfirmReceiptTable.defaultProps = {
-  sort: null,
-  order: null,
-};
-
 export default ConfirmReceiptTable;

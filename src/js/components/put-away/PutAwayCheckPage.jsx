@@ -19,9 +19,6 @@ import showLocationChangedAlert from 'utils/location-change-alert';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
-import 'react-table/react-table.css';
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
 /**
@@ -83,8 +80,7 @@ class PutAwayCheckPage extends Component {
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
-      this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
+      this.props.translate, this.state.location, nextProps.location, () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
     );
 
     this.setState((prev) => ({

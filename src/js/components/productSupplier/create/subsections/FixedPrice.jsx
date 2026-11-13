@@ -11,7 +11,7 @@ import { FormErrorPropType } from 'utils/propTypes';
 
 const FixedPrice = ({
   control,
-  errors,
+  errors = {},
   triggerValidation,
 }) => (
   <Subsection
@@ -99,8 +99,4 @@ FixedPrice.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: fixedPriceFormErrors,
   triggerValidation: PropTypes.func.isRequired,
-};
-
-FixedPrice.defaultProps = {
-  errors: {},
 };

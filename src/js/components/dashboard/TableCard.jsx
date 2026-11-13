@@ -1,16 +1,26 @@
 import React from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-/* global _ */
-const TableCard = (props) => {
-  const {
-    columnsSize,
-    truncationLength,
-    disableTruncation,
-    data,
-  } = props;
-
+const TableCard = ({
+  columnsSize = {
+    name: null,
+    number: null,
+    value: null,
+  },
+  truncationLength = {
+    name: null,
+    number: null,
+    value: null,
+  },
+  disableTruncation = {
+    name: undefined,
+    number: undefined,
+    value: undefined,
+  },
+  data,
+}) => {
   const displayItemData = ({
     truncate,
     item,
@@ -132,24 +142,6 @@ TableCard.propTypes = {
     number: PropTypes.bool,
     value: PropTypes.bool,
   }),
-};
-
-TableCard.defaultProps = {
-  columnsSize: {
-    name: null,
-    number: null,
-    value: null,
-  },
-  truncationLength: {
-    name: null,
-    number: null,
-    value: null,
-  },
-  disableTruncation: {
-    name: undefined,
-    number: undefined,
-    value: undefined,
-  },
 };
 
 export default TableCard;

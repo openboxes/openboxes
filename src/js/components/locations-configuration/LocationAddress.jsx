@@ -15,7 +15,6 @@ import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationAddress.scss';
 
 const FIELDS = {

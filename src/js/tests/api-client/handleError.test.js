@@ -5,19 +5,17 @@ import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import { handleError } from 'utils/apiClient';
 
-const mockShowNotification = jest.fn();
+const mockShowNotification = vi.fn();
 
-jest.mock('components/Layout/notifications/notification', () => ({
-  __esModule: true,
-  default: jest.fn(() => mockShowNotification),
+vi.mock('components/Layout/notifications/notification', () => ({
+  default: vi.fn(() => mockShowNotification),
 }));
 
-jest.mock('react-confirm-alert', () => ({
-  confirmAlert: jest.fn(),
+vi.mock('react-confirm-alert', () => ({
+  confirmAlert: vi.fn(),
 }));
 
-jest.mock('components/LoginModal', () => ({
-  __esModule: true,
+vi.mock('components/LoginModal', () => ({
   default: () => null,
 }));
 
@@ -28,7 +26,7 @@ const buildResponseError = (status, data = {}) => Object.assign(
 
 describe('handleError', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('canceled requests', () => {

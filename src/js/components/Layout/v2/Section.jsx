@@ -7,7 +7,10 @@ import Translate from 'utils/Translate';
 import './styles.scss';
 
 const Section = ({
-  showTitle, title, children, className,
+  showTitle = true, title = {
+    label: '',
+    defaultMessage: '',
+  }, children, className = '',
 }) => (
   <div className={`v2-section ${className}`}>
     {showTitle && (
@@ -29,13 +32,4 @@ Section.propTypes = {
   }),
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-};
-
-Section.defaultProps = {
-  showTitle: true,
-  title: {
-    label: '',
-    defaultMessage: '',
-  },
-  className: '',
 };

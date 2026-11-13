@@ -36,10 +36,4 @@ ConfirmReceiptButtons.propTypes = {
   isCompleteDisabled: PropTypes.bool,
 };
 
-ConfirmReceiptButtons.defaultProps = {
-  onBackToReceive: () => {},
-  onCompleteReceipt: () => {},
-  isCompleteDisabled: false,
-};
-
 export default ConfirmReceiptButtons;

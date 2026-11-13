@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 
 import Button from 'components/form-elements/Button';
 
-const InboundAddItemsNavigationButtons = memo(({
+const InboundAddItemsNavigationButtonsComponent = ({
   onPrevious,
   onNext,
-  isPreviousDisabled,
-  isNextDisabled,
+  isPreviousDisabled = false,
+  isNextDisabled = false,
 }) => (
   <div className="submit-buttons">
     <Button
@@ -26,20 +26,17 @@ const InboundAddItemsNavigationButtons = memo(({
       onClick={onNext}
     />
   </div>
-));
+);
+
+const InboundAddItemsNavigationButtons = memo(InboundAddItemsNavigationButtonsComponent);
 
 InboundAddItemsNavigationButtons.displayName = 'InboundAddItemsNavigationButtons';
 
-InboundAddItemsNavigationButtons.propTypes = {
+InboundAddItemsNavigationButtonsComponent.propTypes = {
   onPrevious: PropTypes.func.isRequired,
   onNext: PropTypes.func.isRequired,
   isPreviousDisabled: PropTypes.bool,
   isNextDisabled: PropTypes.bool,
-};
-
-InboundAddItemsNavigationButtons.defaultProps = {
-  isPreviousDisabled: false,
-  isNextDisabled: false,
 };
 
 export default InboundAddItemsNavigationButtons;

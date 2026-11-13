@@ -4,8 +4,6 @@ import { confirmAlert } from 'react-confirm-alert';
 
 import ConfirmModal from 'utils/ConfirmModal';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 /**
  * Convenience wrapper on a {@link ConfirmModal}, wrapping it in a confirmAlert.
  *

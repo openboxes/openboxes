@@ -13,35 +13,12 @@
     "test": "test"
   },
   "scripts": {
-    "watch": "webpack --watch --progress --mode=development",
-    "bundle": "webpack --no-color --mode=production",
-    "test": "jest",
-    "styleguide": "styleguidist server",
-    "styleguide:build": "styleguidist build",
-    "eslint": "eslint --fix --ext .js,.jsx ./src/js/"
-  },
-  "jest": {
-    "verbose": true,
-    "roots": [
-      "<rootDir>/src/"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "src/js"
-    ],
-    "moduleNameMapper": {
-      "\\.(css|scss)$": "<rootDir>/src/js/tests/__mocks__/styleMock.js"
-    },
-    "testEnvironment": "jsdom",
-    "testEnvironmentOptions": {
-      "url": "http://localhost/"
-    },
-    "setupFiles": [
-      "<rootDir>/src/js/tests/setupTests.js"
-    ],
-    "setupFilesAfterEnv": [
-      "mock-local-storage"
-    ]
+    "watch": "vite build --watch --mode development",
+    "bundle": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "eslint": "eslint --fix --ext .js,.jsx ./src/js/",
+    "lint": "eslint --quiet --ext .js,.jsx ./src/js/"
   },
   "repository": {
     "type": "git",
@@ -56,10 +33,7 @@
   "dependencies": {
     "@dnd-kit/react": "0.3.2",
     "@fontsource/inter": "4.5.15",
-    "@fortawesome/fontawesome-free": "5.14.0",
     "@fortawesome/fontawesome-svg-core": "1.2.30",
-    "@fortawesome/free-brands-svg-icons": "5.14.0",
-    "@fortawesome/free-regular-svg-icons": "5.14.0",
     "@fortawesome/free-solid-svg-icons": "5.14.0",
     "@fortawesome/react-fontawesome": "0.1.8",
     "@hookform/resolvers": "3.3.4",
@@ -120,38 +94,22 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0",
-    "@babel/eslint-parser": "7.28.6",
-    "@babel/preset-env": "7.29.2",
-    "@babel/preset-react": "7.28.5",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
-    "babel-loader": "9.1.2",
-    "css-loader": "3.6.0",
-    "css-minimizer-webpack-plugin": "4.2.2",
-    "eslint": "7.5.0",
-    "eslint-config-airbnb": "18.2.1",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-jsx-a11y": "6.4.1",
-    "eslint-plugin-react": "7.21.5",
-    "eslint-plugin-react-hooks": "4.0.8",
+    "@vitejs/plugin-react": "6.2.1",
+    "eslint": "8.57.1",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "4.6.2",
     "eslint-plugin-simple-import-sort": "10.0.0",
-    "eslint-webpack-plugin": "3.2.0",
-    "file-loader": "6.2.0",
-    "filemanager-webpack-plugin": "8.0.0",
-    "html-webpack-plugin": "5.5.1",
-    "jest": "30.3.0",
-    "jest-environment-jsdom": "30.3.0",
     "jquery": "3.6.3",
-    "mini-css-extract-plugin": "2.7.5",
-    "mock-local-storage": "1.1.23",
+    "jsdom": "26.1.0",
     "postcss": "8.5.6",
-    "react-styleguidist": "12.0.1",
-    "sass": "1.62.1",
-    "sass-loader": "13.2.2",
-    "url-loader": "4.1.1",
-    "webpack": "5.104.1",
-    "webpack-cli": "5.1.1"
+    "sass": "1.77.8",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
   }
 }

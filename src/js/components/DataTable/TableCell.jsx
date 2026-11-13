@@ -8,19 +8,20 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 
 const TableCell = ({
   value,
-  children,
-  tooltip,
-  tooltipLabel,
-  link, reactLink,
-  defaultValue,
-  className,
-  openLinkInNewTab,
-  tdProps,
-  style,
-  showError,
-  tooltipForm,
-  tooltipClassname,
-  customTooltip,
+  children = undefined,
+  tooltip = undefined,
+  tooltipLabel = '',
+  link = undefined,
+  reactLink = false,
+  defaultValue = undefined,
+  className = '',
+  openLinkInNewTab = false,
+  tdProps = {},
+  style = undefined,
+  showError = false,
+  tooltipForm = undefined,
+  tooltipClassname = undefined,
+  customTooltip = undefined,
 }) => {
   let cellValue = children || value || defaultValue;
   const errorMessage = tdProps?.rest?.error;
@@ -84,6 +85,7 @@ const TableCell = ({
           className={elementClasses}
           style={style}
           target={openLinkInNewTab ? '_blank' : undefined}
+          rel={openLinkInNewTab ? 'noopener noreferrer' : undefined}
           href={link}
         >
           {cellValue}
@@ -93,16 +95,6 @@ const TableCell = ({
   }
 
   return cellElement;
-};
-
-TableCell.defaultProps = {
-  defaultValue: undefined,
-  className: '',
-  reactLink: false,
-  openLinkInNewTab: false,
-  showError: false,
-  tdProps: {},
-  tooltipLabel: '',
 };
 
 TableCell.propTypes = {

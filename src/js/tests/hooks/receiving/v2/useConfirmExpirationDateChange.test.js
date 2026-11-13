@@ -3,12 +3,12 @@ import { act, renderHook } from '@testing-library/react';
 import ProductApi from 'api/services/ProductApi';
 import useConfirmExpirationDateChange from 'hooks/receiving/v2/useConfirmExpirationDateChange';
 
-jest.mock('api/services/ProductApi', () => ({
-  getAvailabilityInAllDepots: jest.fn(),
+vi.mock('api/services/ProductApi', () => ({
+  default: { getAvailabilityInAllDepots: vi.fn() },
 }));
 
-const mockSpinner = { show: jest.fn(), hide: jest.fn() };
-jest.mock('hooks/useSpinner', () => () => mockSpinner);
+const mockSpinner = { show: vi.fn(), hide: vi.fn() };
+vi.mock('hooks/useSpinner', () => ({ default: () => mockSpinner }));
 
 const product = { id: 'product-1', productCode: '10001' };
 
@@ -53,7 +53,7 @@ const renderConfirmation = () => renderHook(() => useConfirmExpirationDateChange
 
 describe('useConfirmExpirationDateChange', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not ask when the entered date matches the one the lot carries', async () => {

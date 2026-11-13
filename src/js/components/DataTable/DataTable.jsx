@@ -10,17 +10,22 @@ import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import TablePagination from 'components/DataTable/TablePagination';
 import TableRow from 'components/DataTable/TableRow';
 
-import 'react-table/react-table.css';
-// important: this line must be placed after react-table css import
-import 'react-table-hoc-fixed-columns/lib/styles.css';
 import 'components/DataTable/DataTable.scss';
 
 const ReactTableFixedColumns = withFixedColumns(ReactTable);
 
-const DataTable = React.forwardRef((props, ref) => {
-  const {
-    data, footerComponent, headerComponent, columns, className, totalData, errors,
-  } = props;
+const DataTableComponent = ({
+  footerComponent = undefined,
+  headerComponent = undefined,
+  sortable = false,
+  resizable = false,
+  className = '',
+  multiSort = false,
+  totalData = undefined,
+  errors = {},
+  ...props
+}, ref) => {
+  const { data, columns } = props;
 
   const PaginationComponent = (paginationProps) => (
     <>
@@ -42,6 +47,13 @@ const DataTable = React.forwardRef((props, ref) => {
       )}
       <ReactTableFixedColumns
         {...props}
+        footerComponent={footerComponent}
+        headerComponent={headerComponent}
+        sortable={sortable}
+        resizable={resizable}
+        multiSort={multiSort}
+        totalData={totalData}
+        errors={errors}
         innerRef={ref}
         className={`app-react-table ${className} ${data.length === 0 ? 'hide-data' : ''}`}
         data={data}
@@ -65,20 +77,11 @@ const DataTable = React.forwardRef((props, ref) => {
       />
     </div>
   );
-});
-
-DataTable.defaultProps = {
-  footerComponent: undefined,
-  headerComponent: undefined,
-  sortable: false,
-  resizable: false,
-  className: '',
-  multiSort: false,
-  totalData: undefined,
-  errors: {},
 };
 
-DataTable.propTypes = {
+const DataTable = React.forwardRef(DataTableComponent);
+
+DataTableComponent.propTypes = {
   ...ReactTablePropTypes,
   footerComponent: PropTypes.func,
   headerComponent: PropTypes.func,

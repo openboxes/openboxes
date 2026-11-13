@@ -2,10 +2,10 @@ import getCommonPinningStyles from 'utils/getCommonPinningStyles';
 
 describe('getCommonPinningStyles', () => {
   const mockColumn = {
-    getIsPinned: jest.fn().mockReturnValue(false),
-    getIsLastColumn: jest.fn().mockReturnValue(false),
-    getStart: jest.fn().mockReturnValue(0),
-    getSize: jest.fn().mockReturnValue(100),
+    getIsPinned: vi.fn().mockReturnValue(false),
+    getIsLastColumn: vi.fn().mockReturnValue(false),
+    getStart: vi.fn().mockReturnValue(0),
+    getSize: vi.fn().mockReturnValue(100),
   };
 
   const defaultProps = {
@@ -28,7 +28,7 @@ describe('getCommonPinningStyles', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns styles for non-pinned column', () => {

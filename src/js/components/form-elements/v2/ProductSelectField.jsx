@@ -12,7 +12,7 @@ import SelectField from './SelectField';
 const ProductSelectField = ({
   // Strip out any provided labelKey to ensure we always get the default display text behaviour
   // from ProductSelect (which is triggered when labelKey is falsy).
-  labelKey,
+  labelKey = undefined, // eslint-disable-line no-unused-vars
   ...props
 }) => (
   <SelectField
@@ -23,10 +23,6 @@ const ProductSelectField = ({
 
 ProductSelectField.propTypes = {
   labelKey: PropTypes.string,
-};
-
-ProductSelectField.defaultProps = {
-  labelKey: undefined,
 };
 
 export default ProductSelectField;

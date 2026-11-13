@@ -18,8 +18,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import 'react-table/react-table.css';
-
 class StocklistManagement extends Component {
   constructor(props) {
     super(props);

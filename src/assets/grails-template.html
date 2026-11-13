@@ -2,6 +2,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="react" />
+    <link rel="stylesheet" href="<%= vendorCssSource %>">
 </head>
 
 <body>
@@ -11,7 +12,7 @@
     </script>
     <div id="root"></div>
     <link rel="stylesheet" href="<%= cssSource %>">
-    <script src="<%= jsSource %>" type="text/javascript" ></script>
+    <script src="<%= jsSource %>" type="<%= scriptType %>"></script>
     <%= receivingIfStatement %>
 </body>
 </html>

@@ -31,16 +31,12 @@ site/
 build/
 node_modules
 npm-debug.log
-/src/main/webapp/webpack
-/web-app/js/*bundle*
-/web-app/css/*bundle*
+/src/main/webapp/dist
 /web-app/fonts/*
 /web-app/js/fonts/*
 grails-app/views/partialReceiving/create.gsp
 grails-app/views/common/react.gsp
 grails-app/views/common/_sentryBundle.gsp
-grails-app/assets/javascripts/bundle*
-grails-app/assets/stylesheets/bundle*
 grails-app/assets/images/*.eot
 grails-app/assets/images/*.svg
 grails-app/assets/images/*.woff

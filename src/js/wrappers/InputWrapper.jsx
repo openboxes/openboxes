@@ -12,19 +12,19 @@ import 'wrappers/style.scss';
 
 const InputWrapper = ({
   children,
-  tooltip,
-  required,
-  button,
-  title,
-  errorMessage,
-  className,
-  inputId,
-  labelPosition,
-  hideErrorMessageWrapper,
+  tooltip = null,
+  required = false,
+  button = null,
+  title = null,
+  errorMessage = null,
+  className = '',
+  inputId = undefined,
+  labelPosition = 'top',
+  hideErrorMessageWrapper = false,
   customTooltip = false,
-  value,
-  ariaLabel,
-  hasErrors,
+  value = '',
+  ariaLabel = null,
+  hasErrors = false,
 }) => {
   const translate = useTranslate();
   return (
@@ -122,20 +122,4 @@ InputWrapper.propTypes = {
     defaultMessage: PropTypes.string,
   }),
   hasErrors: PropTypes.bool,
-};
-
-InputWrapper.defaultProps = {
-  tooltip: null,
-  required: false,
-  title: null,
-  button: null,
-  errorMessage: null,
-  className: '',
-  inputId: undefined,
-  labelPosition: 'top',
-  hideErrorMessageWrapper: false,
-  customTooltip: false,
-  value: '',
-  ariaLabel: null,
-  hasErrors: false,
 };

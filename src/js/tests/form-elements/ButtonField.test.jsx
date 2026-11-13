@@ -5,7 +5,7 @@ import { render } from '@testing-library/react';
 import ButtonField from 'components/form-elements/ButtonField';
 import { renderFormField } from 'utils/form-utils';
 
-jest.mock('react-localize-redux', () => ({
+vi.mock('react-localize-redux', () => ({
   Translate: (props) => {
     const { id } = props;
 

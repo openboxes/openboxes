@@ -3,8 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-const Numbers = (props) => {
-  const [data, options] = Object.values(props);
+const Numbers = ({ data = null, options }) => {
   const values = _.sortBy(Object.entries(data), '[1].order');
   return (
     <div className="gyr-indicator">
@@ -60,10 +59,6 @@ Numbers.propTypes = {
       third: PropTypes.string,
     }),
   }).isRequired,
-};
-
-Numbers.defaultProps = {
-  data: null,
 };
 
 export default Numbers;

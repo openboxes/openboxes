@@ -15,7 +15,7 @@ describe('confirmAlert', () => {
   });
 
   it('renders a dialog with buttons and closes it after a click', async () => {
-    const onConfirm = jest.fn();
+    const onConfirm = vi.fn();
 
     await openAlert({
       title: 'Confirm refresh',

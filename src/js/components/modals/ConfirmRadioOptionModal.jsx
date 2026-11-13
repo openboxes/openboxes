@@ -6,7 +6,6 @@ import Button from 'components/form-elements/Button';
 import Checkbox from 'components/form-elements/v2/Checkbox';
 import translate from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'utils/utils.scss';
 
 const ConfirmRadioOptionModal = ({
@@ -14,7 +13,7 @@ const ConfirmRadioOptionModal = ({
   initialValue,
   options,
   buttons,
-  className,
+  className = '',
 }) => {
   const [selectedOption, setSelectedOption] = useState(initialValue);
 
@@ -107,10 +106,6 @@ ConfirmRadioOptionModal.propTypes = {
   })).isRequired,
   buttons: PropTypes.func.isRequired,
   className: PropTypes.string,
-};
-
-ConfirmRadioOptionModal.defaultProps = {
-  className: '',
 };
 
 export default ConfirmRadioOptionModal;

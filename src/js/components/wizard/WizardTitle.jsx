@@ -3,18 +3,18 @@ import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-const WizardTitle = (props) => {
-  if (!props.title && !props.additionalTitle) {
+const WizardTitle = ({ title, additionalTitle = null }) => {
+  if (!title && !additionalTitle) {
     return null;
   }
 
   return (
     <div className="panel-heading movement-number" data-testid="wizardTitle">
-      {props.title
+      {title
         ? (
           <div>
             {
-              _.map(props.title, (element) => (
+              _.map(title, (element) => (
                 <span key={element.text} style={{ color: element.color }}>
                   {element.text}
                   <span style={{ color: 'black' }}>
@@ -26,7 +26,7 @@ const WizardTitle = (props) => {
           </div>
         )
         : null}
-      {props.additionalTitle}
+      {additionalTitle}
     </div>
   );
 };
@@ -37,8 +37,4 @@ WizardTitle.propTypes = {
   /** Array of steps names */
   title: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   additionalTitle: PropTypes.oneOf([PropTypes.string, PropTypes.func]),
-};
-
-WizardTitle.defaultProps = {
-  additionalTitle: null,
 };

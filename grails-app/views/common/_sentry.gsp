@@ -2,7 +2,7 @@
 
 <%--
 Initializes Sentry on GSPs. React pages initialize Sentry via the main bundle instead.
-See src/js/sentry.js and webpack.config.js.
+See src/js/sentry.js and vite.config.mjs.
 --%>
 <g:if test="${grailsApplication.config.getProperty('sentry.web.dsn')}">
     <%--

@@ -6,9 +6,9 @@ import Badge from 'utils/Badge';
 
 import '@testing-library/jest-dom';
 
-const mockCustomTooltip = jest.fn(({ children }) => <>{children}</>);
+const mockCustomTooltip = vi.fn(({ children }) => children);
 
-jest.mock('wrappers/CustomTooltip', () => (props) => mockCustomTooltip(props));
+vi.mock('wrappers/CustomTooltip', () => ({ default: (props) => mockCustomTooltip(props) }));
 
 describe('Badge component', () => {
   it('should match snapshot', () => {
@@ -28,7 +28,7 @@ describe('Badge component', () => {
   });
 
   it('renders nothing when label prop is undefined', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     render(<Badge variant="primary" />);
     expect(screen.queryByTestId('badge')).not.toBeInTheDocument();
     consoleSpy.mockRestore();

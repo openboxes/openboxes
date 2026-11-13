@@ -10,7 +10,9 @@ import useTranslate from 'hooks/useTranslate';
  * title with the action buttons on the right.
  */
 const ConfirmReceiptHeader = ({
-  onBackToReceive, onCompleteReceipt, isCompleteDisabled = false,
+  onBackToReceive = undefined,
+  onCompleteReceipt = undefined,
+  isCompleteDisabled = false,
 }) => {
   const translate = useTranslate();
 
@@ -32,12 +34,6 @@ ConfirmReceiptHeader.propTypes = {
   onBackToReceive: PropTypes.func,
   onCompleteReceipt: PropTypes.func,
   isCompleteDisabled: PropTypes.bool,
-};
-
-ConfirmReceiptHeader.defaultProps = {
-  onBackToReceive: undefined,
-  onCompleteReceipt: undefined,
-  isCompleteDisabled: false,
 };
 
 export default ConfirmReceiptHeader;

@@ -7,17 +7,17 @@ import InputWrapper from 'wrappers/InputWrapper';
 import './style.scss';
 
 const Checkbox = ({
-  title,
-  tooltip,
-  button,
-  disabled,
-  errorMessage,
-  labelPosition,
-  id,
-  name,
-  noWrapper,
-  indeterminate,
-  className,
+  title = null,
+  tooltip = null,
+  button = null,
+  disabled = false,
+  errorMessage = null,
+  labelPosition = 'right',
+  id = undefined,
+  name = undefined,
+  noWrapper = false,
+  indeterminate = false,
+  className = '',
   ...fieldProps
 }) => {
   const checkbox = (
@@ -91,18 +91,4 @@ Checkbox.propTypes = {
   noWrapper: PropTypes.bool,
   indeterminate: PropTypes.bool,
   className: PropTypes.string,
-};
-
-Checkbox.defaultProps = {
-  tooltip: null,
-  title: null,
-  button: null,
-  errorMessage: null,
-  disabled: false,
-  id: undefined,
-  name: undefined,
-  labelPosition: 'right',
-  noWrapper: false,
-  indeterminate: false,
-  className: '',
 };

@@ -9,7 +9,7 @@ import useTranslation from 'hooks/useTranslation';
 import ModalWithTable from './ModalWithTable';
 
 const ConfirmExpirationDateModal = ({
-  isOpen, data, onConfirm, onCancel,
+  isOpen, data = [], onConfirm, onCancel,
 }) => {
   useTranslation('confirmExpirationDate');
   const translate = useTranslate();
@@ -49,10 +49,6 @@ ConfirmExpirationDateModal.propTypes = {
   ),
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-ConfirmExpirationDateModal.defaultProps = {
-  data: [],
 };
 
 export default ConfirmExpirationDateModal;

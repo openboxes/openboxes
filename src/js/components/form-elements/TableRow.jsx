@@ -92,8 +92,15 @@ class TableRow extends Component {
               {properties.isAutosaveEnabled
                 && <RowSaveIndicator lineItemSaveStatus={rowValues.rowSaveStatus} />}
               {this.rowRender(
-                properties, fieldsConfig, focusFieldMap, field, addRow,
-                removeRow, index, rowValues, rowRef,
+                properties,
+                fieldsConfig,
+                focusFieldMap,
+                field,
+                addRow,
+                removeRow,
+                index,
+                rowValues,
+                rowRef,
               )}
             </div>
           </CustomTooltip>
@@ -103,8 +110,15 @@ class TableRow extends Component {
             {properties.isAutosaveEnabled
               && <RowSaveIndicator lineItemSaveStatus={rowValues.rowSaveStatus} />}
             {this.rowRender(
-              properties, fieldsConfig, focusFieldMap, field, addRow,
-              removeRow, index, rowValues, rowRef,
+              properties,
+              fieldsConfig,
+              focusFieldMap,
+              field,
+              addRow,
+              removeRow,
+              index,
+              rowValues,
+              rowRef,
             )}
           </div>
         )}

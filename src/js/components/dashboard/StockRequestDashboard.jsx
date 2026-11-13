@@ -15,7 +15,6 @@ import { getCurrentEventComment } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import 'react-table/react-table.css';
 import './StockRequestDashboard.scss';
 
 const getColumns = ({ currentLocale }) => [

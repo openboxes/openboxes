@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiAddCircleLine } from 'react-icons/all';
+import { RiAddCircleLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import CycleCountStockDiscrepancyInfoBar from 'components/cycleCount/CycleCountStockDiscrepancyInfoBar';
@@ -24,7 +24,7 @@ const ResolveStepTable = ({
   id,
   product,
   dateCounted,
-  tableData,
+  tableData = [],
   tableMeta,
   addEmptyRow,
   removeRow,
@@ -35,7 +35,9 @@ const ResolveStepTable = ({
   shouldHaveRootCause,
   isStepEditable,
   triggerValidation,
-  cycleCountWithItemsWithoutRecount,
+  cycleCountWithItemsWithoutRecount = {
+    cycleCountItems: [],
+  },
   isFormDisabled,
   dateRecounted: initialDateRecounted,
   recountedBy: initialRecountedBy,
@@ -237,11 +239,4 @@ ResolveStepTable.propTypes = {
   }),
   isFormDisabled: PropTypes.bool.isRequired,
   forceRerender: PropTypes.func.isRequired,
-};
-
-ResolveStepTable.defaultProps = {
-  tableData: [],
-  cycleCountWithItemsWithoutRecount: {
-    cycleCountItems: [],
-  },
 };

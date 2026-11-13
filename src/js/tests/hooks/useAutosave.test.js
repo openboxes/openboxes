@@ -10,15 +10,15 @@ import '@testing-library/jest-dom';
 const DEBOUNCE_TIME = 2000;
 const RETRY_DELAY = 5000;
 
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn((selector) => selector()),
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn((selector) => selector()),
 }));
-jest.mock('selectors', () => ({
-  getAutosaveBatchSize: jest.fn(() => 4),
-  getAutosaveDebounceTime: jest.fn(() => 2000),
-  getAutosaveMaxRetries: jest.fn(() => 3),
-  getAutosaveRetryDelay: jest.fn(() => 5000),
-  getAutosaveMaxRetryDelay: jest.fn(() => 40000),
+vi.mock('selectors', () => ({
+  getAutosaveBatchSize: vi.fn(() => 4),
+  getAutosaveDebounceTime: vi.fn(() => 2000),
+  getAutosaveMaxRetries: vi.fn(() => 3),
+  getAutosaveRetryDelay: vi.fn(() => 5000),
+  getAutosaveMaxRetryDelay: vi.fn(() => 40000),
 }));
 
 const createDeferred = () => {
@@ -78,9 +78,9 @@ describe('useAutosave', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     deferreds = [];
-    updateFn = jest.fn(() => {
+    updateFn = vi.fn(() => {
       const deferred = createDeferred();
       deferreds.push(deferred);
       return deferred.promise;
@@ -88,7 +88,7 @@ describe('useAutosave', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('debounces the save and tracks row statuses through PENDING, SAVING and SAVED', async () => {
@@ -100,10 +100,10 @@ describe('useAutosave', () => {
     expect(result.current.isSavePending).toBe(true);
     expect(result.current.autosaveStatus).toBe(AutosaveStatus.SAVING);
 
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME - 1));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME - 1));
     expect(updateFn).not.toHaveBeenCalled();
 
-    act(() => jest.advanceTimersByTime(1));
+    act(() => vi.advanceTimersByTime(1));
     expect(updateFn).toHaveBeenCalledTimes(1);
     expect(updateFn).toHaveBeenCalledWith([
       expect.objectContaining({ rowId: 'row-1', quantityReceiving: 5 }),
@@ -126,7 +126,7 @@ describe('useAutosave', () => {
       const { result } = renderUseAutosave({ rowOptions });
 
       act(() => result.current.updateRow('row-1', { quantityReceiving: -1 }));
-      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+      act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
       await flushPromises();
 
       expect(updateFn).not.toHaveBeenCalled();
@@ -139,9 +139,9 @@ describe('useAutosave', () => {
       const { result } = renderUseAutosave({ rowOptions });
 
       act(() => result.current.updateRow('row-1', { quantityReceiving: -1 }));
-      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+      act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
       act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
-      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+      act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
 
       expect(updateFn).toHaveBeenCalledTimes(1);
       deferreds[0].resolve([{ rowId: 'row-1' }]);
@@ -163,7 +163,7 @@ describe('useAutosave', () => {
 
     // Zero delay instead of a synchronous call, so a burst of edits ends up
     // in one batch request.
-    act(() => jest.advanceTimersByTime(0));
+    act(() => vi.advanceTimersByTime(0));
 
     expect(updateFn).toHaveBeenCalledTimes(1);
     expect(updateFn).toHaveBeenCalledWith([
@@ -177,7 +177,7 @@ describe('useAutosave', () => {
 
     // Edit 1
     act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
     expect(updateFn).toHaveBeenCalledTimes(1);
 
     // Edit 2 happens while the request is still running...
@@ -193,7 +193,7 @@ describe('useAutosave', () => {
     }));
 
     // The next flush sends the newest value against the saved receipt item.
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
     expect(updateFn).toHaveBeenCalledTimes(2);
     expect(updateFn).toHaveBeenLastCalledWith([
       expect.objectContaining({
@@ -208,7 +208,7 @@ describe('useAutosave', () => {
     const { result } = renderUseAutosave();
 
     act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
     deferreds[0].reject(new Error('server error'));
     await flushPromises();
 
@@ -217,7 +217,7 @@ describe('useAutosave', () => {
 
     // The row is edited before the retry fires - the retry sends the newest value.
     act(() => result.current.updateRow('row-1', { quantityReceiving: 8 }));
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
 
     expect(updateFn).toHaveBeenCalledTimes(2);
     expect(updateFn).toHaveBeenLastCalledWith([
@@ -233,25 +233,25 @@ describe('useAutosave', () => {
     const { result } = renderUseAutosave({ retryOptions: { maxRetries: 1 } });
 
     act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
     deferreds[0].reject(new Error('server error'));
     await flushPromises();
     expect(updateFn).toHaveBeenCalledTimes(1);
 
     // First retry
-    act(() => jest.advanceTimersByTime(RETRY_DELAY));
+    act(() => vi.advanceTimersByTime(RETRY_DELAY));
     expect(updateFn).toHaveBeenCalledTimes(2);
     deferreds[1].reject(new Error('server error'));
     await flushPromises();
 
     // After exhausting maxRetries the row is left in ERROR, no more requests.
-    act(() => jest.advanceTimersByTime(RETRY_DELAY * 10));
+    act(() => vi.advanceTimersByTime(RETRY_DELAY * 10));
     expect(updateFn).toHaveBeenCalledTimes(2);
     expect(result.current.rows['row-1'].saveStatus).toBe(RowSaveStatus.ERROR);
 
     // A new edit resets the retry budget and saving works again.
     act(() => result.current.updateRow('row-1', { quantityReceiving: 6 }));
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
     expect(updateFn).toHaveBeenCalledTimes(3);
   });
 
@@ -265,22 +265,22 @@ describe('useAutosave', () => {
       });
 
       act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
-      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+      act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
       deferreds[0].reject(networkError());
       await flushPromises();
       expect(result.current.rows['row-1'].saveStatus).toBe(RowSaveStatus.ERROR);
 
-      act(() => jest.advanceTimersByTime(RETRY_DELAY));
+      act(() => vi.advanceTimersByTime(RETRY_DELAY));
       expect(updateFn).toHaveBeenCalledTimes(2);
       deferreds[1].reject(networkError());
       await flushPromises();
 
-      act(() => jest.advanceTimersByTime(RETRY_DELAY * 2));
+      act(() => vi.advanceTimersByTime(RETRY_DELAY * 2));
       expect(updateFn).toHaveBeenCalledTimes(3);
       deferreds[2].reject(networkError());
       await flushPromises();
 
-      act(() => jest.advanceTimersByTime(RETRY_DELAY * 2));
+      act(() => vi.advanceTimersByTime(RETRY_DELAY * 2));
       expect(updateFn).toHaveBeenCalledTimes(4);
 
       deferreds[3].resolve([{ rowId: 'row-1' }]);
@@ -292,7 +292,7 @@ describe('useAutosave', () => {
       const { result } = renderUseAutosave();
 
       act(() => result.current.updateRow('row-1', { quantityReceiving: 5 }));
-      act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+      act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
       deferreds[0].reject(networkError());
       await flushPromises();
       expect(updateFn).toHaveBeenCalledTimes(1);
@@ -307,7 +307,7 @@ describe('useAutosave', () => {
     });
 
     it('flush() gives up on a persistent network failure instead of looping forever', async () => {
-      const failingUpdateFn = jest.fn(() => Promise.reject(networkError()));
+      const failingUpdateFn = vi.fn(() => Promise.reject(networkError()));
       const { result } = renderUseAutosave({
         requests: { updateFn: failingUpdateFn },
         retryOptions: { maxRetries: 0 },
@@ -337,7 +337,7 @@ describe('useAutosave', () => {
     expect(result.current.rowsById).toContain(rowId);
     expect(result.current.rows[rowId].saveStatus).toBe(RowSaveStatus.PENDING);
 
-    act(() => jest.advanceTimersByTime(DEBOUNCE_TIME));
+    act(() => vi.advanceTimersByTime(DEBOUNCE_TIME));
     expect(updateFn).toHaveBeenCalledWith([
       expect.objectContaining({ rowId, quantityReceiving: 2 }),
     ]);
@@ -354,7 +354,7 @@ describe('useAutosave', () => {
   describe('deleteRow', () => {
     it('ignores repeated delete clicks while the delete request is running', async () => {
       const deleteDeferred = createDeferred();
-      const deleteFn = jest.fn(() => deleteDeferred.promise);
+      const deleteFn = vi.fn(() => deleteDeferred.promise);
       const { result } = renderUseAutosave({ requests: { deleteFn } });
 
       act(() => {
@@ -374,7 +374,7 @@ describe('useAutosave', () => {
     });
 
     it('restores the row with ERROR status when the delete request fails', async () => {
-      const deleteFn = jest.fn(() => Promise.reject(new Error('delete failed')));
+      const deleteFn = vi.fn(() => Promise.reject(new Error('delete failed')));
       const { result } = renderUseAutosave({ requests: { deleteFn } });
 
       act(() => {
@@ -411,7 +411,7 @@ describe('useAutosave', () => {
     });
 
     it('rejects when a row still cannot be saved', async () => {
-      const failingUpdateFn = jest.fn(() => Promise.reject(new Error('server error')));
+      const failingUpdateFn = vi.fn(() => Promise.reject(new Error('server error')));
       const { result } = renderUseAutosave({
         requests: { updateFn: failingUpdateFn },
         retryOptions: { maxRetries: 0 },

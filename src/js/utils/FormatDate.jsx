@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import DateFormat from 'consts/dateFormat';
 import { formatDate } from 'utils/translation-utils';
 
-const FormatDate = ({ date, formatName }) => {
+const FormatDate = ({ date = new Date(), formatName = DateFormat.DEFAULT }) => {
   const { translateDate } = useSelector((state) => ({
     translateDate: formatDate(state.localize),
   }));
@@ -23,9 +23,4 @@ export default FormatDate;
 FormatDate.propTypes = {
   date: PropTypes.instanceOf(Date),
   formatName: PropTypes.string,
-};
-
-FormatDate.defaultProps = {
-  date: new Date(),
-  formatName: DateFormat.DEFAULT,
 };

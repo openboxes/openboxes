@@ -3,11 +3,11 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 const AlertMessage = ({
-  show,
-  message,
-  danger,
-  close,
-  className,
+  show = false,
+  message = '',
+  danger = false,
+  close = () => null,
+  className = '',
 }) => {
   const getMessageElement = useMemo(() => {
     const alertMessages = typeof message !== 'string' && Array.isArray(message) ? message : [message];
@@ -48,12 +48,4 @@ AlertMessage.propTypes = {
   danger: PropTypes.bool,
   message: PropTypes.string,
   show: PropTypes.bool,
-};
-
-AlertMessage.defaultProps = {
-  className: '',
-  close: () => null,
-  danger: false,
-  message: '',
-  show: false,
 };

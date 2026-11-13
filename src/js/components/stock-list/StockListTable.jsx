@@ -26,8 +26,6 @@ import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const StockListTable = ({
   filterParams,
   translate,

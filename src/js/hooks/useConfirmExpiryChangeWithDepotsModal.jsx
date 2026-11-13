@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import * as locales from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale } from 'selectors';
 
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
+import locales from 'consts/dateFnsLocales';
 import depotAvailabilityColumn from 'consts/depotAvailabilityColumn';
 import useTranslate from 'hooks/useTranslate';
 import { formatDateToDatetimeString, parseApiDate } from 'utils/dateUtils';

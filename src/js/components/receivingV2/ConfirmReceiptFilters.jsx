@@ -102,10 +102,4 @@ ConfirmReceiptFilters.propTypes = {
   clearFilterParams: PropTypes.func.isRequired,
 };
 
-ConfirmReceiptFilters.defaultProps = {
-  onCancelAllRemaining: () => {},
-  onSaveAndExit: () => {},
-  onResetSort: () => {},
-};
-
 export default ConfirmReceiptFilters;

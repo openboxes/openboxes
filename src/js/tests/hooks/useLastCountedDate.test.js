@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import productApi from 'api/services/ProductApi';
 import useLastCountedDate from 'hooks/cycleCount/useLastCountedDate';
 
-jest.mock('api/services/ProductApi');
+vi.mock('api/services/ProductApi');
 
 describe('useLastCountedDate', () => {
   const mockTableData = {
@@ -19,7 +19,7 @@ describe('useLastCountedDate', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('does not call API when tableData.data is empty', () => {

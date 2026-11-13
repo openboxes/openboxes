@@ -12,7 +12,11 @@ import Translate from 'utils/Translate';
 import './utils.scss';
 
 const ContextMenu = ({
-  positions, actions, dropdownClasses, popoverClasses, id,
+  positions = ['top', 'right', 'left', 'bottom'],
+  actions,
+  dropdownClasses = '',
+  popoverClasses = '',
+  id,
 }) => {
   const {
     getActionItemType,
@@ -109,10 +113,4 @@ ContextMenu.propTypes = {
   id: PropTypes.string.isRequired,
   dropdownClasses: PropTypes.string,
   popoverClasses: PropTypes.string,
-};
-
-ContextMenu.defaultProps = {
-  positions: ['top', 'right', 'left', 'bottom'],
-  dropdownClasses: '',
-  popoverClasses: '',
 };

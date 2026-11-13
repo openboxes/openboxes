@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import useQueryParams from 'hooks/useQueryParams';
 import Translate from 'utils/Translate';
 
-const Tabs = ({ config, className }) => {
+const Tabs = ({ config = {}, className = '' }) => {
   const parsedQueryParams = useQueryParams();
   return (
     <div className={`tabs d-flex align-items-center ${className}`}>
@@ -38,9 +38,4 @@ Tabs.propTypes = {
     }),
   }),
   className: PropTypes.string,
-};
-
-Tabs.defaultProps = {
-  className: '',
-  config: {},
 };

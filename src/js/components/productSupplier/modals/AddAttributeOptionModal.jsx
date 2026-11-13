@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCloseFill } from 'react-icons/all';
+import { RiCloseFill } from 'react-icons/ri';
 import Modal from 'react-modal';
 
 import Button from 'components/form-elements/Button';
@@ -13,7 +13,7 @@ import '../styles.scss';
 const AddAttributeOptionModal = ({
   isOpen,
   close,
-  selectedAttribute,
+  selectedAttribute = {},
   setValue,
 }) => {
   const [inputValue, setInputValue] = useState(null);
@@ -92,8 +92,4 @@ AddAttributeOptionModal.propTypes = {
     name: PropTypes.string,
   }),
   setValue: PropTypes.func.isRequired,
-};
-
-AddAttributeOptionModal.defaultProps = {
-  selectedAttribute: {},
 };

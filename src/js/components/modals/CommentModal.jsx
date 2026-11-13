@@ -75,9 +75,4 @@ CommentModal.propTypes = {
   onSave: PropTypes.func.isRequired,
 };
 
-CommentModal.defaultProps = {
-  anchor: null,
-  initialValue: '',
-};
-
 export default CommentModal;

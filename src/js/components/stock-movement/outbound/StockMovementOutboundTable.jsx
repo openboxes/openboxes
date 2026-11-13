@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCloseFill } from 'react-icons/all';
 import {
   RiArrowGoBackLine,
   RiArrowRightSLine, RiCheckFill,
+  RiCloseFill,
   RiDeleteBinLine,
   RiDownload2Line,
   RiInformationLine,
@@ -30,8 +30,6 @@ import canEditRequest from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import { supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const StockMovementOutboundTable = ({
   filterParams,

@@ -9,8 +9,8 @@ import useTranslate from 'hooks/useTranslate';
  * Memoized cell rendering a value limited to a configurable number of lines
  * (two by default) with the full value displayed on a tooltip.
  */
-const MultilineCell = React.memo(({
-  value, label, defaultLabel, maxLines = 2, className = '',
+const MultilineCellComponent = ({
+  value = undefined, label, defaultLabel, maxLines = 2, className = '',
 }) => {
   const translate = useTranslate();
 
@@ -21,22 +21,18 @@ const MultilineCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const MultilineCell = React.memo(MultilineCellComponent);
 
 MultilineCell.displayName = 'MultilineCell';
 
-MultilineCell.propTypes = {
+MultilineCellComponent.propTypes = {
   value: PropTypes.string,
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   maxLines: PropTypes.number,
   className: PropTypes.string,
-};
-
-MultilineCell.defaultProps = {
-  value: undefined,
-  maxLines: 2,
-  className: '',
 };
 
 export default MultilineCell;

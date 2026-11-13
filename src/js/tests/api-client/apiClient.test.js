@@ -9,13 +9,11 @@ import apiClient, {
   urlInterceptor,
 } from 'utils/apiClient';
 
-jest.mock('components/Layout/notifications/notification', () => ({
-  __esModule: true,
-  default: jest.fn(() => jest.fn()),
+vi.mock('components/Layout/notifications/notification', () => ({
+  default: vi.fn(() => vi.fn()),
 }));
 
-jest.mock('components/LoginModal', () => ({
-  __esModule: true,
+vi.mock('components/LoginModal', () => ({
   default: () => null,
 }));
 
@@ -99,7 +97,7 @@ describe('mapToEmptyString', () => {
 
 describe('handleValidationErrors', () => {
   it('shows the validation messages in an alert for 400 instead of a notification', async () => {
-    const setState = jest.fn();
+    const setState = vi.fn();
     const error = buildResponseError(400, { errorMessages: ['Name is required', 'Code is required'] });
 
     await expect(handleValidationErrors(setState)(error)).rejects.toBe(error);
@@ -111,7 +109,7 @@ describe('handleValidationErrors', () => {
   });
 
   it('does not touch the alert for other statuses', async () => {
-    const setState = jest.fn();
+    const setState = vi.fn();
     const error = buildResponseError(500);
 
     await expect(handleValidationErrors(setState)(error)).rejects.toBe(error);
