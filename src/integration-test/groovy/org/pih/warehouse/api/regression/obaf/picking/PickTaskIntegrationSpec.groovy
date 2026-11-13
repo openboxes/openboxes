@@ -10,8 +10,10 @@ import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picking.PickTask
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 
@@ -347,6 +349,57 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         then:
         thrown(IllegalArgumentException)
         pickTask(o.taskIds[0]) != null
+    }
+
+    void 'reallocate refuses a picklist item without an inventory item and keeps the task'() {
+        given:
+        PickSite s = pickSite('PT-RAI')
+        PickOrder o = pickOrder(s, [5])
+
+        when: 'one of the new picks names no inventory item, another one that does not exist'
+        Throwable missing = reallocateError(o.taskIds[0], [[binLocation: [id: s.alt], quantity: 5]])
+        Throwable unknown = reallocateError(o.taskIds[0], [
+                [inventoryItem: [id: s.lotId], binLocation: [id: s.alt], quantity: 2],
+                [inventoryItem: [id: 'no-such-lot'], binLocation: [id: s.bin], quantity: 3],
+        ])
+
+        then: 'both are refused before anything is deleted or created'
+        missing instanceof IllegalArgumentException
+        missing.message.contains('inventory item')
+        unknown instanceof IllegalArgumentException
+        unknown.message.contains('no-such-lot')
+        tx { PickTask.findAllByRequisitionItem(RequisitionItem.get(o.requisitionItemId))*.id } == o.taskIds
+        pickTask(o.taskIds[0]).subMap(['status', 'location', 'quantityRequired']) == [status: 'PENDING', location: 'BIN', quantityRequired: 5]
+    }
+
+    void 'refreshing availability tolerates an allocated picklist item without an inventory item'() {
+        given: 'a pending pick of the line from the alternative bin that names no lot'
+        PickSite s = pickSite('PT-RANL')
+        PickOrder o = pickOrder(s, [5])
+        String lotless = tx {
+            Picklist picklist = Picklist.get(o.picklistId)
+            PicklistItem item = new PicklistItem(requisitionItem: RequisitionItem.get(o.requisitionItemId),
+                    inventoryItem: null, binLocation: Location.get(s.alt), quantity: 2, quantityPicked: 0, sortOrder: 1)
+            picklist.addToPicklistItems(item)
+            picklist.save(flush: true, failOnError: true)
+            return item.id
+        } as String
+
+        expect: 'its refresh event is scoped to the line\'s product, not the whole facility'
+        tx { PicklistItem.get(lotless).associatedProducts } == [s.product]
+
+        and: 'the refresh completes; only the pick with a lot is allocated against that lot (record stock also leaves a zero row with no bin and no lot)'
+        onHand(s.dc, s.product) == [BIN: 20, ALT: 20]
+        availability(s.dc, s.product).findAll { it.value[0] } == [(['BIN', s.lot]): [20, 15], (['ALT', s.lot]): [20, 20]]
+    }
+
+    Throwable reallocateError(String taskId, List picklistItems) {
+        try {
+            tx { pickTaskService.reallocate(PickTask.get(taskId), picklistItems) }
+            return null
+        } catch (Throwable t) {
+            return t
+        }
     }
 
     void 'reallocate does not check the new quantities against the line (characterised)'() {
