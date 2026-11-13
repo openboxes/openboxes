@@ -28,12 +28,12 @@ class ShipmentReceivingCalculator {
      * exactly as {@link ShipmentItemReceivingSummaryDto} totals them for the receiving client.
      */
     Integer getShipmentItemQuantityRemaining(ShipmentItem shipmentItem) {
-        int quantityReceivedAndCanceled = (shipmentItem.receiptItems ?: []).sum(0) { ReceiptItem receiptItem ->
+        int quantityReceivedAndCanceled = (shipmentItem?.receiptItems ?: []).sum(0) { ReceiptItem receiptItem ->
             receiptItem.receipt?.receiptStatusCode == ReceiptStatusCode.RECEIVED
                     ? (receiptItem.quantityReceived ?: 0) + (receiptItem.quantityCanceled ?: 0)
                     : 0
         } as int
-        return (shipmentItem.quantity ?: 0) - quantityReceivedAndCanceled
+        return (shipmentItem?.quantity ?: 0) - quantityReceivedAndCanceled
     }
 
     /**
