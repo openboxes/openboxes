@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import org.springframework.validation.ObjectError
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.core.validation.ObjectValidator
@@ -86,7 +87,7 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
      * A receipt must have received something to be completed: at least one of its lines with a quantity received
      * above zero. The exception is a receipt that cancels some remaining quantity - it can be completed without
      * receiving anything, and then no transaction is recorded for it (see
-     * {@link org.pih.warehouse.api.receiving.v2.ReceiptV2Service#completeReceipt}).
+     * {@link ReceiptTransactionManager#createInboundTransaction}).
      */
     private ObjectError validateSomethingWasReceived(ReceiptCompleteRequestCommand command) {
         if (!command.receipt) {
@@ -98,12 +99,25 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
             (receiptItem.quantityReceived ?: 0) > 0
         }
 
-        // The request flags at least one line to cancel that still has a remaining quantity
-        boolean hasLinesWithQuantityToCancel = command.itemsToComplete.any { ReceiptItemCompleteRequest item ->
-            item.cancelRemainingQuantity && shipmentReceivingCalculator.getShipmentItemQuantityRemaining(item.receiptItem?.shipmentItem) > 0
+        // Something was received, so there is no need to check what gets canceled
+        if (!hasNoReceivedLines) {
+            return null
         }
 
-        if (hasNoReceivedLines && !hasLinesWithQuantityToCancel) {
+        Location destination = command.receipt.shipment?.destination
+
+        // At least one line that the completion cancels still has a remaining quantity. With partial receiving these
+        // are the lines marked with cancelRemainingQuantity in the request, without it all lines
+        boolean hasLinesWithQuantityToCancel = destination?.supports(ActivityCode.PARTIAL_RECEIVING)
+                ? command.itemsToComplete.any { ReceiptItemCompleteRequest item ->
+                    item.cancelRemainingQuantity &&
+                        shipmentReceivingCalculator.getShipmentItemQuantityRemaining(item.receiptItem?.shipmentItem) > 0
+                }
+                : (command.receipt.receiptItems ?: []).any { ReceiptItem receiptItem ->
+                    shipmentReceivingCalculator.getShipmentItemQuantityRemaining(receiptItem.shipmentItem) > 0
+                }
+
+        if (!hasLinesWithQuantityToCancel) {
             return rejectField("receipt", command.receipt, "receiptCompleteRequestCommand.receipt.nothingReceived",
                     [command.receipt.receiptNumber])
         }

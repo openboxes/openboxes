@@ -354,23 +354,6 @@ class ReceiptV2Service {
         // The canceled quantities count towards the shipment being fully received, so the shipment event (which
         // decides between RECEIVED and PARTIALLY_RECEIVED) can only be created after they are applied.
         createShipmentReceivedEvent(receipt)
-
-        boolean hasReceivedLines = receipt.receiptItems.any { ReceiptItem receiptItem ->
-            receiptItem.quantityReceived > 0
-        }
-
-        // If no line has a quantity received above zero, we do not create a transaction
-        if (!hasReceivedLines) {
-            // Without a transaction no later shipment save triggers the order summary refresh, so it is published
-            // by hand once the canceled quantities are flushed to the database
-            receipt.shipment.save(flush: true)
-            receipt.shipment.disableRefresh = false
-            receipt.shipment.publishRefreshEvent()
-            grailsApplication.mainContext.publishEvent(
-                    new ShipmentStatusTransitionEvent(receipt, ShipmentStatusCode.RECEIVED))
-            return ReceiptDto.from(receipt)
-        }
-
         Transaction transaction = receiptTransactionManager.createInboundTransaction(receipt)
 
         // Trigger shipment status transition event to handle email notifications
@@ -378,9 +361,11 @@ class ReceiptV2Service {
                 new ShipmentStatusTransitionEvent(receipt, ShipmentStatusCode.RECEIVED))
 
         // Trigger product availability refresh
-        transaction.disableRefresh = Boolean.FALSE
-        grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(
-                transaction, transaction.associatedLocation, transaction.associatedProducts, false))
+        if (transaction) {
+            transaction.disableRefresh = Boolean.FALSE
+            grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(
+                    transaction, transaction.associatedLocation, transaction.associatedProducts, false))
+        }
 
         return ReceiptDto.from(receipt)
     }

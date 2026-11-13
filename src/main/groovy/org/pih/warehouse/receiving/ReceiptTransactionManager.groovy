@@ -38,10 +38,24 @@ class ReceiptTransactionManager {
     /**
      * Records the inbound stock transaction of a completed receipt: one entry per line that received something,
      * crediting the received quantities to the destination's inventory. Lines completed with nothing received get
-     * no entry.
+     * no entry. A receipt that received nothing records no transaction, so null is returned for it.
      */
     Transaction createInboundTransaction(Receipt receipt) {
         Shipment shipment = receipt.shipment
+
+        boolean hasReceivedLines = receipt.receiptItems.any { ReceiptItem receiptItem ->
+            receiptItem.quantityReceived > 0
+        }
+
+        // Nothing was received, so no transaction is recorded. The shipment save below, which refreshes the order
+        // summary, is skipped too, so the refresh is published by hand after the canceled quantities are flushed
+        if (!hasReceivedLines) {
+            shipment.save(flush: true)
+            shipment.disableRefresh = false
+            shipment.publishRefreshEvent()
+            return null
+        }
+
         if (!shipment.destination?.inventory) {
             throw new IllegalStateException(
                     "Destination ${shipment.destination?.name} must have an inventory in order to receive stock")

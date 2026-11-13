@@ -160,6 +160,8 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
         "receives nothing and cancels nothing"                            | [0]                | [4]                 | false    | ActivityCode.PARTIAL_RECEIVING || [NOTHING_RECEIVED]
         "receives nothing and cancels only lines with nothing left"       | [0]                | [0]                 | true     | ActivityCode.PARTIAL_RECEIVING || [NOTHING_RECEIVED]
         "receives nothing and cancels after partial receiving turned off" | [0]                | [4]                 | true     | ActivityCode.MANAGE_INVENTORY  || []
+        "receives nothing and flags no line without partial receiving"    | [0]                | [4]                 | false    | ActivityCode.MANAGE_INVENTORY  || []
+        "receives nothing without partial receiving and has nothing left" | [0]                | [0]                 | false    | ActivityCode.MANAGE_INVENTORY  || [NOTHING_RECEIVED]
     }
 
     void 'doValidate should reject the cancel-remaining flag on a split item'() {
