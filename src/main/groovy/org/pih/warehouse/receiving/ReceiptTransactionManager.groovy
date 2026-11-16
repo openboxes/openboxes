@@ -48,9 +48,9 @@ class ReceiptTransactionManager {
         }
 
         // Nothing was received, so no transaction is recorded. The order summary is refreshed by the shipment's
-        // afterUpdate, but if the shipment has nothing to update, afterUpdate is not called, so the refresh is
-        // published by hand after the save. The flag is cleared only after the save, so a shipment that does get
-        // updated is not refreshed twice
+        // afterUpdate, but if the shipment has nothing to update (such as when it is already partially received and
+        // its status does not change), afterUpdate is not called, so the refresh is published by hand after the save.
+        // The flag is cleared only after the save, so a shipment that does get updated is not refreshed twice
         if (!hasReceivedLines) {
             shipment.save(flush: true)
             shipment.disableRefresh = false
