@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import BaseField from 'components/form-elements/BaseField';
 import locales from 'consts/dateFnsLocales';
 import DateFormat from 'consts/dateFormat';
+import { DateFormat as DateFormatPattern, TimeFormat } from 'consts/timeFormat';
 import Translate from 'utils/Translate';
 import { formatDate, getLocaleCode } from 'utils/translation-utils';
 
@@ -60,10 +61,10 @@ const CustomInput = React.forwardRef((props, ref) => {
 const DateFilter = ({
   value = null,
   onChange = undefined,
-  dateFormat = 'MM/DD/YYYY',
+  dateFormat = DateFormatPattern.MM_DD_YYYY,
   placeholder = '',
   label = '',
-  timeFormat = 'HH:mm',
+  timeFormat = TimeFormat.HH_MM,
   defaultMessage = '',
   localizeDate = false,
   localizedDateFormat = DateFormat.DEFAULT,
