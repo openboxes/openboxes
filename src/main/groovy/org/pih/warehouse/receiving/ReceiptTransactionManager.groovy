@@ -44,11 +44,13 @@ class ReceiptTransactionManager {
         Shipment shipment = receipt.shipment
 
         boolean hasReceivedLines = receipt.receiptItems.any { ReceiptItem receiptItem ->
-            receiptItem.quantityReceived > 0
+            (receiptItem.quantityReceived ?: 0) > 0
         }
 
-        // Nothing was received, so no transaction is recorded. The shipment save below, which refreshes the order
-        // summary, is skipped too, so the refresh is published by hand after the canceled quantities are flushed
+        // Nothing was received, so no transaction is recorded. The order summary is refreshed by the shipment's
+        // afterUpdate, but if the shipment has nothing to update, afterUpdate is not called, so the refresh is
+        // published by hand after the save. The flag is cleared only after the save, so a shipment that does get
+        // updated is not refreshed twice
         if (!hasReceivedLines) {
             shipment.save(flush: true)
             shipment.disableRefresh = false

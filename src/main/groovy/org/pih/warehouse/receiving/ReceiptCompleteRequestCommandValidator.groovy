@@ -94,13 +94,13 @@ class ReceiptCompleteRequestCommandValidator extends ObjectValidator<ReceiptComp
             return null
         }
 
-        // No line on this receipt has a quantity received above zero (null counts as zero)
-        boolean hasNoReceivedLines = !(command.receipt.receiptItems ?: []).any { ReceiptItem receiptItem ->
+        // At least one line on this receipt has a quantity received above zero (null counts as zero)
+        boolean hasReceivedLines = (command.receipt.receiptItems ?: []).any { ReceiptItem receiptItem ->
             (receiptItem.quantityReceived ?: 0) > 0
         }
 
         // Something was received, so there is no need to check what gets canceled
-        if (!hasNoReceivedLines) {
+        if (hasReceivedLines) {
             return null
         }
 
