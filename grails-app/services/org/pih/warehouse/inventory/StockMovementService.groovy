@@ -3351,7 +3351,7 @@ class StockMovementService {
         if (!shipment) {
             throw new IllegalStateException("There are no shipments associated with stock movement ${stockMovement.id}")
         }
-        shipmentService.sendShipment(shipment, "Sent on ${new Date()}", user, shipment.origin, stockMovement.dateShipped ?: new Date())
+        shipmentService.sendShipment(shipment, null, user, shipment.origin, stockMovement.dateShipped ?: new Date())
     }
 
     void issueRequisitionBasedStockMovement(String id) {
