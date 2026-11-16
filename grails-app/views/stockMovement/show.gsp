@@ -437,6 +437,16 @@
                                 </td>
                             </tr>
                         </g:if>
+                        <g:if test="${stockMovement?.requisition?.deliveryTypeCode}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <warehouse:message code="requisition.deliveryTypeCode.label" default="Delivery Type"/>
+                                </td>
+                                <td class="value">
+                                    <format:metadata obj="${stockMovement?.requisition?.deliveryTypeCode}"/>
+                                </td>
+                            </tr>
+                        </g:if>
                         <g:if test="${stockMovement?.isElectronicType()}">
                             <tr class="prop">
                                 <td class="name">
