@@ -31,7 +31,6 @@ import 'components/DataTable/DataTable.scss';
 //                      while scrolling, it has worse performance than hardcoded
 //                      row height
 // }
-
 const DataTable = ({
   columns,
   data,
