@@ -13,8 +13,8 @@ SELECT
         WHEN 'SERVICE' THEN 2
         WHEN 'WILL_CALL' THEN 3
         WHEN 'STOCK_TRANSFER_IBT' THEN 3
-        WHEN 'VENDOR_RETURN' THEN 3
         WHEN 'SHIP_TO' THEN 4
+        WHEN 'VENDOR_RETURN' THEN 5
         ELSE 6
     END AS priority,
     r.requested_by_id AS requested_by_id,

@@ -50,11 +50,11 @@ class SortationServicesSpec extends Specification implements DataTest {
 
     void 'unmet demand: several delivery types come back in delivery priority order'() {
         when:
-        Map result = unmet([(PICK_UP): 1], [(DEFAULT): 9, (SHIP_TO): 2, (WILL_CALL): 3, (SERVICE): 4, (LOCAL_DELIVERY): 5, (PICK_UP): 6])
+        Map result = unmet([(PICK_UP): 1], [(DEFAULT): 9, (VENDOR_RETURN): 7, (SHIP_TO): 2, (WILL_CALL): 3, (SERVICE): 4, (LOCAL_DELIVERY): 5, (PICK_UP): 6])
 
         then:
-        result.keySet() as Set == [PICK_UP, SERVICE, LOCAL_DELIVERY, WILL_CALL, SHIP_TO, DEFAULT] as Set
-        result.keySet().toList().collect { it.priority } == [1, 2, 2, 3, 4, 5]
+        result.keySet() as Set == [PICK_UP, SERVICE, LOCAL_DELIVERY, WILL_CALL, SHIP_TO, VENDOR_RETURN, DEFAULT] as Set
+        result.keySet().toList().collect { it.priority } == [1, 2, 2, 3, 4, 5, 6]
         result[PICK_UP] == 5
         result[DEFAULT] == 9
     }

@@ -364,6 +364,7 @@ class AllocationJobsUnitSpec extends Specification implements DataTest, JobUnitS
         DeliveryTypeCode.SHIP_TO              | null                         || true
         DeliveryTypeCode.DEFAULT              | null                         || true
         DeliveryTypeCode.STOCK_TRANSFER_IBT   | null                         || true
+        DeliveryTypeCode.VENDOR_RETURN        | null                         || true
         DeliveryTypeCode.SERVICE              | null                         || false
         null                                  | null                         || false
         DeliveryTypeCode.SERVICE              | OrderTypeCode.TRANSFER_ORDER || true
