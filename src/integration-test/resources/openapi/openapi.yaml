@@ -376,6 +376,8 @@ paths:
     $ref: 'paths/outbound-order.yaml#/~1api~1outbound-orders~1{id}'
   '/api/outbound-orders/{id}/items/{itemId}/allocations':
     $ref: 'paths/outbound-order.yaml#/~1api~1outbound-orders~1{id}~1items~1{itemId}~1allocations'
+  '/api/outbound-orders/{id}/items/{itemId}/amend':
+    $ref: 'paths/outbound-order.yaml#/~1api~1outbound-orders~1{id}~1items~1{itemId}~1amend'
   '/api/outboundOrders/{id}':
     $ref: 'paths/outbound-order.yaml#/~1api~1outboundOrders~1{id}'
   '/api/partialReceiving':

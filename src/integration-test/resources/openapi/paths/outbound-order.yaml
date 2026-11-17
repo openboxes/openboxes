@@ -54,6 +54,38 @@
         $ref: ../components/responses.yaml#/StubNoContent
       default:
         $ref: ../components/responses.yaml#/Error
+/api/outbound-orders/{id}/items/{itemId}/amend:
+  post:
+    operationId: outboundOrderApi_amend
+    summary: outboundOrderApi.amend
+    tags:
+    - Outbound Order
+    x-doc-status: stub
+    x-openboxes-controller: outboundOrderApi
+    x-openboxes-action: amend
+    x-openboxes-source: explicit
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        type: string
+    requestBody:
+      $ref: ../components/request-bodies.yaml#/StubBody
+    responses:
+      '200':
+        $ref: ../components/responses.yaml#/StubSuccess
+      '201':
+        $ref: ../components/responses.yaml#/StubCreated
+      '204':
+        $ref: ../components/responses.yaml#/StubNoContent
+      default:
+        $ref: ../components/responses.yaml#/Error
 /api/outboundOrders/{id}:
   get:
     operationId: outboundOrderApi_read_get

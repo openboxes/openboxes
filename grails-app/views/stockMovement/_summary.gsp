@@ -60,6 +60,12 @@
                             <warehouse:message code="requisition.priority.label"/>:
                             <label><g:message code="enum.PriorityLevel.${org.pih.warehouse.requisition.PriorityLevel.fromPriority(requisition?.priority)}" default="${requisition?.priority}"/></label>
                         </span>
+                        <g:if test="${requisition?.deliveryTypeCode}">
+                            <span class="deliveryType">
+                                <warehouse:message code="requisition.deliveryTypeCode.label" default="Delivery Type"/>:
+                                <label>${format.metadata(obj:requisition?.deliveryTypeCode)}</label>
+                            </span>
+                        </g:if>
                         <g:if test="${stockMovement?.origin }">
                             <span class="origin">
                                 <warehouse:message code="shipping.origin.label"/>:
