@@ -15,14 +15,18 @@ import org.pih.warehouse.core.validation.ObjectValidationResult
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentItem
 
 @Unroll
 class ReceiptCompleteRequestCommandValidatorSpec extends Specification implements DataTest {
 
-    ReceiptCompleteRequestCommandValidator validator = new ReceiptCompleteRequestCommandValidator()
+    static final String NOTHING_RECEIVED = "receiptCompleteRequestCommand.receipt.nothingReceived"
+
+    ReceiptCompleteRequestCommandValidator validator = new ReceiptCompleteRequestCommandValidator(
+            shipmentReceivingCalculator: new ShipmentReceivingCalculator())
 
     void setupSpec() {
-        mockDomains(Receipt, ReceiptItem, Product, Shipment, Location)
+        mockDomains(Receipt, ReceiptItem, Product, Shipment, ShipmentItem, Location)
 
         // ReceiptItemCompleteRequest implements ObjectValidatable, whose validate() performs javax validation
         // through the "defaultValidator" bean. A running app gets that bean from Boot's autoconfiguration, but
@@ -127,6 +131,37 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
 
         then: 'the one line that moved stock is enough - the transaction gets its entry'
         assert result.valid
+    }
+
+    void 'doValidate should return errors #errorCodes for a receipt that #scenario'() {
+        given: 'a receipt whose lines each still had the given quantity remaining before it'
+        Receipt receipt = buildPendingReceipt()
+        List<ReceiptItem> receiptItems = quantitiesReceived.collect { Integer quantityReceived ->
+            buildReceiptItem(receipt, false, quantityReceived)
+        }
+        receiveInto(receipt, supportedActivity)
+        receiptItems.eachWithIndex { ReceiptItem receiptItem, int index ->
+            receiptItem.shipmentItem = buildShipmentItem(quantitiesRemaining[index])
+        }
+
+        expect:
+        assert validator.doValidate(new ReceiptCompleteRequestCommand(
+                receipt: receipt,
+                itemsToComplete: receiptItems.collect { ReceiptItem receiptItem ->
+                    new ReceiptItemCompleteRequest(receiptItem: receiptItem, cancelRemainingQuantity: canceled)
+                },
+        )).errors*.code == errorCodes
+
+        where:
+        scenario                                                          | quantitiesReceived | quantitiesRemaining | canceled | supportedActivity              || errorCodes
+        "receives nothing and cancels all remaining"                      | [0]                | [4]                 | true     | ActivityCode.PARTIAL_RECEIVING || []
+        "receives nothing and cancels with some lines fully received"     | [0, 0]             | [0, 4]              | true     | ActivityCode.PARTIAL_RECEIVING || []
+        "receives some and cancels all remaining"                         | [2, 0]             | [4, 4]              | true     | ActivityCode.PARTIAL_RECEIVING || []
+        "receives nothing and cancels nothing"                            | [0]                | [4]                 | false    | ActivityCode.PARTIAL_RECEIVING || [NOTHING_RECEIVED]
+        "receives nothing and cancels only lines with nothing left"       | [0]                | [0]                 | true     | ActivityCode.PARTIAL_RECEIVING || [NOTHING_RECEIVED]
+        "receives nothing and cancels after partial receiving turned off" | [0]                | [4]                 | true     | ActivityCode.MANAGE_INVENTORY  || []
+        "receives nothing and flags no line without partial receiving"    | [0]                | [4]                 | false    | ActivityCode.MANAGE_INVENTORY  || []
+        "receives nothing without partial receiving and has nothing left" | [0]                | [0]                 | false    | ActivityCode.MANAGE_INVENTORY  || [NOTHING_RECEIVED]
     }
 
     void 'doValidate should reject the cancel-remaining flag on a split item'() {
@@ -410,6 +445,17 @@ class ReceiptCompleteRequestCommandValidatorSpec extends Specification implement
                 name: "Destination",
                 supportedActivities: [supportedActivity.id] as Set,
         ))
+    }
+
+    /**
+     * A shipment item of 10 whose earlier received receipt took everything but the given quantity remaining.
+     */
+    private static ShipmentItem buildShipmentItem(Integer quantityRemaining) {
+        ReceiptItem earlierReceiptItem = new ReceiptItem(
+                receipt: new Receipt(receiptStatusCode: ReceiptStatusCode.RECEIVED),
+                quantityReceived: 10 - quantityRemaining,
+        )
+        return new ShipmentItem(quantity: 10, receiptItems: [earlierReceiptItem] as Set)
     }
 
     /**
