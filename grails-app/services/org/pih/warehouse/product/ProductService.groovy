@@ -1372,11 +1372,17 @@ class ProductService {
     /**
      * Get all products matching the given terms and categories.
      *
+     * The product code also matches with spaces ignored (any whitespace in the term, spaces in the stored code),
+     * so a code stored as "TL  60272Y" is found by "TL 60272Y" or "TL60272Y".
+     *
      * @param terms
      * @param categories
+     * @param returnIds return product ids instead of products
+     * @param matchCodeAnywhere match the whitespace-free code anywhere instead of only as a prefix
+     *        (e.g. "60272Y" finds "TL  60272Y")
      * @return
      */
-    def searchProducts(String[] terms, List<Category> categories, boolean returnIds = false) {
+    def searchProducts(String[] terms, List<Category> categories, boolean returnIds = false, boolean matchCodeAnywhere = false) {
         def results = Product.createCriteria().list {
             if (returnIds) {
                 projections {
@@ -1396,9 +1402,14 @@ class ProductService {
             if (terms) {
                 terms.each { term ->
                     term = term + "%"
+                    String compactCode = term.replaceAll(/\s+/, '').toLowerCase(Locale.ROOT)
                     or {
                         ilike("name", "%" + term)
                         ilike("productCode", term)
+                        if (compactCode != "%") {
+                            sqlRestriction("lower(replace({alias}.product_code, ' ', '')) like ?",
+                                    [(matchCodeAnywhere ? "%" : "") + compactCode])
+                        }
                         and {
                             ilike("synonym.name", "%" + term)
                             eq("synonym.synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
