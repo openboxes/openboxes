@@ -139,6 +139,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
         try {
             pickTaskService.drop(outboundContainer, jsonBody)
         } catch (StagingLocationNotFoundException e) {
+            log.info "Drop of ${outboundContainer.locationNumber} at facility ${facility.id} rejected: ${e.message}"
             render(status: HttpStatus.NOT_FOUND.value(), [errorCode: 404, errorMessage: e.message] as JSON)
             return
         }

@@ -810,10 +810,6 @@ class PickTaskService {
     }
 
     private void validateStagingLocation(Location stagingLocation) {
-        if (!stagingLocation) {
-            throw new IllegalArgumentException("Staging location does not exist")
-        }
-
         if (!stagingLocation.supports(ActivityCode.STAGING_LOCATION)) {
             throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.STAGING_LOCATION} activity")
         }
