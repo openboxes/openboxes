@@ -311,6 +311,19 @@ class PickTaskService {
         }
 
         PicklistItem existingPickItem = PicklistItem.get(task.id)
+
+        if (quantityPicked == null || quantityPicked < 0) {
+            throw new IllegalArgumentException("Quantity picked must be a non-negative integer")
+        }
+
+        // A shortage is handled once: a short pick with a reason code ends the task (PICKED or STAGED), so a new
+        // shortage is one recorded on a task that is still open. The stored reason code is not a reliable signal,
+        // because the web pick page also stores the reason for an allocation change on the picklist item.
+        // The stock that should have been in the bin is held in the facility's lost and found location, so it is
+        // not allocated again and Inventory can investigate it. When the facility has no lost and found location,
+        // the shortage is still recorded, but nothing is moved.
+        boolean newShortage = reasonCode && task.status in [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
+
         if (quantityPicked > 0) {
             picklistService.updatePicklistItem(existingPickItem.id, task.product?.id, quantityPicked.toBigDecimal(), pickedById, reasonCode)
             transferToContainer(task, outboundContainer, quantityPicked)
@@ -333,6 +346,13 @@ class PickTaskService {
         }
 
         save(task)
+
+        if (newShortage) {
+            Location lostAndFound = findLostAndFoundLocation(task)
+            Integer quantityMovedToLostAndFound = lostAndFound ? transferShortageToLostAndFound(task, existingPickItem, lostAndFound) : 0
+            sendShortageNotification(existingPickItem, quantityMovedToLostAndFound, lostAndFound)
+        }
+
         // has to be done after save() because we need new requisition status for isCanceledDuringPick() check
         if (!existingPickItem.quantityPicked || existingPickItem.quantityPicked == 0) {
             Set<PicklistItem> list = existingPickItem.picklist.picklistItems
@@ -544,6 +564,69 @@ class PickTaskService {
         command.transferOut = Boolean.TRUE
         command.disableRefresh = Boolean.TRUE
         transfer(task, command)
+    }
+
+    private Location findLostAndFoundLocation(PickTask task) {
+        Location lostAndFound = task.facility?.internalLocations?.find { it.supports(ActivityCode.LOST_AND_FOUND) }
+        if (!lostAndFound) {
+            log.warn("Skipping transfer to lost and found for pick task ${task.identifier}: facility ${task.facility?.name} has no lost and found location")
+        }
+        return lostAndFound
+    }
+
+    /**
+     * Moves the shorted quantity (quantity requested - quantity picked) from the pick bin to the lost and found
+     * location. The quantity is capped at what is still recorded in the bin; when internal transactions are not
+     * tracked, the picked quantity is still in the bin, so it is not available to move.
+     *
+     * The transfer is linked to the picklist (like the transfer to the outbound container), so rolling back the
+     * pick tasks moves the stock back to the pick bin.
+     *
+     * @return the quantity moved to lost and found
+     */
+    private Integer transferShortageToLostAndFound(PickTask task, PicklistItem picklistItem, Location lostAndFound) {
+        Integer quantityPicked = picklistItem.quantityPicked ?: 0
+        Integer quantityShorted = (picklistItem.quantity ?: 0) - quantityPicked
+        if (quantityShorted <= 0) {
+            return 0
+        }
+
+        Integer quantityInBin = inventoryService.getBinLocationsByInventoryItem(task.facility, task.inventoryItem).find {
+            it.binLocation == task.location
+        }?.quantity ?: 0
+        if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+            quantityInBin -= quantityPicked
+        }
+
+        Integer quantity = Math.min(quantityShorted, quantityInBin)
+        if (quantity <= 0) {
+            log.warn("Skipping transfer to lost and found for pick task ${task.identifier}: no stock left in ${task.location?.name}")
+            return 0
+        }
+        if (quantity < quantityShorted) {
+            log.warn("Only ${quantity} of ${quantityShorted} shorted units are left in ${task.location?.name} for pick task ${task.identifier}")
+        }
+
+        TransferStockCommand command = new TransferStockCommand()
+        command.location = task.facility
+        command.binLocation = task.location
+        command.inventoryItem = task.inventoryItem
+        command.quantity = quantity
+        command.otherLocation = task.facility
+        command.otherBinLocation = lostAndFound
+        command.transferOut = Boolean.TRUE
+        command.disableRefresh = Boolean.TRUE
+        transfer(task, command)
+
+        return quantity
+    }
+
+    private void sendShortageNotification(PicklistItem picklistItem, Integer quantityMovedToLostAndFound, Location lostAndFound) {
+        try {
+            grailsApplication.mainContext.publishEvent(new PickShortageEvent(picklistItem, quantityMovedToLostAndFound, lostAndFound))
+        } catch (Exception e) {
+            log.error("Error while processing PickShortageEvent", e)
+        }
     }
 
     void transferToStaging(PickTask task, AvailableItem item, Location stagingLocation) {

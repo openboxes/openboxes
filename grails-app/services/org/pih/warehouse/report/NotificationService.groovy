@@ -30,6 +30,7 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.FileGenerationService
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.GoodsReceiptNoteDto
@@ -295,6 +296,38 @@ class NotificationService {
             }
         } catch (EmailException e) {
             log.error("Unable to send an email: " + e.message, e)
+        }
+    }
+
+    /**
+     * Notifies the discrepancy notification users and the creator of the order that a picker recorded a shortage.
+     */
+    def sendPickShortageNotification(PicklistItem picklistItem, Integer quantityMovedToLostAndFound, Location lostAndFound) {
+        try {
+            def emailValidator = EmailValidator.getInstance()
+            List<User> recipients = new ArrayList<User>(userService.findUsersByRoleType(RoleType.ROLE_DISCREPANCY_NOTIFICATION) ?: [])
+            User orderCreator = picklistItem?.requisitionItem?.requisition?.createdBy
+            if (orderCreator) {
+                recipients << orderCreator
+            }
+            List<String> emails = recipients*.email.findAll { emailValidator.isValid(it) }.unique()
+            if (!emails) {
+                return
+            }
+            def locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+            def subject = messageSource.getMessage('email.pickShortage.message', null, locale)
+            def body = renderTemplate("/email/pickShortage", [
+                    picklistItem               : picklistItem,
+                    quantityMovedToLostAndFound: quantityMovedToLostAndFound,
+                    lostAndFound               : lostAndFound,
+            ])
+            emails.each { String email ->
+                mailService.sendHtmlMail(subject, body.toString(), email)
+            }
+        } catch (Exception e) {
+            // Any failure here (mail, template, message lookup) must not reach the transactional event listener:
+            // it would mark the short pick's transaction rollback-only and silently undo the pick and stock moves.
+            log.error("Unable to send the pick shortage notification: " + e.message, e)
         }
     }
 
