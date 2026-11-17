@@ -8,7 +8,8 @@ enum DeliveryTypeCode {
     // STOCK_TRANSFER_IBT Delivery Type Code is a temporary solution until proper one is implemented
     STOCK_TRANSFER_IBT(3, ActivityCode.DELIVERY_TYPE_STOCK_TRANSFER_IBT),
     SHIP_TO(4, ActivityCode.DELIVERY_TYPE_SHIPPING),
-    DEFAULT(5, null)
+    VENDOR_RETURN(5, ActivityCode.DELIVERY_TYPE_VENDOR_RETURN),
+    DEFAULT(6, null)
 
     final Integer priority
     final ActivityCode activityCode
