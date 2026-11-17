@@ -41,7 +41,7 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
            2               | 1                | false    || 1
     }
 
-    void 'OrderItem.isInvoiceable() should return: #isInoviceable when quantity available to invoice is #quantityAvailableToInvoice'() {
+    void 'OrderItem.isInvoiceable() should return: #isInvoiceable when quantity available to invoice is #quantityAvailableToInvoice'() {
         given:
         OrderItem orderItem = Spy(OrderItem) {
             getHasPrepaymentInvoice() >> true
@@ -60,7 +60,7 @@ class OrderItemSpec extends Specification implements DomainUnitTest<OrderItem> {
         100                        || true
     }
 
-    void 'OrderItem.isFullyInvoiced() should return: #isFullyInvoiced when quantityInvoicedInStandardUom: #quantityInvoicedInStandardUom and quantity: #quantity'() {
+    void 'OrderItem.isFullyInvoiced() should return: #isFullyInvoiced when quantityInvoiced: #quantityInvoiced and quantity: #quantity'() {
         given:
         OrderItem orderItem = Spy(OrderItem) {
             getQuantityInvoiced() >> quantityInvoiced
