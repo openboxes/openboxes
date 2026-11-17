@@ -514,7 +514,13 @@ class PickTaskService {
 
     void dropToStaging(Location outboundContainer, String stagingLocationId, String stagedById,
                         boolean overrideStagingLocationZone = false) {
+        if (!stagingLocationId?.trim()) {
+            throw new IllegalArgumentException("Staging location is required")
+        }
         Location stagingLocation = findInFacility(stagingLocationId, outboundContainer.parentLocation)
+        if (!stagingLocation) {
+            throw new StagingLocationNotFoundException(stagingLocationId)
+        }
         validateStagingLocation(stagingLocation)
 
         List<AvailableItem> itemsToMove = productAvailabilityService.getAvailableItems(outboundContainer)
@@ -887,10 +893,6 @@ class PickTaskService {
     }
 
     private void validateStagingLocation(Location stagingLocation) {
-        if (!stagingLocation) {
-            throw new IllegalArgumentException("Staging location does not exist")
-        }
-
         if (!stagingLocation.supports(ActivityCode.STAGING_LOCATION)) {
             throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.STAGING_LOCATION} activity")
         }
