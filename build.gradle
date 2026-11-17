@@ -290,11 +290,7 @@ dependencies {
     testImplementation "org.testcontainers:mariadb:${testContainersVersion}"
     testImplementation "org.testcontainers:spock:${testContainersVersion}"
     testImplementation 'org.springframework:spring-test'
-    testImplementation('io.rest-assured:rest-assured:3.2.0') {
-        // pulls codehaus groovy 2.4, which capability-conflicts with Groovy 4;
-        // bump to rest-assured 5.x when the integration tests are migrated
-        exclude group: 'org.codehaus.groovy'
-    }
+    testImplementation 'io.rest-assured:rest-assured'  // 5.x from the Spring Boot BOM (Groovy 4); 3.x fails on Groovy 4
     integrationTestImplementation testFixtures('org.apache.grails:grails-geb')
     // community fork of build-test-data with a Grails 7 line (package grails.buildtestdata unchanged)
     integrationTestImplementation 'io.github.longwa:build-test-data:6.0.0-M2'
@@ -395,7 +391,10 @@ task prepareDocker(type: Copy, dependsOn: assemble) {
 
 // Jacoco code coverage reporting: "./gradlew jacocoTestReport"
 jacocoTestReport {
-    dependsOn test
+    dependsOn test, integrationTest
+
+    // One combined report from the unit and the integration test coverage data.
+    executionData test, integrationTest
 
     reports {
         xml.required = true

@@ -87,17 +87,19 @@ class DeferResponseCloseFilter extends OncePerRequestFilter {
             super(delegate, false)
         }
 
+        // The inherited protected fields are read and written with the field operator (this.@), because Groovy 4 on
+        // Java 17 does not resolve the JDK's Writer.lock and PrintWriter.out as properties.
         @Override
         void close() {
-            synchronized (lock) {
-                if (out == null) {
+            synchronized (this.@lock) {
+                if (this.@out == null) {
                     return
                 }
                 // checkError() flushes the delegate and reports any error it has recorded so far.
-                if (((PrintWriter) out).checkError()) {
+                if (((PrintWriter) this.@out).checkError()) {
                     setError()
                 }
-                out = null
+                this.@out = null
             }
         }
     }

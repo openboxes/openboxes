@@ -43,7 +43,9 @@ class ProductPackageApiSpec extends ApiSpec {
         productSupplierToDelete.productPackages*.delete()
         productSupplierToDelete.delete()
         packageUom?.delete()
-        supplierProduct?.delete()
+        // Delete this session's copy of the product. The detached @Shared one still holds the setupData() product
+        // supplier, and the delete cascade would bring a second copy of the supplier deleted above into the session.
+        Product.get(supplierProduct.id)?.delete()
     }
 
     void 'create product package should create default package with given uom, quantity and price'() {
