@@ -10,6 +10,7 @@ import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.RequisitionItemEvent
 import org.pih.warehouse.core.history.EventLogCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
@@ -453,6 +454,16 @@ class PickTaskService {
                 requisition.status = RequisitionStatus.PICKED
             }
         } else if (task.status == PickTaskStatus.STAGED) {
+            // Notify once per requisition item, when the last of its tasks is staged
+            // (published before REQUISITION_STAGED so item events precede the order-level event)
+            RequisitionItem requisitionItem = existingPickItem.requisitionItem
+            boolean allItemTasksStaged = allOrderTasks.findAll { it.requisitionItem?.id == requisitionItem.id }.every {
+                it.status == PickTaskStatus.STAGED.name()
+            }
+            if (allItemTasksStaged) {
+                grailsApplication.mainContext.publishEvent(new RequisitionItemEvent(requisitionItem.id, WebhookEventType.REQUISITION_ITEM_STAGED))
+            }
+
             boolean allTasksStaged = allOrderTasks.every {
                 it.status == PickTaskStatus.STAGED.name()
             }

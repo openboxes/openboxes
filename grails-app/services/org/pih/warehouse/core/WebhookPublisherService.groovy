@@ -70,73 +70,97 @@ class WebhookPublisherService {
         publishEvent(payload)
     }
 
-    def publishRequisitionEvent(Requisition requisition, WebhookEventType eventType) {
+    void publishRequisitionEvent(Requisition requisition, WebhookEventType eventType) {
         if (!requisition) {
             log.warn "Cannot publish order confirmation webhook event without a requisition"
             return
         }
-
-        boolean webhooksEnabled = requisition.origin.supports(ActivityCode.ENABLE_WEBHOOKS)
-        if (!webhooksEnabled) {
-            log.info "Location ${requisition.origin} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
+        if (!supportsWebhooks(requisition.origin)) {
             return
         }
 
-        String eventId = UUID.randomUUID().toString()
-        String webhookId = UUID.randomUUID().toString()
-        Date dateTriggered = new Date()
-        User triggeredBy = AuthService.currentUser
-        Location facility = requisition.origin
+        Map payload = buildRequisitionPayload(requisition, eventType)
+        payload.lines = requisition.requisitionItems?.collect { RequisitionItem item -> buildRequisitionItemPayload(item) }
+        payload.metadata = buildMetadata(requisition.origin)
+        publishEvent(payload, "openboxes.n8n")
+    }
 
-        Map payload = [
-                eventId: eventId,
+    void publishRequisitionItemEvent(RequisitionItem item, WebhookEventType eventType) {
+        if (!item) {
+            log.warn "Cannot publish webhook event without a requisition item"
+            return
+        }
+
+        Requisition requisition = item.requisition
+        if (!supportsWebhooks(requisition.origin)) {
+            return
+        }
+
+        Map payload = buildRequisitionPayload(requisition, eventType)
+        payload.item = buildRequisitionItemPayload(item)
+        payload.metadata = buildMetadata(requisition.origin)
+        publishEvent(payload, "openboxes.n8n")
+    }
+
+    private static boolean supportsWebhooks(Location facility) {
+        boolean webhooksEnabled = facility.supports(ActivityCode.ENABLE_WEBHOOKS)
+        if (!webhooksEnabled) {
+            log.info "Location ${facility} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
+        }
+        return webhooksEnabled
+    }
+
+    private static Map buildRequisitionPayload(Requisition requisition, WebhookEventType eventType) {
+        User triggeredBy = AuthService.currentUser
+        return [
+                eventId: UUID.randomUUID().toString(),
                 eventType: eventType?.name,
-                eventDate: dateTriggered.toString(),
+                eventDate: new Date().toString(),
                 triggeredBy: triggeredBy?.name,
                 requisitionNumber: requisition.requestNumber,
                 requisitionType: requisition.type,
+                requisitionStatus: requisition.status?.name(),
                 deliveryTypeCode: requisition.deliveryTypeCode.toString(),
                 requestedBy: requisition.requestedBy?.toJson(),
                 createdBy: requisition.createdBy?.toJson(),
-                lines: requisition.requisitionItems?.collect { RequisitionItem item ->
-                    [
-                            productId: item.product.id,
-                            productCode: item.product.productCode,
-                            requisitionItemType: item.requisitionItemType.name(),
-                            quantityRequested: item.quantity,
-                            quantityCanceled: item.quantityCanceled ?: 0,
-                            quantityAllocated: item.calculateQuantityAllocated(),
-                            quantityPicked: item.calculateQuantityPicked(),
-                            quantityIssued: item.quantityIssued,
-                            reasonCode: item.picklistItems?.reasonCode,
-                            outboundContainers: item?.picklistItems?.outboundContainer?.findAll { it }?.unique()?.collect { it ->
-                                [
-                                        id: it.id,
-                                        locationNumber: it.locationNumber,
-                                        name: it.name
-                                ]
-                            } ?: [],
-                            stagingLocations: item?.picklistItems?.stagingLocation?.findAll { it }?.unique()?.collect { it ->
-                                [
-                                        id: it.id,
-                                        locationNumber: it.locationNumber,
-                                        name: it.name
-                                ]
-                            } ?: [],
-                            stagedBy: item?.picklistItems?.stagedBy?.findAll { it }?.unique()?.collect { it.toJson()  } ?: [],
-                            dateStaged: item?.picklistItems?.dateStaged?.findAll { it }?.unique() ?: []
-                    ]
-                },
-                metadata: [
-                        facilityId: facility.id,
-                        facilityCode: facility.locationNumber,
-                        facilityName: facility.name,
-                        webhookId: webhookId,
-                        attemptNumber: 1
-                ]
         ]
+    }
 
-        publishEvent(payload, "openboxes.n8n")
+    private static Map buildRequisitionItemPayload(RequisitionItem item) {
+        return [
+                identifier: item.identifier,
+                productId: item.product.id,
+                productCode: item.product.productCode,
+                requisitionItemType: item.requisitionItemType.name(),
+                quantityRequested: item.quantity,
+                quantityCanceled: item.quantityCanceled ?: 0,
+                quantityAllocated: item.calculateQuantityAllocated(),
+                quantityPicked: item.calculateQuantityPicked(),
+                quantityIssued: item.quantityIssued,
+                reasonCode: item.picklistItems?.reasonCode,
+                outboundContainers: item.picklistItems?.outboundContainer?.findAll { it }?.unique()?.collect { Location it -> buildLocationPayload(it) } ?: [],
+                stagingLocations: item.picklistItems?.stagingLocation?.findAll { it }?.unique()?.collect { Location it -> buildLocationPayload(it) } ?: [],
+                stagedBy: item.picklistItems?.stagedBy?.findAll { it }?.unique()?.collect { it.toJson() } ?: [],
+                dateStaged: item.picklistItems?.dateStaged?.findAll { it }?.unique() ?: []
+        ]
+    }
+
+    private static Map buildLocationPayload(Location location) {
+        return [
+                id: location.id,
+                locationNumber: location.locationNumber,
+                name: location.name
+        ]
+    }
+
+    private static Map buildMetadata(Location facility) {
+        return [
+                facilityId: facility.id,
+                facilityCode: facility.locationNumber,
+                facilityName: facility.name,
+                webhookId: UUID.randomUUID().toString(),
+                attemptNumber: 1
+        ]
     }
 
     /**
