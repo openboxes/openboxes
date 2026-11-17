@@ -102,7 +102,7 @@ class WebhookPublisherService {
         publishEvent(payload, "openboxes.n8n")
     }
 
-    private static boolean supportsWebhooks(Location facility) {
+    private boolean supportsWebhooks(Location facility) {
         boolean webhooksEnabled = facility.supports(ActivityCode.ENABLE_WEBHOOKS)
         if (!webhooksEnabled) {
             log.info "Location ${facility} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
