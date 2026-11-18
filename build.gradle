@@ -217,6 +217,9 @@ dependencies {
 
     // BootStrap/LiquibaseUtil drive Liquibase directly (BOM-managed 4.27)
     implementation 'org.liquibase:liquibase-core'
+    // Needed to support the use of 'modifyColumn' in liquibase migrations.
+    // Version must match the BOM-managed version of liquibase core.
+    implementation 'org.liquibase.ext:liquibase-modify-column:4.27.0'
 
     // --- Sentry (jakarta variants; custom tracing classes import io.sentry.spring.jakarta) ---
     implementation "io.sentry:sentry-logback:${sentryVersion}"
