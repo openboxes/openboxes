@@ -544,6 +544,40 @@
         }
       });
 
+      // Bin location search fields rendered by g:selectBinLocationAjax. Uses livequery so that it also applies to
+      // fields added after the page has loaded (e.g. rows rendered from a jQuery template).
+      $("select.bin-location-ajax").livequery(function () {
+        var $select = $(this);
+        if ($select.hasClass("select2-hidden-accessible")) {
+          return;
+        }
+        $select.select2({
+          placeholder: $select.data("placeholder"),
+          width: '100%',
+          allowClear: true,
+          minimumInputLength: $select.data("min-length"),
+          ajax: {
+            url: $select.data("url"),
+            dataType: 'json',
+            delay: $select.data("delay"),
+            data: function (params) {
+              return {
+                searchTerm: params.term,
+                'parentLocation.id': $select.data("parent-location-id"),
+                max: 25,
+              };
+            },
+            processResults: function (data) {
+              return {
+                results: data.data.map(function (bin) {
+                  return { id: bin.id, text: bin.zoneName ? bin.zoneName + ': ' + bin.name : bin.name };
+                }),
+              };
+            },
+          },
+        });
+      });
+
       $(".warehouse-switch")
       .click(function () {
         $("#warehouseMenu")
