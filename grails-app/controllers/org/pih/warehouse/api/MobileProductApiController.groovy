@@ -192,7 +192,8 @@ class MobileProductApiController extends BaseDomainApiController {
 
         // Don't split scanned value - treat as single term for barcode/product code matching
         String[] terms = jsonObject.value ? [jsonObject.value] as String[] : null
-        List products = productService.searchProducts(terms, [])
+        // Match the code anywhere, so a part number typed without its manufacturer prefix is found
+        List products = productService.searchProducts(terms, [], false, true)
         render([data: products?.unique()] as JSON)
     }
 

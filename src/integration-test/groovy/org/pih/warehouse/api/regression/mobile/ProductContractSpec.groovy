@@ -84,6 +84,23 @@ class ProductContractSpec extends MobileContractSpec {
         (r.data.data as List<Map>)*.id.contains(p.id)
     }
 
+    @Covers('src/apis/products.ts#searchProductGlobally')
+    void 'POST /mobile/products/search {value} finds a product code typed with other spacing or without its prefix'() {
+        given:
+        String n = uid()
+        Product spaced = newProduct('WS', [productCode: "TL  ${n}Y".toString()])
+
+        when:
+        CallResult oneSpace = call('src/apis/products.ts#searchProductGlobally', [:], [value: "TL ${n}Y".toString()])
+        CallResult noPrefix = call('src/apis/products.ts#searchProductGlobally', [:], [value: "${n}Y".toString()])
+
+        then:
+        oneSpace.holds()
+        (oneSpace.data.data as List<Map>)*.id.contains(spaced.id)
+        noPrefix.holds()
+        (noPrefix.data.data as List<Map>)*.id.contains(spaced.id)
+    }
+
     @Covers('src/apis/products.ts#searchProductByCode')
     void 'POST /generic/product/search by productCode like (search header, unreachable in the UI)'() {
         when:

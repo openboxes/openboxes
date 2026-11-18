@@ -198,6 +198,62 @@ class MobileServicesIntegrationSpec extends ObafEventsIntegrationSpec {
         found as Set == [exact, longer, byUpc] as Set
     }
 
+    /** A product with exactly this code, named so that no name match can stand in for a code match. */
+    String productWithCode(String code) {
+        String id = product('WS')
+        tx {
+            Product p = Product.get(id)
+            p.productCode = code
+            p.name = "Spacing fixture ${uid()}".toString()
+            p.save(flush: true, failOnError: true)
+        }
+        return id
+    }
+
+    /** Which of the given fixture products searchProducts returns for one term. */
+    Set<String> searchedAmong(String term, Map<String, String> fixtures, boolean matchCodeAnywhere = false) {
+        Set<String> found = tx {
+            (matchCodeAnywhere ? productService.searchProducts([term] as String[], [], false, true) :
+                    productService.searchProducts([term] as String[], []))*.id as Set<String>
+        } as Set<String>
+        return fixtures.findAll { k, v -> found.contains(v) }.keySet()
+    }
+
+    void 'searchProducts finds a product code whatever its spacing and letter case (#label)'() {
+        given:
+        String n = uid()
+        Map<String, String> fixtures = [twoSpace: productWithCode("TL  ${n}Y"), oneSpace: productWithCode("DDE ${n}"),
+                                        noSpace : productWithCode("${n}7")]
+
+        expect:
+        searchedAmong(term(n) as String, fixtures) == expected as Set
+
+        where:
+        label                       | term                                  | expected
+        'exact, as stored'          | { String k -> "TL  ${k}Y" }           | ['twoSpace']
+        'one space for two'         | { String k -> "TL ${k}Y" }            | ['twoSpace']
+        'no space'                  | { String k -> "TL${k}Y" }             | ['twoSpace']
+        'lower case'                | { String k -> "tl  ${k.toLowerCase()}y" } | ['twoSpace']
+        'a prefix, one space'       | { String k -> "TL ${k}" }             | ['twoSpace']
+        'three-letter prefix'       | { String k -> "DDE ${k}" }            | ['oneSpace']
+        'three-letter, no space'    | { String k -> "DDE${k}" }             | ['oneSpace']
+        'plain number'              | { String k -> "${k}7" }               | ['noSpace']
+        'another prefix'            | { String k -> "ZZ ${k}Y" }            | []
+    }
+
+    void 'searchProducts finds a product code typed without its prefix only when asked to (the mobile search)'() {
+        given:
+        String n = uid()
+        Map<String, String> fixtures = [twoSpace: productWithCode("TL  ${n}Y"), oneSpace: productWithCode("DDE ${n}")]
+
+        expect: 'the web callers keep prefix matching on the code'
+        searchedAmong("${n}Y", fixtures).isEmpty()
+
+        and: 'the mobile search matches anywhere in the code with spaces removed'
+        searchedAmong("${n}Y", fixtures, true) == ['twoSpace'] as Set
+        searchedAmong(n, fixtures, true) == ['twoSpace', 'oneSpace'] as Set
+    }
+
     // ------------------------------------------------------------------ MobileProductApiController (in-process)
 
     Map call(String action, Map params, String json = null, String username = 'admin', String facility = null) {
