@@ -1,0 +1,47 @@
+# Per-PR preview stack: app (from OB_IMAGE) + its own MariaDB, isolated per compose project
+# (deployed as `docker compose -p pr-<n>`). Traefik routes ${PREVIEW_HOST} to the app over the
+# shared external "traefik" network and terminates HTTPS; the db stays on the project-private
+# default network. No host ports are published, so many PRs run side by side without collisions.
+#
+# Required env at deploy time: OB_IMAGE, PREVIEW_PROJECT (e.g. pr-123), PREVIEW_HOST.
+services:
+  app:
+    image: "${OB_IMAGE:-ghcr.io/openboxes/openboxes:latest}"
+    # Preview hosts don't honor compose depends_on health gating, so block until the db is up.
+    entrypoint:
+      - /bin/bash
+      - -c
+      - 'until (echo > /dev/tcp/db/3306) 2>/dev/null; do echo "waiting for db:3306..."; sleep 2; done; exec java -Dgrails.env=prod -jar /app/openboxes.war'
+    restart: on-failure
+    environment:
+      DATASOURCE_URL: "jdbc:mysql://db/openboxes?serverTimezone=UTC&useSSL=false"
+      DATASOURCE_USERNAME: openboxes
+      DATASOURCE_PASSWORD: openboxes
+      # Canonical URL behind the Traefik TLS terminator, so generated links use the preview host.
+      GRAILS_SERVER_URL: "https://${PREVIEW_HOST}/openboxes/"
+      JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1536m -XX:+UseG1GC -Djava.awt.headless=true"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${PREVIEW_PROJECT}.rule=Host(`${PREVIEW_HOST}`)"
+      - "traefik.http.routers.${PREVIEW_PROJECT}.entrypoints=websecure"
+      - "traefik.http.routers.${PREVIEW_PROJECT}.tls.certresolver=le"
+      - "traefik.http.services.${PREVIEW_PROJECT}.loadbalancer.server.port=8080"
+    networks:
+      - default
+      - traefik
+
+  db:
+    image: mariadb:10
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: openboxes
+      MYSQL_USER: openboxes
+      MYSQL_PASSWORD: openboxes
+    networks:
+      - default
+
+networks:
+  # Shared with the Traefik proxy; created once by preview-deploy.sh.
+  traefik:
+    external: true
