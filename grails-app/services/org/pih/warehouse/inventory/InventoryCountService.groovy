@@ -1,8 +1,10 @@
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.data.DataService
 
 import javax.sql.DataSource
 
@@ -10,6 +12,7 @@ import javax.sql.DataSource
 class InventoryCountService {
 
     DataSource dataSource
+    DataService dataService
 
     void refreshAdjustmentCandidatesView(Inventory inventory, List<String> productIds, String transactionId, Date transactionDate) {
         productIds.each {
@@ -173,5 +176,42 @@ class InventoryCountService {
             WHERE transaction_id = :transactionId
         """
         sql.executeUpdate(params, query)
+    }
+
+    /**
+     * The migration SQL file that builds each cycle count helper table (under grails-app/migrations, on the
+     * classpath). views/changelog.xml builds each table once, guarded by a tableExists precondition, and the
+     * methods above maintain them incrementally afterwards.
+     */
+    static final Map<String, String> INVENTORY_COUNT_CANDIDATE_TABLES = [
+            adjustment_candidate        : 'views/adjustment-candidate.sql',
+            inventory_baseline_candidate: 'views/inventory-baseline-candidate.sql',
+            product_inventory_candidate : 'views/product-inventory-candidate.sql',
+    ].asImmutable()
+
+    /**
+     * Manual full rebuild of one helper table, or of all three when tableName is null: runs the same
+     * migration SQL file the startup migration runs. Use it after a migration or a manual change to the
+     * transaction data these tables are derived from, or after a change to the SQL file itself, since the
+     * startup migration no longer rebuilds an existing table. Like refreshProductDemandData, the table is
+     * dropped and recreated in place, so it is missing while its CREATE TABLE ... AS SELECT runs and rows
+     * written to it in that window are not captured.
+     *
+     * Not transactional: DROP TABLE and CREATE TABLE commit implicitly on MySQL and MariaDB.
+     */
+    @NotTransactional
+    void refreshInventoryCountCandidates(String tableName) {
+        List<String> tableNames = tableName == null ? INVENTORY_COUNT_CANDIDATE_TABLES.keySet().toList() : [tableName]
+        tableNames.each { String name ->
+            String sqlFile = INVENTORY_COUNT_CANDIDATE_TABLES[name]
+            if (!sqlFile) {
+                throw new IllegalArgumentException("Unknown inventory count candidate table: ${name}")
+            }
+            log.info "Refreshing ${name} from ${sqlFile}"
+            Sql sql = new Sql(dataSource)
+            dataService.readStatements(sqlFile).each { String statement ->
+                sql.execute(statement)
+            }
+        }
     }
 }

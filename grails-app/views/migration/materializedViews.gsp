@@ -37,6 +37,36 @@
                     </div>
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="name">Adjustment Candidate</td>
+                <td class="value">
+                    ${adjustmentCandidateCount}
+                </td>
+                <td>
+                    <g:remoteLink controller="report" action="refreshInventoryCountCandidates" params="[table: 'adjustment_candidate']" class="button"
+                                  onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">Inventory Baseline Candidate</td>
+                <td class="value">
+                    ${inventoryBaselineCandidateCount}
+                </td>
+                <td>
+                    <g:remoteLink controller="report" action="refreshInventoryCountCandidates" params="[table: 'inventory_baseline_candidate']" class="button"
+                                  onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                </td>
+            </tr>
+            <tr class="prop">
+                <td class="name">Product Inventory Candidate</td>
+                <td class="value">
+                    ${productInventoryCandidateCount}
+                </td>
+                <td>
+                    <g:remoteLink controller="report" action="refreshInventoryCountCandidates" params="[table: 'product_inventory_candidate']" class="button"
+                                  onLoading="onLoading()" onComplete="onComplete()">Refresh</g:remoteLink>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
