@@ -2,6 +2,10 @@
 # config location). Purpose: a production-mode app (grails.env=prod) whose outbound integrations
 # are inert or pointed at the in-network label stub. The containers have no route to the
 # internet regardless (compose.yml: internal network).
+#@ Template (up.sh renders it once per stack): `#@` comment lines are dropped, every @NAME@
+#@ placeholder takes the stack profile's value (lib/common.sh), and a line whose placeholder is
+#@ empty is dropped. The default profile renders the file as the comments below describe; the
+#@ `scenarios` profile delivers events to the webhook sink and polls every 20 s.
 dataSource:
     url: "jdbc:mysql://db:3306/openboxes?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true"
     username: openboxes
@@ -18,10 +22,12 @@ openboxes:
         enabled: false
         endpoint:
             url: "http://127.0.0.1:9/"
+    #@ scenarios: event delivery to the webhook sink, with the header the sink records
     n8n:
-        enabled: false
+        enabled: @E2E_N8N_ENABLED@
         endpoint:
-            url: "http://127.0.0.1:9/"
+            url: "@E2E_N8N_URL@"
+            headers: {X-Api-Key: "@E2E_N8N_HEADER@"}
     mail:
         enabled: false
     signup:
@@ -65,13 +71,17 @@ openboxes:
     # putaway reassignment) still fire exactly as in production.
     jobs:
         automaticStateTransitionPollingJob:
-            cronExpression: "0 0 0 1 1 ? 2099"
+            cronExpression: "@E2E_CRON_POLLING@"
         automaticReceiptJob:
-            cronExpression: "0 0 0 1 1 ? 2099"
+            cronExpression: "@E2E_CRON_POLLING@"
         automaticBackorderReallocationJob:
-            cronExpression: "0 0 0 1 1 ? 2099"
+            cronExpression: "@E2E_CRON_POLLING@"
         automaticAllocationJob:
-            cronExpression: "0 0 0 1 1 ? 2099"
+            cronExpression: "@E2E_CRON_POLLING@"
+            maxAttempts: @E2E_ALLOCATION_MAX_ATTEMPTS@
+        #@ scenarios: the four polling crons above every 20 s; the issuance job off (the branch
+        #@ default) or on (--issuance-job on), the attempt limit from --allocation-max-attempts
+        automaticIssuanceJob: {enabled: @E2E_ISSUANCE_JOB@}
         dataCleaningJob:
             cronExpression: "0 0 0 1 1 ? 2099"
         assignIdentifierJob:

@@ -2,6 +2,8 @@
 #   - `db`, `app` and `labelstub` sit only on `sealed`, an internal network (no route out);
 #   - `gateway` (socat) is the one container on both networks and only forwards three loopback
 #     ports of the host to services on `sealed`.
+# The `scenarios` profile (up.sh --profile scenarios) adds `webhooksink`, which receives the app's
+# event deliveries on `sealed`, and `sinkgateway`, which forwards one more loopback port to it.
 # Host ports are bound to 127.0.0.1 only.
 name: ${E2E_PROJECT:-openboxes-e2e}
 
@@ -46,6 +48,15 @@ services:
       - ./labelstub.py:/stub/labelstub.py:ro
     mem_limit: 64m
 
+  webhooksink:
+    image: python:3.12.8-alpine
+    profiles: [scenarios]
+    networks: [sealed]
+    command: ["python", "-u", "/stub/webhooksink.py"]
+    volumes:
+      - ./webhooksink.py:/stub/webhooksink.py:ro
+    mem_limit: 64m
+
   app:
     image: eclipse-temurin:8-jre-jammy
     networks: [sealed]
@@ -79,4 +90,14 @@ services:
       - "127.0.0.1:${E2E_HTTP_PORT:-18080}:8080"
       - "127.0.0.1:${E2E_DB_PORT:-13306}:3306"
       - "127.0.0.1:${E2E_LABEL_PORT:-18081}:8081"
+    mem_limit: 64m
+
+  sinkgateway:
+    image: alpine/socat:1.8.0.0
+    profiles: [scenarios]
+    networks: [sealed, edge]
+    depends_on: [webhooksink]
+    command: ["TCP-LISTEN:8082,fork,reuseaddr", "TCP:webhooksink:8082"]
+    ports:
+      - "127.0.0.1:${E2E_SINK_PORT:-18082}:8082"
     mem_limit: 64m

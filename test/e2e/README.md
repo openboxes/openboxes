@@ -64,14 +64,49 @@ test/e2e/run.sh --reuse --project mobile-api  # test against the running stack
 test/e2e/down.sh                              # stop it
 ```
 
-Options of `run.sh`: `--project mobile-api|flows|all`, `--keep-up`, `--reuse`, `--known-gaps`, and
-`-- <playwright args>` (for example `-- --grep "putaway"`). Environment: `E2E_HTTP_PORT` (18080),
-`E2E_DB_PORT` (13306), `E2E_LABEL_PORT` (18081), `E2E_DB_IMAGE` (`mariadb:11.4`, or `mysql:8.0.36`),
-`E2E_WORKERS` (2), `E2E_STRICT_EGRESS=1` (fail a test whose pages requested a URL the mirror lacks).
+Options of `run.sh`: `--project mobile-api|flows|scenarios|all`, `--keep-up`, `--reuse`, `--known-gaps`,
+`--profile`, `--issuance-job`, `--allocation-max-attempts` (see [Profiles](#profiles)), `--war <path>`
+(see [The WAR](#the-war)), and `-- <playwright args>` (for example `-- --grep "putaway"`). `up.sh` takes
+the profile switches and `--war` too. Environment: `E2E_HTTP_PORT` (18080), `E2E_DB_PORT` (13306),
+`E2E_LABEL_PORT` (18081), `E2E_DB_IMAGE` (`mariadb:11.4`, or `mysql:8.0.36`), `E2E_WORKERS` (2),
+`E2E_STRICT_EGRESS=1` (fail a test whose pages requested a URL the mirror lacks).
 
-Reports go to `build/e2e/reports/`: `junit.xml`, `html/` (traces of failures), `contract-coverage.json`,
-`cdn-mirror.{json,txt}`, `app.log` (the app container log) and `summary.txt`. The exit status is
-Playwright's.
+Reports go to `build/e2e/reports/` (`build/e2e/reports-scenarios[-a<n>]/` on the `scenarios` profile):
+`junit.xml`, `html/` (traces of failures), `contract-coverage.json`, `cdn-mirror.{json,txt}`, `app.log`
+(the app container log) and `summary.txt`. The exit status is Playwright's.
+
+### Profiles
+
+The stack runs with one of two profiles (`--profile`, or `E2E_PROFILE`). Both render the one config
+template `docker/openboxes.yml`; its `@NAME@` placeholders take the profile's values (`lib/common.sh`).
+
+| | `default` | `scenarios` |
+|---|---|---|
+| Event delivery (`openboxes.n8n`) | off | on, to the webhook sink, header `X-Api-Key: e2e` |
+| Polling crons (state transition, receipt, backorder reallocation, allocation) | parked in 2099 | every 20 s |
+| Automatic issuance job | the app default (off) | `--issuance-job on\|off` (default `off`, the branch default) |
+| Allocation job attempt limit | the app default (3) | `--allocation-max-attempts <n>` (default 3) |
+| Compose project | `openboxes-e2e-<checkout>` | `openboxes-e2e-scenarios[-a<n>]-<checkout>` |
+| Ports (HTTP, DB, label stub, sink) | 18080, 13306, 18081, - | 38080, 33306, 38081, 38082 (48080, 43306, 48081, 48082 with a limit other than 3) |
+
+The default profile renders the same configuration as before the profiles existed. Each profile, and
+each attempt limit of `scenarios`, has its own compose project, ports and reports directory, so a
+default stack and scenario stacks with different attempt limits can run side by side (a third limit
+needs its own `E2E_*_PORT` values). `--project scenarios` needs `--profile scenarios`; the project
+itself does not exist yet, and the runner says so and stops.
+
+The **webhook sink** (`docker/webhooksink.py`, scenarios only) sits on the sealed network as
+`webhooksink:8082` and receives the app's event deliveries; a second gateway publishes it on
+`127.0.0.1:$E2E_SINK_PORT` for the tests (`SINK_URL` in `lib/ts/env.ts`):
+
+- `GET /events?since=<n>`: the deliveries with `seq > n` (all without `since`), oldest first, each
+  `{seq, time, path, headers, body, json}`;
+- `DELETE /events`: clears them (`seq` keeps counting).
+
+Event delivery also needs the requisition's origin to support the `ENABLE_WEBHOOKS` activity.
+
+A stack started with `--keep-up` or `up.sh` on the `scenarios` profile is stopped with the same
+settings: `E2E_PROFILE=scenarios E2E_ALLOCATION_MAX_ATTEMPTS=<n> test/e2e/down.sh` (the runner prints it).
 
 ### The WAR
 
@@ -83,6 +118,10 @@ cleans it (`git clean -fdx`, so no output of an earlier build reaches the WAR), 
 `build/e2e/war/openboxes-<HEAD sha>.war`. Later runs at the same commit reuse that WAR; `--force`
 rebuilds HEAD.
 
+`run.sh --war <path>` / `up.sh --war <path>` (or `E2E_WAR=<path>`) run the stack from a prebuilt WAR
+instead, as is: `build-war.sh` is not called, so the WAR may come from another commit or a CI artifact
+(the run summary names the file, not a commit).
+
 The clone carries a marker file (`.openboxes-e2e-build`) the script writes when it creates it; a
 directory at that location that is not empty and has no marker is never deleted or reset (the script
 stops with a message instead). A lock directory next to the clone (`<clone>.lock`) keeps two builds of
@@ -92,18 +131,21 @@ the same clone apart: a second build waits (up to `E2E_BUILD_LOCK_TIMEOUT` secon
 
 No test reaches the internet:
 
-- `db`, `app` and the label stub sit on an internal Docker network with no route out; the gateway
-  container only forwards three loopback ports of the host (HTTP, database, label stub).
+- `db`, `app` and the label stub (and the webhook sink on the `scenarios` profile) sit on an internal
+  Docker network with no route out; the gateway container only forwards three loopback ports of the
+  host (HTTP, database, label stub), and the sink's gateway one more.
 - The app runs in production mode (`grails.env=prod`) with `docker/openboxes.yml`: mail, webhooks and
-  third-party widgets are off, polling jobs are parked, and the Zebra printer and the labelary render
-  point at the label stub (`docker/labelstub.py`), which records what it received for the tests.
+  third-party widgets are off, polling jobs are parked (the `scenarios` profile delivers events to the
+  sink and polls every 20 s instead), and the Zebra printer and the labelary render point at the label
+  stub (`docker/labelstub.py`), which records what it received for the tests.
 - The browser is sealed twice. Every browser context is routed through `lib/ts/cdn-mirror.ts`:
-  only the app's port and the label stub's port on `127.0.0.1`/`localhost` continue (any other local
+  only the app's port and the label stub's port (and the sink's, on the `scenarios` profile) on
+  `127.0.0.1`/`localhost` continue (any other local
   port is aborted and reported as BLOCKED), third-party CDN assets come from the CDN mirror (below),
   everything else is aborted. Below that, Chromium starts with
   `--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost` (both Playwright
   configs), so no other host name resolves, even for requests the routing does not see.
-- The API clients refuse any URL but the app's and the label stub's loopback ports.
+- The API clients refuse any URL but those loopback ports.
 
 ## CDN mirror
 
@@ -160,7 +202,7 @@ way.
 | Path | What |
 |---|---|
 | `run.sh`, `build-war.sh`, `up.sh`, `seed.sh`, `down.sh`, `lib/common.sh` | the runners |
-| `docker/` | the compose file, the app config, the label stub |
+| `docker/` | the compose file, the app config template, the label stub, the webhook sink |
 | `fixtures/seed.sql` | reference data no API creates (category, event types, ZPL label templates) |
 | `lib/ts/` | the Playwright `test` (sealed browser, fixtures), the contract checks, SQL fixtures, reporters |
 | `tests/` | the `setup`, `mobile-api` and `flows` projects |
