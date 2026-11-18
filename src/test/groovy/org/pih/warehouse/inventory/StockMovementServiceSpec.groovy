@@ -210,7 +210,7 @@ class StockMovementServiceSpec extends Specification implements ServiceUnitTest<
     }
 
     private static StockMovement buildIssuedStockMovement(Shipment shipment, Location destination) {
-        return new StockMovement(
+        StockMovement stockMovement = new StockMovement(
                 id: shipment.id,
                 identifier: shipment.shipmentNumber,
                 statusCode: RequisitionStatus.ISSUED.toString(),
@@ -219,5 +219,8 @@ class StockMovementServiceSpec extends Specification implements ServiceUnitTest<
                 shipmentType: shipment.shipmentType,
                 dateShipped: shipment.expectedShippingDate,
         )
+        // toJson() is only used for logging and needs the tag lib bean, which unit tests don't have
+        stockMovement.metaClass.toJson = { -> [:] }
+        return stockMovement
     }
 }
