@@ -55,6 +55,5 @@
         });
     });
     </script>
-    <%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>
