@@ -92,6 +92,5 @@
 
 <asset:javascript src="application.js"/>
 
-<%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>
