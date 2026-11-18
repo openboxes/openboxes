@@ -755,6 +755,5 @@
     </g:if>
 </g:if>
 <r:layoutResources/>
-<%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>

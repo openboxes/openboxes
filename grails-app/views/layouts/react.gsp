@@ -16,6 +16,5 @@
     <div style="flex: 1">
         <g:layoutBody />
     </div>
-<%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>
