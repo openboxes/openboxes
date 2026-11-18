@@ -50,7 +50,9 @@ class ProductSupplierPreferenceApiSpec extends ApiSpec {
         ProductSupplier.get(productSupplier.id)?.delete()
         ProductSupplier.get(productSupplierWithPreference.id)?.delete()
         preferenceType?.delete()
-        supplierProduct?.delete()
+        // Delete this session's copy of the product. The detached @Shared one still holds the setupData() product
+        // suppliers, and the delete cascade would bring second copies of the suppliers deleted above into the session.
+        Product.get(supplierProduct.id)?.delete()
     }
 
     void 'create product supplier preference should succeed when product supplier and preference type are provided'() {
