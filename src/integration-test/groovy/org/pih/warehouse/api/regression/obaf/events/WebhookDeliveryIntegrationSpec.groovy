@@ -189,7 +189,7 @@ class WebhookDeliveryIntegrationSpec extends ObafEventsIntegrationSpec {
         sent.size() == 2
         Map p = sent[0]
         p.keySet() == ['eventId', 'eventType', 'eventDate', 'triggeredBy', 'requisitionNumber', 'requisitionType',
-                       'deliveryTypeCode', 'requestedBy', 'createdBy', 'lines', 'metadata'] as Set
+                       'requisitionStatus', 'deliveryTypeCode', 'requestedBy', 'createdBy', 'lines', 'metadata'] as Set
         p.eventId ==~ UUID_RE
         sent[1].eventId != p.eventId
         p.requisitionNumber == number

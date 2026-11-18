@@ -5,6 +5,7 @@ enum WebhookEventType {
     REQUISITION_ISSUED('requisition.issued'),
     SHIPMENT_RECEIVED('shipment.received'),
     REQUISITION_STAGED('requisition.staged'),
+    REQUISITION_ITEM_STAGED('requisitionItem.staged'),
     PICK_STARTED('pick.started'),
     PICK_COMPLETED('pick.completed'),
     ADJUSTMENT_CREATED('adjustment.created'),
