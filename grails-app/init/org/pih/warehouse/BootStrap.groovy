@@ -507,7 +507,8 @@ class BootStrap {
                 partialIssuanceAllowed: requisition.partialIssuanceAllowed,
                 allocationSourceStrategy: requisition.allocationSourceStrategy?.name(),
                 autoIssuanceRequested: requisition.autoIssuanceRequested,
-                negativeAllocationAllowed: requisition.negativeAllocationAllowed
+                negativeAllocationAllowed: requisition.negativeAllocationAllowed,
+                deliveryTypeCode: requisition.deliveryTypeCode?.name()
             ]
         }
 
