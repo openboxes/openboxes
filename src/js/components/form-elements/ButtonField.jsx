@@ -1,9 +1,9 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const ButtonField = (props) => {
   const {
@@ -20,18 +20,13 @@ const ButtonField = (props) => {
       {
         typeof ButtonLabel === 'string'
           ? (
-            <Tooltip
-              html={(ButtonLabel
+            <CustomTooltip
+              content={(ButtonLabel
             && <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />)}
-              theme="transparent"
-              arrow="true"
-              delay="150"
-              duration="250"
-              hideDelay="50"
             >
               {' '}
               <Translate id={ButtonLabel} defaultMessage={buttonDefaultMessage} />
-            </Tooltip>
+            </CustomTooltip>
           )
           : <ButtonLabel />
       }

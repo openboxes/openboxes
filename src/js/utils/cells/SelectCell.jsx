@@ -9,23 +9,23 @@ import useTranslate from 'hooks/useTranslate';
 /**
  * Memoized cell rendering a dropdown.
  */
-const SelectCell = React.memo(({
-  options,
-  value,
-  onChange,
+const SelectCellComponent = ({
+  options = [],
+  value = null,
+  onChange = undefined,
   label,
   defaultLabel,
-  placeholder,
-  disabled,
-  selectFieldComponent: SelectFieldComponent,
-  labelKey,
-  locationId,
-  async,
-  loadOptions,
-  showValueTooltip,
-  onBlur,
-  clearable,
-  errorMessage,
+  placeholder = '',
+  disabled = false,
+  selectFieldComponent: SelectFieldComponent = SelectField,
+  labelKey = 'name',
+  locationId = null,
+  async = false,
+  loadOptions = () => [],
+  showValueTooltip = true,
+  onBlur = undefined,
+  clearable = true,
+  errorMessage = null,
 }) => {
   const translate = useTranslate();
 
@@ -56,11 +56,13 @@ const SelectCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const SelectCell = React.memo(SelectCellComponent);
 
 SelectCell.displayName = 'SelectCell';
 
-SelectCell.propTypes = {
+SelectCellComponent.propTypes = {
   options: PropTypes.arrayOf(PropTypes.shape({})),
   value: PropTypes.shape({}),
   onChange: PropTypes.func,
@@ -77,23 +79,6 @@ SelectCell.propTypes = {
   onBlur: PropTypes.func,
   clearable: PropTypes.bool,
   errorMessage: PropTypes.string,
-};
-
-SelectCell.defaultProps = {
-  options: [],
-  value: null,
-  onChange: undefined,
-  placeholder: '',
-  disabled: false,
-  selectFieldComponent: SelectField,
-  labelKey: 'name',
-  locationId: null,
-  async: false,
-  loadOptions: () => [],
-  showValueTooltip: true,
-  onBlur: undefined,
-  clearable: true,
-  errorMessage: null,
 };
 
 export default SelectCell;

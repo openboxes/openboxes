@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 import { useSelector } from 'react-redux';
 
 import useEditModalLocationAutofill from 'hooks/receiving/v2/useEditModalLocationAutofill';
@@ -6,14 +6,16 @@ import useReceivingLineItemColumns from 'hooks/receiving/v2/useReceivingLineItem
 import useReceivingLineItems from 'hooks/receiving/v2/useReceivingLineItems';
 
 // The hook only reads the partial receiving activity code of the current location.
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(() => true),
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn(() => true),
 }));
-jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
-jest.mock('hooks/receiving/v2/useReceivingLineItemColumns', () => jest.fn(() => ({ columns: [] })));
-jest.mock('hooks/receiving/v2/useEditModalLocationAutofill', () => jest.fn(() => ({
-  onLocationAutofill: jest.fn(),
-})));
+vi.mock('hooks/useTranslate', () => ({ default: () => (id, defaultMessage) => defaultMessage }));
+vi.mock('hooks/receiving/v2/useReceivingLineItemColumns', () => ({ default: vi.fn(() => ({ columns: [] })) }));
+vi.mock('hooks/receiving/v2/useEditModalLocationAutofill', () => ({
+  default: vi.fn(() => ({
+    onLocationAutofill: vi.fn(),
+  })),
+}));
 
 const product = { id: 'product-1', name: 'Ibuprofen 200mg' };
 const splitProduct = { id: 'product-2', name: 'Paracetamol 500mg' };
@@ -61,9 +63,9 @@ const getRemoveRow = () => getColumnsProps().removeRow;
 
 // The resolver validates asynchronously, so its result is awaited before the errors are
 // asserted (React 16.8 has no async act).
-const flushValidation = () => new Promise((resolve) => {
+const flushValidation = () => act(() => new Promise((resolve) => {
   setTimeout(resolve, 0);
-});
+}));
 
 describe('useReceivingLineItems', () => {
   beforeEach(() => {

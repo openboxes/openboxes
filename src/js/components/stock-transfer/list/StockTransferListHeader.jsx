@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
@@ -32,7 +32,7 @@ const mapStateToProps = (state) => ({
   isUserManager: state.session.isUserManager,
 });
 
-export default withRouter(connect(mapStateToProps)(StockTransferListHeader));
+export default connect(mapStateToProps)(StockTransferListHeader);
 
 StockTransferListHeader.propTypes = {
   isUserManager: PropTypes.bool.isRequired,

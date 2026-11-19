@@ -7,10 +7,10 @@ import productSupplierApi from 'api/services/ProductSupplierApi';
 import confirmationModal from 'utils/confirmationModalUtils';
 
 const useDeletePreferenceType = ({
-  preferenceTypeData,
+  preferenceTypeData = null,
   afterDelete,
-  isDefaultPreferenceType,
-  onCancel,
+  isDefaultPreferenceType = false,
+  onCancel = () => {},
 }) => {
   const dispatch = useDispatch();
 
@@ -91,10 +91,4 @@ useDeletePreferenceType.propTypes = {
   afterDelete: PropTypes.func.isRequired,
   isDefaultPreferenceType: PropTypes.bool,
   onCancel: PropTypes.func,
-};
-
-useDeletePreferenceType.defaultProps = {
-  preferenceTypeData: null,
-  isDefaultPreferenceType: false,
-  onCancel: () => {},
 };

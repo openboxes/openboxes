@@ -1,13 +1,18 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 import 'components/location/LocationChooser/LocationChooserButton/LocationChooserButton.scss';
 
-const LocationChooserButton = ({ onToggle, location, envTag }) => {
+const LocationChooserButton = ({
+  onToggle, location = {
+    name: 'Choose Location',
+    backgroundColor: undefined,
+  }, envTag = undefined,
+}) => {
   const buttonStyle = () => {
     if (!location.backgroundColor) return { '--location-color': 'unset' };
 
@@ -27,15 +32,13 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
       {
         location && location.name && location.name.length > 20
           ? (
-            <Tooltip
-              html={<div className="custom-tooltip">{location.name}</div>}
-              delay="500"
-              duration="250"
-              hideDelay="50"
+            <CustomTooltip
+              content={<div className="custom-tooltip">{location.name}</div>}
+              delayShow={500}
               className="location-chooser__button-title"
             >
               { location.name }
-            </Tooltip>
+            </CustomTooltip>
           ) : (
             <span className="location-chooser__button-title">
               { location.name
@@ -51,14 +54,6 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
       { envTag && <strong className="location-chooser__button-tag">{envTag}</strong> }
     </button>
   );
-};
-
-LocationChooserButton.defaultProps = {
-  location: {
-    name: 'Choose Location',
-    backgroundColor: undefined,
-  },
-  envTag: undefined,
 };
 
 LocationChooserButton.propTypes = {

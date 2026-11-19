@@ -16,8 +16,8 @@ import receivingSortOptions from 'consts/receivingSortOptions';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
+import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/stock-movement-wizard/StockMovement.scss';
 
 /** Main partial receiving form's component. */
@@ -45,7 +45,8 @@ class ReceivingPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'partialReceiving');
     }
@@ -216,9 +217,9 @@ const mapStateToProps = (state) => ({
   formatLocalizedDate: formatDate(state.localize),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(ReceivingPage);
+})(ReceivingPage));
 
 ReceivingPage.propTypes = {
   /** React router's object which contains information about url variables and params */

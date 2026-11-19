@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 
-import { format, parse } from 'date-fns';
+import { format, isValid, parse } from 'date-fns';
 import PropTypes from 'prop-types';
-import DatePicker from 'react-datepicker-6';
+import DatePicker from 'react-datepicker';
 import { useSelector } from 'react-redux';
 import { getCurrentLocale } from 'selectors';
 
@@ -18,30 +18,36 @@ import RootPortalWrapper from 'wrappers/RootPortalWrapper';
 
 import 'components/form-elements/DateFilter/DateFilter.scss';
 import 'components/form-elements/v2/style.scss';
-import 'react-datepicker-6/dist/react-datepicker.css';
+
+const DEFAULT_FOCUS_PROPS = {};
 
 const DateFieldDateFns = ({
-  title,
-  required,
-  tooltip,
-  disabled,
-  errorMessage,
-  placeholder,
-  button,
-  className,
-  value,
-  onChange,
-  showTimeSelect,
-  hideErrorMessageWrapper,
-  customDateFormat,
-  onChangeRaw,
-  clearable,
-  wrapperClassName,
-  focusProps = {},
-  customTooltip,
-  showCustomInput,
-  ariaLabel,
-  hasErrors,
+  title = null,
+  required = false,
+  tooltip = null,
+  disabled = false,
+  errorMessage = null,
+  placeholder = '',
+  button = null,
+  className = '',
+  value = null,
+  onChange = () => {},
+  showTimeSelect = false,
+  hideErrorMessageWrapper = false,
+  customDateFormat = null,
+  outputDateFormat = null,
+  onChangeRaw = null,
+  clearable = true,
+  wrapperClassName = '',
+  focusProps = DEFAULT_FOCUS_PROPS,
+  customTooltip = false,
+  // If false, the 'x' icon for clearing the date will be hidden,
+  // but the date can still be cleared using Backspace.
+  // Thanks to this, the E2E tests won't fail and we won't need to
+  // write new getters for the datePicker in the E2E tests.
+  showCustomInput = true,
+  ariaLabel = null,
+  hasErrors = false,
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -63,14 +69,17 @@ const DateFieldDateFns = ({
       return null;
     }
 
+    // Values in other formats (e.g. ISO strings from the API or Date objects) fall back to the
+    // default parsing, the same way as in the old v2/DateField component (based on moment.js)
     try {
-      return parse(
+      const parsedDate = parse(
         dateToFormat,
         getDateFormat(),
         new Date(),
       );
+      return isValid(parsedDate) ? parsedDate : new Date(dateToFormat);
     } catch (e) {
-      return null;
+      return new Date(dateToFormat);
     }
   };
 
@@ -89,7 +98,7 @@ const DateFieldDateFns = ({
       return;
     }
 
-    const formatted = format(date, getDateFormat());
+    const formatted = format(date, outputDateFormat || getDateFormat());
     onChange(formatted);
   };
 
@@ -188,6 +197,8 @@ DateFieldDateFns.propTypes = {
   showTimeSelect: PropTypes.bool,
   hideErrorMessageWrapper: PropTypes.bool,
   customDateFormat: PropTypes.string,
+  // Format of the value passed to onChange, used when it should differ from the displayed format
+  outputDateFormat: PropTypes.string,
   focusProps: PropTypes.shape({
     fieldIndex: PropTypes.string,
     fieldId: PropTypes.string,
@@ -204,32 +215,4 @@ DateFieldDateFns.propTypes = {
     defaultMessage: PropTypes.string,
   }),
   hasErrors: PropTypes.bool,
-};
-
-DateFieldDateFns.defaultProps = {
-  tooltip: null,
-  required: false,
-  title: null,
-  button: null,
-  errorMessage: null,
-  disabled: false,
-  placeholder: '',
-  className: '',
-  wrapperClassName: '',
-  value: null,
-  onChange: () => {},
-  showTimeSelect: false,
-  hideErrorMessageWrapper: false,
-  customDateFormat: null,
-  focusProps: {},
-  onChangeRaw: null,
-  clearable: true,
-  customTooltip: false,
-  // If false, the 'x' icon for clearing the date will be hidden,
-  // but the date can still be cleared using Backspace.
-  // Thanks to this, the E2E tests won't fail and we won't need to
-  // write new getters for the datePicker in the E2E tests.
-  showCustomInput: true,
-  ariaLabel: null,
-  hasErrors: false,
 };

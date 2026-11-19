@@ -17,7 +17,7 @@ import 'components/location/LocationChooser/LocationChooserModal/LocationChooser
 Modal.setAppElement('#root');
 
 const LocationChooserModal = ({
-  locations, onClose, isLoading, isOpen, onSelectLocation,
+  locations, onClose, isLoading = false, isOpen, onSelectLocation = undefined,
 }) => {
   const renderGroupedLocations = (groupedLocations) => (
     <div
@@ -117,10 +117,6 @@ const LocationChooserModal = ({
       </div>
     </Modal>
   );
-};
-LocationChooserModal.defaultProps = {
-  isLoading: false,
-  onSelectLocation: undefined,
 };
 
 LocationChooserModal.propTypes = {

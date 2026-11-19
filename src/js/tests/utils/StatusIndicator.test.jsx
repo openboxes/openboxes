@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import StatusIndicator from 'utils/StatusIndicator';
 
@@ -15,8 +14,8 @@ describe('status indicator', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedStatusIndicator = renderer.create(statusIndicator);
-    expect(renderedStatusIndicator.toJSON()).toMatchSnapshot();
+    const renderedStatusIndicator = render(statusIndicator);
+    expect(renderedStatusIndicator.asFragment()).toMatchSnapshot();
   });
 
   it('should render properly', () => {

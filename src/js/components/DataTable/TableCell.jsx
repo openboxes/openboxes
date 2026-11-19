@@ -3,25 +3,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RiErrorWarningLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Tooltip } from 'react-tippy';
 
 import CustomTooltip from 'wrappers/CustomTooltip';
 
 const TableCell = ({
   value,
-  children,
-  tooltip,
-  tooltipLabel,
-  link, reactLink,
-  defaultValue,
-  className,
-  openLinkInNewTab,
-  tdProps,
-  style,
-  showError,
-  tooltipForm,
-  tooltipClassname,
-  customTooltip,
+  children = undefined,
+  tooltip = undefined,
+  tooltipLabel = '',
+  link = undefined,
+  reactLink = false,
+  defaultValue = undefined,
+  className = '',
+  openLinkInNewTab = false,
+  tdProps = {},
+  style = undefined,
+  showError = false,
+  tooltipForm = undefined,
+  tooltipClassname = undefined,
+  customTooltip = undefined,
 }) => {
   let cellValue = children || value || defaultValue;
   const errorMessage = tdProps?.rest?.error;
@@ -29,16 +29,9 @@ const TableCell = ({
   if (showError && errorMessage) {
     cellValue = (
       <div className="d-flex flex-row align-items-center">
-        <Tooltip
-          arrow="true"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          className="text-overflow-ellipsis"
-          html={errorMessage}
-        >
+        <CustomTooltip content={errorMessage} className="text-overflow-ellipsis">
           <RiErrorWarningLine className="mr-1" />
-        </Tooltip>
+        </CustomTooltip>
         {cellValue}
       </div>
     );
@@ -47,17 +40,12 @@ const TableCell = ({
   if (tooltip) {
     cellValue = (
       <div className={`d-flex ${tooltipClassname}`}>
-        <Tooltip
-          arrow="true"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          className="text-overflow-ellipsis"
-          style={tooltipForm && { width: '100%' }}
-          html={tooltipLabel || value}
+        <CustomTooltip
+          content={tooltipLabel || value}
+          className={`text-overflow-ellipsis ${tooltipForm ? 'w-100' : ''}`}
         >
           {cellValue}
-        </Tooltip>
+        </CustomTooltip>
       </div>
     );
   }
@@ -97,6 +85,7 @@ const TableCell = ({
           className={elementClasses}
           style={style}
           target={openLinkInNewTab ? '_blank' : undefined}
+          rel={openLinkInNewTab ? 'noopener noreferrer' : undefined}
           href={link}
         >
           {cellValue}
@@ -106,16 +95,6 @@ const TableCell = ({
   }
 
   return cellElement;
-};
-
-TableCell.defaultProps = {
-  defaultValue: undefined,
-  className: '',
-  reactLink: false,
-  openLinkInNewTab: false,
-  showError: false,
-  tdProps: {},
-  tooltipLabel: '',
 };
 
 TableCell.propTypes = {

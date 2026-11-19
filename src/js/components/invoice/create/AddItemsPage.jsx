@@ -450,13 +450,14 @@ class AddItemsPage extends Component {
   saveBeforeOpenInvoiceCandidates(values) {
     return new Promise((resolve) => {
       if (someItemsHaveZeroQuantity(values.invoiceItems)) {
-        return this.confirmSave(() => {
+        this.confirmSave(() => {
           this.saveInvoiceItems(values).then(() => {
             this.loadMoreRows({ startIndex: 0 });
           }).finally(() => resolve());
         });
+        return;
       }
-      return this.saveInvoiceItems(values).finally(() => resolve());
+      this.saveInvoiceItems(values).finally(() => resolve());
     });
   }
 

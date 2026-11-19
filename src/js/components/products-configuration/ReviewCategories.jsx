@@ -9,8 +9,6 @@ import { CATEGORY_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const INITIAL_STATE = {
   categoriesCount: 0,
 };
@@ -45,7 +43,7 @@ class ReviewCategories extends Component {
         this.props.hideSpinner();
       })
       .catch(() => this.props.hideSpinner());
-  }
+  };
 
   render() {
     const {

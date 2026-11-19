@@ -14,8 +14,8 @@ const ConfirmReceiptTable = ({
   loading,
   commentModal,
   cancelRemaining,
-  sort,
-  order,
+  sort = null,
+  order = null,
 }) => {
   const {
     isOpen: isCommentModalOpen,
@@ -128,11 +128,6 @@ ConfirmReceiptTable.propTypes = {
   }).isRequired,
   sort: PropTypes.string,
   order: PropTypes.string,
-};
-
-ConfirmReceiptTable.defaultProps = {
-  sort: null,
-  order: null,
 };
 
 export default ConfirmReceiptTable;

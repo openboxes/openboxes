@@ -7,11 +7,12 @@ import { RiCalendarLine, RiCloseLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import BaseField from 'components/form-elements/BaseField';
+import locales from 'consts/dateFnsLocales';
 import DateFormat from 'consts/dateFormat';
+import { DateFormat as DateFormatPattern, TimeFormat } from 'consts/timeFormat';
 import Translate from 'utils/Translate';
 import { formatDate, getLocaleCode } from 'utils/translation-utils';
 
-import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 
 const CustomInput = React.forwardRef((props, ref) => {
@@ -57,17 +58,24 @@ const CustomInput = React.forwardRef((props, ref) => {
   );
 });
 
-const DateFilter = (props) => {
-  const {
-    value, onChange, dateFormat, placeholder, label, timeFormat, defaultMessage,
-    localizeDate, localizedDateFormat,
-  } = props;
+const DateFilter = ({
+  value = null,
+  onChange = undefined,
+  dateFormat = DateFormatPattern.MM_DD_YYYY,
+  placeholder = '',
+  label = '',
+  timeFormat = TimeFormat.HH_MM,
+  defaultMessage = '',
+  localizeDate = false,
+  localizedDateFormat = DateFormat.DEFAULT,
+  ...props
+}) => {
   const { localeCode, formatLocalizedDate } = useSelector((state) => ({
     localeCode: getLocaleCode(state.localize),
     formatLocalizedDate: formatDate(state.localize),
   }));
   const [isFocused, setIsFocused] = useState(false);
-  const onChangeHandler = (date) => onChange(date.format(dateFormat));
+  const onChangeHandler = (date) => onChange(moment(date).format(dateFormat));
 
   const onClear = (e) => {
     e.stopPropagation();
@@ -94,13 +102,14 @@ const DateFilter = (props) => {
   const isValidClass = value ? 'date-picker__wrapper--valid' : '';
 
   const selectedDate = value ? moment(value, dateFormat) : null;
-  const highlightedDates = [selectedDate || moment(new Date(), dateFormat)];
+  const highlightedDates = [selectedDate?.toDate() || new Date()];
 
-  const localeCodeToDisplay = localizeDate ? localeCode : null;
+  const localeCodeToDisplay = localizeDate ? locales[localeCode] : null;
   return (
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`} data-testid="date-filter">
       <DatePicker
         {...props}
+        value={value}
         customInput={(
           <CustomInput
             formatDateToDisplay={formatDateToDisplay}
@@ -119,6 +128,7 @@ const DateFilter = (props) => {
         onClickOutside={onBlur}
         disabledKeyboardNavigation
         popperClassName="force-on-top"
+        popperPlacement="bottom-start"
         showYearDropdown
         locale={localeCodeToDisplay}
         scrollableYearDropdown
@@ -138,18 +148,6 @@ const DateFilterBaseInput = (props) => (
     renderInput={DateFilter}
   />
 );
-
-DateFilter.defaultProps = {
-  onChange: undefined,
-  label: '',
-  defaultMessage: '',
-  placeholder: '',
-  dateFormat: 'MM/DD/YYYY',
-  timeFormat: 'HH:mm',
-  value: null,
-  localizeDate: false,
-  localizedDateFormat: DateFormat.DEFAULT,
-};
 
 DateFilter.propTypes = {
   onChange: PropTypes.func,

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import productHandlingLabels from 'consts/productHandlingLabels';
 
-const ProductHandlingIcons = ({ handlingLabels }) => {
+const ProductHandlingIcons = ({ handlingLabels = [] }) => {
   if (!handlingLabels?.length) {
     return null;
   }
@@ -35,8 +35,4 @@ ProductHandlingIcons.propTypes = {
     labelCode: PropTypes.string,
     labelText: PropTypes.string,
   })),
-};
-
-ProductHandlingIcons.defaultProps = {
-  handlingLabels: [],
 };

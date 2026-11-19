@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import Checkbox from 'utils/Checkbox';
 
@@ -17,8 +16,8 @@ describe('custom checkbox', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedCheckbox = renderer.create(customCheckbox);
-    expect(renderedCheckbox.toJSON()).toMatchSnapshot();
+    const renderedCheckbox = render(customCheckbox);
+    expect(renderedCheckbox.asFragment()).toMatchSnapshot();
   });
 
   it('should not be checked', () => {
@@ -46,8 +45,8 @@ describe('checkbox with label', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedCheckbox = renderer.create(withLabelCheckbox);
-    expect(renderedCheckbox.toJSON()).toMatchSnapshot();
+    const renderedCheckbox = render(withLabelCheckbox);
+    expect(renderedCheckbox.asFragment()).toMatchSnapshot();
   });
 
   it('should not be checked', () => {
@@ -69,7 +68,8 @@ describe('checkbox with label', () => {
   });
 
   it('should have label', () => {
-    expect(screen.findByText('test label')).toBeTruthy();
+    render(withLabelCheckbox);
+    expect(screen.getByText('test label')).toBeTruthy();
   });
 });
 
@@ -79,8 +79,8 @@ describe('default checkbox', () => {
   });
 
   it('should match snapshot', () => {
-    const renderedCheckbox = renderer.create(checkbox);
-    expect(renderedCheckbox.toJSON()).toMatchSnapshot();
+    const renderedCheckbox = render(checkbox);
+    expect(renderedCheckbox.asFragment()).toMatchSnapshot();
   });
 
   it('should not be checked', () => {

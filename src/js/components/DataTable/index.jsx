@@ -1,5 +1,6 @@
+import DataTable from 'components/DataTable/DataTable';
 import TableCell from 'components/DataTable/TableCell';
 
-export { default } from 'components/DataTable/DataTable';
+export default DataTable;
 
 export { TableCell };

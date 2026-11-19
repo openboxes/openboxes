@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import CheckboxField from 'components/form-elements/CheckboxField';
@@ -20,8 +20,6 @@ import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import 'react-table/react-table.css';
 import 'components/locations-configuration/ZoneTable.scss';
 
 const ZONE_FIELDS = {
@@ -206,12 +204,12 @@ class ZoneAndBinLocations extends Component {
   }
 
   zoneEditCallback() {
-    Alert.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { timeout: 3000 });
+    toast.success(this.props.translate('react.locationsConfiguration.editZone.success.label', 'Zone location has been edited successfully!'), { autoClose: 3000 });
     this.refZoneTable.current.fireFetchData();
   }
 
   binEditCallback() {
-    Alert.success(this.props.translate('react.locationsConfiguration.editBin.success.label', 'Bin location has been edited successfully!'), { timeout: 3000 });
+    toast.success(this.props.translate('react.locationsConfiguration.editBin.success.label', 'Bin location has been edited successfully!'), { autoClose: 3000 });
     this.refBinTable.current.fireFetchData();
   }
 
@@ -270,12 +268,12 @@ class ZoneAndBinLocations extends Component {
   }
 
   finish() {
-    Alert.success(
+    toast.success(
       this.props.translate(
         'react.locationsConfiguration.alert.configurationCompleted.label',
         'Location configuration completed!',
       ),
-      { timeout: 3000 },
+      { autoClose: 3000 },
     );
     this.setState({ showSuccessMessage: true });
   }

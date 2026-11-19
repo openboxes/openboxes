@@ -8,17 +8,15 @@ import TableRow from 'components/form-elements/TableRow';
 import Spinner from 'components/spinner/Spinner';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-const TableBody = (props) => {
-  const {
-    translate,
-    fieldsConfig,
-    properties,
-    fields,
-    showRowSaveIndicator,
-    tableRef = () => {
-    },
-    addRow = (row = {}) => fields.push(row),
-  } = props;
+const TableBody = ({
+  translate,
+  fieldsConfig,
+  properties,
+  fields,
+  showRowSaveIndicator,
+  tableRef = () => {},
+  addRow = (row = {}) => fields.push(row),
+}) => {
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
 
   // properties for loading screen in modal
@@ -82,9 +80,4 @@ TableBody.propTypes = {
   properties: PropTypes.shape({}).isRequired,
   addRow: PropTypes.func,
   tableRef: PropTypes.func,
-};
-
-TableBody.defaultProps = {
-  addRow: undefined,
-  tableRef: undefined,
 };

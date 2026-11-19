@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { SortableElement } from 'react-sortable-hoc';
-import { Tooltip } from 'react-tippy';
 
 import DragHandle from 'components/dashboard/DragHandle';
 import { getColorByName } from 'consts/dataFormat/colorMapping';
@@ -54,7 +52,15 @@ const options = {
 const ZERO = 0;
 
 const NumberSparklineCard = ({
-  cardTitle, cardInfo, color, value, goalDifference, sparklineData, translate, cardInfoDefaultValue,
+  cardTitle,
+  cardInfo,
+  color,
+  value,
+  goalDifference,
+  sparklineData,
+  translate,
+  cardInfoDefaultValue = '',
+  handleRef = null,
 }) => (
   <div className="number-div">
     <div className="number-body">
@@ -83,34 +89,36 @@ const NumberSparklineCard = ({
     <div className="number-infos">
       <CustomTooltip
         content={translate(cardInfo, cardInfoDefaultValue || cardInfo)}
-        show={cardInfo}
+        show={Boolean(cardInfo)}
       >
         <i className="fa fa-info-circle" />
       </CustomTooltip>
     </div>
-    <DragHandle />
+    <DragHandle handleRef={handleRef} />
   </div>
 );
 
-const NumberCard = SortableElement(({
+const NumberCard = (({
   cardTitle,
-  cardTitleDefaultValue,
+  cardTitleDefaultValue = '',
   cardNumber,
   cardNumberType,
-  cardSubtitle,
-  cardSubtitleDefaultValue,
-  cardSubtitleValue,
-  cardLink,
-  cardDataTooltip,
+  cardSubtitle = '',
+  cardSubtitleDefaultValue = '',
+  cardSubtitleValue = '',
+  cardLink = '',
+  cardDataTooltip = '',
   cardInfo,
-  cardInfoDefaultValue,
+  cardInfoDefaultValue = '',
   sparklineData = null,
   translate,
   currencyCode,
   hideDraghandle,
-  showPercentSign,
-  infoIcon,
-  disableSubtitleEllipsis,
+  showPercentSign = false,
+  infoIcon = null,
+  disableSubtitleEllipsis = false,
+  sortableRef = null,
+  handleRef = null,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -120,17 +128,15 @@ const NumberCard = SortableElement(({
   }
   const cardNumberLocale = cardNumber ? cardNumber.toLocaleString() : ZERO.toLocaleString();
   const card = !isSparkline ? (
-    <Tooltip
-      html={(
+    <CustomTooltip
+      content={(
         <p style={{ whiteSpace: 'pre' }}>
           {' '}
           {cardDataTooltip}
           {' '}
         </p>
-)}
-      theme="transparent"
-      arrow="true"
-      disabled={!cardDataTooltip}
+      )}
+      show={Boolean(cardDataTooltip)}
     >
       <div className="number-div">
         <div className="number-body">
@@ -163,9 +169,9 @@ const NumberCard = SortableElement(({
             )
             : null
 }
-        {!hideDraghandle && <DragHandle />}
+        {!hideDraghandle && <DragHandle handleRef={handleRef} />}
       </div>
-    </Tooltip>
+    </CustomTooltip>
   )
     : (
       <NumberSparklineCard
@@ -177,11 +183,18 @@ const NumberCard = SortableElement(({
         goalDifference={sparklineData.colorNumber.value2}
         sparklineData={sparklineData}
         translate={translate}
+        handleRef={handleRef}
       />
     );
 
   return (
-    cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">{card}</a> : <div className="number-card">{card}</div>
+    cardLink
+      ? (
+        <a ref={sortableRef} target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">
+          {card}
+        </a>
+      )
+      : <div ref={sortableRef} className="number-card">{card}</div>
   );
 });
 
@@ -192,25 +205,9 @@ const mapStateToProps = (state) => ({
 
 export default (connect(mapStateToProps)(NumberCard));
 
-NumberCard.defaultProps = {
-  cardTitleDefaultValue: '',
-  cardSubtitle: '',
-  cardSubtitleDefaultValue: '',
-  cardSubtitleValue: '',
-  cardLink: '',
-  cardDataTooltip: '',
-  cardInfoDefaultValue: '',
-  sparklineData: null,
-  showPercentSign: false,
-  infoIcon: null,
-  disableSubtitleEllipsis: false,
-};
-
 NumberCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardTitleDefaultValue: PropTypes.string,
-  cardNumber: PropTypes.number,
-  cardNumberType: PropTypes.string,
   cardSubtitle: PropTypes.string,
   cardSubtitleDefaultValue: PropTypes.string,
   cardSubtitleValue: PropTypes.string,
@@ -223,6 +220,8 @@ NumberCard.propTypes = {
   showPercentSign: PropTypes.bool,
   infoIcon: PropTypes.node,
   disableSubtitleEllipsis: PropTypes.bool,
+  sortableRef: PropTypes.func,
+  handleRef: PropTypes.func,
 };
 
 NumberSparklineCard.propTypes = {
@@ -234,8 +233,5 @@ NumberSparklineCard.propTypes = {
   goalDifference: PropTypes.string.isRequired,
   sparklineData: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
-};
-
-NumberSparklineCard.defaultProps = {
-  cardInfoDefaultValue: '',
+  handleRef: PropTypes.func,
 };

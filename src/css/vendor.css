@@ -1,0 +1,5 @@
+@import 'react-datepicker/dist/react-datepicker.css';
+@import 'react-confirm-alert/src/react-confirm-alert.css';
+@import 'react-table/react-table.css';
+/* important: this line must be placed after react-table css import */
+@import 'react-table-hoc-fixed-columns/lib/styles.css';

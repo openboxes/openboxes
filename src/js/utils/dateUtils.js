@@ -9,9 +9,9 @@ import {
   parseISO,
   startOfDay,
 } from 'date-fns';
-import * as locales from 'date-fns/locale';
 import moment from 'moment';
 
+import locales from 'consts/dateFnsLocales';
 import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 
 /**
@@ -276,6 +276,17 @@ export const displayTimezoneOffset = (timezoneOffset = new Date().getTimezoneOff
  * @returns {string}
  */
 export const getFilenameDateString = () => format(new Date(), DateFormatDateFns.YYYYMMDD_HHMMSS);
+
+/**
+ * Converts moment.js format to date-fns format, e.g. 'MM/DD/YYYY' -> 'MM/dd/yyyy'.
+ * Only the day of month, year and timezone tokens used in the app differ between the libraries.
+ * @param {string} momentFormat
+ * @returns {string}
+ */
+export const convertMomentFormatToDateFns = (momentFormat) => momentFormat
+  ?.replace('DD', 'dd')
+  .replace('YYYY', 'yyyy')
+  .replace('Z', 'xxx');
 
 export default dateWithoutTimeZone;
 

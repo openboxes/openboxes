@@ -8,15 +8,21 @@ import Button from 'components/form-elements/Button';
 
 const ModalWithTable = ({
   isOpen,
-  title,
-  subtitle,
-  columns,
-  data,
-  confirmLabel,
-  cancelLabel,
-  onConfirm,
-  onCancel,
-  children,
+  title = null,
+  subtitle = null,
+  columns = [],
+  data = [],
+  confirmLabel = {
+    id: 'react.default.yes.label',
+    defaultMessage: 'Yes',
+  },
+  cancelLabel = {
+    id: 'react.default.no.label',
+    defaultMessage: 'No',
+  },
+  onConfirm = null,
+  onCancel = null,
+  children = null,
 }) => {
   if (!isOpen) {
     document.body.style.overflowY = 'auto';
@@ -62,8 +68,8 @@ ModalWithTable.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   title: PropTypes.string,
   subtitle: PropTypes.string,
-  columns: PropTypes.arrayOf(PropTypes.object),
-  data: PropTypes.arrayOf(PropTypes.object),
+  columns: PropTypes.arrayOf(PropTypes.shape({})),
+  data: PropTypes.arrayOf(PropTypes.shape({})),
   confirmLabel: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
@@ -75,24 +81,6 @@ ModalWithTable.propTypes = {
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
   children: PropTypes.node,
-};
-
-ModalWithTable.defaultProps = {
-  title: null,
-  subtitle: null,
-  columns: [],
-  data: [],
-  children: null,
-  confirmLabel: {
-    id: 'react.default.yes.label',
-    defaultMessage: 'Yes',
-  },
-  cancelLabel: {
-    id: 'react.default.no.label',
-    defaultMessage: 'No',
-  },
-  onConfirm: null,
-  onCancel: null,
 };
 
 export default ModalWithTable;

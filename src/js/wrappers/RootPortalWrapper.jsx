@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { Portal } from '@restart/ui';
 import PropTypes from 'prop-types';
-import { Portal } from 'react-overlays';
 
 const RootPortalWrapper = ({ children }) => {
   const rootContainer = document.getElementById('root');

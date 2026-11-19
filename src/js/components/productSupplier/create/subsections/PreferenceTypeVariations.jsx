@@ -18,7 +18,7 @@ import { FormErrorPropType } from 'utils/propTypes';
 
 const PreferenceTypeVariations = ({
   control,
-  errors,
+  errors = [],
   triggerValidation,
 }) => {
   const { fields, remove, prepend } = useFieldArray({
@@ -136,8 +136,4 @@ PreferenceTypeVariations.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: preferenceTypeVariationsFormErrors,
   triggerValidation: PropTypes.func.isRequired,
-};
-
-PreferenceTypeVariations.defaultProps = {
-  errors: [],
 };

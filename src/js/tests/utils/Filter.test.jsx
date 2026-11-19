@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import Filter from 'utils/Filter';
 
@@ -13,14 +12,14 @@ let onChangeFunc;
 
 describe('filter', () => {
   beforeEach(() => {
-    onChangeFunc = jest.fn();
+    onChangeFunc = vi.fn();
     filter = (<Filter onChange={onChangeFunc} />);
     filterWithValue = (<Filter onChange={onChangeFunc} filter={{ value: 'testValue' }} />);
   });
 
   it('should match snapshot', () => {
-    const renderedFilter = renderer.create(filter);
-    expect(renderedFilter.toJSON())
+    const renderedFilter = render(filter);
+    expect(renderedFilter.asFragment())
       .toMatchSnapshot();
   });
 

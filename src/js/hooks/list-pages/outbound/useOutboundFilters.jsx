@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
@@ -17,7 +17,8 @@ const useOutboundFilters = (sourceType) => {
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const {
     requisitionStatuses,
@@ -56,9 +57,9 @@ const useOutboundFilters = (sourceType) => {
       .reduce((acc, key) => ({ ...acc, [key]: '' }), { direction: 'OUTBOUND' });
     const transformedParams = transformFilterParams(defaultValues, { direction: { name: 'direction' } });
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (queryFilterParams) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
   };
 
@@ -81,7 +82,7 @@ const useOutboundFilters = (sourceType) => {
       defaultValues.sourceType = 'ELECTRONIC';
     }
 
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(window.location.search);
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.requisitionStatusCode) {
       const statuses = getParamList(queryProps.requisitionStatusCode);
@@ -147,7 +148,7 @@ const useOutboundFilters = (sourceType) => {
       requestedBy: currentUserValue.id,
       createdBy: currentUserValue.id,
     };
-    history.push({
+    navigate({
       pathname: STOCK_MOVEMENT_URL.list(),
       search: queryString.stringify(searchQuery),
     });
@@ -177,9 +178,9 @@ const useOutboundFilters = (sourceType) => {
 
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (queryFilterParams) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

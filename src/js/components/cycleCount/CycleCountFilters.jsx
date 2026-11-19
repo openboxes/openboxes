@@ -8,7 +8,7 @@ import ListFilterFormWrapper from 'wrappers/ListFilterFormWrapper';
 const CycleCountFilters = ({
   setFilterParams,
   defaultValues,
-  formProps,
+  formProps = {},
   isLoading,
   filterFields,
 }) => (
@@ -39,8 +39,4 @@ CycleCountFilters.propTypes = {
   formProps: PropTypes.shape({}),
   isLoading: PropTypes.bool.isRequired,
   filterFields: PropTypes.shape({}).isRequired,
-};
-
-CycleCountFilters.defaultProps = {
-  formProps: {},
 };

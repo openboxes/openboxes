@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import Input from 'utils/Input';
 
@@ -13,14 +12,14 @@ let arrowUpFunction;
 
 describe('input', () => {
   beforeEach(() => {
-    onChangeFunc = jest.fn();
-    arrowUpFunction = jest.fn();
+    onChangeFunc = vi.fn();
+    arrowUpFunction = vi.fn();
     input = (<Input onChange={onChangeFunc} arrowUp={arrowUpFunction} />);
   });
 
   it('should match snapshot', () => {
-    const renderedInput = renderer.create(input);
-    expect(renderedInput.toJSON()).toMatchSnapshot();
+    const renderedInput = render(input);
+    expect(renderedInput.asFragment()).toMatchSnapshot();
   });
 
   it('should render properly', () => {

@@ -1,14 +1,14 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/locations-configuration/SuccessMessage.scss';
 
-const LoadDemoDataSuccessMessage = ({ history, supportLinks }) => (
+const LoadDemoDataSuccessMessage = ({ navigate, supportLinks }) => (
   <div className="success-wrapper">
     <div className="success-content">
       <i className="fa fa-check-circle-o success-icon" aria-hidden="true" />
@@ -28,7 +28,7 @@ const LoadDemoDataSuccessMessage = ({ history, supportLinks }) => (
         </a>
       </p>
       <div className="success-buttons-section d-flex flex-column w-50">
-        <button type="button" className="btn btn-outline-primary" onClick={() => history.push(DASHBOARD_URL.base)}>
+        <button type="button" className="btn btn-outline-primary" onClick={() => navigate(DASHBOARD_URL.base)}>
           <Translate id="react.loadData.success.exploreDashboard.button.label" defaultMessage="Explore dashboard" />
         </button>
       </div>
@@ -39,7 +39,7 @@ const LoadDemoDataSuccessMessage = ({ history, supportLinks }) => (
 export default withRouter(LoadDemoDataSuccessMessage);
 
 LoadDemoDataSuccessMessage.propTypes = {
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
   supportLinks: PropTypes.shape({
     knowledgeBase: PropTypes.string.isRequired,
   }).isRequired,

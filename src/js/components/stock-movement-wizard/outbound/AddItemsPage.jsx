@@ -10,7 +10,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import {
   addStockMovementDraft,
@@ -47,8 +47,7 @@ import requestsQueue from 'utils/requestsQueue';
 import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'react-confirm-alert/src/react-confirm-alert.css';
+import withRouter from 'utils/withRouter';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -239,7 +238,6 @@ const NO_STOCKLIST_FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
-          openOnClick: false,
         },
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -432,7 +430,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -1028,7 +1027,7 @@ class AddItemsPage extends Component {
               // When there is an error, we are adding items to
               // state for draft
               this.props.addStockMovementDraft({
-                lineItems: this.state.values.lineItems,
+                lineItems: lineItemsWithErrors,
                 id: this.state.values.stockMovementId,
                 statusCode: this.state.values.statusCode,
               });
@@ -1176,7 +1175,7 @@ class AddItemsPage extends Component {
         this.fetchLineItems();
         this.props.removeStockMovementDraft(this.state.values.stockMovementId);
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner())
       .finally(() => {
@@ -1251,7 +1250,7 @@ class AddItemsPage extends Component {
       if (this.state.values.statusCode === StockMovementStatus.CREATED) {
         resolve(apiClient.post(url, payload));
       }
-      return resolve();
+      resolve();
     })
       .then(this.props.nextPage(values || this.state.values))
       .finally(this.props.hideSpinner());
@@ -1370,184 +1369,183 @@ class AddItemsPage extends Component {
     const { showOnly } = this.props;
 
     return (
-      <>
-        <Form
-          onSubmit={() => {}}
-          validate={this.validate}
-          mutators={{
-            ...arrayMutators,
-            setColumnValue,
-          }}
-          initialValues={this.state.values}
-          render={({
-            handleSubmit,
-            values,
-            invalid,
-            form: { mutators },
-          }) => (
-            <div className="d-flex flex-column">
-              { !showOnly
-                ? (
-                  <span className="buttons-container">
-                    <label
-                      htmlFor="csvInput"
-                      className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                    >
-                      <span>
-                        <i className="fa fa-download pr-2" />
-                        <Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" />
-                      </span>
-                      <input
-                        id="csvInput"
-                        type="file"
-                        style={{ display: 'none' }}
-                        onChange={this.importTemplate}
-                        onClick={(event) => {
-                          // eslint-disable-next-line no-param-reassign
-                          event.target.value = null;
-                        }}
-                        accept=".csv"
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => this.exportTemplate(values)}
-                      className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                    >
-                      <span>
-                        <i className="fa fa-upload pr-2" />
-                        <Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" />
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={invalid}
-                      onClick={() => this.removeAll()}
-                      className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
-                    >
-                      <span>
-                        <i className="fa fa-remove pr-2" />
-                        <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={invalid}
-                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-                      onMouseDown={() => this.save(values)}
-                      className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                    >
-                      <span className="saving-button">
-                        {_.some(
-                          values.lineItems,
-                          (item) => item.rowSaveStatus === RowSaveStatus.SAVING,
-                        ) ? <Spinner /> : <i className="fa fa-save pr-2" />}
-                        <Translate id="react.default.button.save.label" defaultMessage="Save" />
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={invalid}
-                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-                      onMouseDown={() => this.saveAndExit(values)}
-                      className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                    >
-                      <span>
-                        <i className="fa fa-sign-out pr-2" />
-                        <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
-                      </span>
-                    </button>
-                  </span>
-                )
-                : (
+      <Form
+        onSubmit={() => {}}
+        validate={this.validate}
+        mutators={{
+          ...arrayMutators,
+          setColumnValue,
+        }}
+        initialValues={this.state.values}
+        render={({
+          handleSubmit,
+          values,
+          invalid,
+          form: { mutators },
+        }) => (
+          <div className="d-flex flex-column">
+            { !showOnly
+              ? (
+                <span className="buttons-container">
+                  <label
+                    htmlFor="csvInput"
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-download pr-2" />
+                      <Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" />
+                    </span>
+                    <input
+                      id="csvInput"
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={this.importTemplate}
+                      onClick={(event) => {
+                        // eslint-disable-next-line no-param-reassign
+                        event.target.value = null;
+                      }}
+                      accept=".csv"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => this.exportTemplate(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-upload pr-2" />
+                      <Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" />
+                    </span>
+                  </button>
                   <button
                     type="button"
                     disabled={invalid}
-                    onClick={() => {
-                      this.props.history(STOCK_MOVEMENT_URL.listOutbound());
-                    }}
-                    className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+                    onClick={() => this.removeAll()}
+                    className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
+                  >
+                    <span>
+                      <i className="fa fa-remove pr-2" />
+                      <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={invalid}
+                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
+                    onMouseDown={() => this.save(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  >
+                    <span className="saving-button">
+                      {_.some(
+                        values.lineItems,
+                        (item) => item.rowSaveStatus === RowSaveStatus.SAVING,
+                      ) ? <Spinner /> : <i className="fa fa-save pr-2" />}
+                      <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={invalid}
+                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
+                    onMouseDown={() => this.saveAndExit(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                   >
                     <span>
                       <i className="fa fa-sign-out pr-2" />
-                      <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+                      <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
                     </span>
                   </button>
-                ) }
-              <form onSubmit={handleSubmit}>
-                <div className="table-form">
-                  {_.map(this.getFields(), (fieldConfig, fieldName) =>
-                    renderFormField(fieldConfig, fieldName, {
-                      stocklist: values.stocklist,
-                      recipients: this.props.recipients,
-                      removeItem: this.removeItem,
-                      originId: this.props.initialValues.origin.id,
-                      getSortOrder: this.getSortOrder,
-                      newItemAdded: this.newItemAdded,
-                      newItem: this.state.newItem,
-                      totalCount: this.state.totalCount,
-                      loadMoreRows: this.loadMoreRows,
-                      isRowLoaded: this.isRowLoaded,
-                      updateTotalCount: this.updateTotalCount,
-                      isPaginated: this.props.isPaginated,
-                      isFromOrder: this.state.values.isFromOrder,
-                      showOnly,
-                      updateRow: this.updateRow,
-                      values,
-                      isFirstPageLoaded: this.state.isFirstPageLoaded,
-                      saveProgress: this.saveProgress,
-                      getStockMovementDraft: this.getStockMovementDraft,
-                      isDraftAvailable: this.state.isDraftAvailable,
-                      isAutosaveEnabled: this.props.isAutosaveEnabled,
-                      setRecipientValue: (val) => mutators.setColumnValue('lineItems', 'recipient', val),
-                      translate: this.props.translate,
-                    }))}
-                </div>
-                <div className="submit-buttons">
-                  <button
-                    type="button"
-                    disabled={
+                </span>
+              )
+              : (
+                <button
+                  type="button"
+                  disabled={invalid}
+                  onClick={() => {
+                    this.props.navigate(STOCK_MOVEMENT_URL.listOutbound());
+                  }}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
+                >
+                  <span>
+                    <i className="fa fa-sign-out pr-2" />
+                    <Translate id="react.default.button.exit.label" defaultMessage="Exit" />
+                  </span>
+                </button>
+              ) }
+            <form onSubmit={handleSubmit}>
+              <div className="table-form">
+                {_.map(this.getFields(), (fieldConfig, fieldName) =>
+                  renderFormField(fieldConfig, fieldName, {
+                    stocklist: values.stocklist,
+                    recipients: this.props.recipients,
+                    removeItem: this.removeItem,
+                    originId: this.props.initialValues.origin.id,
+                    getSortOrder: this.getSortOrder,
+                    newItemAdded: this.newItemAdded,
+                    newItem: this.state.newItem,
+                    totalCount: this.state.totalCount,
+                    loadMoreRows: this.loadMoreRows,
+                    isRowLoaded: this.isRowLoaded,
+                    updateTotalCount: this.updateTotalCount,
+                    isPaginated: this.props.isPaginated,
+                    isFromOrder: this.state.values.isFromOrder,
+                    showOnly,
+                    updateRow: this.updateRow,
+                    values,
+                    isFirstPageLoaded: this.state.isFirstPageLoaded,
+                    saveProgress: this.saveProgress,
+                    getStockMovementDraft: this.getStockMovementDraft,
+                    isDraftAvailable: this.state.isDraftAvailable,
+                    isAutosaveEnabled: this.props.isAutosaveEnabled,
+                    setRecipientValue: (val) => mutators.setColumnValue('lineItems', 'recipient', val),
+                    translate: this.props.translate,
+                  }))}
+              </div>
+              <div className="submit-buttons">
+                <button
+                  type="button"
+                  disabled={
                     invalid
                     || showOnly
                     || _.some(values.lineItems, (item) => item.quantityRequested < 0)
                   }
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-                    onMouseDown={() => {
-                      if (
-                        this.props.isAutosaveEnabled
+                  onMouseDown={() => {
+                    if (
+                      this.props.isAutosaveEnabled
                       && _.some(values.lineItems, (lineItem) =>
                         (lineItem.rowSaveStatus === RowSaveStatus.PENDING
                         || lineItem.rowSaveStatus === RowSaveStatus.SAVING)
                         && lineItem.product)
-                      ) {
-                        this.showPendingSaveNotification();
-                        return;
-                      }
-                      this.previousPage(values, invalid);
-                    }}
-                    className="btn btn-outline-primary btn-form btn-xs"
-                  >
-                    <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
-                  </button>
-                  <button
-                    type="submit"
+                    ) {
+                      this.showPendingSaveNotification();
+                      return;
+                    }
+                    this.previousPage(values, invalid);
+                  }}
+                  className="btn btn-outline-primary btn-form btn-xs"
+                >
+                  <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
+                </button>
+                <button
+                  type="submit"
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-                    onMouseDown={() => {
-                      if (
-                        this.props.isAutosaveEnabled
+                  onMouseDown={() => {
+                    if (
+                      this.props.isAutosaveEnabled
                       && _.some(values.lineItems, (lineItem) =>
                         lineItem.rowSaveStatus === RowSaveStatus.PENDING
                         || lineItem.rowSaveStatus === RowSaveStatus.SAVING)
-                      ) {
-                        this.showPendingSaveNotification();
-                        return;
-                      }
-                      if (!invalid) {
-                        this.nextPage(values);
-                      }
-                    }}
-                    className="btn btn-outline-primary btn-form float-right btn-xs"
-                    disabled={
+                    ) {
+                      this.showPendingSaveNotification();
+                      return;
+                    }
+                    if (!invalid) {
+                      this.nextPage(values);
+                    }
+                  }}
+                  className="btn btn-outline-primary btn-form float-right btn-xs"
+                  disabled={
                     values.lineItems.length === 0
                     || (values.lineItems.length === 1 && !('product' in values.lineItems[0]))
                     || invalid
@@ -1556,15 +1554,14 @@ class AddItemsPage extends Component {
                     || _.every(values.lineItems,
                       (item) => parseInt(item.quantityRequested, 10) === 0)
                   }
-                  >
-                    <Translate id="react.default.button.next.label" defaultMessage="Next" />
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-        />
-      </>
+                >
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      />
     );
   }
 }
@@ -1596,7 +1593,7 @@ const mapDispatchToProps = {
   showInfoBar,
 };
 
-export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
 
 AddItemsPage.propTypes = {
   /** Initial component's data */
@@ -1655,9 +1652,7 @@ AddItemsPage.propTypes = {
   })).isRequired,
   showInfoBar: PropTypes.func.isRequired,
   hideInfoBar: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };
 
 AddItemsPage.defaultProps = {

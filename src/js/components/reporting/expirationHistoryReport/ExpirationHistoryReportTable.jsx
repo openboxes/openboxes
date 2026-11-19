@@ -11,7 +11,7 @@ const ExpirationHistoryReportTable = ({
   paginationProps,
   columns,
   emptyTableMessage,
-  footerComponent,
+  footerComponent = null,
 }) => (
   <div>
     <DataTable
@@ -43,21 +43,17 @@ ExpirationHistoryReportTable.propTypes = {
     search: PropTypes.string,
   }).isRequired,
   tableData: PropTypes.shape({
-    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     totalCount: PropTypes.number,
     totalValueLost: PropTypes.number,
     totalQuantityLost: PropTypes.number,
   }).isRequired,
   loading: PropTypes.bool.isRequired,
   paginationProps: PropTypes.shape({}).isRequired,
-  columns: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   emptyTableMessage: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }).isRequired,
   footerComponent: PropTypes.func,
-};
-
-ExpirationHistoryReportTable.defaultProps = {
-  footerComponent: null,
 };

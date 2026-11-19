@@ -12,8 +12,7 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { TbArrowsSplit2 } from 'react-icons/tb';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
-import { Tooltip } from 'react-tippy';
+import { toast } from 'react-toastify';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ProductApi from 'api/services/ProductApi';
@@ -46,8 +45,7 @@ import Input from 'utils/Input';
 import { debounceProductsFetch } from 'utils/option-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-import 'react-confirm-alert/src/react-confirm-alert.css';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const customTextFieldWithTooltip = (params) => {
   const renderInput = ({
@@ -62,20 +60,15 @@ const customTextFieldWithTooltip = (params) => {
     />
   );
   return (
-    <Tooltip
-      html={params?.fieldValue}
-      theme="transparent"
-      arrow="true"
-      delay="150"
-      duration="250"
-      hideDelay="50"
+    <CustomTooltip
+      content={params?.fieldValue}
       disabled={!params?.fieldValue}
     >
       <BaseField
         {...params}
         renderInput={renderInput}
       />
-    </Tooltip>
+    </CustomTooltip>
   );
 };
 
@@ -287,7 +280,6 @@ const FIELDS = {
         }),
         attributes: {
           labelKey: 'name',
-          openOnClick: false,
           showValueTooltip: true,
         },
       },
@@ -302,36 +294,26 @@ const FIELDS = {
         }) => (
           <span className="inbound-actions">
             <div aria-label={translate('react.stockMovement.splitLine.label', 'Split line')} role="button">
-              <Tooltip
-                html={(<Translate id="react.stockMovement.splitLine.label" defaultMessage="Split line" />)}
-                theme="transparent"
-                arrow="true"
-                delay="150"
-                duration="250"
-                hideDelay="50"
+              <CustomTooltip
+                content={(<Translate id="react.stockMovement.splitLine.label" defaultMessage="Split line" />)}
               >
                 <TbArrowsSplit2
                   className="split-icon"
                   onClick={() => onSplit(fieldValue, addRow, rowIndex, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />
-              </Tooltip>
+              </CustomTooltip>
             </div>
             <div aria-label={translate('react.default.button.delete.label', 'Delete')} role="button">
-              <Tooltip
-                html={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
-                theme="transparent"
-                arrow="true"
-                delay="150"
-                duration="250"
-                hideDelay="50"
+              <CustomTooltip
+                content={(<Translate id="react.default.button.delete.label" defaultMessage="Delete" />)}
               >
                 <RiDeleteBinLine
                   className="delete-icon"
                   onClick={() => onDelete(fieldValue, removeItem, removeRow, updateTotalCount)}
                   disabled={fieldValue?.statusCode === requisitionStatus.SUBSTITUTED}
                 />
-              </Tooltip>
+              </CustomTooltip>
             </div>
           </span>
         ),
@@ -342,7 +324,9 @@ const FIELDS = {
 
 const LOT_AND_EXPIRY_ERROR = 'react.stockMovement.error.lotAndExpiryControl.label';
 
-/* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
+/* eslint class-methods-use-this: ["error", {
+  "exceptMethods": ["getLineItemsToBeSaved"], "enforceForClassFields": false
+}] */
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -406,7 +390,8 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
@@ -523,8 +508,7 @@ class AddItemsPage extends Component {
             (sum + (val.packsRequested
               ? _.toInteger(val.packsRequested * val.packSize)
               : 0
-            )),
-          0,
+            )), 0,
         );
         if (requestedQuantity > item.quantityAvailable) {
           _.forEach(values.lineItems, (lineItem, lineItemKey) => {
@@ -678,7 +662,7 @@ class AddItemsPage extends Component {
       });
   }
 
-  isRowLoaded = (values) => ({ index }) => !!values.lineItems[index]
+  isRowLoaded = (values) => ({ index }) => !!values.lineItems[index];
 
   /**
    * Saves current stock movement progress (line items) and goes to the next stock movement step.
@@ -961,7 +945,7 @@ class AddItemsPage extends Component {
         this.saveItems(lineItems);
       }
     } else {
-      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
+      toast(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { type: 'error', autoClose: 2000 });
     }
   }
 
@@ -999,7 +983,7 @@ class AddItemsPage extends Component {
         });
       }
     } else {
-      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
+      toast(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { type: 'error', autoClose: 2000 });
     }
   }
 
@@ -1014,7 +998,7 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        toast(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { type: 'success', autoClose: 3000 });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -1133,7 +1117,7 @@ class AddItemsPage extends Component {
       .catch(() => {
         this.props.hideSpinner();
       });
-  }
+  };
 
   exportTemplate(blank) {
     const url = `${COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE}?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;

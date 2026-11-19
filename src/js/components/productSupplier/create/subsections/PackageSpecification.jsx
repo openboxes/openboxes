@@ -9,7 +9,7 @@ import Subsection from 'components/Layout/v2/Subsection';
 import useQuantityUnitOfMeasureOptions from 'hooks/options-data/useQuantityUnitOfMeasureOptions';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const PackageSpecification = ({ control, errors, setProductPackageQuantity }) => {
+const PackageSpecification = ({ control, errors = {}, setProductPackageQuantity }) => {
   const { quantityUom } = useQuantityUnitOfMeasureOptions();
   const uom = useWatch({ control, name: 'packageSpecification.uom' });
 
@@ -159,8 +159,4 @@ PackageSpecification.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: packageSpecificationFormErrors,
   setProductPackageQuantity: PropTypes.func.isRequired,
-};
-
-PackageSpecification.defaultProps = {
-  errors: {},
 };

@@ -14,7 +14,12 @@ function handleClick(onClick, event, link) {
 }
 
 const DocumentButton = ({
-  buttonIcon, buttonTitle, link, target, disabled, onClick,
+  buttonIcon = 'fa-download',
+  buttonTitle = 'Print Document',
+  link,
+  target = '_blank',
+  disabled,
+  onClick,
 }) => (
   <a
     href={link}
@@ -43,10 +48,4 @@ DocumentButton.propTypes = {
   target: PropTypes.string,
   disabled: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
-};
-
-DocumentButton.defaultProps = {
-  buttonIcon: 'fa-download',
-  buttonTitle: 'Print Document',
-  target: '_blank',
 };

@@ -17,8 +17,6 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const FIELDS = {
   picklistItems: {
     type: ArrayField,
@@ -129,7 +127,8 @@ class PickPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();

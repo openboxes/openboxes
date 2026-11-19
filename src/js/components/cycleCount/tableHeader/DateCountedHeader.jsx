@@ -7,8 +7,8 @@ import { getFormatLocalizedDate, makeGetCycleCountDateCounted } from 'selectors'
 import { updateDateCounted } from 'actions';
 import HeaderLabel from 'components/cycleCount/HeaderLabel';
 import HeaderSelect from 'components/cycleCount/HeaderSelect';
-import DateField from 'components/form-elements/v2/DateField';
-import { DateFormat } from 'consts/timeFormat';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
+import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import useTranslate from 'hooks/useTranslate';
 
 const DateCountedHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => {
@@ -33,12 +33,12 @@ const DateCountedHeader = ({ cycleCountId, isStepEditable, isFormDisabled }) => 
       <HeaderSelect
         label={translate('react.cycleCount.dateCounted.label', 'Date counted')}
       >
-        <DateField
+        <DateFieldDateFns
           className="date-counted-date-picker date-field-input"
           onChangeRaw={handleUpdateDateCounted}
           value={cycleCountDateCounted}
           clearable={false}
-          customDateFormat={DateFormat.DD_MMM_YYYY}
+          customDateFormat={DateFormatDateFns.DD_MMM_YYYY}
           disabled={isFormDisabled}
         />
       </HeaderSelect>

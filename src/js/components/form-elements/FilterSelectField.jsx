@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Overlay } from 'react-overlays';
 import { components } from 'react-select';
 
 import BaseField from 'components/form-elements/BaseField';
@@ -13,7 +12,7 @@ import 'components/form-elements/FilterSelectField.scss';
 
 const Dropdown = ({
   children,
-  style,
+  style = {},
   inputContainerRec,
   hasOptions,
 }) => {
@@ -36,9 +35,8 @@ const Dropdown = ({
       className="filter-select__dropdown"
       style={{
         ...style,
+        position: 'absolute',
         width: dropdownWidth,
-        left: inputContainerRec.left,
-        top: inputContainerRec?.bottom,
       }}
     >
       {children}
@@ -62,28 +60,17 @@ Dropdown.propTypes = {
   hasOptions: PropTypes.bool.isRequired,
 };
 
-Dropdown.defaultProps = {
-  style: {},
-};
-
 const Menu = (props) => {
   const inputContainer = document.getElementById(`${props.selectProps.id}-container`);
   return (
-    <Overlay
-      show
-      placement="bottom"
-      target={inputContainer}
-      container={document.getElementById('root')}
+    <Dropdown
+      inputContainerRec={inputContainer.getBoundingClientRect()}
+      hasOptions={!!props.options.length}
     >
-      <Dropdown
-        inputContainerRec={inputContainer.getBoundingClientRect()}
-        hasOptions={!!props.options.length}
-      >
-        <div className="filter-select__custom-option" {...props.innerProps}>
-          {props.children}
-        </div>
-      </Dropdown>
-    </Overlay>
+      <div className="filter-select__custom-option" {...props.innerProps}>
+        {props.children}
+      </div>
+    </Dropdown>
   );
 };
 
@@ -137,10 +124,6 @@ const IndicatorsContainer = ({ children, ...props }) => (
   </components.IndicatorsContainer>
 );
 
-IndicatorsContainer.defaultProps = {
-  width: undefined,
-};
-
 IndicatorsContainer.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
@@ -153,10 +136,9 @@ IndicatorsContainer.propTypes = {
       PropTypes.shape({}),
     ]),
   }).isRequired,
-  width: PropTypes.string,
 };
 
-const FilterSelectField = (props) => {
+const FilterSelectField = ({ className: fieldClassName = '', ...props }) => {
   const renderInput = ({ className, ...attributes }) => {
     const [input, setInput] = useState('');
 
@@ -193,6 +175,7 @@ const FilterSelectField = (props) => {
   return (
     <BaseField
       {...props}
+      className={fieldClassName}
       renderInput={renderInput}
     />
   );
@@ -202,8 +185,4 @@ export default FilterSelectField;
 
 FilterSelectField.propTypes = {
   className: PropTypes.string,
-};
-
-FilterSelectField.defaultProps = {
-  className: '',
 };

@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { LOCATION } from 'api/urls';
@@ -14,8 +13,8 @@ import TextField from 'components/form-elements/TextField';
 import apiClient, { mapToEmptyString } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationAddress.scss';
 
 const FIELDS = {
@@ -122,7 +121,7 @@ class LocationAddress extends Component {
 
   nextPage(values) {
     this.saveAddressOfLocation(values, (val) => {
-      Alert.success(this.props.translate('react.locationsConfiguration.alert.addressSaveCompleted.label', 'Address was succesfully added to the location!'), { timeout: 3000 });
+      toast.success(this.props.translate('react.locationsConfiguration.alert.addressSaveCompleted.label', 'Address was succesfully added to the location!'), { autoClose: 3000 });
       this.props.nextPage(val);
     });
   }

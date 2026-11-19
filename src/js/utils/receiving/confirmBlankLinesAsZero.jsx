@@ -4,8 +4,6 @@ import { confirmAlert } from 'react-confirm-alert';
 
 import ZeroLinesConfirmModal from 'components/receivingV2/zeroLinesModal/ZeroLinesConfirmModal';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 /**
  * Warns that the lines left blank will be received as zero, listing them. Resolves to true only
  * when the user picks "Yes" - closing the modal any other way keeps them on the receiving step.

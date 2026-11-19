@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCheckboxCircleLine } from 'react-icons/all';
-import { RiErrorWarningLine } from 'react-icons/ri';
+import { RiCheckboxCircleLine, RiErrorWarningLine } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 import useScrollbar from 'hooks/useScrollbar';
@@ -29,10 +28,10 @@ const getButtonVariant = ({
 });
 
 const InvalidItemsIndicator = ({
-  className,
-  errorsCounter,
-  setIsFiltered,
-  isFiltered,
+  className = '',
+  errorsCounter = 0,
+  setIsFiltered = () => {},
+  isFiltered = false,
   handleOnFilterButtonClick,
 }) => {
   const { Icon, variant, wrapperClassName } = getButtonVariant({
@@ -77,11 +76,4 @@ InvalidItemsIndicator.propTypes = {
   setIsFiltered: PropTypes.func,
   isFiltered: PropTypes.bool,
   handleOnFilterButtonClick: PropTypes.func.isRequired,
-};
-
-InvalidItemsIndicator.defaultProps = {
-  className: '',
-  errorsCounter: 0,
-  setIsFiltered: () => {},
-  isFiltered: false,
 };

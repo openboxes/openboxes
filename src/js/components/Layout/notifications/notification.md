@@ -4,7 +4,7 @@
 notification is implemented as curried function - as argument it expects `type` of the notification which is from the:
 `NotificationType` enum.
 
-It returns a function that expects `message` (required), `details`, `detailsArray`, `icon` as arguments to then call the proper `Alert` function from `react-s-alert` package.
+It returns a function that expects `message` (required), `details`, `detailsArray`, `icon` as arguments to then call the proper `toast` function from the `react-toastify` package. Toasts are rendered by `NotificationContainer` (mounted once in `Router`).
 
                                                                                                         
 #### Examples:
@@ -15,7 +15,7 @@ It returns a function that expects `message` (required), `details`, `detailsArra
     icon: <RiWifiOffLine />,
 });
 ````
-The above generates the Alert of info type (gray border) with message (title [bold]) of "Lost connection" and the details of the message with the start icon of Wifi icon.
+The above generates the toast of info type (gray border) with message (title [bold]) of "Lost connection" and the details of the message with the start icon of Wifi icon.
 
 ````
  notification(NotificationType.SUCCESS)({
@@ -24,7 +24,7 @@ The above generates the Alert of info type (gray border) with message (title [bo
 });
 ````
 
-The above generates the Alert of type success. We have not provided the `icon` prop, so the default will be: `<RiCheckboxCircleLine />`
+The above generates the toast of type success. We have not provided the `icon` prop, so the default will be: `<RiCheckboxCircleLine />`
 
 We can also provide an array of errors to be displayed one below another:
 ```

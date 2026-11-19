@@ -2,12 +2,12 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 
 const Logo = ({
-  logoUrl,
+  logoUrl = '',
 }) => (
   <div className="d-flex align-items-center logo-wrapper" data-testid="logo-wrapper">
     <div className="logo-square" aria-label="logo">
@@ -27,12 +27,8 @@ const mapStateToProps = (state) => ({
   logoUrl: state.session.logoUrl,
 });
 
-export default withRouter(connect(mapStateToProps)(Logo));
+export default connect(mapStateToProps)(Logo);
 
 Logo.propTypes = {
   logoUrl: PropTypes.string,
-};
-
-Logo.defaultProps = {
-  logoUrl: '',
 };

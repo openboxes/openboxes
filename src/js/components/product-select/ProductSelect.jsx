@@ -2,29 +2,28 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 const productOptionLabel = ({
   productCode, displayName, displayNames, name,
 }) => (`${productCode} - ${displayName || displayNames?.default || name}`);
 
 const Option = (option) => (
-  <Tooltip
-    html={<div className="text-truncate">{option.name}</div>}
-    theme="transparent"
-    disabled={!(option.displayName || option.displayNames?.default)}
-    position="top-start"
+  <CustomTooltip
+    content={<div className="text-truncate">{option.name}</div>}
+    show={Boolean(option.displayName || option.displayNames?.default)}
+    place="top-start"
   >
     <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
       {option.label || productOptionLabel(option)}
         &nbsp;
       {renderHandlingIcons(option.handlingIcons)}
     </strong>
-  </Tooltip>
+  </CustomTooltip>
 );
 
 const SelectedValue = (option) => (
@@ -37,10 +36,13 @@ const SelectedValue = (option) => (
 );
 
 const ProductSelect = ({
-  onExactProductSelected,
+  className = 'text-left',
+  showValueTooltip = true,
+  onExactProductSelected = undefined,
   locationId,
-  fieldRef,
-  includeUom,
+  fieldRef = undefined,
+  loadOptions = undefined,
+  includeUom = false,
   ...props
 }) => {
   const selectRef = useRef(null);
@@ -83,7 +85,7 @@ const ProductSelect = ({
       }
 
       if (exactMatchProduct) {
-        selectRef.current.select.select.setValue(exactMatchProduct);
+        selectRef.current.selectOption(exactMatchProduct);
       }
       if (onExactProductSelected) {
         /* There are cases when we want to call this callback right after the state change.
@@ -131,10 +133,12 @@ const ProductSelect = ({
   return (
     <Select
       {...props}
+      className={className}
+      showValueTooltip={showValueTooltip}
       fieldRef={handleFieldRef}
       async
       options={[]}
-      loadOptions={props.loadOptions || loadProductOptions}
+      loadOptions={loadOptions || loadProductOptions}
       onMenuClose={() => {
         setLoadedOptions([]);
         setSearchTerm('');
@@ -147,23 +151,8 @@ const ProductSelect = ({
   );
 };
 
-ProductSelect.defaultProps = {
-  className: 'text-left',
-  openOnClick: true,
-  autoload: true,
-  cache: false,
-  showValueTooltip: true,
-  onExactProductSelected: undefined,
-  fieldRef: undefined,
-  loadOptions: undefined,
-  includeUom: false,
-};
-
 ProductSelect.propTypes = {
   className: PropTypes.string,
-  openOnClick: PropTypes.bool,
-  autoload: PropTypes.bool,
-  cache: PropTypes.bool,
   showValueTooltip: PropTypes.bool,
   locationId: PropTypes.string.isRequired,
   onExactProductSelected: PropTypes.func,

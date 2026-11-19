@@ -1,11 +1,15 @@
 import React from 'react';
 
-import renderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import store from 'tests/__mocks__/formStore';
 
 import SelectField from 'components/form-elements/SelectField';
 import { renderFormField } from 'utils/form-utils';
 
-jest.mock('react-final-form', () => ({
+import '@testing-library/jest-dom';
+
+vi.mock('react-final-form', () => ({
   Field: (props) => {
     const { component: Component, name, ...others } = props;
     const input = { onChange: () => {}, name };
@@ -14,7 +18,8 @@ jest.mock('react-final-form', () => ({
   },
 }));
 
-jest.mock('react-localize-redux', () => ({
+vi.mock('react-localize-redux', async () => ({
+  ...(await vi.importActual('react-localize-redux')),
   Translate: (props) => {
     const { id } = props;
 
@@ -22,8 +27,8 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-xdescribe('SelectField component is correctly rendering', () => {
-  it('renders correctly', () => {
+describe('SelectField component is correctly rendering', () => {
+  it('renders a react-select with its label and no value selected', () => {
     const fieldConfig = {
       type: SelectField,
       label: 'test label',
@@ -32,8 +37,12 @@ xdescribe('SelectField component is correctly rendering', () => {
       },
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    const { container } = render(
+      <Provider store={store}>{renderFormField(fieldConfig, 'test-field')}</Provider>,
+    );
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(screen.getByText('test label')).toBeInTheDocument();
+    expect(container.querySelector('.select-xs .react-select__control')).toBeInTheDocument();
+    expect(container.querySelector('.react-select__single-value')).not.toBeInTheDocument();
   });
 });

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   fetchPreferenceTypes,
@@ -36,7 +36,7 @@ const useProductSupplierForm = () => {
   const { productSupplierId } = useParams();
   const queryParams = useQueryParams();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const translateWithRedirect = useTranslateWithRedirect();
   const dispatch = useDispatch();
 
@@ -349,7 +349,7 @@ const useProductSupplierForm = () => {
       });
 
       notification(NotificationType.SUCCESS)({ message: successMessage });
-      history.push(PRODUCT_SUPPLIER_URL.list());
+      navigate(PRODUCT_SUPPLIER_URL.list());
     } finally {
       dispatch(hideSpinner());
     }
