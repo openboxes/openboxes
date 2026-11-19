@@ -231,8 +231,10 @@ class PicklistService {
         PicklistItem picklistItem = PicklistItem.get(picklistItemId)
 
         Product product = Product.get(productId)
-        if (product != picklistItem?.requisitionItem?.product) {
-            picklistItem.errors.reject("Picked product ${product?.productCode} does not match picklist item ${picklistItem?.requisitionItem?.product?.productCode}")
+        // A picklist item is for a requisition item (outbound) or an order item (replenishment)
+        Product expectedProduct = picklistItem?.requisitionItem?.product ?: picklistItem?.orderItem?.product
+        if (product != expectedProduct) {
+            picklistItem.errors.reject("Picked product ${product?.productCode} does not match picklist item ${expectedProduct?.productCode}")
         }
 
         // Initialize quantity picked

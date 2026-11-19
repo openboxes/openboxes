@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW replenishment_task AS
 SELECT
     pli.id AS id,
-    CONCAT('PK-', CRC32(pli.id)) AS identifier,
+    CONCAT('RT-', CRC32(pli.id)) AS identifier,
 
     o.id AS order_id,
     o.order_number AS order_number,
@@ -13,8 +13,9 @@ SELECT
 
     oi.id AS order_item_id,
     oi.product_id AS product_id,
+    oi.destination_bin_location_id AS destination_location_id,
 
-    pli.bin_location_id AS bin_location_id,
+    pli.bin_location_id AS location_id,
     pli.outbound_container_id AS outbound_container_id,
     pli.staging_location_id AS staging_location_id,
     pli.inventory_item_id AS inventory_item_id,
@@ -42,5 +43,9 @@ FROM picklist_item pli
          JOIN picklist pl ON pl.id = pli.picklist_id
          JOIN `order` o ON o.id = pl.order_id
          JOIN order_type ot ON ot.id = o.order_type_id
-         LEFT JOIN order_item oi ON oi.id = pli.order_item_id
-WHERE ot.order_type_code = 'TRANSFER_ORDER' AND o.status NOT IN ('COMPLETED', 'CANCELED', 'REJECTED');
+         JOIN order_item oi ON oi.id = pli.order_item_id
+-- Replenishment lines move stock into a destination bin; transfer order lines without one are plain stock transfers
+WHERE ot.code = 'TRANSFER_ORDER'
+  AND o.status NOT IN ('COMPLETED', 'CANCELED', 'REJECTED')
+  AND oi.destination_bin_location_id IS NOT NULL
+  AND (oi.order_item_status_code IS NULL OR oi.order_item_status_code <> 'CANCELED');
