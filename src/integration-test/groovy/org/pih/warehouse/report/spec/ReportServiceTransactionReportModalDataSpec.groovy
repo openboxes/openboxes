@@ -13,6 +13,7 @@ import org.pih.warehouse.common.domain.builder.product.ProductTestBuilder
 import org.pih.warehouse.common.util.RandomUtil
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.date.JavaUtilDateFormatter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ReportService
@@ -150,6 +151,38 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
         assert rows.last().balance == 100
     }
 
+    void 'each row has the expiration date of its lot, including the ghost rows'() {
+        given: 'lot 2 expires, lot 1 does not'
+        setExpirationDate(item2, day(400))
+
+        and: 'a credit of both lots, then a count that leaves out lot 2'
+        insertTransaction(ADJUSTMENT_CREDIT, day(6), [[item1, 100], [item2, 20]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 100]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.transactionCode == ["BALANCE_OPENING", "CREDIT", "CREDIT", "UNRECORDED_CHANGE",
+                                        "PRODUCT_INVENTORY", "BALANCE_CLOSING"]
+        assert rows[1].subMap("lotNumber", "expirationDate") == [lotNumber: "L1", expirationDate: null]
+        assert rows[2].subMap("lotNumber", "expirationDate") ==
+                [lotNumber: "L2", expirationDate: JavaUtilDateFormatter.formatAsDate(day(400))]
+        assert rows[3].subMap("lotNumber", "expirationDate") ==
+                [lotNumber: "L2", expirationDate: JavaUtilDateFormatter.formatAsDate(day(400))]
+    }
+
+    void 'the entries of a transaction are sorted by lot number'() {
+        given: 'a credit whose entries were saved with lot 2 first'
+        insertTransaction(ADJUSTMENT_CREDIT, day(6), [[item2, 20], [item1, 100]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.lotNumber == [null, "L1", "L2", null]
+    }
+
     void 'a count that matches the balance has no ghost row'() {
         given:
         insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
@@ -277,5 +310,17 @@ class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
                 .setString("sourceTransactionId", sourceTransactionId)
                 .setString("destinationTransactionId", destinationTransactionId)
                 .executeUpdate()
+    }
+
+    /**
+     * Sets the expiration date of a lot with SQL. Saving a change to an existing inventory item with GORM fails in
+     * these tests (a NullPointerException in the timestamp handling), so it's updated directly and then reloaded.
+     */
+    private void setExpirationDate(InventoryItem item, Date expirationDate) {
+        sessionFactory.currentSession.createSQLQuery("UPDATE inventory_item SET expiration_date = :expirationDate WHERE id = :id")
+                .setTimestamp("expirationDate", expirationDate)
+                .setString("id", item.id)
+                .executeUpdate()
+        sessionFactory.currentSession.refresh(item)
     }
 }

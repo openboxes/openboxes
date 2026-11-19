@@ -30,6 +30,7 @@
             <th><g:message code="transaction.label" default="Transaction"/></th>
             <th><g:message code="default.reference.label" default="Reference"/></th>
             <th><g:message code="inventory.lotNumber.label" default="Lot number"/></th>
+            <th><g:message code="inventoryItem.expirationDate.label" default="Expiration date"/></th>
             <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
             <th class="right"><g:message code="default.quantity.label" default="Quantity"/></th>
             <th class="right"><g:message code="default.balance.label" default="Balance"/></th>
@@ -74,13 +75,18 @@
         };
         // "Ghost" rows: changes in quantity on hand that no transaction recorded
         var ghostLabels = {
-            UNRECORDED_CHANGE: "${g.message(code: 'report.transaction.unrecordedChange.label', default: 'Unrecorded change')}",
-            UNRECONCILED: "${g.message(code: 'report.transaction.unreconciled.label', default: 'Unexplained difference')}"
+            UNRECORDED_CHANGE: "${g.message(code: 'report.transaction.unrecordedChange.label', default: 'Difference')}",
+            UNRECONCILED: "${g.message(code: 'report.transaction.unreconciled.label', default: 'Difference')}"
+        };
+        var ghostDescriptions = {
+            UNRECORDED_CHANGE: "${g.message(code: 'report.transaction.unrecordedChange.description', default: 'Found by the count below, not recorded as a transaction')}",
+            UNRECONCILED: "${g.message(code: 'report.transaction.unreconciled.description', default: 'Not explained by the transactions and counts above')}"
         };
         var ghostHints = {
-            UNRECORDED_CHANGE: "${g.message(code: 'report.transaction.unrecordedChange.hint', default: 'The difference between the count below and the balance before it, i.e. a change that was not recorded as a transaction (e.g. a loss, or a transaction that was deleted after the count). These add up to the Differences column.')}",
+            UNRECORDED_CHANGE: "${g.message(code: 'report.transaction.unrecordedChange.hint', default: 'The difference between the count below and the balance before it, i.e. a change that was not recorded as a transaction (e.g. a loss, or a transaction that was deleted after the count). We don\'t know when it happened, only that the count found it. These add up to the Differences column.')}",
             UNRECONCILED: "${g.message(code: 'report.transaction.unreconciled.hint', default: 'The transactions above do not add up to the closing balance. This is the rest of the difference.')}"
         };
+        var negativeCountHint = "${g.message(code: 'report.transaction.negativeCount.hint', default: 'Negative count. A counted quantity can\'t be negative, so this is likely a data error.')}";
         var countHint = "${g.message(code: 'report.transaction.countQuantity.hint', default: 'Counted quantity. The balance is set to the counted quantity instead of adding to it.')}";
         var internalTransferHint = $('.internal-transfers-toggle').attr('title');
 
@@ -96,8 +102,10 @@
             internalCounted: "${g.message(code: 'report.transaction.summary.counted.label', default: 'counted')}",
             internalNotCounted: "${g.message(code: 'report.transaction.summary.notCounted.label', default: 'not counted')}",
             countsType: "${g.message(code: 'report.transaction.byType.counts.label', default: 'Counts')}",
-            countsHint: "${g.message(code: 'report.transaction.byType.counts.hint', default: 'Counts set the balance instead of adding to it. Their differences are in the Unrecorded change row.')}",
+            countsHint: "${g.message(code: 'report.transaction.byType.counts.hint', default: 'Counts set the balance instead of adding to it. Their differences are in the Difference rows.')}",
             internalType: "${g.message(code: 'report.transaction.byType.internalTransfers.label', default: 'Internal transfers')}",
+            noTransactions: "${g.message(code: 'report.transaction.noTransactions.message', default: 'No transactions in this period.')}",
+            onlyInternalTransfers: "${g.message(code: 'report.transaction.onlyInternalTransfers.message', default: 'No transactions in this period except {0} internal transfers, which are hidden. Check Include internal transfers to show them.')}",
             total: "${g.message(code: 'default.total.label', default: 'Total')}",
             filterHint: "${g.message(code: 'report.transaction.summary.filter.hint', default: 'Click to show only these rows')}"
         };
@@ -108,6 +116,30 @@
 
         function isIncludingInternalTransfers() {
             return $('#dialogIncludeInternalTransfers').is(':checked');
+        }
+
+        // When the period has only the opening and closing balances, says so between them: either there were no
+        // transactions, or only internal transfers, which are hidden unless they're included
+        function showNoTransactionsRow() {
+            var tbody = $('#dialogDataTable tbody');
+            tbody.find('tr.no-transactions-row').remove();
+            if (!dialogRows.length || dialogFilter || tbody.find('tr').not('.balance-row').length) {
+                return;
+            }
+            var internal = countTransactions(dialogRows.filter(function (row) { return row.internal; }));
+            var message = (internal && !isIncludingInternalTransfers())
+                ? labels.onlyInternalTransfers.replace('{0}', formatNumber(internal))
+                : labels.noTransactions;
+            var row = $('<tr class="no-transactions-row">')
+                .append($('<td>').attr('colspan', $('#dialogDataTable thead th').length).text(message));
+            var opening = tbody.find('tr.balance-row').first();
+            if (opening.length) {
+                opening.after(row);
+            } else {
+                tbody.prepend(row);
+            }
+            // The table sized its scroll area to the rows before this one, so the closing balance would be out of view
+            tbody.closest('.dataTables_scrollBody').css('height', 'auto');
         }
 
         function isCountedRow(row) {
@@ -406,11 +438,12 @@
             },
             "aoColumns": [
                 // Every column has a default, because some rows (e.g. the ghost rows) don't have every field
-                {"mData": "transactionDate", "sClass": "date-cell", "sWidth": "140px", "sDefaultContent": ""},
+                {"mData": "transactionDate", "sClass": "date-cell", "sWidth": "150px", "sDefaultContent": ""},
                 {"mData": "transactionTypeName", "sDefaultContent": ""},
                 {"mData": "transactionNumber", "sWidth": "110px", "sDefaultContent": ""},
                 {"mData": "reference", "sWidth": "170px", "sDefaultContent": ""},
                 {"mData": "lotNumber", "sWidth": "110px", "sDefaultContent": ""},
+                {"mData": "expirationDate", "sClass": "expiration-cell", "sWidth": "95px", "sDefaultContent": ""},
                 {"mData": "binLocation", "sWidth": "110px", "sDefaultContent": ""},
                 {"mData": "quantity", "sClass": "right", "sWidth": "80px", "sDefaultContent": ""},
                 {"mData": "balance", "sClass": "right", "sWidth": "80px", "sDefaultContent": ""}
@@ -425,12 +458,30 @@
                 // Dim a date that's the same as the row above, and draw a line above the first row of each day, so
                 // that it's easier to see where each day starts
                 var previousDate = null;
+                var previousDateTime = null;
+                // Fade the type, transaction and reference when they're the same as the row above (another lot or bin
+                // of the same transaction), like the date
+                var table = $('#dialogDataTable').dataTable();
+                var previousTransactionId = null;
                 $('#dialogDataTable tbody tr').each(function () {
+                    var data = table.fnGetData(this);
+                    var transactionId = (data && data.transactionId) || null;
+                    $(this).toggleClass('same-transaction', !!transactionId && transactionId === previousTransactionId);
+                    previousTransactionId = transactionId;
+                    // A change with no known date doesn't start a day or count as one
+                    if ($(this).hasClass('ghost-row')) {
+                        return;
+                    }
+                    // Fade the date and time only when both are the same as the row above, so that transactions at
+                    // different times of the same day stay apart
                     var date = $(this).find('td.date-cell .date').text();
+                    var dateTime = date + ' ' + $(this).find('td.date-cell .time').text();
                     $(this).toggleClass('new-day', previousDate !== null && date !== previousDate);
-                    $(this).find('td.date-cell .date').toggleClass('same-date', date === previousDate);
+                    $(this).find('td.date-cell').toggleClass('same-datetime', dateTime === previousDateTime);
                     previousDate = date;
+                    previousDateTime = dateTime;
                 });
+                showNoTransactionsRow();
             },
             "fnRowCallback": function (nRow, aData) {
                 var cells = $('td', nRow);
@@ -443,18 +494,23 @@
 
                 if (ghostLabels[aData.transactionCode]) {
                     $(nRow).addClass('ghost-row').attr('title', ghostHints[aData.transactionCode]);
+                    // We don't know when the change happened, only that the count after it found it
+                    cells.eq(0).empty().append($('<span class="date unknown-date">').text('\u2014'));
                     cells.eq(1).text(ghostLabels[aData.transactionCode]);
-                    // No transaction or reference, but the lot and bin that the change was in (if it's known)
-                    cells.slice(2, 4).empty();
+                    // No transaction or reference, so what the difference means goes in their place, followed by the
+                    // lot and bin that the change was in (if it's known)
+                    cells.eq(2).attr('colspan', 2).addClass('ghost-description').text(ghostDescriptions[aData.transactionCode]);
+                    cells.eq(3).empty().hide();
                     cells.eq(4).text(aData.lotNumber || '');
-                    cells.eq(5).text(aData.binLocation || '');
-                    var ghostQuantityCell = cells.eq(6).removeClass('credit debit zero counted');
+                    cells.eq(5).text(aData.expirationDate || '');
+                    cells.eq(6).text(aData.binLocation || '');
+                    var ghostQuantityCell = cells.eq(7).removeClass('credit debit zero counted');
                     if (aData.quantityChange > 0) {
                         ghostQuantityCell.text('+' + aData.quantityChange.toLocaleString('en-US')).addClass('credit');
                     } else {
                         renderQuantity(ghostQuantityCell, Math.abs(aData.quantityChange), 'debit');
                     }
-                    renderQuantity(cells.eq(7), aData.balance);
+                    renderQuantity(cells.eq(8), aData.balance);
                     return nRow;
                 }
 
@@ -462,8 +518,8 @@
                 if (balanceLabels[aData.transactionCode]) {
                     $(nRow).addClass('balance-row');
                     cells.eq(1).text(balanceLabels[aData.transactionCode]);
-                    cells.slice(2, 7).empty();
-                    renderQuantity(cells.eq(7), aData.balance);
+                    cells.slice(2, 8).empty();
+                    renderQuantity(cells.eq(8), aData.balance);
                     return nRow;
                 }
 
@@ -484,21 +540,30 @@
                 if (aData.reference) {
                     var referenceText = (aData.reference.typeName || referenceLabels[aData.reference.type]) + " \u203a " +
                         (aData.reference.number || '');
-                    referenceCell.attr('title', referenceText).append($('<a target="_blank" class="ellipsis">')
+                    referenceCell.append($('<a target="_blank">')
                         .attr('href', "${request.contextPath}" + aData.reference.url)
                         .text(referenceText));
                 }
 
                 // Credits are shown as +n and debits as (n). Counts set the balance, so they're dimmed.
-                var quantityCell = cells.eq(6).removeClass('credit debit zero counted').removeAttr('title');
+                var quantityCell = cells.eq(7).removeClass('credit debit zero counted negative-count').removeAttr('title');
                 if (aData.quantityChange == null) {
-                    quantityCell.text(Number(aData.quantity).toLocaleString('en-US')).addClass('counted').attr('title', countHint);
+                    // A count sets the balance to its quantity, so it's a plain number, unlike credits (+n) and debits
+                    // ((n)), which change it. A negative count is a data error, so it's flagged in a warning color
+                    // (not red, which is for debits).
+                    var counted = Number(aData.quantity);
+                    if (counted < 0) {
+                        quantityCell.text('\u26a0 ' + counted.toLocaleString('en-US')).addClass('counted negative-count')
+                            .attr('title', negativeCountHint);
+                    } else {
+                        quantityCell.text(counted.toLocaleString('en-US')).addClass('counted').attr('title', countHint);
+                    }
                 } else if (aData.quantityChange > 0) {
                     quantityCell.text('+' + aData.quantityChange.toLocaleString('en-US')).addClass('credit');
                 } else {
                     renderQuantity(quantityCell, Math.abs(aData.quantityChange), 'debit');
                 }
-                renderQuantity(cells.eq(7), aData.balance);
+                renderQuantity(cells.eq(8), aData.balance);
                 return nRow;
             }
         });

@@ -191,17 +191,81 @@
 
 	/* Transaction dates in the details dialog: fixed-width digits so that they line up, a lighter time, a dimmed date
 	   when it's the same as the row above, and a line above the first row of each day */
+	/* The site limits data table cells to 100px wide, which is too narrow for a date and time, a reference or a
+	   type (which gets the space the other columns leave). The header cells set the columns' widths, so
+	   they need the room too. */
+	#dialogDataTable_wrapper th:first-child {
+		max-width: none;
+		min-width: 130px;
+	}
+
+	/* The type, and the reference (e.g. "Requisition › 391PSG"), which wraps when the dialog is too narrow */
+	#dialogDataTable_wrapper th:nth-child(2),
+	#dialogDataTable_wrapper td:nth-child(2),
+	#dialogDataTable_wrapper th:nth-child(4),
+	#dialogDataTable_wrapper td:nth-child(4) {
+		max-width: none;
+	}
+
+	#dialogDataTable_wrapper th:nth-child(2) {
+		min-width: 120px;
+	}
+
+	#dialogDataTable_wrapper th:nth-child(4) {
+		min-width: 150px;
+	}
+
 	#dialogDataTable_wrapper td.date-cell {
 		font-variant-numeric: tabular-nums;
+		/* The site limits data table cells to 100px wide. When the column is still too narrow (e.g. with larger text),
+		   the time wraps under the date instead of running into the next column. */
+		max-width: none;
+	}
+
+	#dialogDataTable_wrapper td.date-cell .date,
+	#dialogDataTable_wrapper td.date-cell .time {
 		white-space: nowrap;
+	}
+
+	/* A line between the transaction (date, type, transaction, reference) and its entry (lot, expiration, bin,
+	   quantity, balance). Lot number is the 5th cell, also in difference rows, whose 4th cell is hidden. */
+	#dialogDataTable_wrapper th:nth-child(5),
+	#dialogDataTable_wrapper td:nth-child(5) {
+		border-left: 2px solid #c9d3df;
+	}
+
+	/* Expiration dates line up, like the transaction dates */
+	#dialogDataTable_wrapper td.expiration-cell {
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+
+	/* A cell never runs into the next one, e.g. with larger text */
+	#dialogDataTable_wrapper td {
+		overflow: hidden;
+	}
+
+	/* Another lot or bin of the same transaction as the row above: its type, transaction and reference are faded */
+	#dialogDataTable_wrapper tbody tr.same-transaction td:nth-child(2),
+	#dialogDataTable_wrapper tbody tr.same-transaction td:nth-child(3) a,
+	#dialogDataTable_wrapper tbody tr.same-transaction td:nth-child(4) a {
+		color: #ccc;
 	}
 
 	#dialogDataTable_wrapper td.date-cell .time {
 		color: #999;
 	}
 
-	#dialogDataTable_wrapper td.date-cell .date.same-date {
+	/* The same date and time as the row above (e.g. another lot of the same transaction) */
+	#dialogDataTable_wrapper td.date-cell.same-datetime .date,
+	#dialogDataTable_wrapper td.date-cell.same-datetime .time {
 		color: #ccc;
+	}
+
+	/* What a difference row means, in the Transaction and Reference columns, which it doesn't have */
+	#dialogDataTable_wrapper tbody tr.ghost-row td.ghost-description {
+		white-space: normal;
+		max-width: none;
 	}
 
 	#dialogDataTable_wrapper tbody tr.new-day td {
@@ -215,6 +279,16 @@
 		cursor: help;
 	}
 
+	/* Between the opening and closing balances when the period had no transactions to show */
+	#dialogDataTable_wrapper tbody tr.no-transactions-row td {
+		text-align: center;
+		font-style: italic;
+		color: #888;
+		max-width: none;
+		white-space: normal;
+	}
+
+	/* The Type cell, which labels the row */
 	#dialogDataTable_wrapper tbody tr.ghost-row td:nth-child(2) {
 		border-left: 3px dashed #ccc;
 	}
@@ -282,7 +356,7 @@
 
 	/* The opening and closing balances, set apart from the activity between them */
 	.dialog-stat-balance {
-		background-color: #f1f3f5;
+		background-color: #e6ecf3;
 	}
 
 	.dialog-stat-balance .dialog-stat-value {
@@ -448,6 +522,13 @@
 		background-color: #f7f7f9;
 	}
 
+	/* The opening and closing balances stand apart from the period's activity between them, with the same tint as in
+	   the details dialog. It's an overlay, so the row stripes and the hover color still show through. */
+	#transactionReport_wrapper th.balance-column,
+	#transactionReport_wrapper td.balance-column {
+		box-shadow: inset 0 0 0 9999px rgba(70, 110, 160, 0.09);
+	}
+
 	/* Rows open the product's transactions when clicked */
 	#transactionReport_wrapper tbody tr:hover td,
 	#transactionReport_wrapper tbody tr:hover td.sorting_1 {
@@ -482,15 +563,34 @@
 		border-bottom: 1px dotted;
 	}
 
+	/* The checkboxes have tooltips too. Only the text is marked, so the checkbox still looks clickable. */
+	label.hint .hint-text {
+		cursor: help;
+		border-bottom: 1px dotted;
+	}
+
+	/* Long checkbox labels wrap, with the second line under the text rather than under the checkbox */
+	.filter-list-item label.checkbox-label {
+		display: flex;
+		align-items: baseline;
+		gap: 4px;
+		white-space: normal;
+	}
+
 	#transactionReport_wrapper a,
 	#dialogDataTable_wrapper a {
 		color: #1a5ea8;
 	}
 
 	/* Details dialog: the opening and closing balances stand out from the transactions */
-	#dialogDataTable_wrapper tbody tr.balance-row td {
+	/* The opening and closing balances stand apart from the period's activity between them, with the same tint as
+	   their figures in the summary above. The colors are kept on hover, since these rows aren't clickable. */
+	#dialogDataTable_wrapper tbody tr.balance-row td,
+	#dialogDataTable_wrapper tbody tr.balance-row:hover td {
 		font-weight: 600;
-		background-color: #f0f0f2;
+		background-color: #e6ecf3;
+		border-top: 1px solid #cfd8e3;
+		border-bottom: 1px solid #cfd8e3;
 	}
 
 	/* The period label, with the links to the period before and after on the right */
@@ -517,16 +617,27 @@
 		text-decoration: none;
 	}
 
-	/* The summary counts in the metadata box filter the table */
-	.report-metadata-summary a {
+	/* The indicators under Products in the metadata box. Each one filters the table to its products. */
+	.report-metadata-indicators {
+		list-style: none;
+		margin: 4px 0 0;
+		padding: 0;
+	}
+
+	.report-metadata-indicators li {
+		margin: 2px 0;
+		cursor: help;
+	}
+
+	.report-metadata-indicators a {
 		color: #1a5ea8;
 	}
 
-	.report-metadata-summary a.active {
+	.report-metadata-indicators a.active {
 		font-weight: 600;
 	}
 
-	.report-metadata-summary .zero {
+	.report-metadata-indicators .zero {
 		color: #999;
 	}
 
@@ -541,10 +652,17 @@
 	}
 
 	/* Counted quantities don't change the balance */
+	/* A counted quantity sets the balance, so it's a plain number in the regular text color, unlike credits and
+	   debits. Faded italics are for the difference rows. */
 	#dialogDataTable_wrapper .counted {
-		color: #999;
-		font-style: italic;
+		color: #333;
 		cursor: help;
+	}
+
+	/* A negative count is a data error: a warning color, since red is for debits */
+	#dialogDataTable_wrapper .counted.negative-count {
+		color: #b45309;
+		font-weight: 600;
 	}
 	</style>
 	<%-- The same date range picker as the request list --%>
@@ -693,15 +811,23 @@
 								</div>
 							</div>
 							<div class="filter-list-item">
-								<label class="hint" title="${g.message(code: 'report.transaction.includeProductsWithNoActivity.hint', default: 'Also lists products that had stock but no activity, i.e. their credits, debits and differences are all 0.')}">
-									<g:checkBox name="includeProductsWithNoActivity" value="${params?.includeProductsWithNoActivity}"/>
-									<g:message code="report.transaction.includeProductsWithNoActivity.label" default="Include products with no activity"/>
+								<label class="hint checkbox-label" title="${g.message(code: 'report.transaction.includeProductsWithNoActivity.hint', default: 'Lists products that had stock but no activity (no credits, debits or differences) too. Uncheck to list only products with activity.')}">
+									<%-- Checked by default. A report link (run=true) leaves it out when it was unchecked. --%>
+									<g:checkBox name="includeProductsWithNoActivity" value="true"
+												checked="${params.run == 'true' ? params.includeProductsWithNoActivity != null : true}"/>
+									<span class="hint-text"><g:message code="report.transaction.includeProductsWithNoActivity.label" default="Include products with no activity within reporting period"/></span>
 								</label>
 							</div>
 							<div class="filter-list-item">
-								<label class="hint" title="${g.message(code: 'report.transaction.includeInternalTransfers.hint', default: 'Counts transfers between bin locations of the facility (e.g. putaways and stock transfers) in the credits and debits. They move stock between bins without changing the facility\'s quantity on hand, so they\'re left out by default.')}">
+								<label class="hint checkbox-label" title="${g.message(code: 'report.transaction.includeInternalTransfers.hint', default: 'Includes transfers between bin locations within the facility (e.g. putaways and stock transfers) in the credits and debits. They move stock between bins without changing the facility\'s quantity on hand, so they\'re left out by default.')}">
 									<g:checkBox name="includeInternalTransfers" value="${params?.includeInternalTransfers}"/>
-									<g:message code="report.transaction.includeInternalTransfers.label" default="Include internal transfers"/>
+									<span class="hint-text"><g:message code="report.transaction.includeInternalTransfers.label" default="Include internal transfers"/></span>
+								</label>
+							</div>
+							<div class="filter-list-item">
+								<label class="hint checkbox-label" title="${g.message(code: 'report.transaction.includeDataQuality.hint', default: 'Adds columns to the CSV for review: Backdated (entered more than a day late), Entered after period end, Debits with a negative quantity, and Expired stock at closing. They are not part of the sum across the row.')}">
+									<g:checkBox name="includeDataQuality" value="${params?.includeDataQuality}"/>
+									<span class="hint-text"><g:message code="report.transaction.includeDataQuality.label" default="Include data quality columns (CSV only)"/></span>
 								</label>
 							</div>
 						</div>
@@ -745,20 +871,18 @@
 								</tr>
 								<tr class="prop">
 									<td class="name"><label><g:message code="products.label" default="Products"/></label></td>
-									<td class="value report-metadata-products"></td>
-								</tr>
-								<%-- Products to look into. Each one filters the table to those products. --%>
-								<tr class="prop">
-									<td class="name"><label class="hint" title="${g.message(code: 'report.metadata.withDifferences.hint', default: 'Products whose counts changed their quantity, i.e. Differences is not 0')}"><g:message code="report.metadata.withDifferences.label" default="With differences"/></label></td>
-									<td class="value report-metadata-summary" data-summary="differences"></td>
-								</tr>
-								<tr class="prop">
-									<td class="name"><label class="hint" title="${g.message(code: 'report.metadata.stockouts.hint', default: 'Products that had stock at the start of the period and none at the end')}"><g:message code="report.metadata.stockouts.label" default="Stockouts"/></label></td>
-									<td class="value report-metadata-summary" data-summary="stockouts"></td>
-								</tr>
-								<tr class="prop">
-									<td class="name"><label class="hint" title="${g.message(code: 'report.metadata.negativeClosing.hint', default: 'Products with a negative closing balance, which usually means a transaction is missing or wrong')}"><g:message code="report.metadata.negativeClosing.label" default="Negative closing"/></label></td>
-									<td class="value report-metadata-summary" data-summary="negativeClosing"></td>
+									<td class="value">
+										<%-- All the products in the report, then products to look into. Each one filters the table to
+											 those products, and All listed shows them all again. --%>
+										<ul class="report-metadata-indicators">
+											<li data-summary="all" title="${g.message(code: 'report.metadata.allListed.hint', default: 'All the products in the report, with the filters and options it was run with. Click to show them all again.')}" data-label="<g:message code="report.metadata.allListed.label" default="All listed"/>"></li>
+											<li data-summary="differences" title="${g.message(code: 'report.metadata.withDifferences.hint', default: 'Products whose closing differs from the expected closing, i.e. Differences is not 0')}" data-label="<g:message code="report.metadata.withDifferences.label" default="With differences"/>"></li>
+											<li data-summary="stockouts" title="${g.message(code: 'report.metadata.stockouts.hint', default: 'Products that had stock at the start of the period and none at the end. A product that ran out and was restocked during the period isn\'t counted.')}" data-label="<g:message code="report.metadata.stockouts.label" default="Ran out of stock"/>"></li>
+											<li data-summary="backInStock" title="${g.message(code: 'report.metadata.backInStock.hint', default: 'Products that had no stock at the start of the period and had stock at the end')}" data-label="<g:message code="report.metadata.backInStock.label" default="Back in stock"/>"></li>
+											<li data-summary="noMovement" title="${g.message(code: 'report.metadata.noMovement.hint', default: 'Products with stock but no credits or debits during the period, e.g. slow-moving or dormant stock. Check Include products with no activity within reporting period to see all of them.')}" data-label="<g:message code="report.metadata.noMovement.label" default="No movement"/>"></li>
+											<li data-summary="negativeClosing" title="${g.message(code: 'report.metadata.negativeClosing.hint', default: 'Products with a negative closing balance, which usually means a transaction is missing or wrong')}" data-label="<g:message code="report.metadata.negativeClosing.label" default="Negative closing"/>"></li>
+										</ul>
+									</td>
 								</tr>
 								<tr class="prop">
 									<td class="name"><label><g:message code="report.metadata.generated.label" default="Generated"/></label></td>
@@ -788,7 +912,7 @@
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.openingBalance.hint', default: "Quantity on hand at the beginning of the start date")}"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></span></th>
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.credits.hint', default: "Quantity added by credit transactions during the period, e.g. receipts, transfers in and adjustments up")}"><warehouse:message code="default.credits.label" default="Credits"/></span></th>
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.debits.hint', default: "Quantity removed by debit transactions during the period, e.g. issues, transfers out and adjustments down")}"><warehouse:message code="default.debits.label" default="Debits"/></span></th>
-                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.differences.hint', default: "The change in quantity from counts that didn't match the balance, i.e. the change that credits and debits don't account for")}"><warehouse:message code="report.transaction.differences.label" default="Differences"/></span></th>
+                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.differences.hint', default: "Closing minus expected closing (opening + credits - debits): the change in quantity that credits and debits don't account for. Usually from counts that didn't match the expected stock.")}"><warehouse:message code="report.transaction.differences.label" default="Differences"/></span></th>
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.closingBalance.hint', default: "Quantity on hand at the end of the end date (or now, if the end date is today or later)")}"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></span></th>
                         </tr>
                         </thead>
@@ -952,7 +1076,7 @@
             tags: $("#tags").val(),
             catalogs: $("#catalogs").val()
         };
-        ["includeCategoryChildren", "includeProductsWithNoActivity", "includeInternalTransfers"].forEach(function (name) {
+        ["includeCategoryChildren", "includeProductsWithNoActivity", "includeInternalTransfers", "includeDataQuality"].forEach(function (name) {
             if ($("#" + name).is(":checked")) {
                 params[name] = true;
             }
@@ -1010,20 +1134,25 @@
     var REPORT_SUMMARIES = {
         differences: function (row) { return row.Differences !== 0; },
         stockouts: function (row) { return row.Opening > 0 && row.Closing <= 0; },
+        backInStock: function (row) { return row.Opening <= 0 && row.Closing > 0; },
+        noMovement: function (row) { return !row.Credits && !row.Debits && (row.Opening > 0 || row.Closing > 0); },
         negativeClosing: function (row) { return row.Closing < 0; }
     };
 
     // The filter that a summary count set on the table, or null for none
     var reportRowFilter = null;
 
+    // Filters the table to the products of an indicator, or shows them all again (key "all", or the same key again)
     function setReportRowFilter(key) {
-        reportRowFilter = (reportRowFilter === key) ? null : key;
-        $(".report-metadata-summary a.summary-count").removeClass("active");
+        reportRowFilter = (key === "all" || reportRowFilter === key) ? null : key;
+        $(".report-metadata-indicators a.summary-count").removeClass("active");
         $(".report-metadata-filter-clear").remove();
-        if (reportRowFilter) {
-            var cell = $(".report-metadata-summary[data-summary='" + reportRowFilter + "']");
-            cell.find("a.summary-count").addClass("active");
-            cell.append($('<a href="#" class="report-metadata-filter-clear">')
+        if (!reportRowFilter) {
+            $(".report-metadata-indicators li[data-summary='all'] a.summary-count").addClass("active");
+        } else {
+            var item = $(".report-metadata-indicators li[data-summary='" + reportRowFilter + "']");
+            item.find("a.summary-count").addClass("active");
+            item.append($('<a href="#" class="report-metadata-filter-clear">')
                 .text("${g.message(code: 'default.clear.label', default: 'Clear')}")
                 .click(function (event) {
                     event.preventDefault();
@@ -1042,26 +1171,21 @@
         $(".report-metadata-period").text(lastReportParams.period);
         $(".report-metadata-filters").text(lastReportParams.filters.join("; ") || none);
         $(".report-metadata-included").text(lastReportParams.included.join(", ") || none);
-        $(".report-metadata-products").text(rows.length.toLocaleString('en-US'));
         reportRowFilter = null;
-        $.each(REPORT_SUMMARIES, function (key, test) {
-            var matching = rows.filter(test);
-            var cell = $(".report-metadata-summary[data-summary='" + key + "']").empty();
-            if (!matching.length) {
-                cell.append($('<span class="zero">').text("0"));
+        $.each($.extend({ all: function () { return true; } }, REPORT_SUMMARIES), function (key, test) {
+            var count = rows.filter(test).length;
+            var item = $(".report-metadata-indicators li[data-summary='" + key + "']").empty();
+            var text = item.data("label") + " (" + count.toLocaleString('en-US') + ")";
+            if (!count) {
+                item.append($('<span class="zero">').text(text));
                 return;
             }
-            cell.append($('<a href="#" class="summary-count">').text(matching.length.toLocaleString('en-US')).click(function (event) {
+            item.append($('<a href="#" class="summary-count">').text(text).click(function (event) {
                 event.preventDefault();
                 setReportRowFilter(key);
             }));
-            // The net change from counts, for the products with differences
-            if (key === "differences") {
-                var net = matching.reduce(function (sum, row) { return sum + row.Differences; }, 0);
-                cell.append(document.createTextNode(" (" + (net > 0 ? "+" : net < 0 ? "\u2212" : "") +
-                    Math.abs(net).toLocaleString('en-US') + ")"));
-            }
         });
+        $(".report-metadata-indicators li[data-summary='all'] a.summary-count").addClass("active");
         $(".report-metadata-generated").text(new Date().toLocaleString());
         $(".report-metadata-duration").text(Math.floor(seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60);
         $(".report-metadata-empty").hide();
@@ -1105,11 +1229,11 @@
 				{"mData": "Code"},
 				{"mData": "Name"},
 				{"mData": "Category"},
-				{"mData": "Opening", "sType": 'numeric', "sClass": "right" },
+				{"mData": "Opening", "sType": 'numeric', "sClass": "right balance-column" },
 				{"mData": "Credits", "sType": 'numeric', "sClass": "right" },
 				{"mData": "Debits", "sType": 'numeric', "sClass": "right" },
 				{"mData": "Differences", "sType": 'numeric', "sClass": "right" },
-				{"mData": "Closing", "sType": 'numeric', "sClass": "right" }
+				{"mData": "Closing", "sType": 'numeric', "sClass": "right balance-column" }
 			],
 			"aLengthMenu": [
 				[5, 15, 25, 50, 100, 500, 1000, -1],
@@ -1165,7 +1289,7 @@
 					}
 				})
 			},
-			"oLanguage": getDataTableLanguage("${g.message(code: 'report.transaction.noRows.message', default: 'No products had activity in this period. Check Include products with no activity to see products that had stock.')}"),
+			"oLanguage": getDataTableLanguage("${g.message(code: 'report.transaction.noRows.message', default: 'No products had activity in this period. Check Include products with no activity within reporting period to see products that had stock.')}"),
 			"bUseRendered": false,
 			"dom": '<"top"i>rt<"bottom"flp><"clear">',
             "fnRowCallback": function (nRow, aData) {
@@ -1512,7 +1636,7 @@
 			if (productCode && productName && lastReportParams) {
 				var queryString = $.param(params);
 				var url = "${request.contextPath}/report/showTransactionReportDialog?" + queryString;
-				openModalDialog("#dlgShowDialog", productCode + " " + productName, 1000, null, url);
+				openModalDialog("#dlgShowDialog", productCode + " " + productName, 1100, null, url);
 			}
 		});
 
