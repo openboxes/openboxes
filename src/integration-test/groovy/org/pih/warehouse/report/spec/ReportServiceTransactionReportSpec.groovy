@@ -225,12 +225,10 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         Map<String, Map> rows = report(includeDetails: true, includeProductsWithNoActivity: true)
 
         then:
-        rows.A.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
-                [Opening: 100, Credits: 0, Debits: 20, Differences: 0, Closing: 80]
-        rows.A["Transfer Out"] == 20
-        rows.A["Transfer In"] == 0
-        rows.B.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
-                [Opening: 5, Credits: 0, Debits: 0, Differences: 0, Closing: 5]
+        rows.A.subMap("Opening", "Transfer In", "Transfer Out", "Differences", "Closing") ==
+                [Opening: 100, "Transfer In": 0, "Transfer Out": -20, "Differences": 0, Closing: 80]
+        rows.B.subMap("Opening", "Transfer In", "Transfer Out", "Differences", "Closing") ==
+                [Opening: 5, "Transfer In": 0, "Transfer Out": 0, "Differences": 0, Closing: 5]
 
         and: 'B had no activity, so it is only listed when products with no activity are included'
         report().keySet() == ["A"] as Set
@@ -240,11 +238,9 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
 
         then:
         rows.keySet() == ["A", "B"] as Set
-        rows.A.subMap("Opening", "Credits", "Debits", "Differences", "Closing") ==
-                [Opening: 100, Credits: 30, Debits: 50, Differences: 0, Closing: 80]
-        rows.A["Transfer Out"] == 50
-        rows.A["Transfer In"] == 30
-        rows.B.subMap("Credits", "Debits") == [Credits: 5, Debits: 5]
+        rows.A.subMap("Opening", "Transfer In", "Transfer Out", "Differences", "Closing") ==
+                [Opening: 100, "Transfer In": 30, "Transfer Out": -50, "Differences": 0, Closing: 80]
+        rows.B.subMap("Transfer In", "Transfer Out") == ["Transfer In": 5, "Transfer Out": -5]
     }
 
     void 'filters by category, tag, catalog and product'() {
@@ -271,13 +267,15 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         report(tags: [tag1, tag2]).A.Credits == 10
     }
 
-    void 'the detailed report has the quantity of each transaction type and the backdated corrections'() {
+    void 'the detailed report has the net quantity of each transaction type and the backdated corrections'() {
         given:
         setupFacilityAndProducts()
         insertTransaction(TRANSFER_IN, day(6), [[itemA1, 10]])
         insertTransaction(ADJUSTMENT_CREDIT, day(7), [[itemA1, 4]])
         insertTransaction(ADJUSTMENT_DEBIT, day(8), [[itemA1, 1]])
         insertTransaction(CONSUMPTION, day(9), [[itemA1, 3]])
+        // An adjustment that decreased stock, stored as a negative credit
+        insertTransaction(ADJUSTMENT_CREDIT, day(9), [[itemA1, -2]])
         // Created more than a day after its transaction date
         insertTransaction(ADJUSTMENT_CREDIT, day(10), [[itemA1, 6]], day(12))
         insertTransaction(CONSUMPTION, day(10), [[itemA1, 2]], day(12))
@@ -285,15 +283,77 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         insertTransaction(TRANSFER_OUT, day(11), [[itemA1, 5]], day(11, 3600))
 
         when:
-        Map row = report(includeDetails: true).A
+        Map row = report(includeDetails: true, includeDataQuality: true).A
+
+        then: 'each transaction type has its net quantity: what it added is positive and what it removed is negative'
+        row["Transfer In"] == 10
+        row["Transfer Out"] == -5
+        row["Consumption"] == -(3 + 2)
+        row["Expired"] == 0
+        row["Damaged"] == 0
+
+        and: 'Adjustment is the net of the adjustments up and down, including Adjustment - Debit, which has no column'
+        row["Adjustment"] == 4 - 1 - 2 + 6
+        !row.containsKey("Adjustment - Debit")
+
+        and:
+        row.subMap("Opening", "Differences", "Closing") == ["Opening": 0, "Differences": 0, "Closing": 7]
+        row["Backdated (included above)"] == 6 - 2
+        assertDetailedRowAddsUp(row)
+    }
+
+    void 'the detailed report columns are in a fixed order, so that a row can be summed straight across'() {
+        given:
+        setupFacilityAndProducts()
+        insertTransaction(TRANSFER_IN, day(6), [[itemA1, 10]])
+
+        when:
+        List<String> columns = report(includeDetails: true).A.keySet() as List<String>
+
+        then: 'the product, Opening, the transaction types in a fixed order, Differences, Closing'
+        columns.subList(0, 15) == ["Code", "Name", "Product Family", "Display Name", "Category", "Formulary", "Tag",
+                                   "Unit Cost", "Opening", "Transfer In", "Transfer Out", "Consumption", "Expired",
+                                   "Damaged", "Adjustment"]
+        columns.subList(columns.size() - 2, columns.size()) == ["Differences", "Closing"]
+
+        when: 'the data quality columns are included'
+        columns = report(includeDetails: true, includeDataQuality: true).A.keySet() as List<String>
+
+        then: 'they follow Closing'
+        columns.subList(columns.indexOf("Closing"), columns.size()) == ["Closing", "Backdated (included above)",
+                "Entered after period end (included above)", "Debits with a negative quantity (entries)",
+                "Expired stock at closing"]
+    }
+
+    void 'the data quality columns flag late entries, negative debits and expired stock'() {
+        given:
+        setupFacilityAndProducts()
+        insertTransaction(TRANSFER_IN, day(6), [[itemA1, 20]])
+
+        and: 'a consumption entered after the period ended (on day 20, the period ends on day 15)'
+        insertTransaction(CONSUMPTION, day(10), [[itemA1, 3]], day(20))
+
+        and: 'a consumption with a negative quantity, a data error'
+        insertTransaction(CONSUMPTION, day(11), [[itemA1, -2]])
+
+        and: 'a lot that expired during the period, with stock'
+        setExpirationDate(itemA2, day(12))
+        insertTransaction(TRANSFER_IN, day(7), [[itemA2, 4]])
+
+        when:
+        Map row = report(includeDetails: true, includeDataQuality: true).A
 
         then:
-        row["Transfer In"] == 10
-        row["Consumption"] == 5
-        row["Transfer Out"] == 5
-        row["Adjustment (Credit and Debit)"] == 4 + 6 - 1
-        row["Backdated inventory correction"] == 6 - 2
-        row.subMap("Credits", "Debits", "Differences", "Closing") == [Credits: 20, Debits: 11, Differences: 0, Closing: 9]
+        row["Backdated (included above)"] == -3
+        row["Entered after period end (included above)"] == -3
+        row["Debits with a negative quantity (entries)"] == 1
+        row["Expired stock at closing"] == 4
+
+        and: 'the negative debit is counted as a debit, but quantity on hand adds it, so the difference is in Differences'
+        row["Consumption"] == -(3 + 2)
+        row.subMap("Opening", "Transfer In", "Differences", "Closing") ==
+                ["Opening": 0, "Transfer In": 24, "Differences": 4, "Closing": 20 - 3 + 2 + 4]
+        assertDetailedRowAddsUp(row)
     }
 
     void 'backdated transactions are each counted, even when they have the same dates'() {
@@ -303,7 +363,7 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         insertTransaction(ADJUSTMENT_CREDIT, day(6), [[itemA1, 7]], day(10))
 
         expect: 'note that the previous implementation only counted one of them'
-        report(includeDetails: true).A["Backdated inventory correction"] == 12
+        report(includeDetails: true, includeDataQuality: true).A["Backdated (included above)"] == 12
     }
 
     void 'matches the previous implementation for a random transaction history'() {
@@ -338,18 +398,24 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
                 Map<String, Map> expected = previousReport(args)
                 // The previous implementation only included products with credits or debits in the period. The others
                 // are included now if they had stock, and have no credits or debits.
+                // The rows without details have the credits and debits
+                Map<String, Map> summary = report(filters + [includeProductsWithNoActivity: true])
+                assert actual.keySet() == summary.keySet(), "Different products with details for ${args}"
                 assert actual.keySet().containsAll(expected.keySet()), "Missing products for ${args}"
                 (actual.keySet() - expected.keySet()).each { String product ->
-                    assert actual[product].subMap("Credits", "Debits") == [Credits: 0, Debits: 0], "Extra product ${product} for ${args}"
+                    assert summary[product].subMap("Credits", "Debits") == [Credits: 0, Debits: 0], "Extra product ${product} for ${args}"
                 }
                 assert report(args).keySet() ==
-                        actual.findAll { product, row -> row.Credits || row.Debits || row.Differences ||
+                        summary.findAll { product, row -> row.Credits || row.Debits || row.Differences ||
                                 row.Closing != row.Opening }.keySet(), "Products with activity for ${args}"
                 expected.each { String product, Map row ->
                     Map differences = row.findAll { column, value -> actual[product][column] != value }
                             .collectEntries { column, value -> [(column): [expected: value, actual: actual[product][column]]] }
                     Set extraColumns = actual[product].keySet() - row.keySet()
                     assert !differences && !extraColumns, "Mismatch for ${args}, product ${product}: ${differences} ${extraColumns}"
+                }
+                if (includeDetails) {
+                    actual.values().each { Map row -> assertDetailedRowAddsUp(row) }
                 }
             }
         }
@@ -362,7 +428,7 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         return keyByProduct(reportService.getTransactionReport(facility, args.categories as List,
                 args.tags as List, args.catalogs as List, args.products as List, startDate, endDate,
                 args.includeDetails as Boolean, args.includeProductsWithNoActivity as Boolean,
-                args.includeInternalTransfers as Boolean))
+                args.includeInternalTransfers as Boolean, args.includeDataQuality as Boolean))
     }
 
     /**
@@ -447,15 +513,33 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
                     productFamilyName: product.productFamily?.name ?: '',
                     formulary: product.productCatalogsToString(),
                     tag: product.tagsToString(),
-                    detailedReportData: value
-                            .groupBy { it.transaction.transactionType.name }
-                            .collectEntries { name, entriesByType -> [(name): entriesByType.sum { it.quantity }] },
+                    typeTotals: value
+                            .groupBy { it.transaction.transactionType.id }
+                            .collectEntries { String typeId, List<TransactionEntry> entriesByType ->
+                                [(typeId): [
+                                        credits: reportService.getCreditTransactionEntries(entriesByType)
+                                                .sum { it.quantity } ?: 0,
+                                        debits: reportService.getDebitTransactionEntries(entriesByType)
+                                                .sum { Math.abs(it.quantity) } ?: 0,
+                                ]]
+                            },
                     availableTransactionTypes: transactionTypes,
                     backdatedQuantity: backdatedEntries.sum {
                         reportService.isTransactionEntryCredit(it) ? Math.abs(it.quantity) : -Math.abs(it.quantity)
                     } ?: 0,
             ])
         })
+    }
+
+    /**
+     * Checks that a row of the CSV download can be summed straight across: Opening + the transaction type columns
+     * (between Opening and Differences) + Differences = Closing.
+     */
+    private static void assertDetailedRowAddsUp(Map row) {
+        List<String> columns = row.keySet() as List<String>
+        List<String> typeColumns = columns.subList(columns.indexOf("Opening") + 1, columns.indexOf("Differences"))
+        Integer sum = row.Opening + (typeColumns.sum { row[it] } ?: 0) + row.Differences
+        assert sum == row.Closing, "Opening + ${typeColumns} + Differences doesn't add up to Closing: ${row}"
     }
 
     private Map<String, Map> keyByProduct(List rows) {
@@ -519,5 +603,17 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
                       VALUES (:id, 0, NOW(), NOW(), :sourceTransactionId, :destinationTransactionId)""",
                 [id: UUID.randomUUID().toString(), sourceTransactionId: sourceTransactionId,
                  destinationTransactionId: destinationTransactionId])
+    }
+
+    /**
+     * Sets the expiration date of a lot with SQL. Saving a change to an existing inventory item with GORM fails in
+     * these tests (a NullPointerException in the timestamp handling), so it's updated directly and then reloaded.
+     */
+    private void setExpirationDate(InventoryItem item, Date expirationDate) {
+        sessionFactory.currentSession.createSQLQuery("UPDATE inventory_item SET expiration_date = :expirationDate WHERE id = :id")
+                .setTimestamp("expirationDate", expirationDate)
+                .setString("id", item.id)
+                .executeUpdate()
+        sessionFactory.currentSession.refresh(item)
     }
 }

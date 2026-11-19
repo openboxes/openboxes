@@ -1491,9 +1491,12 @@ class ReportService implements ApplicationContextAware {
      * @return a row per product and transaction type, with:
      *         - credits: the sum of positive CREDIT quantities
      *         - debits: the sum of DEBIT quantities and negative CREDIT quantities, as a positive number
-     *         - quantity: the sum of the quantities as they're stored
-     *         - backdatedQuantity: the net quantity (credits minus debits) of transactions that were created more
+     *         - backdated_quantity: the net quantity (credits minus debits) of transactions that were created more
      *           than a day after their transaction date
+     *         - after_period_quantity: the net quantity of transactions that were created after the period ended, so
+     *           that the period's numbers changed after the fact
+     *         - negative_debit_entries: the number of DEBIT entries with a negative quantity, which is a data error.
+     *           They're counted as debits (by their absolute quantity), while quantity on hand adds them.
      */
     private List<Map> getTransactionReportTotals(Location location,
                                                  List<Category> categories,
@@ -1513,10 +1516,14 @@ class ReportService implements ApplicationContextAware {
                    t.transaction_type_id AS transaction_type_id,
                    SUM(CASE WHEN ${credit} THEN te.quantity ELSE 0 END) AS credits,
                    SUM(CASE WHEN ${credit} THEN 0 ELSE ABS(te.quantity) END) AS debits,
-                   SUM(te.quantity) AS quantity,
                    SUM(CASE WHEN t.date_created IS NULL OR t.date_created <= t.transaction_date + INTERVAL 1 DAY THEN 0
                             WHEN ${credit} THEN te.quantity
-                            ELSE -ABS(te.quantity) END) AS backdated_quantity
+                            ELSE -ABS(te.quantity) END) AS backdated_quantity,
+                   SUM(CASE WHEN t.date_created IS NULL OR t.date_created < :endDate THEN 0
+                            WHEN ${credit} THEN te.quantity
+                            ELSE -ABS(te.quantity) END) AS after_period_quantity,
+                   SUM(CASE WHEN tt.transaction_code = 'DEBIT' AND te.quantity < 0 THEN 1 ELSE 0 END)
+                       AS negative_debit_entries
             FROM transaction t
             JOIN transaction_type tt ON tt.id = t.transaction_type_id
             JOIN transaction_entry te ON te.transaction_id = t.id
@@ -1536,8 +1543,9 @@ class ReportService implements ApplicationContextAware {
                 .addScalar("transaction_type_id", StandardBasicTypes.STRING)
                 .addScalar("credits", StandardBasicTypes.BIG_DECIMAL)
                 .addScalar("debits", StandardBasicTypes.BIG_DECIMAL)
-                .addScalar("quantity", StandardBasicTypes.BIG_DECIMAL)
                 .addScalar("backdated_quantity", StandardBasicTypes.BIG_DECIMAL)
+                .addScalar("after_period_quantity", StandardBasicTypes.BIG_DECIMAL)
+                .addScalar("negative_debit_entries", StandardBasicTypes.BIG_DECIMAL)
                 .setString("inventoryId", location.inventory.id)
                 .setTimestamp("startDate", startDate)
                 .setTimestamp("endDate", endDate)
@@ -1575,13 +1583,16 @@ class ReportService implements ApplicationContextAware {
      * own database connection and Hibernate session (see calculateTransactionReportBalancesInParallel). Only ids are
      * passed to the other threads, and they return plain totals, so no entity is shared between sessions.
      *
-     * @return the total quantity on hand of each product keyed on product id, for each date in the same order
+     * @return for each date in the same order, keyed on product id:
+     *         - onHand: the total quantity on hand of each product
+     *         - expired: the quantity on hand of each product in lots that had expired by the date
      */
-    private List<Map<String, Integer>> getQuantityOnHandByProductAtDates(Location location,
-                                                                         List<Product> products,
-                                                                         List<Date> dates) {
-        Closure<Map<String, Integer>> getQuantityOnHandByProduct = { Date date ->
-            sumQuantityOnHandByProduct(productAvailabilityService.getQuantityOnHandAtDateAsMap(location, products, date))
+    private List<Map<String, Map<String, Integer>>> getQuantityOnHandByProductAtDates(Location location,
+                                                                                      List<Product> products,
+                                                                                      List<Date> dates) {
+        Closure<Map<String, Map<String, Integer>>> getQuantityOnHandByProduct = { Date date ->
+            AvailableItemMap availableItems = productAvailabilityService.getQuantityOnHandAtDateAsMap(location, products, date)
+            return [onHand: sumQuantityOnHandByProduct(availableItems), expired: sumExpiredQuantityByProduct(availableItems, date)]
         }
         if (!calculateTransactionReportBalancesInParallel) {
             return dates.collect(getQuantityOnHandByProduct)
@@ -1592,7 +1603,18 @@ class ReportService implements ApplicationContextAware {
             dates.collectParallel { Date date ->
                 Transaction.withNewSession { getQuantityOnHandByProduct(date) }
             }
-        } as List<Map<String, Integer>>
+        } as List<Map<String, Map<String, Integer>>>
+    }
+
+    /**
+     * @return the quantity on hand of each product in lots that had expired by the given date (positive quantities
+     *         only), keyed on product id
+     */
+    private static Map<String, Integer> sumExpiredQuantityByProduct(AvailableItemMap availableItems, Date date) {
+        return availableItems.values()
+                .findAll { it.quantityOnHand > 0 && it.inventoryItem.expirationDate && it.inventoryItem.expirationDate < date }
+                .groupBy { it.inventoryItem.product.id }
+                .collectEntries { productId, items -> [(productId): items.sum { it.quantityOnHand } as Integer ?: 0] }
     }
 
     /**
@@ -1619,19 +1641,69 @@ class ReportService implements ApplicationContextAware {
         ]
     }
 
-    Map<String, String> getTransactionReportDetailedRow(Map data) {
-        List<String> adjustmentTransactionTypes = [
-                Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
-                Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID
-        ]
+    /**
+     * The transaction type columns of the CSV download, in this order. Other CREDIT and DEBIT transaction types (e.g.
+     * ones an implementation added) follow, by name.
+     */
+    private static final List<String> CSV_TRANSACTION_TYPE_ORDER = [
+            Constants.TRANSFER_IN_TRANSACTION_TYPE_ID,
+            Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
+            Constants.CONSUMPTION_TRANSACTION_TYPE_ID,
+            Constants.EXPIRATION_TRANSACTION_TYPE_ID,
+            Constants.DAMAGE_TRANSACTION_TYPE_ID,
+            Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+    ]
 
-        TransactionType creditTransactionType = data.availableTransactionTypes.find { it.id ==  Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID }
-        TransactionType debitTransactionType = data.availableTransactionTypes.find { it.id ==  Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID }
+    /**
+     * Transaction types that share another type's column in the CSV download: an Adjustment - Debit is in the
+     * Adjustment column, so that it has the net of all the adjustments.
+     */
+    private static final Map<String, String> CSV_MERGED_TRANSACTION_TYPES = [
+            (Constants.ADJUSTMENT_DEBIT_TRANSACTION_TYPE_ID): Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID,
+    ]
 
-        Integer adjustmentCredit = data.detailedReportData?.get(creditTransactionType?.name) ?: 0
-        Integer adjustmentDebit = data.detailedReportData?.get(debitTransactionType?.name) ?: 0
+    /**
+     * A row of the CSV download. Each transaction type has one column with its net quantity: what it added is
+     * positive and what it removed is negative. So a row can be summed straight across:
+     *
+     *   Opening + the transaction type columns + Differences = Closing
+     *
+     * Differences is the change that the transactions don't account for, usually from counts that didn't match the
+     * expected stock.
+     *
+     * With data.includeDataQuality, data quality columns follow, for review. They aren't part of the sum:
+     *   - Backdated: the part of the transactions that was entered more than a day after its transaction date. It's
+     *     already included in the transaction type columns.
+     *   - Entered after period end: the part of Backdated that was entered after the period ended, so the period's
+     *     numbers changed after the fact.
+     *   - Debits with a negative quantity: the number of debit entries with a negative quantity, a data error. They're
+     *     counted as debits, but quantity on hand adds them, so the difference shows in Differences.
+     *   - Expired stock at closing: the quantity at closing in lots that had expired by then
+     *
+     * @param data.typeTotals the credits and debits of each transaction type, keyed on transaction type id
+     * @param data.availableTransactionTypes the CREDIT and DEBIT transaction types, which each get a column
+     */
+    Map<String, Object> getTransactionReportDetailedRow(Map data) {
+        Map<String, Map> typeTotals = data.typeTotals ?: [:]
+        // Credits are positive, and debits (including negative credits) are negative
+        Closure<Integer> net = { String typeId ->
+            Map totals = typeTotals[typeId]
+            return ((totals?.credits ?: 0) - (totals?.debits ?: 0)) as Integer
+        }
+        Closure<String> columnName = { TransactionType type -> LocalizationUtil.getLocalizedString(type.name) }
+        Closure<Integer> position = { TransactionType type ->
+            int index = CSV_TRANSACTION_TYPE_ORDER.indexOf(type.id)
+            return index >= 0 ? index : CSV_TRANSACTION_TYPE_ORDER.size()
+        }
 
-        Map<String, String> row = [
+        List<TransactionType> types = data.availableTransactionTypes as List<TransactionType>
+        Set<String> typeIds = types*.id as Set
+        // A type only shares another type's column if that type has one
+        Closure<Boolean> isMerged = { TransactionType type -> typeIds.contains(CSV_MERGED_TRANSACTION_TYPES[type.id]) }
+        List<TransactionType> columnTypes = types.findAll { !isMerged(it) }
+                .sort { TransactionType a, TransactionType b -> position(a) <=> position(b) ?: columnName(a) <=> columnName(b) }
+
+        Map<String, Object> row = [
             "Code": data.productCode,
             "Name": data.name,
             "Product Family": data.productFamilyName,
@@ -1641,24 +1713,25 @@ class ReportService implements ApplicationContextAware {
             "Tag": data.tag,
             "Unit Cost": data.pricePerUnit,
             "Opening": data.openingBalance,
-            "Credits": data.credits,
-            "Debits": data.debits,
-            "Adjustment (Credit and Debit)": adjustmentCredit - adjustmentDebit
         ]
-
-        data.availableTransactionTypes.each { transactionType ->
-            if (adjustmentTransactionTypes.contains(transactionType.id)) {
-                return
-            }
-            String columnName = LocalizationUtil.getLocalizedString(transactionType?.name)
-            row[columnName] = data.detailedReportData?.get(transactionType?.name) ?: 0
+        columnTypes.each { TransactionType type ->
+            List<String> mergedTypeIds = types.findAll { isMerged(it) && CSV_MERGED_TRANSACTION_TYPES[it.id] == type.id }*.id
+            row[columnName(type)] = ([type.id] + mergedTypeIds).sum { String typeId -> net(typeId) }
         }
 
-        return row + [
+        row += [
                 "Differences": data.differences,
                 "Closing": data.closingBalance,
-                "Backdated inventory correction": data.backdatedQuantity ?: 0
         ]
+        if (data.includeDataQuality) {
+            row += [
+                    "Backdated (included above)": data.backdatedQuantity ?: 0,
+                    "Entered after period end (included above)": data.afterPeriodQuantity ?: 0,
+                    "Debits with a negative quantity (entries)": data.negativeDebitEntries ?: 0,
+                    "Expired stock at closing": data.expiredAtClosing ?: 0,
+            ]
+        }
+        return row
     }
 
     @Transactional(readOnly = true)
@@ -1671,7 +1744,8 @@ class ReportService implements ApplicationContextAware {
                                       Date endDate,
                                       Boolean includeDetails,
                                       Boolean includeProductsWithNoActivity = false,
-                                      Boolean includeInternalTransfers = false) {
+                                      Boolean includeInternalTransfers = false,
+                                      Boolean includeDataQuality = false) {
 
         List<TransactionCode> adjustmentTransactionCodes = [
                 TransactionCode.CREDIT,
@@ -1693,10 +1767,11 @@ class ReportService implements ApplicationContextAware {
         // Quantity on hand of each product at the startDate (opening balance) and endDate (closing balance), for all
         // products at the facility (or the selected products), so that products with stock but no credits or debits
         // in the period are included too
-        List<Map<String, Integer>> balancesByProduct = getQuantityOnHandByProductAtDates(
+        List<Map<String, Map<String, Integer>>> balancesByProduct = getQuantityOnHandByProductAtDates(
                 location, productList ?: [], [startDate, endDate.before(new Date()) ? endDate : new Date()])
-        Map<String, Integer> openingBalanceByProduct = balancesByProduct[0]
-        Map<String, Integer> closingBalanceByProduct = balancesByProduct[1]
+        Map<String, Integer> openingBalanceByProduct = balancesByProduct[0].onHand
+        Map<String, Integer> closingBalanceByProduct = balancesByProduct[1].onHand
+        Map<String, Integer> expiredAtClosingByProduct = balancesByProduct[1].expired
 
         // The report includes every product that matches the filters and had stock at the start or end of the period,
         // or a credit or debit during it. A product whose stock was counted during the period has either stock or a
@@ -1713,7 +1788,6 @@ class ReportService implements ApplicationContextAware {
                     'in'("transactionCode", adjustmentTransactionCodes)
                 }
                 : []
-        Map<String, String> transactionTypeNames = availableTransactionTypes.collectEntries { [(it.id): it.name] }
 
         // Additional calculation info:
         // 1. CREDITS = transaction entries in relation with transactions that are CREDIT type
@@ -1751,12 +1825,15 @@ class ReportService implements ApplicationContextAware {
                         debits: debits,
                         differences: differences,
                         closingBalance: closingBalance,
-                        // The quantity of each transaction type, keyed on transaction type name
-                        detailedReportData: totals.collectEntries {
-                            [(transactionTypeNames[it.transaction_type_id]): it.quantity as Integer]
+                        typeTotals: totals.collectEntries {
+                            [(it.transaction_type_id): [credits: it.credits as Integer, debits: it.debits as Integer]]
                         },
                         availableTransactionTypes: availableTransactionTypes,
-                        backdatedQuantity: totals.sum { it.backdated_quantity } as Integer ?: 0
+                        includeDataQuality: includeDataQuality,
+                        backdatedQuantity: totals.sum { it.backdated_quantity } as Integer ?: 0,
+                        afterPeriodQuantity: totals.sum { it.after_period_quantity } as Integer ?: 0,
+                        negativeDebitEntries: totals.sum { it.negative_debit_entries } as Integer ?: 0,
+                        expiredAtClosing: expiredAtClosingByProduct[key.id] ?: 0,
                 )
             }
 
@@ -1851,13 +1928,22 @@ class ReportService implements ApplicationContextAware {
     private static class StockKey {
         String id
         String lotNumber
+        String expirationDate
         String binLocationName
 
         StockKey(InventoryItem inventoryItem, Location binLocation) {
             id = "${inventoryItem?.id}:${binLocation?.id}"
             lotNumber = inventoryItem?.lotNumber
+            expirationDate = formatExpirationDate(inventoryItem)
             binLocationName = binLocation?.name
         }
+    }
+
+    /**
+     * @return the expiration date of a lot, as a date without a time, or null if it has none
+     */
+    private static String formatExpirationDate(InventoryItem inventoryItem) {
+        return inventoryItem?.expirationDate ? JavaUtilDateFormatter.formatAsDate(inventoryItem.expirationDate) : null
     }
 
     private static boolean isCountTransaction(Transaction transaction) {
@@ -1866,12 +1952,14 @@ class ReportService implements ApplicationContextAware {
 
     /**
      * A "ghost" row in the transaction report details: a change in quantity on hand that no transaction recorded.
+     * It has no date or time, because we don't know when the change happened, only where it was found (e.g. by the
+     * count after it). Its position in the list places it.
      */
-    private static Map getUnrecordedChangeRow(Date date, Integer quantityChange, Integer balance,
+    private static Map getUnrecordedChangeRow(Integer quantityChange, Integer balance,
                                               String transactionCode = "UNRECORDED_CHANGE") {
         return [
-                transactionDate: JavaUtilDateFormatter.formatAsDate(date),
-                transactionTime: JavaUtilDateFormatter.formatAsTime(date),
+                transactionDate: null,
+                transactionTime: null,
                 transactionCode: transactionCode,
                 transactionTypeName: null,  // The details dialog labels these rows
                 quantity       : null,
@@ -1933,10 +2021,15 @@ class ReportService implements ApplicationContextAware {
         // Sort the entries in the order that quantity on hand is calculated in: by transaction date, then by date
         // created. The query only sorts by transaction date, so transactions with the same date could be in any order.
         // A count comes before credits and debits with exactly the same dates, like it does for quantity on hand.
+        // The entries of a transaction are sorted by lot number, then bin location, like the difference rows before a
+        // count, so that they're always in the same order.
         transactionEntriesWithinDateRange = transactionEntriesWithinDateRange.sort(false) { TransactionEntry a, TransactionEntry b ->
             a.transaction <=> b.transaction ?:
                     !isCountTransaction(a.transaction) <=> !isCountTransaction(b.transaction) ?:
-                    a.transaction.id <=> b.transaction.id
+                    a.transaction.id <=> b.transaction.id ?:
+                    a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber ?:
+                    a.binLocation?.name <=> b.binLocation?.name ?:
+                    a.id <=> b.id
         }
 
         // The quantity of each lot and bin, so that a count's difference can be shown for each lot and bin. Starts with
@@ -1982,8 +2075,9 @@ class ReportService implements ApplicationContextAware {
                                 Integer difference = (countedQuantityByStockKey[key.id] ?: 0) - (quantityByStockKey[key.id] ?: 0)
                                 if (difference) {
                                     openingBalance += difference
-                                    entries.add(getUnrecordedChangeRow(it.transaction.transactionDate, difference, openingBalance)
-                                            + [lotNumber: key.lotNumber, binLocation: key.binLocationName])
+                                    entries.add(getUnrecordedChangeRow(difference, openingBalance)
+                                            + [lotNumber: key.lotNumber, expirationDate: key.expirationDate,
+                                               binLocation: key.binLocationName])
                                 }
                             }
                     quantityByStockKey = countedQuantityByStockKey
@@ -2012,6 +2106,7 @@ class ReportService implements ApplicationContextAware {
                     transactionNumber: it.transaction.transactionNumber,
                     reference: referencesByTransactionId[it.transaction.id],
                     lotNumber: it.inventoryItem?.lotNumber,
+                    expirationDate: formatExpirationDate(it.inventoryItem),
                     binLocation: it.binLocation?.name,
                     quantity: it.quantity,
                     quantityChange: quantityChange,
@@ -2023,7 +2118,7 @@ class ReportService implements ApplicationContextAware {
         // The transactions should always add up to the closing balance. If they don't, show the rest of the difference
         // instead of hiding it (e.g. a legacy INVENTORY transaction, which only sets the quantity of one lot).
         if (openingBalance != closingBalance) {
-            entries.add(getUnrecordedChangeRow(endDate - 1, closingBalance - openingBalance, closingBalance, "UNRECONCILED"))
+            entries.add(getUnrecordedChangeRow(closingBalance - openingBalance, closingBalance, "UNRECONCILED"))
         }
 
         // Add closing balance as a last element
