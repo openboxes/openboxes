@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html lang="en">
 <head>
-    <%= NewRelic.getBrowserTimingHeader() %>
+    <%= raw(NewRelic.getBrowserTimingHeader()) %>
 
     <!-- Include default page title -->
     <title><g:layoutTitle default="OpenBoxes" /></title>
