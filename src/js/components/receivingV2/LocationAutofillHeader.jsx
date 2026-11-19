@@ -7,7 +7,7 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import receivingLocationOptions from 'consts/receivingLocationOptions';
 import useTranslate from 'hooks/useTranslate';
 
-const LocationAutofillHeader = ({ onSelect }) => {
+const LocationAutofillHeader = ({ onSelect = undefined }) => {
   const translate = useTranslate();
 
   return (
@@ -47,10 +47,6 @@ const LocationAutofillHeader = ({ onSelect }) => {
 
 LocationAutofillHeader.propTypes = {
   onSelect: PropTypes.func,
-};
-
-LocationAutofillHeader.defaultProps = {
-  onSelect: undefined,
 };
 
 export default LocationAutofillHeader;

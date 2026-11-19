@@ -94,7 +94,7 @@ grails:
     #
     # Every field except `bundle` should also be set in build.gradle.
     #
-    # Because we use webpack to bundle .css and .js files, most of
+    # Because we use Vite to bundle .css and .js files, most of
     # asset-pipeline's advanced features are unnecessary.
     #
     assets:

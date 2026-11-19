@@ -7,20 +7,21 @@ import { CYCLE_COUNT } from 'consts/applicationUrls';
 import { TO_COUNT_TAB, TO_RESOLVE_TAB } from 'consts/cycleCount';
 import useDraftInfoBar from 'hooks/cycleCount/useDraftInfoBar';
 
-const mockDispatch = jest.fn();
-const mockNavigate = jest.fn();
-const eraseDraftSpy = jest.spyOn(actions, 'eraseDraft');
+const mockDispatch = vi.fn();
+const mockNavigate = vi.fn();
+const eraseDraftSpy = vi.spyOn(actions, 'eraseDraft');
 
-jest.mock('react-redux', () => ({
-  useDispatch: jest.fn(() => mockDispatch),
-  useSelector: jest.fn(() => ({ currentLocation: { id: 'loc-123' } })),
-  connect: jest.fn(() => (Component) => Component),
+vi.mock('react-redux', () => ({
+  useDispatch: vi.fn(() => mockDispatch),
+  useSelector: vi.fn(() => ({ currentLocation: { id: 'loc-123' } })),
+  connect: vi.fn(() => (Component) => Component),
 }));
-jest.mock('react-router-dom', () => ({
-  useNavigate: jest.fn(() => mockNavigate),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
+  useNavigate: vi.fn(() => mockNavigate),
 }));
-jest.mock('selectors', () => ({
-  getCurrentLocation: jest.fn(),
+vi.mock('selectors', () => ({
+  getCurrentLocation: vi.fn(),
 }));
 
 describe('useDraftInfoBar', () => {
@@ -28,7 +29,7 @@ describe('useDraftInfoBar', () => {
     renderHook(() => useDraftInfoBar(tab), { wrapper: MemoryRouter });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns discardDraft and continueDraft functions', () => {

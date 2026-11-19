@@ -20,7 +20,11 @@ import './utils.scss';
  * @constructor
  */
 const RedirectButton = ({
-  className, label, defaultMessage, redirectTo, handleOnClick,
+  className = '',
+  label,
+  defaultMessage,
+  redirectTo = null,
+  handleOnClick = null,
 }) => {
   const navigate = useNavigate();
 
@@ -57,10 +61,4 @@ RedirectButton.propTypes = {
   defaultMessage: PropTypes.string.isRequired,
   redirectTo: PropTypes.string,
   handleOnClick: PropTypes.func,
-};
-
-RedirectButton.defaultProps = {
-  className: '',
-  handleOnClick: null,
-  redirectTo: null,
 };

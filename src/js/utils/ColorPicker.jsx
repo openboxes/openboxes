@@ -6,7 +6,7 @@ import { SliderPicker } from 'react-color';
 import Input from 'utils/Input';
 import PortalTooltip from 'wrappers/PortalTooltip';
 
-const ColorPicker = ({ value, onChange }) => {
+const ColorPicker = ({ value = null, onChange }) => {
   const tooltipId = useId();
 
   const handleChange = (color) => {
@@ -46,8 +46,4 @@ export default ColorPicker;
 ColorPicker.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
-};
-
-ColorPicker.defaultProps = {
-  value: null,
 };

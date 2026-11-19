@@ -5,22 +5,31 @@ import PropTypes from 'prop-types';
 import Translate from 'utils/Translate';
 
 const Checkbox = ({
-  value, indeterminate, custom, fieldRef, withLabel, label, defaultMessage, ...props
+  onChange: onCheckedChange = null,
+  value = null,
+  indeterminate = false,
+  custom = false,
+  id = '',
+  fieldRef = undefined,
+  withLabel = false,
+  label = '',
+  defaultMessage = '',
+  ...props
 }) => {
   const onChange = (event) => {
     const { checked } = event.target;
 
-    if (props.onChange) {
-      props.onChange(checked);
+    if (onCheckedChange) {
+      onCheckedChange(checked);
     }
   };
 
   if (custom) {
     return (
       <div data-testid="custom-checkbox" className="custom-checkbox">
-        <label htmlFor={props.id}>
+        <label htmlFor={id}>
           <input
-            id={props.id}
+            id={id}
             type="checkbox"
             ref={fieldRef}
             checked={value}
@@ -46,11 +55,12 @@ const Checkbox = ({
               fieldRef(elem);
             }
           }}
+          id={id}
           checked={value}
           {...props}
           onChange={onChange}
         />
-        <label htmlFor={props.id} style={{ margin: '0 0 0 5px' }}>
+        <label htmlFor={id} style={{ margin: '0 0 0 5px' }}>
           <Translate id={label} defaultMessage={defaultMessage || label} />
         </label>
       </div>
@@ -70,6 +80,7 @@ const Checkbox = ({
           fieldRef(elem);
         }
       }}
+      id={id}
       checked={value}
       {...props}
       onChange={onChange}
@@ -89,16 +100,4 @@ Checkbox.propTypes = {
   withLabel: PropTypes.bool,
   label: PropTypes.string,
   defaultMessage: PropTypes.string,
-};
-
-Checkbox.defaultProps = {
-  onChange: null,
-  value: null,
-  indeterminate: false,
-  custom: false,
-  id: '',
-  fieldRef: undefined,
-  withLabel: false,
-  label: '',
-  defaultMessage: '',
 };

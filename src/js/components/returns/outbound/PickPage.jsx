@@ -17,8 +17,6 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const FIELDS = {
   picklistItems: {
     type: ArrayField,

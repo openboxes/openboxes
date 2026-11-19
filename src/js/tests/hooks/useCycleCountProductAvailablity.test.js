@@ -6,17 +6,17 @@ import useCycleCountProductAvailability from 'hooks/cycleCount/useCycleCountProd
 import useQueryParams from 'hooks/useQueryParams';
 import * as checkStatusUtils from 'utils/checkCycleCountStatus';
 
-jest.mock('hooks/useQueryParams', () => jest.fn());
+vi.mock('hooks/useQueryParams', () => ({ default: vi.fn() }));
 
 describe('useCycleCountProductAvailability', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns "counting" message when status is counting and tab = ALL_PRODUCTS_TAB', () => {
     useQueryParams.mockReturnValue({ tab: ALL_PRODUCTS_TAB });
-    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(true);
-    jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(true);
+    vi.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
 
     const row = { status: cycleCountCandidateStatus.COUNTING, quantityAllocated: 0 };
     const { result } = renderHook(() => useCycleCountProductAvailability(row));
@@ -32,8 +32,8 @@ describe('useCycleCountProductAvailability', () => {
 
   it('returns "resolving" message when status is resolving and tab = ALL_PRODUCTS_TAB', () => {
     useQueryParams.mockReturnValue({ tab: ALL_PRODUCTS_TAB });
-    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
-    jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(true);
+    vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(true);
 
     const row = { status: cycleCountCandidateStatus.INVESTIGATING, quantityAllocated: 0 };
     const { result } = renderHook(() => useCycleCountProductAvailability(row));
@@ -49,8 +49,8 @@ describe('useCycleCountProductAvailability', () => {
 
   it('returns warning when quantityAllocated > 0 and tab = TO_RESOLVE_TAB', () => {
     useQueryParams.mockReturnValue({ tab: TO_RESOLVE_TAB });
-    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
-    jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
 
     const row = { status: 'ANY', quantityAllocated: 5 };
     const { result } = renderHook(() => useCycleCountProductAvailability(row));
@@ -66,8 +66,8 @@ describe('useCycleCountProductAvailability', () => {
 
   it('returns warning when quantityAllocated > 0 and status = COUNTING', () => {
     useQueryParams.mockReturnValue({ tab: 'RANDOM_TAB' });
-    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
-    jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
 
     const row = { status: cycleCountCandidateStatus.COUNTING, quantityAllocated: 3 };
     const { result } = renderHook(() => useCycleCountProductAvailability(row));
@@ -83,8 +83,8 @@ describe('useCycleCountProductAvailability', () => {
 
   it('returns info when quantityAllocated > 0 and no special conditions', () => {
     useQueryParams.mockReturnValue({ tab: 'RANDOM_TAB' });
-    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
-    jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
 
     const row = { status: 'any', quantityAllocated: 2 };
     const { result } = renderHook(() => useCycleCountProductAvailability(row));
@@ -100,8 +100,8 @@ describe('useCycleCountProductAvailability', () => {
 
   it('returns default availability object when no special conditions are met', () => {
     useQueryParams.mockReturnValue({ tab: 'any' });
-    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
-    jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
+    vi.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(false);
 
     const row = { status: 'any', quantityAllocated: 0 };
     const { result } = renderHook(() => useCycleCountProductAvailability(row));
@@ -118,7 +118,7 @@ describe('useCycleCountProductAvailability', () => {
   it('calls isCounting with the correct status', () => {
     useQueryParams.mockReturnValue({ tab: ALL_PRODUCTS_TAB });
 
-    const isCountingSpy = jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(true);
+    const isCountingSpy = vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(true);
 
     const row = { status: cycleCountCandidateStatus.COUNTING, quantityAllocated: 0 };
     renderHook(() => useCycleCountProductAvailability(row));
@@ -128,8 +128,8 @@ describe('useCycleCountProductAvailability', () => {
 
   it('calls isResolving with the correct status', () => {
     useQueryParams.mockReturnValue({ tab: ALL_PRODUCTS_TAB });
-    jest.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
-    const isResolvingSpy = jest.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(true);
+    vi.spyOn(checkStatusUtils, 'isCounting').mockReturnValue(false);
+    const isResolvingSpy = vi.spyOn(checkStatusUtils, 'isResolving').mockReturnValue(true);
 
     const row = { status: cycleCountCandidateStatus.INVESTIGATING, quantityAllocated: 0 };
     renderHook(() => useCycleCountProductAvailability(row));

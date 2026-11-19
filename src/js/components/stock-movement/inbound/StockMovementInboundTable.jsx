@@ -23,8 +23,6 @@ import { mapShipmentTypes } from 'utils/option-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const StockMovementInboundTable = ({
   filterParams,
   translate,

@@ -9,12 +9,12 @@ import confirmBlankLinesAsZero from 'utils/receiving/confirmBlankLinesAsZero';
 import '@testing-library/jest-dom';
 
 // The hook only reads the activity codes of the current location (and the locale, unused here).
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(() => false),
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn(() => false),
 }));
-jest.mock('utils/receiving/confirmBlankLinesAsZero', () => jest.fn());
-jest.mock('utils/receiving/alertMissingBinLocations', () => jest.fn());
-jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
+vi.mock('utils/receiving/confirmBlankLinesAsZero', () => ({ default: vi.fn() }));
+vi.mock('utils/receiving/alertMissingBinLocations', () => ({ default: vi.fn() }));
+vi.mock('hooks/useTranslate', () => ({ default: () => (id, defaultMessage) => defaultMessage }));
 
 const buildRow = (rowId, overrides = {}) => ({
   rowId,
@@ -50,7 +50,7 @@ const renderValidation = (rows, {
 
 describe('useReceivingNextValidation', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('isNextDisabled', () => {

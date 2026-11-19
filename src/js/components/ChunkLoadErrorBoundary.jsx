@@ -7,8 +7,17 @@ import { RiErrorWarningLine, RiRefreshLine } from 'react-icons/ri';
 import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
-const isChunkLoadError = (error) =>
-  error?.name === 'ChunkLoadError' || error?.code === 'CSS_CHUNK_LOAD_FAILED';
+// Failed dynamic imports reject with a native TypeError (message differs per browser),
+// failed CSS preloads with an Error thrown by Vite's preload helper
+const CHUNK_LOAD_ERROR_MESSAGES = [
+  'Failed to fetch dynamically imported module', // Chromium
+  'error loading dynamically imported module', // Firefox
+  'Importing a module script failed', // Safari
+  'Unable to preload CSS', // Vite
+];
+
+export const isChunkLoadError = (error) =>
+  CHUNK_LOAD_ERROR_MESSAGES.some((message) => error?.message?.includes(message));
 
 const ChunkLoadErrorFallback = ({ error }) => {
   if (!isChunkLoadError(error)) {
@@ -51,16 +60,12 @@ export default ChunkLoadErrorBoundary;
 
 ChunkLoadErrorFallback.propTypes = {
   error: PropTypes.shape({
-    name: PropTypes.string,
-    code: PropTypes.string,
+    message: PropTypes.string,
   }).isRequired,
 };
 
 ChunkLoadErrorBoundary.propTypes = {
   children: PropTypes.node.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
   resetKeys: PropTypes.arrayOf(PropTypes.any),
-};
-
-ChunkLoadErrorBoundary.defaultProps = {
-  resetKeys: [],
 };

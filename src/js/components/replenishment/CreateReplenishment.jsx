@@ -26,8 +26,6 @@ import { renderFormField } from 'utils/form-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const FIELD = {
   requirements: {
     type: ArrayField,

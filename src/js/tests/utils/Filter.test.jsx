@@ -12,7 +12,7 @@ let onChangeFunc;
 
 describe('filter', () => {
   beforeEach(() => {
-    onChangeFunc = jest.fn();
+    onChangeFunc = vi.fn();
     filter = (<Filter onChange={onChangeFunc} />);
     filterWithValue = (<Filter onChange={onChangeFunc} filter={{ value: 'testValue' }} />);
   });

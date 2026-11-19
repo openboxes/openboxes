@@ -24,8 +24,6 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation, { formatDate } from 'utils/translation-utils';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.inboundReturns.origin.label',

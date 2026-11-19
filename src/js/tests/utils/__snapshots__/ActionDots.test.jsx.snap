@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`action dots should match snapshot 1`] = `
+exports[`action dots > should match snapshot 1`] = `
 <DocumentFragment>
   <button
     class="action-dots dropdown-toggle d-flex align-items-center justify-content-center"

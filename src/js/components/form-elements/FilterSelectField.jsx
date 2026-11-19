@@ -12,7 +12,7 @@ import 'components/form-elements/FilterSelectField.scss';
 
 const Dropdown = ({
   children,
-  style,
+  style = {},
   inputContainerRec,
   hasOptions,
 }) => {
@@ -58,10 +58,6 @@ Dropdown.propTypes = {
     y: PropTypes.number.isRequired,
   }).isRequired,
   hasOptions: PropTypes.bool.isRequired,
-};
-
-Dropdown.defaultProps = {
-  style: {},
 };
 
 const Menu = (props) => {
@@ -128,10 +124,6 @@ const IndicatorsContainer = ({ children, ...props }) => (
   </components.IndicatorsContainer>
 );
 
-IndicatorsContainer.defaultProps = {
-  width: undefined,
-};
-
 IndicatorsContainer.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
@@ -144,10 +136,9 @@ IndicatorsContainer.propTypes = {
       PropTypes.shape({}),
     ]),
   }).isRequired,
-  width: PropTypes.string,
 };
 
-const FilterSelectField = (props) => {
+const FilterSelectField = ({ className: fieldClassName = '', ...props }) => {
   const renderInput = ({ className, ...attributes }) => {
     const [input, setInput] = useState('');
 
@@ -184,6 +175,7 @@ const FilterSelectField = (props) => {
   return (
     <BaseField
       {...props}
+      className={fieldClassName}
       renderInput={renderInput}
     />
   );
@@ -193,8 +185,4 @@ export default FilterSelectField;
 
 FilterSelectField.propTypes = {
   className: PropTypes.string,
-};
-
-FilterSelectField.defaultProps = {
-  className: '',
 };

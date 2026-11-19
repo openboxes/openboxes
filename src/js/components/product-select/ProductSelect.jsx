@@ -36,10 +36,13 @@ const SelectedValue = (option) => (
 );
 
 const ProductSelect = ({
-  onExactProductSelected,
+  className = 'text-left',
+  showValueTooltip = true,
+  onExactProductSelected = undefined,
   locationId,
-  fieldRef,
-  includeUom,
+  fieldRef = undefined,
+  loadOptions = undefined,
+  includeUom = false,
   ...props
 }) => {
   const selectRef = useRef(null);
@@ -130,10 +133,12 @@ const ProductSelect = ({
   return (
     <Select
       {...props}
+      className={className}
+      showValueTooltip={showValueTooltip}
       fieldRef={handleFieldRef}
       async
       options={[]}
-      loadOptions={props.loadOptions || loadProductOptions}
+      loadOptions={loadOptions || loadProductOptions}
       onMenuClose={() => {
         setLoadedOptions([]);
         setSearchTerm('');
@@ -144,15 +149,6 @@ const ProductSelect = ({
       valueRenderer={SelectedValue}
     />
   );
-};
-
-ProductSelect.defaultProps = {
-  className: 'text-left',
-  showValueTooltip: true,
-  onExactProductSelected: undefined,
-  fieldRef: undefined,
-  loadOptions: undefined,
-  includeUom: false,
 };
 
 ProductSelect.propTypes = {

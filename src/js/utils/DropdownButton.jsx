@@ -7,11 +7,11 @@ import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
 const DropdownButton = ({
-  actions,
-  disabled,
+  actions = [],
+  disabled = false,
   buttonLabel,
   buttonDefaultLabel,
-  variant,
+  variant = 'secondary',
 }) => (
   <>
     <Button
@@ -59,10 +59,4 @@ DropdownButton.propTypes = {
   buttonDefaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   variant: PropTypes.string,
-};
-
-DropdownButton.defaultProps = {
-  actions: [],
-  disabled: false,
-  variant: 'secondary',
 };

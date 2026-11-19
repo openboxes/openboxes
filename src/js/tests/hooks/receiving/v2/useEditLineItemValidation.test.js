@@ -6,7 +6,7 @@ import useEditLineItemValidation, {
 import { QuantityReceivingErrorMessage } from 'hooks/receiving/v2/useQuantityReceivingValidation';
 
 // Translations resolve to the default message, so the errors are asserted against it.
-jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
+vi.mock('hooks/useTranslate', () => ({ default: () => (id, defaultMessage) => defaultMessage }));
 
 const product = { id: 'product-1', lotAndExpiryControl: false };
 const lotControlledProduct = { id: 'product-2', lotAndExpiryControl: true };

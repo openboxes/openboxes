@@ -38,8 +38,3 @@ TooltipWrapper.propTypes = {
   defaultTooltipLabel: PropTypes.string,
   children: PropTypes.node.isRequired,
 };
-
-TooltipWrapper.defaultProps = {
-  tooltipLabel: null,
-  defaultTooltipLabel: '',
-};

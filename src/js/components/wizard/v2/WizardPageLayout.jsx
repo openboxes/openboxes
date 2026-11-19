@@ -144,11 +144,3 @@ WizardPageLayout.propTypes = {
   /** Main page content */
   children: PropTypes.node,
 };
-
-WizardPageLayout.defaultProps = {
-  title: {},
-  buttons: {},
-  topSection: null,
-  className: '',
-  children: null,
-};

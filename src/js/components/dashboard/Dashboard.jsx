@@ -26,8 +26,6 @@ import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 
-import 'react-table/react-table.css';
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/dashboard/Dashboard.scss';
 // Disable charts legends by default.
 defaults.scale.ticks.beginAtZero = true;

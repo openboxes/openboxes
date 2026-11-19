@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import useTranslate from 'hooks/useTranslate';
 
-const DataTableStatus = ({ defaultMessage, label, shouldDisplay }) => {
+const DataTableStatus = ({ defaultMessage, label, shouldDisplay = false }) => {
   const translate = useTranslate();
 
   return shouldDisplay ? (
@@ -20,8 +20,4 @@ DataTableStatus.propTypes = {
   defaultMessage: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   shouldDisplay: PropTypes.bool,
-};
-
-DataTableStatus.defaultProps = {
-  shouldDisplay: false,
 };

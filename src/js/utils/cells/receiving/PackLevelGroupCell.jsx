@@ -11,7 +11,7 @@ import ValueCell from 'utils/cells/ValueCell';
  * The pack level group cell in packing list view. Besides the pack level value,
  * this column hosts the changes toggle and the green arrow of split item rows.
  */
-const PackLevelGroupCell = React.memo(({ item = null, isExpanded = false, onToggle }) => {
+const PackLevelGroupCellComponent = ({ item = null, isExpanded = false, onToggle }) => {
   if (item?.rowType === ReceivingRowType.TOGGLE) {
     return (
       <ChangesToggleCell
@@ -39,11 +39,13 @@ const PackLevelGroupCell = React.memo(({ item = null, isExpanded = false, onTogg
       truncate
     />
   );
-});
+};
+
+const PackLevelGroupCell = React.memo(PackLevelGroupCellComponent);
 
 PackLevelGroupCell.displayName = 'PackLevelGroupCell';
 
-PackLevelGroupCell.propTypes = {
+PackLevelGroupCellComponent.propTypes = {
   item: PropTypes.shape({
     rowType: PropTypes.string,
     splitItemIds: PropTypes.arrayOf(PropTypes.string),
@@ -52,11 +54,6 @@ PackLevelGroupCell.propTypes = {
   }),
   isExpanded: PropTypes.bool,
   onToggle: PropTypes.func.isRequired,
-};
-
-PackLevelGroupCell.defaultProps = {
-  item: null,
-  isExpanded: false,
 };
 
 export default PackLevelGroupCell;

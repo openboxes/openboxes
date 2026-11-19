@@ -16,8 +16,6 @@ import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 function validate(values) {
   const errors = {};
   if (!values.description) {

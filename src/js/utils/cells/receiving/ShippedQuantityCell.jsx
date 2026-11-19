@@ -14,8 +14,8 @@ import getShippedQuantityInPoUom from 'utils/receiving/getShippedQuantityInPoUom
  * Otherwise, it is just the number.
  * The displayed value is always in single units (each), never in packs.
  */
-const ShippedQuantityCell = React.memo(({
-  item, isShipmentFromPurchaseOrder = false, label, defaultLabel,
+const ShippedQuantityCellComponent = ({
+  item = undefined, isShipmentFromPurchaseOrder = false, label, defaultLabel,
 }) => {
   const translate = useTranslate();
   const formatNumber = useFormatNumber();
@@ -39,11 +39,13 @@ const ShippedQuantityCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const ShippedQuantityCell = React.memo(ShippedQuantityCellComponent);
 
 ShippedQuantityCell.displayName = 'ShippedQuantityCell';
 
-ShippedQuantityCell.propTypes = {
+ShippedQuantityCellComponent.propTypes = {
   item: PropTypes.shape({
     quantityShipped: PropTypes.number,
     packSize: PropTypes.number,
@@ -52,11 +54,6 @@ ShippedQuantityCell.propTypes = {
   isShipmentFromPurchaseOrder: PropTypes.bool,
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
-};
-
-ShippedQuantityCell.defaultProps = {
-  item: undefined,
-  isShipmentFromPurchaseOrder: false,
 };
 
 export default ShippedQuantityCell;

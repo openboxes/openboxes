@@ -52,8 +52,15 @@ const options = {
 const ZERO = 0;
 
 const NumberSparklineCard = ({
-  cardTitle, cardInfo, color, value, goalDifference, sparklineData, translate, cardInfoDefaultValue,
-  handleRef,
+  cardTitle,
+  cardInfo,
+  color,
+  value,
+  goalDifference,
+  sparklineData,
+  translate,
+  cardInfoDefaultValue = '',
+  handleRef = null,
 }) => (
   <div className="number-div">
     <div className="number-body">
@@ -93,25 +100,25 @@ const NumberSparklineCard = ({
 
 const NumberCard = (({
   cardTitle,
-  cardTitleDefaultValue,
+  cardTitleDefaultValue = '',
   cardNumber,
   cardNumberType,
-  cardSubtitle,
-  cardSubtitleDefaultValue,
-  cardSubtitleValue,
-  cardLink,
-  cardDataTooltip,
+  cardSubtitle = '',
+  cardSubtitleDefaultValue = '',
+  cardSubtitleValue = '',
+  cardLink = '',
+  cardDataTooltip = '',
   cardInfo,
-  cardInfoDefaultValue,
+  cardInfoDefaultValue = '',
   sparklineData = null,
   translate,
   currencyCode,
   hideDraghandle,
-  showPercentSign,
-  infoIcon,
-  disableSubtitleEllipsis,
-  sortableRef,
-  handleRef,
+  showPercentSign = false,
+  infoIcon = null,
+  disableSubtitleEllipsis = false,
+  sortableRef = null,
+  handleRef = null,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -198,21 +205,6 @@ const mapStateToProps = (state) => ({
 
 export default (connect(mapStateToProps)(NumberCard));
 
-NumberCard.defaultProps = {
-  sortableRef: null,
-  handleRef: null,
-  cardTitleDefaultValue: '',
-  cardSubtitle: '',
-  cardSubtitleDefaultValue: '',
-  cardSubtitleValue: '',
-  cardLink: '',
-  cardDataTooltip: '',
-  cardInfoDefaultValue: '',
-  showPercentSign: false,
-  infoIcon: null,
-  disableSubtitleEllipsis: false,
-};
-
 NumberCard.propTypes = {
   cardTitle: PropTypes.string.isRequired,
   cardTitleDefaultValue: PropTypes.string,
@@ -242,9 +234,4 @@ NumberSparklineCard.propTypes = {
   sparklineData: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
   handleRef: PropTypes.func,
-};
-
-NumberSparklineCard.defaultProps = {
-  cardInfoDefaultValue: '',
-  handleRef: null,
 };

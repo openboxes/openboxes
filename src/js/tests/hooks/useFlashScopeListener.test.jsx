@@ -7,11 +7,10 @@ import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import useFlashScopeListener from 'hooks/useFlashScopeListener';
 
-const mockShowNotification = jest.fn();
+const mockShowNotification = vi.fn();
 
-jest.mock('components/Layout/notifications/notification', () => ({
-  __esModule: true,
-  default: jest.fn(() => mockShowNotification),
+vi.mock('components/Layout/notifications/notification', () => ({
+  default: vi.fn(() => mockShowNotification),
 }));
 
 const renderWithFlash = (flash) => {
@@ -25,7 +24,7 @@ const renderWithFlash = (flash) => {
 
 describe('useFlashScopeListener', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('shows a flash message as a success notification', () => {

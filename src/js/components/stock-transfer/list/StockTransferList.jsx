@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 
 import filterFields from 'components/stock-transfer/list/FilterFields';
 import StockTransferListFilters from 'components/stock-transfer/list/StockTransferListFilters';
@@ -10,6 +9,7 @@ import StockTransferListHeader from 'components/stock-transfer/list/StockTransfe
 import StockTransferListTable from 'components/stock-transfer/list/StockTransferListTable';
 import useStockTransferFilters from 'hooks/list-pages/stock-transfer/useStockTransferFilters';
 import useTranslation from 'hooks/useTranslation';
+import withRouter from 'utils/withRouter';
 
 const StockTransferList = (props) => {
   const { setFilterValues, defaultFilterValues, filterParams } = useStockTransferFilters();

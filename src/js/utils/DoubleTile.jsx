@@ -17,9 +17,9 @@ const DoubleTile = ({
   cardDefaultSecondSubtitle,
   cardInfo,
   cardInfoDefaultValue,
-  currencyCode,
-  showFirstValuePercentSign,
-  formatSecondValueAsCurrency,
+  currencyCode = 'USD',
+  showFirstValuePercentSign = false,
+  formatSecondValueAsCurrency = false,
 }) => {
   const translate = useTranslate();
 
@@ -73,12 +73,6 @@ const DoubleTile = ({
 };
 
 export default DoubleTile;
-
-DoubleTile.defaultProps = {
-  currencyCode: 'USD',
-  showFirstValuePercentSign: false,
-  formatSecondValueAsCurrency: false,
-};
 
 DoubleTile.propTypes = {
   cardTitle: PropTypes.string.isRequired,

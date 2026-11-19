@@ -5,25 +5,31 @@ import PropTypes from 'prop-types';
 
 import 'components/wizard/WizardSteps.scss';
 
-const WizardSteps = (props) => (
+const WizardSteps = ({
+  steps,
+  currentStep,
+  onClick = (stepIdx) => stepIdx,
+  stepsClickable = false,
+  showStepNumber = false,
+}) => (
   <div className="steps-main-box">
     <div className="steps-inside-wrapper">
-      {_.map(props.steps, (step, index) => (
+      {_.map(steps, (step, index) => (
         <div
           key={index}
-          className={`step-container ${props.currentStep === index + 1 ? 'active' : ''}`}
+          className={`step-container ${currentStep === index + 1 ? 'active' : ''}`}
           data-testid="wizard-step"
-          data-stepstate={props.currentStep === index + 1 ? 'active' : 'inactive'}
+          data-stepstate={currentStep === index + 1 ? 'active' : 'inactive'}
         >
           <div
-            className={props.showStepNumber ? 'circle filled' : 'circle'}
-            onClick={() => props.onClick(index + 1)}
-            onKeyPress={() => props.onClick(index + 1)}
+            className={showStepNumber ? 'circle filled' : 'circle'}
+            onClick={() => onClick(index + 1)}
+            onKeyPress={() => onClick(index + 1)}
             role="button"
             tabIndex="0"
-            disabled={!props.stepsClickable}
+            disabled={!stepsClickable}
           >
-            {props.showStepNumber && <span className="number">{index + 1}</span>}
+            {showStepNumber && <span className="number">{index + 1}</span>}
           </div>
           <div className="step-name">
             {step}
@@ -47,10 +53,4 @@ WizardSteps.propTypes = {
   /** Indicator if steps are clickable (default = false) */
   stepsClickable: PropTypes.bool,
   showStepNumber: PropTypes.bool,
-};
-
-WizardSteps.defaultProps = {
-  onClick: (stepIdx) => stepIdx,
-  stepsClickable: false,
-  showStepNumber: false,
 };

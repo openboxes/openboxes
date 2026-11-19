@@ -68,9 +68,3 @@ WizardPageHeader.propTypes = {
   /** Optional status badge rendered on the right side of the header */
   status: PropTypes.string,
 };
-
-WizardPageHeader.defaultProps = {
-  label: '',
-  info: [],
-  status: '',
-};

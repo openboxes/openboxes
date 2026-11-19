@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/react/sortable';
 import PropTypes from 'prop-types';
 
 const SortableCard = ({
-  id, index, type, disabled, component: Card, ...cardProps
+  id, index, type, disabled = false, component: Card, ...cardProps
 }) => {
   const { ref, handleRef } = useSortable({
     id,
@@ -26,8 +26,4 @@ SortableCard.propTypes = {
   type: PropTypes.oneOf(['graph', 'number']).isRequired,
   disabled: PropTypes.bool,
   component: PropTypes.elementType.isRequired,
-};
-
-SortableCard.defaultProps = {
-  disabled: false,
 };

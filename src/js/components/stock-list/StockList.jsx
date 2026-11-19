@@ -1,13 +1,12 @@
 import React from 'react';
 
-import withRouter from 'utils/withRouter';
-
 import filterFields from 'components/stock-list/FilterFields';
 import StockListFilters from 'components/stock-list/StockListFilters';
 import StockListHeader from 'components/stock-list/StockListHeader';
 import StockListTable from 'components/stock-list/StockListTable';
 import useStockListFilters from 'hooks/list-pages/stock-list/useStockListFilters';
 import useTranslation from 'hooks/useTranslation';
+import withRouter from 'utils/withRouter';
 
 const StockList = () => {
   const {

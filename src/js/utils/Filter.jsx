@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-const Filter = ({ filter, onChange, name }) => (
+const Filter = ({ filter = undefined, onChange, name = '' }) => (
   <input
     data-testid={`filter-input${name ? `-${name}` : ''}`}
     onChange={(event) => onChange(event.target.value)}
@@ -20,9 +20,4 @@ Filter.propTypes = {
   /** Current filter value */
   filter: PropTypes.shape({}),
   name: PropTypes.string,
-};
-
-Filter.defaultProps = {
-  filter: undefined,
-  name: '',
 };

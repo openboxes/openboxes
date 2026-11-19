@@ -14,10 +14,10 @@ import ListFilterFormWrapper from 'wrappers/ListFilterFormWrapper';
 const CycleCountReportingFilters = ({
   setFilterParams,
   defaultValues,
-  formProps,
+  formProps = {},
   isLoading,
-  filterFields,
-  setShouldFetch,
+  filterFields = {},
+  setShouldFetch = null,
   tablePaginationProps,
 }) => {
   const updateCounter = useRef(0);
@@ -86,10 +86,4 @@ CycleCountReportingFilters.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   setShouldFetch: PropTypes.func,
   tablePaginationProps: PropTypes.shape({}).isRequired,
-};
-
-CycleCountReportingFilters.defaultProps = {
-  formProps: {},
-  filterFields: {},
-  setShouldFetch: null,
 };

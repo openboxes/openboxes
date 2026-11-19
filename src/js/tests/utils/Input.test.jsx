@@ -12,8 +12,8 @@ let arrowUpFunction;
 
 describe('input', () => {
   beforeEach(() => {
-    onChangeFunc = jest.fn();
-    arrowUpFunction = jest.fn();
+    onChangeFunc = vi.fn();
+    arrowUpFunction = vi.fn();
     input = (<Input onChange={onChangeFunc} arrowUp={arrowUpFunction} />);
   });
 

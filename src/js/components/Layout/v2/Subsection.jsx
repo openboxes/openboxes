@@ -6,10 +6,10 @@ import { RiArrowDownSLine } from 'react-icons/ri';
 import Translate from 'utils/Translate';
 
 const Subsection = ({
-  title,
-  collapsable,
+  title = '',
+  collapsable = true,
   children,
-  expandedByDefault,
+  expandedByDefault = true,
 }) => {
   // If a subsection is not collapsable, it is always expanded
   // (collapsable: false --> expanded: true)
@@ -68,10 +68,4 @@ Subsection.propTypes = {
   collapsable: PropTypes.bool,
   expandedByDefault: PropTypes.bool,
   children: PropTypes.node.isRequired,
-};
-
-Subsection.defaultProps = {
-  collapsable: true,
-  expandedByDefault: true,
-  title: '',
 };

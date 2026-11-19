@@ -14,8 +14,15 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  * value (or null when the field is cleared) is reported via `onCommit` on blur. The
  * caller decides where to store it; pass `value` to keep the input in sync with that store.
  */
-const QuantityInputCell = React.memo(({
-  value = null, onCommit, onBlur, label, defaultLabel, disabled = false, errorMessage, className = '',
+const QuantityInputCellComponent = ({
+  value = null,
+  onCommit,
+  onBlur = undefined,
+  label,
+  defaultLabel,
+  disabled = false,
+  errorMessage = undefined,
+  className = '',
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
 
@@ -54,11 +61,13 @@ const QuantityInputCell = React.memo(({
       />
     </TableCell>
   );
-});
+};
+
+const QuantityInputCell = React.memo(QuantityInputCellComponent);
 
 QuantityInputCell.displayName = 'QuantityInputCell';
 
-QuantityInputCell.propTypes = {
+QuantityInputCellComponent.propTypes = {
   // Committed value to display (null/undefined when nothing has been entered yet).
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   // Called on blur with the committed value, or null when the field is cleared.
@@ -69,14 +78,6 @@ QuantityInputCell.propTypes = {
   disabled: PropTypes.bool,
   errorMessage: PropTypes.string,
   className: PropTypes.string,
-};
-
-QuantityInputCell.defaultProps = {
-  value: null,
-  onBlur: undefined,
-  disabled: false,
-  errorMessage: undefined,
-  className: '',
 };
 
 export default QuantityInputCell;

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`wizard component should match snapshot 1`] = `
+exports[`wizard component > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="content-wrap"
@@ -470,7 +470,7 @@ exports[`wizard component should match snapshot 1`] = `
 </DocumentFragment>
 `;
 
-exports[`wizardPage component should match snapshot 1`] = `
+exports[`wizardPage component > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="panel-body m-4"
@@ -860,7 +860,7 @@ exports[`wizardPage component should match snapshot 1`] = `
 </DocumentFragment>
 `;
 
-exports[`wizardSteps component should match snapshot 1`] = `
+exports[`wizardSteps component > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="steps-main-box"
@@ -907,7 +907,7 @@ exports[`wizardSteps component should match snapshot 1`] = `
 </DocumentFragment>
 `;
 
-exports[`wizardTitle component should match snapshot 1`] = `
+exports[`wizardTitle component > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="panel-heading movement-number"

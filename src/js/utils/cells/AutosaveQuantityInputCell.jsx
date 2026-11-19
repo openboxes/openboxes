@@ -17,8 +17,14 @@ const blurOnWheel = (e) => e.currentTarget.blur();
  * committing per keystroke only marks the row dirty; nothing is sent until typing pauses or
  * enough rows accumulate.
  */
-const AutosaveQuantityInputCell = React.memo(({
-  value = null, onCommit, label, defaultLabel, disabled = false, errorMessage = null, className = '',
+const AutosaveQuantityInputCellComponent = ({
+  value = null,
+  onCommit,
+  label,
+  defaultLabel,
+  disabled = false,
+  errorMessage = null,
+  className = '',
 }) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   // Last value handed to onCommit. The `value` prop lags one render behind the store, so
@@ -64,11 +70,13 @@ const AutosaveQuantityInputCell = React.memo(({
       />
     </TableCell>
   );
-});
+};
+
+const AutosaveQuantityInputCell = React.memo(AutosaveQuantityInputCellComponent);
 
 AutosaveQuantityInputCell.displayName = 'AutosaveQuantityInputCell';
 
-AutosaveQuantityInputCell.propTypes = {
+AutosaveQuantityInputCellComponent.propTypes = {
   // Committed value to display (null/undefined when nothing has been entered yet).
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   // Called on every change with the committed integer value, or null when the field is cleared.
@@ -78,13 +86,6 @@ AutosaveQuantityInputCell.propTypes = {
   disabled: PropTypes.bool,
   errorMessage: PropTypes.string,
   className: PropTypes.string,
-};
-
-AutosaveQuantityInputCell.defaultProps = {
-  value: null,
-  disabled: false,
-  errorMessage: null,
-  className: '',
 };
 
 export default AutosaveQuantityInputCell;

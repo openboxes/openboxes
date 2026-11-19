@@ -1,6 +1,6 @@
-import ColorPalette from 'components/dashboard/ColorPalette.scss';
+import _ from 'lodash';
 
-/* global _ */
+import ColorPalette from 'components/dashboard/ColorPalette.module.scss';
 
 function formatColorPalette(colorPalette) {
   const formattedPalette = {

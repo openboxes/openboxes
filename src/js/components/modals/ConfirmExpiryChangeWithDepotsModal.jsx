@@ -84,8 +84,4 @@ ConfirmExpiryChangeWithDepotsModal.propTypes = {
   onCancel: PropTypes.func.isRequired,
 };
 
-ConfirmExpiryChangeWithDepotsModal.defaultProps = {
-  data: [],
-};
-
 export default ConfirmExpiryChangeWithDepotsModal;

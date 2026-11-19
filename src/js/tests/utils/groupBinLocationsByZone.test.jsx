@@ -1,6 +1,6 @@
 import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBinLocationsByZone';
 
-const mockTranslate = jest.fn((key, defaultValue) => defaultValue);
+const mockTranslate = vi.fn((key, defaultValue) => defaultValue);
 
 describe('getBinLocationToDisplay', () => {
   const mockBin = {

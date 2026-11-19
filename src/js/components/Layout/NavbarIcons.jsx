@@ -20,7 +20,7 @@ import useElementSize from 'hooks/useElementSize';
 import useTranslate from 'hooks/useTranslate';
 
 const NavbarIcons = ({
-  username, highestRole, menuItems, configurationMenuSection,
+  username, highestRole, menuItems, configurationMenuSection = {},
 }) => {
   const windowSize = useElementSize(window);
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
@@ -291,8 +291,4 @@ NavbarIcons.propTypes = {
     label: PropTypes.string,
     subsections: PropTypes.shape([]),
   }),
-};
-
-NavbarIcons.defaultProps = {
-  configurationMenuSection: {},
 };

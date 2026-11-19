@@ -20,8 +20,6 @@ import ZoneTable from 'components/locations-configuration/ZoneTable';
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import 'react-table/react-table.css';
 import 'components/locations-configuration/ZoneTable.scss';
 
 const ZONE_FIELDS = {

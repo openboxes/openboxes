@@ -1,5 +1,3 @@
-import { EventEmitter } from 'events';
-
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -30,6 +28,8 @@ import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
+const RECOUNT_CHANGED_EVENT = 'recountChanged';
+
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
   cycleCountId,
@@ -51,7 +51,9 @@ const useResolveStepTable = ({
 
   // State for saving data for binLocation dropdown
   const translate = useTranslate();
-  const events = new EventEmitter();
+  // Table data lives in a ref (no rerender on blur), so recount difference cells
+  // are notified about a changed recounted quantity through this event target
+  const [recountChanges] = useState(() => new EventTarget());
 
   const {
     users,
@@ -284,7 +286,7 @@ const useResolveStepTable = ({
           const parsedValue = value ? (parseInt(value, 10) || 0) : value;
           setValue(parsedValue);
           table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
-          events.emit('refreshRecountDifference');
+          recountChanges.dispatchEvent(new Event(RECOUNT_CHANGED_EVENT));
         }
       };
 
@@ -611,9 +613,11 @@ const useResolveStepTable = ({
           secondValue: value,
           shouldCheckSecondValue: true,
         });
-        events.on('refreshRecountDifference', () => {
-          setValue(tableData?.[index]?.quantityRecounted);
-        });
+        useEffect(() => {
+          const refreshValue = () => setValue(tableData?.[index]?.quantityRecounted);
+          recountChanges.addEventListener(RECOUNT_CHANGED_EVENT, refreshValue);
+          return () => recountChanges.removeEventListener(RECOUNT_CHANGED_EVENT, refreshValue);
+        }, [tableData, index]);
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">

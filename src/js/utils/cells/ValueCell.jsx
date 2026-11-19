@@ -8,8 +8,8 @@ import useTranslate from 'hooks/useTranslate';
 /**
  * Memoized cell rendering a single value with an optional tooltip and truncation.
  */
-const ValueCell = React.memo(({
-  value = null, label, defaultLabel, tooltipLabel, truncate = false, className = '',
+const ValueCellComponent = ({
+  value = null, label, defaultLabel, tooltipLabel = undefined, truncate = false, className = '',
 }) => {
   const translate = useTranslate();
 
@@ -23,24 +23,19 @@ const ValueCell = React.memo(({
       </div>
     </TableCell>
   );
-});
+};
+
+const ValueCell = React.memo(ValueCellComponent);
 
 ValueCell.displayName = 'ValueCell';
 
-ValueCell.propTypes = {
+ValueCellComponent.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   label: PropTypes.string.isRequired,
   defaultLabel: PropTypes.string.isRequired,
   tooltipLabel: PropTypes.string,
   truncate: PropTypes.bool,
   className: PropTypes.string,
-};
-
-ValueCell.defaultProps = {
-  value: null,
-  tooltipLabel: undefined,
-  truncate: false,
-  className: '',
 };
 
 export default ValueCell;

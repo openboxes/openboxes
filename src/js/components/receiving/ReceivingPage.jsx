@@ -18,7 +18,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/stock-movement-wizard/StockMovement.scss';
 
 /** Main partial receiving form's component. */

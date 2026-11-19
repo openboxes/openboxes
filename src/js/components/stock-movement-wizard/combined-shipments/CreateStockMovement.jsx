@@ -18,8 +18,6 @@ import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import withRouter from 'utils/withRouter';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const { orderId } = queryString.parse(window.location.search);
 
 function validate(values) {

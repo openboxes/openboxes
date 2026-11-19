@@ -6,11 +6,11 @@ import DoubleTile from 'utils/DoubleTile';
 
 import '@testing-library/jest-dom';
 
-const mockTranslate = jest.fn((key, defaultValue) => defaultValue);
+const mockTranslate = vi.fn((key, defaultValue) => defaultValue);
 
-jest.mock('hooks/useTranslate', () => () => mockTranslate);
+vi.mock('hooks/useTranslate', () => ({ default: () => mockTranslate }));
 
-jest.mock('wrappers/CustomTooltip', () => ({ children }) => <div>{children}</div>);
+vi.mock('wrappers/CustomTooltip', () => ({ default: ({ children }) => <div>{children}</div> }));
 
 describe('DoubleTile component', () => {
   const defaultProps = {
@@ -30,7 +30,7 @@ describe('DoubleTile component', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should match snapshot', () => {

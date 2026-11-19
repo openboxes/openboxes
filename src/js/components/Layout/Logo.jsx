@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 
 const Logo = ({
-  logoUrl,
+  logoUrl = '',
 }) => (
   <div className="d-flex align-items-center logo-wrapper" data-testid="logo-wrapper">
     <div className="logo-square" aria-label="logo">
@@ -31,8 +31,4 @@ export default connect(mapStateToProps)(Logo);
 
 Logo.propTypes = {
   logoUrl: PropTypes.string,
-};
-
-Logo.defaultProps = {
-  logoUrl: '',
 };

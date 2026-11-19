@@ -3,7 +3,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Input = ({
-  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, copyDown, onTabPress, isFormElement, dataTestId, ...props
+  fieldRef = null,
+  onChange = null,
+  className = '',
+  arrowLeft = null,
+  arrowUp = null,
+  arrowRight = null,
+  arrowDown = null,
+  copyDown = null,
+  onTabPress = null,
+  isFormElement = false,
+  dataTestId = null,
+  ...props
 }) => {
   const handleChange = (event) => {
     const { value } = event.target;
@@ -94,18 +105,4 @@ Input.propTypes = {
   onTabPress: PropTypes.func,
   isFormElement: PropTypes.bool,
   dataTestId: PropTypes.string,
-};
-
-Input.defaultProps = {
-  onChange: null,
-  className: '',
-  arrowLeft: null,
-  arrowUp: null,
-  arrowRight: null,
-  arrowDown: null,
-  copyDown: null,
-  fieldRef: null,
-  onTabPress: null,
-  isFormElement: false,
-  dataTestId: null,
 };

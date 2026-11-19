@@ -2,7 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withRouter from 'utils/withRouter';
 
 import filterFields from 'components/stock-movement/inbound/FilterFields';
 import StockMovementInboundFilters from 'components/stock-movement/inbound/StockMovementInboundFilters';
@@ -10,6 +9,7 @@ import StockMovementInboundHeader from 'components/stock-movement/inbound/StockM
 import StockMovementInboundTable from 'components/stock-movement/inbound/StockMovementInboundTable';
 import useInboundFilters from 'hooks/list-pages/inbound/useInboundFilters';
 import useTranslation from 'hooks/useTranslation';
+import withRouter from 'utils/withRouter';
 
 const StockMovementInboundList = (props) => {
   const {

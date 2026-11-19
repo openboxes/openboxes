@@ -11,7 +11,7 @@ import { renderFormField } from 'utils/form-utils';
 
 import '@testing-library/jest-dom';
 
-jest.mock('react-final-form', () => ({
+vi.mock('react-final-form', () => ({
   Field: (props) => {
     const { component: Component, name, ...others } = props;
     const input = { onChange: () => {}, name };
@@ -20,7 +20,7 @@ jest.mock('react-final-form', () => ({
   },
 }));
 
-jest.mock('react-final-form-arrays', () => ({
+vi.mock('react-final-form-arrays', () => ({
   FieldArray: (props) => {
     const { component: Component, name, ...others } = props;
     const fields = {
@@ -34,8 +34,8 @@ jest.mock('react-final-form-arrays', () => ({
   formValueSelector: () => {},
 }));
 
-jest.mock('react-localize-redux', () => ({
-  ...jest.requireActual('react-localize-redux'),
+vi.mock('react-localize-redux', async () => ({
+  ...(await vi.importActual('react-localize-redux')),
   Translate: (props) => {
     const { id } = props;
 
@@ -43,7 +43,7 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-jest.mock('react-virtualized', () => ({
+vi.mock('react-virtualized', () => ({
   List: (props) => {
     const { rowCount, rowRenderer } = props;
 

@@ -39,8 +39,4 @@ EditLineItemModalFooter.propTypes = {
   isSaveDisabled: PropTypes.bool,
 };
 
-EditLineItemModalFooter.defaultProps = {
-  isSaveDisabled: false,
-};
-
 export default EditLineItemModalFooter;

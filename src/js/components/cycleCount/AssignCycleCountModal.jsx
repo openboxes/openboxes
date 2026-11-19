@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiCloseFill } from 'react-icons/all';
+import { RiCloseFill } from 'react-icons/ri';
 import Modal from 'react-modal';
 
 import DataTable from 'components/DataTable/v2/DataTable';
@@ -12,13 +12,13 @@ import useTranslate from 'hooks/useTranslate';
 const AssignCycleCountModal = ({
   isOpen,
   closeModal,
-  defaultTitleLabel,
-  titleLabel,
+  defaultTitleLabel = 'Assign products to count',
+  titleLabel = 'react.cycleCount.modal.assignProductsToCount.title.label',
   selectedCycleCounts,
-  isRecount,
-  refetchData,
-  assignDataDirectly,
-  showSkipButton,
+  isRecount = false,
+  refetchData = null,
+  assignDataDirectly = false,
+  showSkipButton = false,
 }) => {
   // When the modal is not displayed we want to show the scrollbar to users.
   // The return below is necessary to block executing hooks that are related to
@@ -106,13 +106,4 @@ AssignCycleCountModal.propTypes = {
   refetchData: PropTypes.func,
   assignDataDirectly: PropTypes.bool,
   showSkipButton: PropTypes.bool,
-};
-
-AssignCycleCountModal.defaultProps = {
-  titleLabel: 'react.cycleCount.modal.assignProductsToCount.title.label',
-  defaultTitleLabel: 'Assign products to count',
-  isRecount: false,
-  refetchData: null,
-  assignDataDirectly: false,
-  showSkipButton: false,
 };

@@ -13,7 +13,6 @@ import ImportCategories from 'components/products-configuration/ImportCategories
 import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/products-configuration/ConfigureProductCategories.scss';
 
 const INITIAL_STATE = {

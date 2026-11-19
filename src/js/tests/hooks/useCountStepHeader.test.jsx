@@ -10,8 +10,8 @@ describe('useCountStepHeader', () => {
     initialDateCounted: moment('2025-08-25T09:00:00Z'),
     initialCountedBy: baseUser,
     initialDefaultCountedBy: baseUser,
-    updateDateCounted: jest.fn(),
-    assignCountedBy: jest.fn(),
+    updateDateCounted: vi.fn(),
+    assignCountedBy: vi.fn(),
   };
 
   it('initializes with correct values', () => {
@@ -44,7 +44,7 @@ describe('useCountStepHeader', () => {
 
   it('updates countedBy and defaultCountedBy and calls assignCountedBy', () => {
     const { result } = renderHook(() => useCountStepHeader(props));
-    const assignFn = jest.fn();
+    const assignFn = vi.fn();
     props.assignCountedBy.mockReturnValue(assignFn);
 
     act(() => result.current.handleCountedByChange(newUser));

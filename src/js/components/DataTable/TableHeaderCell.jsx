@@ -7,15 +7,15 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 
 const TableHeaderCell = ({
   children,
-  className,
-  style,
-  toggleSort,
-  sortable,
-  columnId,
-  dynamicClassName,
-  required,
+  className = undefined,
+  style = undefined,
+  toggleSort = () => {},
+  sortable = false,
+  columnId = null,
+  dynamicClassName = () => {},
+  required = false,
   tooltip = false,
-  tooltipLabel,
+  tooltipLabel = undefined,
 }) => {
   const sortableProps = {
     tabIndex: '0',
@@ -45,18 +45,6 @@ const TableHeaderCell = ({
 };
 
 export default TableHeaderCell;
-
-TableHeaderCell.defaultProps = {
-  style: undefined,
-  className: undefined,
-  sortable: false,
-  required: false,
-  columnId: null,
-  dynamicClassName: () => {},
-  toggleSort: () => {},
-  tooltip: false,
-  tooltipLabel: undefined,
-};
 
 TableHeaderCell.propTypes = {
   children: PropTypes.oneOfType([

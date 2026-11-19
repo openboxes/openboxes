@@ -11,7 +11,7 @@ import RoleType from 'consts/roleType';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
 import { FormErrorPropType } from 'utils/propTypes';
 
-const AdditionalDetails = ({ control, errors }) => {
+const AdditionalDetails = ({ control, errors = {} }) => {
   const {
     ratingTypeCodes,
     debounceTime,
@@ -118,8 +118,4 @@ export const additionalDetailsFormErrors = PropTypes.shape({
 AdditionalDetails.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: additionalDetailsFormErrors,
-};
-
-AdditionalDetails.defaultProps = {
-  errors: {},
 };

@@ -6,7 +6,7 @@ import ExpirationDateCell from 'utils/cells/ExpirationDateCell';
 
 import '@testing-library/jest-dom';
 
-jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
+vi.mock('hooks/useTranslate', () => ({ default: () => (id, defaultMessage) => defaultMessage }));
 
 // Both the rendered date and the badge are read west of UTC, where a date-only string formatted
 // as-is lands on the previous day. The badge is relative to today, so the clock is fixed too.
@@ -25,12 +25,12 @@ const badgeText = () => document.querySelector('.expiry-badge')?.textContent ?? 
 
 describe('ExpirationDateCell', () => {
   beforeEach(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime(TODAY);
+    vi.useFakeTimers('modern');
+    vi.setSystemTime(TODAY);
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render the date the API sent', () => {

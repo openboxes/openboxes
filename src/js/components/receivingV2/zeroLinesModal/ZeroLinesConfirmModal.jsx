@@ -16,7 +16,7 @@ import 'utils/utils.scss';
  * here - the translation function and the locale are handed in by the caller.
  */
 const ZeroLinesConfirmModal = ({
-  lines, translate, localeKey, onConfirm, onCancel,
+  lines, translate, localeKey = undefined, onConfirm, onCancel,
 }) => (
   <div
     className="d-flex flex-column custom-modal-content justify-content-between bg-white"
@@ -50,10 +50,6 @@ ZeroLinesConfirmModal.propTypes = {
   localeKey: PropTypes.string,
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-ZeroLinesConfirmModal.defaultProps = {
-  localeKey: undefined,
 };
 
 export default ZeroLinesConfirmModal;

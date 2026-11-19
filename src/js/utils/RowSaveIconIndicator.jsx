@@ -9,7 +9,7 @@ import SaveStatusIcons from 'consts/saveStatusIcons';
 import { translateWithDefaultMessage } from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-const RowSaveIconIndicator = ({ lineItemSaveStatus }) => {
+const RowSaveIconIndicator = ({ lineItemSaveStatus = RowSaveStatus.SAVED }) => {
   const { icon, id, defaultMessage } = SaveStatusIcons[lineItemSaveStatus];
   const translate = useSelector((state) =>
     translateWithDefaultMessage(getTranslate(state.localize)));
@@ -25,8 +25,4 @@ export default RowSaveIconIndicator;
 
 RowSaveIconIndicator.propTypes = {
   lineItemSaveStatus: PropTypes.string,
-};
-
-RowSaveIconIndicator.defaultProps = {
-  lineItemSaveStatus: RowSaveStatus.SAVED,
 };

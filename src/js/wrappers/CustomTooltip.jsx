@@ -7,10 +7,10 @@ import PortalTooltip from 'wrappers/PortalTooltip';
 const CustomTooltip = ({
   children,
   content,
-  className,
+  className = '',
   show = true,
   disabled = false,
-  icon: Icon,
+  icon: Icon = null,
   place = 'top',
   delayShow = 150,
 }) => {
@@ -70,13 +70,4 @@ CustomTooltip.propTypes = {
   icon: PropTypes.elementType,
   place: PropTypes.string,
   delayShow: PropTypes.number,
-};
-
-CustomTooltip.defaultProps = {
-  className: '',
-  icon: null,
-  show: true,
-  disabled: false,
-  place: 'top',
-  delayShow: 150,
 };

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`menu component should match snapshot 1`] = `
+exports[`menu component > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="menu-wrapper"
@@ -13,7 +13,7 @@ exports[`menu component should match snapshot 1`] = `
 </DocumentFragment>
 `;
 
-exports[`menuConfigurationSubsection component should match snapshot 1`] = `
+exports[`menuConfigurationSubsection component > should match snapshot 1`] = `
 <DocumentFragment>
   <div
     class="padding-8"
@@ -34,7 +34,7 @@ exports[`menuConfigurationSubsection component should match snapshot 1`] = `
 </DocumentFragment>
 `;
 
-exports[`menuItem component should match snapshot 1`] = `
+exports[`menuItem component > should match snapshot 1`] = `
 <DocumentFragment>
   <li
     class="nav-item dropdown d-none d-md-flex justify-content-center align-items-center false"

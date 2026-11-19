@@ -52,7 +52,3 @@ DocumentsDropdown.propTypes = {
     hidden: PropTypes.bool,
   })),
 };
-
-DocumentsDropdown.defaultProps = {
-  documents: [],
-};

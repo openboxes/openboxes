@@ -142,7 +142,7 @@ targetCompatibility = 1.8
  * http://www.asset-pipeline.com/manual/index.html#configuration
  * http://www.asset-pipeline.com/manual/index.html#configuration-2
  *
- * Because we use webpack to bundle .css and .js files, most of
+ * Because we use Vite to bundle .css and .js files, most of
  * asset-pipeline's advanced features are unnecessary.
  */
 assets {
@@ -869,14 +869,14 @@ buildProperties.doLast {
     }
 }
 
-task cleanWebpack(type: Delete) {
-    description = "Delete webpack's file cache and output directory"
+task cleanFrontend(type: Delete) {
+    description = "Delete Vite's cache and frontend output directory"
     group = 'Build'
-    delete file('node_modules/.cache')
-    delete file('src/main/webapp/webpack')
+    delete file('node_modules/.vite')
+    delete file('src/main/webapp/dist')
 }
 
-clean.dependsOn cleanWebpack
+clean.dependsOn cleanFrontend
 
 /*
  * This lightweight task logs release info for node, npm and friends.

@@ -10,7 +10,7 @@ import useTableArrowNavigation from 'hooks/useTableArrowNavigation';
 
 import '@testing-library/jest-dom';
 
-jest.mock('hooks/useTranslate');
+vi.mock('hooks/useTranslate');
 
 const COLUMN = 'quantityReceiving';
 const OTHER_COLUMN = 'recipient';
@@ -64,7 +64,7 @@ describe('useTableArrowNavigation', () => {
   // Testing Library wraps a render in act(), and the added field has to be there right away, so
   // the event goes in the way the browser sends it. React warns about that, hence the muted log.
   const arrowDownNatively = (element) => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     element.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
     );
@@ -88,7 +88,7 @@ describe('useTableArrowNavigation', () => {
 
   it('moves down and up the column, stays at its edges and selects the value it enters', () => {
     renderTable(columnRows);
-    const selectValue = jest.spyOn(screen.getByTestId('second'), 'select');
+    const selectValue = vi.spyOn(screen.getByTestId('second'), 'select');
 
     arrowDown(screen.getByTestId('first'));
     expect(screen.getByTestId('second')).toHaveFocus();
@@ -208,7 +208,7 @@ describe('useTableArrowNavigation', () => {
   });
 
   it('adds a row from the last field of the table and focuses the field it brings', () => {
-    const onNavigatePastLastField = jest.fn();
+    const onNavigatePastLastField = vi.fn();
     renderTable(gridRows, { onNavigatePastLastField });
 
     arrowDownNatively(screen.getByTestId('recipient-second'));

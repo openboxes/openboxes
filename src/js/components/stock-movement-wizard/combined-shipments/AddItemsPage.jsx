@@ -47,8 +47,6 @@ import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const customTextFieldWithTooltip = (params) => {
   const renderInput = ({
     inputClassName,
@@ -326,7 +324,9 @@ const FIELDS = {
 
 const LOT_AND_EXPIRY_ERROR = 'react.stockMovement.error.lotAndExpiryControl.label';
 
-/* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
+/* eslint class-methods-use-this: ["error", {
+  "exceptMethods": ["getLineItemsToBeSaved"], "enforceForClassFields": false
+}] */
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -508,8 +508,7 @@ class AddItemsPage extends Component {
             (sum + (val.packsRequested
               ? _.toInteger(val.packsRequested * val.packSize)
               : 0
-            )),
-          0,
+            )), 0,
         );
         if (requestedQuantity > item.quantityAvailable) {
           _.forEach(values.lineItems, (lineItem, lineItemKey) => {
@@ -663,7 +662,7 @@ class AddItemsPage extends Component {
       });
   }
 
-  isRowLoaded = (values) => ({ index }) => !!values.lineItems[index]
+  isRowLoaded = (values) => ({ index }) => !!values.lineItems[index];
 
   /**
    * Saves current stock movement progress (line items) and goes to the next stock movement step.
@@ -1118,7 +1117,7 @@ class AddItemsPage extends Component {
       .catch(() => {
         this.props.hideSpinner();
       });
-  }
+  };
 
   exportTemplate(blank) {
     const url = `${COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE}?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;

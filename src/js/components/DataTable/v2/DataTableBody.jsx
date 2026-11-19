@@ -29,18 +29,24 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 //                      row height
 // }
 const DataTableBody = ({
-  emptyTableMessage,
-  loadingMessage,
+  emptyTableMessage = null,
+  loadingMessage = null,
   defaultLoadingTableMessage,
   defaultEmptyTableMessage,
-  loading,
+  loading = false,
   rowModel,
   dataLength,
   tableWidth,
-  tableWithPinnedColumns,
+  tableWithPinnedColumns = false,
   isScreenWiderThanTable,
-  virtualize,
-  arrowNavigationEnabledForAllFields,
+  virtualize = {
+    enabled: false,
+    minSize: 20,
+    estimateSize: 50,
+    overscan: 10,
+    customRowsHeight: false,
+  },
+  arrowNavigationEnabledForAllFields = false,
 }) => {
   const translate = useTranslate();
   const parentRef = useRef(null);
@@ -238,19 +244,4 @@ DataTableBody.propTypes = {
     customRowsHeight: PropTypes.bool,
   }),
   arrowNavigationEnabledForAllFields: PropTypes.bool,
-};
-
-DataTableBody.defaultProps = {
-  emptyTableMessage: null,
-  loadingMessage: null,
-  loading: false,
-  tableWithPinnedColumns: false,
-  arrowNavigationEnabledForAllFields: false,
-  virtualize: {
-    enabled: false,
-    minSize: 20,
-    estimateSize: 50,
-    overscan: 10,
-    customRowsHeight: false,
-  },
 };

@@ -24,8 +24,6 @@ import Translate from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
 import withRouter from 'utils/withRouter';
 
-import 'react-table/react-table.css';
-
 const SelectTreeTable = selectTableHOC(customTreeTableHOC(ReactTable));
 
 /* eslint-disable no-underscore-dangle */

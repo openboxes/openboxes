@@ -67,10 +67,5 @@ ProductSupplierListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
   filterFields: PropTypes.shape({}).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
-  formProps: PropTypes.shape({}),
   ignoreClearFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
-
-ProductSupplierListFilters.defaultProps = {
-  formProps: {},
 };

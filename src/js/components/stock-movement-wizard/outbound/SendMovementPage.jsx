@@ -37,8 +37,6 @@ import splitTranslation, { formatDate } from 'utils/translation-utils';
 import withRouter from 'utils/withRouter';
 import CustomTooltip from 'wrappers/CustomTooltip';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const SHIPMENT_FIELDS = {
   'origin.name': {
     label: 'react.stockMovement.origin.label',

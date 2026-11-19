@@ -7,14 +7,18 @@ import {
 
 import MainRouter from '../../MainRouter';
 
-jest.mock('components/Router', () => () => null);
-jest.mock('actions', () => ({}));
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('components/Router', () => ({ default: () => null }));
+vi.mock('actions', () => ({
+  fetchMenuConfig: vi.fn(),
+  fetchSessionInfo: vi.fn(),
+  fetchTranslations: vi.fn(),
+}));
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   connect: () => (component) => component,
 }));
-jest.mock('react-localize-redux', () => ({
-  ...jest.requireActual('react-localize-redux'),
+vi.mock('react-localize-redux', async () => ({
+  ...(await vi.importActual('react-localize-redux')),
   withLocalize: (component) => component,
 }));
 
@@ -22,10 +26,10 @@ describe('translation mode language registration', () => {
   it('can activate Crowdin without adding it to selectable user locales', async () => {
     const supportedLocales = [{ code: 'en', name: 'English' }, { code: 'fr', name: 'French' }];
     let localizationState;
-    const initializeLanguages = jest.fn((settings) => {
+    const initializeLanguages = vi.fn((settings) => {
       localizationState = localizeReducer(undefined, initialize(settings));
     });
-    const activateLanguage = jest.fn((code) => {
+    const activateLanguage = vi.fn((code) => {
       localizationState = localizeReducer(localizationState, setActiveLanguage(code));
     });
 
@@ -37,8 +41,8 @@ describe('translation mode language registration', () => {
         initialize={initializeLanguages}
         setActiveLanguage={activateLanguage}
         fetchSessionInfo={() => Promise.resolve()}
-        fetchTranslations={jest.fn()}
-        fetchMenuConfig={jest.fn()}
+        fetchTranslations={vi.fn()}
+        fetchMenuConfig={vi.fn()}
       />,
     );
 

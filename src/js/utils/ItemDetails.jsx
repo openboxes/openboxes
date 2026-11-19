@@ -62,9 +62,3 @@ ItemDetails.propTypes = {
   /** Additional elements rendered as grid items after the fields */
   children: PropTypes.node,
 };
-
-ItemDetails.defaultProps = {
-  badge: null,
-  className: '',
-  children: null,
-};
