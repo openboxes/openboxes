@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.replenishment.SearchReplenishmentTaskCommand
 import org.pih.warehouse.auth.AuthService
@@ -24,12 +25,15 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransferStockCommand
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picking.StagingLocationNotFoundException
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.picklist.PicklistService
 
@@ -46,6 +50,7 @@ class ReplenishmentTaskService {
     GrailsApplication grailsApplication
     InventoryService inventoryService
     PicklistService picklistService
+    ProductAvailabilityService productAvailabilityService
     UserService userService
 
     @Transactional(readOnly = true)
@@ -245,12 +250,17 @@ class ReplenishmentTaskService {
     /**
      * Picks less than required. With a reason code the task ends: PICKED when anything was picked, otherwise STAGED
      * (nothing to stage). Without one, the task stays open for the rest.
+     *
+     * A reason code on a task still open reports a shortage (see {@link #handleShortage}). A shortage is handled once:
+     * the task ends with it, so a later short pick of the same task is no new shortage.
      */
     void shortPick(ReplenishmentTask task, String outboundContainerId, Integer quantityPicked, String pickedById,
                    String reasonCode) {
         if (quantityPicked == null || quantityPicked < 0) {
             throw new IllegalArgumentException("Quantity picked must be zero or more")
         }
+
+        boolean newShortage = reasonCode && task.status in OPEN_STATUSES
 
         Location outboundContainer = null
         if (quantityPicked > 0) {
@@ -281,6 +291,119 @@ class ReplenishmentTaskService {
         }
 
         save(task)
+
+        if (newShortage) {
+            handleShortage(task, picklistItem)
+        }
+    }
+
+    /**
+     * Handles the quantity a picker could not find in the bin (required - picked):
+     * <ul>
+     *     <li>holds it: the quantity still recorded in the bin moves to the facility's lost and found location, out of
+     *     allocation until someone moves it out after investigating (when the facility has no lost and found location,
+     *     nothing moves);</li>
+     *     <li>reallocates it: new tasks pick it from other bins with stock available to allocate, when there are
+     *     any;</li>
+     *     <li>publishes a {@link ReplenishmentShortageEvent}, sent as a pick.shortage webhook once committed.</li>
+     * </ul>
+     */
+    private void handleShortage(ReplenishmentTask task, PicklistItem picklistItem) {
+        Integer quantityShorted = (picklistItem.quantity ?: 0) - (picklistItem.quantityPicked ?: 0)
+        if (quantityShorted <= 0) {
+            return
+        }
+
+        Location lostAndFound = findLostAndFoundLocation(task)
+        Integer quantityHeld = lostAndFound ? holdShortage(task, picklistItem, lostAndFound, quantityShorted) : 0
+        List<String> reallocatedIds = reallocateShortage(task, picklistItem, quantityShorted)
+
+        grailsApplication.mainContext.publishEvent(new ReplenishmentShortageEvent(
+                picklistItem.id, quantityHeld, lostAndFound?.id, reallocatedIds))
+    }
+
+    private Location findLostAndFoundLocation(ReplenishmentTask task) {
+        Location lostAndFound = task.facility?.internalLocations?.find { it.supports(ActivityCode.LOST_AND_FOUND) }
+        if (!lostAndFound) {
+            log.warn("Not holding the shortage of replenishment task ${task.identifier}: facility " +
+                    "${task.facility?.name} has no lost and found location")
+        }
+        return lostAndFound
+    }
+
+    /**
+     * Moves the shorted quantity from the bin to the lost and found location, capped at what is still recorded in
+     * the bin. When internal transactions are not tracked, the picked quantity is still recorded in the bin, so it is
+     * not available to move.
+     *
+     * @return the quantity moved
+     */
+    private Integer holdShortage(ReplenishmentTask task, PicklistItem picklistItem, Location lostAndFound,
+                                 Integer quantityShorted) {
+        Integer quantityInBin = inventoryService.getBinLocationsByInventoryItem(task.facility, task.inventoryItem).find {
+            it.binLocation == task.location
+        }?.quantity ?: 0
+        if (!task.facility.supports(ActivityCode.TRACK_INTERNAL_TRANSACTIONS)) {
+            quantityInBin -= (picklistItem.quantityPicked ?: 0)
+        }
+
+        Integer quantity = Math.min(quantityShorted, quantityInBin)
+        if (quantity <= 0) {
+            log.warn("Not holding the shortage of replenishment task ${task.identifier}: no stock left in ${task.location?.name}")
+            return 0
+        }
+        if (quantity < quantityShorted) {
+            log.warn("Only ${quantity} of ${quantityShorted} shorted units are left in ${task.location?.name} " +
+                    "for replenishment task ${task.identifier}")
+        }
+
+        moveStock(task, task.location, lostAndFound, quantity)
+        return quantity
+    }
+
+    /**
+     * Creates tasks of the same replenishment line to pick the shorted quantity from other bins: those with stock
+     * available to allocate (not on hold, not lost and found), but not the bin that came up short nor the bin being
+     * replenished. Takes what there is, in the order availability sorts the bins (FEFO).
+     *
+     * @return the ids of the picklist items (tasks) created
+     */
+    private List<String> reallocateShortage(ReplenishmentTask task, PicklistItem picklistItem, Integer quantityShorted) {
+        OrderItem orderItem = picklistItem.orderItem
+        Picklist picklist = picklistItem.picklist
+        // The shorted bin may still show stock until availability is refreshed, so it is left out by name
+        List<AvailableItem> candidates = productAvailabilityService.getAvailableBinLocations(task.facility, task.product?.id).findAll {
+            AvailableItem item -> item.binLocation && item.pickable && (item.quantityAvailable ?: 0) > 0 &&
+                    item.binLocation.id != task.location?.id && item.binLocation.id != orderItem?.destinationBinLocation?.id
+        }
+
+        List<PicklistItem> created = []
+        Integer quantityRemaining = quantityShorted
+        candidates.each { AvailableItem item ->
+            if (quantityRemaining <= 0) {
+                return
+            }
+            Integer quantity = Math.min(quantityRemaining, item.quantityAvailable as Integer)
+            PicklistItem reallocated = new PicklistItem(orderItem: orderItem, inventoryItem: item.inventoryItem,
+                    binLocation: item.binLocation, quantity: quantity, quantityPicked: 0,
+                    sortOrder: picklistItem.sortOrder, disableRefresh: Boolean.TRUE)
+            picklist.addToPicklistItems(reallocated)
+            orderItem.addToPicklistItems(reallocated)
+            created << reallocated
+            quantityRemaining -= quantity
+        }
+        if (!created) {
+            log.info("No other bin has ${task.product?.productCode} to replace the shortage of replenishment task ${task.identifier}")
+            return []
+        }
+        picklist.save(flush: true, failOnError: true)
+        productAvailabilityService.refreshProductsAvailability(task.facility?.id, [task.product?.id],
+                created*.binLocation*.id, false)
+        if (quantityRemaining > 0) {
+            log.info("Only ${quantityShorted - quantityRemaining} of ${quantityShorted} shorted units of " +
+                    "${task.product?.productCode} could be reallocated for replenishment task ${task.identifier}")
+        }
+        return created*.id
     }
 
     /**
@@ -367,7 +490,14 @@ class ReplenishmentTaskService {
                     "${ActivityCode.TRACK_INTERNAL_TRANSACTIONS} activity")
             return
         }
+        moveStock(task, fromBin, toBin, quantity)
+    }
 
+    /**
+     * Moves the task's lot between two bins of its facility, whether or not the facility tracks internal transactions.
+     * The transfer is linked to the picklist, like the other transfers of the task.
+     */
+    private void moveStock(ReplenishmentTask task, Location fromBin, Location toBin, Integer quantity) {
         TransferStockCommand command = new TransferStockCommand()
         command.location = task.facility
         command.binLocation = fromBin
