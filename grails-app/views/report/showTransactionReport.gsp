@@ -75,6 +75,20 @@
 		margin: 0;
 	}
 
+	/* The reset link, on the right of the Report Parameters header */
+	.reset-button {
+		float: right;
+		margin-right: 6px;
+		font-size: 0.85em;
+		font-weight: normal;
+		color: #1a5ea8;
+		text-decoration: none;
+	}
+
+	.reset-button:hover {
+		text-decoration: underline;
+	}
+
 	.required-marker {
 		color: #c00;
 	}
@@ -119,7 +133,7 @@
 	}
 
 	.report-overlay-message {
-		width: 320px;
+		width: 380px;
 		padding: 20px;
 		background-color: #fff;
 		border-radius: 4px;
@@ -145,6 +159,34 @@
 
 	.report-overlay-hint {
 		color: #666;
+	}
+
+	/* What the report is being built for, so that it's clear what a long wait (or a cancel) is about */
+	.report-overlay-summary {
+		width: 100%;
+		margin: 10px 0;
+		border-collapse: collapse;
+		text-align: left;
+		font-size: 0.95em;
+	}
+
+	.report-overlay-summary th,
+	.report-overlay-summary td {
+		padding: 2px 4px;
+		vertical-align: top;
+		border: none;
+	}
+
+	.report-overlay-summary th {
+		width: 30%;
+		color: #666;
+		font-weight: normal;
+		white-space: nowrap;
+	}
+
+	.report-overlay-cancel {
+		margin-top: 15px;
+		cursor: pointer;
 	}
 
 	/* Transaction report table. Scoped to the wrapper because DataTables moves the header and footer into their
@@ -593,15 +635,14 @@
 		border-bottom: 1px solid #cfd8e3;
 	}
 
-	/* The period label, with the links to the period before and after on the right */
-	.report-period-header {
+	/* The links under the period field that move to the period before (left) and after (right) */
+	.report-period-steps {
 		display: flex;
 		justify-content: space-between;
-		align-items: baseline;
+		margin-top: 4px;
 	}
 
 	.report-period-steps a {
-		margin-left: 8px;
 		font-size: 0.9em;
 		color: #1a5ea8;
 		text-decoration: none;
@@ -664,6 +705,19 @@
 		color: #b45309;
 		font-weight: 600;
 	}
+
+	/* The link to the help article, just after the Report Details title */
+	.report-help-link {
+		margin-left: 10px;
+		font-size: 0.85em;
+		font-weight: normal;
+		color: #1a5ea8;
+		text-decoration: none;
+	}
+
+	.report-help-link:hover {
+		text-decoration: underline;
+	}
 	</style>
 	<%-- The same date range picker as the request list --%>
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.16.1/daterangepicker.min.css" />
@@ -682,11 +736,39 @@
 				<div class="report-overlay-elapsed">
 					<g:message code="report.elapsed.label" default="Elapsed"/>: <span class="report-overlay-elapsed-time">0:00</span>
 				</div>
+				<table class="report-overlay-summary">
+					<tr><th><g:message code="report.facility.label" default="Facility"/></th><td class="report-overlay-facility"></td></tr>
+					<tr><th><g:message code="report.metadata.period.label" default="Period"/></th><td class="report-overlay-period"></td></tr>
+					<tr><th><g:message code="report.metadata.filters.label" default="Filters"/></th><td class="report-overlay-filters"></td></tr>
+					<tr><th><g:message code="report.metadata.included.label" default="Included"/></th><td class="report-overlay-included"></td></tr>
+				</table>
 				<div class="report-overlay-hint">
 					<g:message code="report.generating.hint" default="Large date ranges can take a few minutes. Please don't refresh the page or click again."/>
 				</div>
+				<button type="button" class="report-overlay-cancel button"
+						title="${g.message(code: 'report.cancel.hint', default: 'Stops waiting for the report. The server may take a moment to finish the work it started.')}">
+					<g:message code="default.button.cancel.label" default="Cancel"/>
+				</button>
 			</div>
 		</div>
+		<%-- The help article, from openboxes.supportLinks.transactionReport: linked from the Report Details header, and
+			 opened by the help icon in the Help Scout widget (see openHelp in _menuicons.gsp) --%>
+		<g:set var="helpArticle" value="${grailsApplication.config.openboxes.supportLinks.transactionReport}"/>
+		<script type="text/javascript">
+			window.helpArticle = {
+				articleId: "${(helpArticle?.articleId ?: '').toString().encodeAsJavaScript()}",
+				// Without searchText, the help icon searches for the page title (see openHelp)
+				searchText: "${(helpArticle?.searchText ?: '').toString().encodeAsJavaScript()}"
+			};
+			// The help link opens the article in the widget when there's an article id, or else in a new tab
+			$(function () {
+				$(".report-help-link").click(function (event) {
+					if (window.openHelpArticle && window.openHelpArticle(window.helpArticle.articleId)) {
+						event.preventDefault();
+					}
+				});
+			});
+		</script>
 		<g:if test="${flash.message}">
 			<div class="message" role="status" aria-label="message">${flash.message}</div>
 		</g:if>
@@ -704,7 +786,11 @@
 				<div class="sidebar">
 
 					<div class="box">
-						<h2><warehouse:message code="report.parameters.label" default="Parameters"/></h2>
+						<h2>
+							<warehouse:message code="report.parameters.label" default="Parameters"/>
+							<a href="#" role="button" class="reset-button"
+							   title="${g.message(code: 'report.transaction.reset.hint', default: 'Clears the report and sets every parameter back to its default')}"><g:message code="default.button.reset.label" default="Reset"/></a>
+						</h2>
 
 						<div class="parameters">
 
@@ -727,19 +813,18 @@
 							<%-- The report period, picked as a range. The hidden fields hold the dates in the format the server reads
 							     (MM/dd/yyyy), and are filled in from the text field by syncReportPeriod. --%>
 							<div class="filter-list-item report-period">
-								<div class="report-period-header">
-									<label for="reportPeriod" class="hint" title="${g.message(code: 'report.period.hint', default: 'Both dates are included: from the start of the first day to the end of the last.')}">
-										<g:message code="report.period.label" default="Period"/>
-										<span class="required-marker">*</span>
-									</label>
-									<%-- Move to the period before or after, of the same length (e.g. the month before) --%>
-									<span class="report-period-steps">
-										<a href="#" class="report-period-previous">&lsaquo; <g:message code="report.period.previous.label" default="Previous"/></a>
-										<a href="#" class="report-period-next"><g:message code="report.period.next.label" default="Next"/> &rsaquo;</a>
-									</span>
-								</div>
+								<label for="reportPeriod" class="hint" title="${g.message(code: 'report.period.hint', default: 'Both dates are included: from the start of the first day to the end of the last.')}">
+									<g:message code="report.period.label" default="Period"/>
+									<span class="required-marker">*</span>
+								</label>
 								<input type="text" id="reportPeriod" class="text filter" autocomplete="off"
 									   placeholder="${g.message(code: 'report.period.placeholder', default: 'e.g. 01/Jan/2026 - 31/Jan/2026')}"/>
+								<%-- Move to the period before or after, of the same length (e.g. the month before). The text says how far
+									 (e.g. "Previous month"), and is set by updateReportPeriodSteps(). --%>
+								<div class="report-period-steps">
+									<a href="#" role="button" class="report-period-step report-period-previous">&lsaquo; <span class="report-period-step-label"><g:message code="report.period.previous.label" default="Previous period"/></span></a>
+									<a href="#" role="button" class="report-period-step report-period-next"><span class="report-period-step-label"><g:message code="report.period.next.label" default="Next period"/></span> &rsaquo;</a>
+								</div>
 								<input type="hidden" id="startDate" name="startDate" value="${formatDate(date: startDate, format: 'MM/dd/yyyy')}"/>
 								<input type="hidden" id="endDate" name="endDate" value="${formatDate(date: endDate, format: 'MM/dd/yyyy')}"/>
 							</div>
@@ -825,7 +910,7 @@
 								</label>
 							</div>
 							<div class="filter-list-item">
-								<label class="hint checkbox-label" title="${g.message(code: 'report.transaction.includeDataQuality.hint', default: 'Adds columns to the CSV for review: Backdated (entered more than a day late), Entered after period end, Debits with a negative quantity, and Expired stock at closing. They are not part of the sum across the row.')}">
+								<label class="hint checkbox-label" title="${g.message(code: 'report.transaction.includeDataQuality.hint', default: 'Adds Data Check columns to the CSV for review: Quantity Backdated (entered more than a day late), Quantity Backdated after Period End, Debit Transaction Entered with Wrong Sign, and Expired Stock at Closing. They are not part of the sum across the row.')}">
 									<g:checkBox name="includeDataQuality" value="${params?.includeDataQuality}"/>
 									<span class="hint-text"><g:message code="report.transaction.includeDataQuality.label" default="Include data quality columns (CSV only)"/></span>
 								</label>
@@ -901,6 +986,10 @@
 				<div class="box">
 					<h2>
 						${warehouse.message(code:'report.details.label', default: "Report Details")}
+						<g:if test="${helpArticle?.url}">
+							<a href="${helpArticle.url}" target="_blank" rel="noopener noreferrer" class="report-help-link"
+							   title="${helpArticle.title ?: ''}">&#9432; <g:message code="report.transaction.help.link" default="How to read this report"/></a>
+						</g:if>
 					</h2>
 
                     <table id="transactionReport" class="dataTable">
@@ -912,7 +1001,7 @@
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.openingBalance.hint', default: "Quantity on hand at the beginning of the start date")}"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></span></th>
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.credits.hint', default: "Quantity added by credit transactions during the period, e.g. receipts, transfers in and adjustments up")}"><warehouse:message code="default.credits.label" default="Credits"/></span></th>
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.debits.hint', default: "Quantity removed by debit transactions during the period, e.g. issues, transfers out and adjustments down")}"><warehouse:message code="default.debits.label" default="Debits"/></span></th>
-                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.differences.hint', default: "Closing minus expected closing (opening + credits - debits): the change in quantity that credits and debits don't account for. Usually from counts that didn't match the expected stock.")}"><warehouse:message code="report.transaction.differences.label" default="Differences"/></span></th>
+                            <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.differences.hint', default: "Closing minus expected closing (opening + credits - debits): the change in quantity that credits and debits don't account for. Differences result from a user entering a stock count, which sets an inventory baseline of the stock at that moment, and then adding or editing a transaction that occurred before that stock count. When not done with intention, this can result in an inventory error that requires correction. You can see the reason for the difference by reviewing backdated transactions in stock history.")}"><warehouse:message code="report.transaction.differences.label" default="Differences"/></span></th>
                             <th class="right"><span class="hint" title="${g.message(code: 'report.transaction.closingBalance.hint', default: "Quantity on hand at the end of the end date (or now, if the end date is today or later)")}"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></span></th>
                         </tr>
                         </thead>
@@ -942,14 +1031,31 @@
     // Only one report request can be in progress at a time. While it is, the report is covered by an overlay
     // and the buttons are disabled, so that it can't be run again until it's done (see #6201).
     var reportRequestInProgress = false;
+    // The request for the report or CSV that's running, so that it can be cancelled
+    var reportRequest = null;
     var reportElapsedTimer = null;
     var reportStartTime = null;
     var reportTimeout = ${grailsApplication.config.openboxes.report.transactionReport.timeout ?: 300000};
 
-    function startReportRequest() {
+    // Shows the report's settings in the overlay. The CSV download also says whether it has the data quality columns.
+    function showReportOverlaySummary(isDownload) {
+        var params = getReportParams();
+        var none = "${g.message(code: 'default.none.label', default: 'None')}";
+        var included = params.included.slice();
+        if (isDownload && $("#includeDataQuality").is(":checked")) {
+            included.push("${g.message(code: 'report.metadata.dataQuality.label', default: 'Data quality columns')}");
+        }
+        $(".report-overlay-facility").text(params.locationName);
+        $(".report-overlay-period").text(params.period);
+        $(".report-overlay-filters").text(params.filters.join("; ") || none);
+        $(".report-overlay-included").text(included.join(", ") || none);
+    }
+
+    function startReportRequest(isDownload) {
         if (reportRequestInProgress) {
             return false;
         }
+        showReportOverlaySummary(isDownload);
         reportRequestInProgress = true;
         $(".submit-button, .download-button").prop("disabled", true);
 
@@ -969,6 +1075,27 @@
         $(".report-overlay").removeClass("active");
         $(".submit-button, .download-button").prop("disabled", false);
         reportRequestInProgress = false;
+        reportRequest = null;
+    }
+
+    // Stops waiting for the report or CSV and clears the table. The browser closes the request, but the server keeps
+    // working on it until its queries finish. The report's settings are left in the URL, but without run=true, so that
+    // reloading the page doesn't run it again.
+    function cancelReportRequest() {
+        if (!reportRequestInProgress) {
+            return;
+        }
+        var request = reportRequest;
+        finishReportRequest();
+        if (request) {
+            request.abort();
+        }
+        initializeDataTable(false);
+        var params = new URLSearchParams(window.location.search);
+        if (params.has("run")) {
+            params.delete("run");
+            history.replaceState(null, "", window.location.pathname + (params.toString() ? "?" + params.toString() : ""));
+        }
     }
 
     // Returns a message to show the user for a failed report request
@@ -991,10 +1118,10 @@
     // Downloads the report in the background (instead of navigating to it) so that we know when it's done and can
     // show any error, and so that clicking again doesn't silently cancel the first download.
     function downloadReport(url) {
-        if (!startReportRequest()) {
+        if (!startReportRequest(true)) {
             return;
         }
-        var xhr = new XMLHttpRequest();
+        var xhr = reportRequest = new XMLHttpRequest();
         xhr.open("GET", url);
         xhr.responseType = "blob";
         xhr.timeout = reportTimeout;
@@ -1268,7 +1395,7 @@
 				}
 			},
             "fnServerData": function ( sSource, aoData, fnCallback ) {
-				$.ajax({
+				reportRequest = $.ajax({
 					"dataType": 'json',
 					"type": "POST",
 					"url": sSource,
@@ -1353,16 +1480,53 @@
 		lastYear: { months: 12 }
 	};
 
-	// A period of whole months (from the first of a month to the end of a month) steps by months, anything else by
-	// its number of days
+	// The lengths in days that the previous and next links step by, as for the day shortcuts (e.g. last 7 days)
+	var REPORT_PERIOD_STEP_DAYS = [1, 7, 30, 90];
+
+	// The length of the period, or null if the previous and next links shouldn't step it (e.g. 13 days). A period of
+	// whole months steps by months. A period from the first of a month to today is taken to be this month, this quarter
+	// (from the start of a quarter, up to 3 months) or this year (from 1 January, more than 3 months), since the
+	// shortcut that was picked isn't known after a reload without the periodLength parameter; any other period up to
+	// today isn't stepped. Other periods step by days if they're as long as a day shortcut.
 	function getReportPeriodLength(startDate, endDate) {
 		if (reportPeriodLength) {
 			return reportPeriodLength;
 		}
-		if (startDate.date() === 1 && endDate.isSame(endDate.clone().endOf("month"), "day")) {
-			return { months: (endDate.year() - startDate.year()) * 12 + endDate.month() - startDate.month() + 1 };
+		if (startDate.date() === 1) {
+			var months = (endDate.year() - startDate.year()) * 12 + endDate.month() - startDate.month() + 1;
+			if (endDate.isSame(endDate.clone().endOf("month"), "day")) {
+				return { months: months };
+			}
+			if (endDate.isSame(moment(), "day")) {
+				if (months === 1) {
+					return { months: 1 };
+				}
+				if (startDate.month() % 3 === 0 && months <= 3) {
+					return { months: 3 };
+				}
+				if (startDate.month() === 0 && months <= 12) {
+					return { months: 12 };
+				}
+				// e.g. from 1 January two years ago until today
+				return null;
+			}
 		}
-		return { days: endDate.diff(startDate, "days") + 1 };
+		var days = endDate.diff(startDate, "days") + 1;
+		return REPORT_PERIOD_STEP_DAYS.indexOf(days) >= 0 ? { days: days } : null;
+	}
+
+	// The period length as a URL parameter (e.g. "3m" or "7d"), so that a reloaded or shared report steps the same way
+	function formatReportPeriodLength(length) {
+		return length ? (length.months ? length.months + "m" : length.days + "d") : null;
+	}
+
+	function parseReportPeriodLength(value) {
+		var match = /^([1-9][0-9]?)([md])$/.exec(value || "");
+		if (!match) {
+			return null;
+		}
+		var n = parseInt(match[1], 10);
+		return match[2] === "m" ? { months: n } : { days: n };
 	}
 
 	// The period before (direction -1) or after (direction 1) the selected one, of the same length, or null if no period
@@ -1374,6 +1538,9 @@
 			return null;
 		}
 		var length = getReportPeriodLength(startDate, endDate);
+		if (!length) {
+			return null;
+		}
 		var start, end;
 		if (length.months) {
 			start = startDate.clone().startOf("month").add(direction * length.months, "months");
@@ -1385,15 +1552,55 @@
 		return { start: start, end: end, length: length };
 	}
 
-	// Shows the period each link moves to, and disables the next link when that period would start after today
+	// The names of the period links, by direction and by how far they move (__N__ is the number of days or months)
+	var REPORT_PERIOD_STEP_LABELS = {
+		previous: {
+			period: "${g.message(code: 'report.period.previous.label', default: 'Previous period')}",
+			day: "${g.message(code: 'report.period.previous.day.label', default: 'Previous day')}",
+			days: "${g.message(code: 'report.period.previous.days.label', args: ['__N__'], default: 'Previous __N__ days')}",
+			month: "${g.message(code: 'report.period.previous.month.label', default: 'Previous month')}",
+			months: "${g.message(code: 'report.period.previous.months.label', args: ['__N__'], default: 'Previous __N__ months')}",
+			year: "${g.message(code: 'report.period.previous.year.label', default: 'Previous year')}"
+		},
+		next: {
+			period: "${g.message(code: 'report.period.next.label', default: 'Next period')}",
+			day: "${g.message(code: 'report.period.next.day.label', default: 'Next day')}",
+			days: "${g.message(code: 'report.period.next.days.label', args: ['__N__'], default: 'Next __N__ days')}",
+			month: "${g.message(code: 'report.period.next.month.label', default: 'Next month')}",
+			months: "${g.message(code: 'report.period.next.months.label', args: ['__N__'], default: 'Next __N__ months')}",
+			year: "${g.message(code: 'report.period.next.year.label', default: 'Next year')}"
+		}
+	};
+
+	// The name of a period link for a period length, e.g. "Previous month" or "Next 7 days"
+	function getReportPeriodStepLabel(direction, length) {
+		var labels = REPORT_PERIOD_STEP_LABELS[direction < 0 ? "previous" : "next"];
+		if (!length) {
+			return labels.period;
+		}
+		if (length.months) {
+			return length.months === 1 ? labels.month : length.months === 12 ? labels.year
+				: labels.months.replace("__N__", length.months);
+		}
+		return length.days === 1 ? labels.day : labels.days.replace("__N__", length.days);
+	}
+
+	// Names each link after how far it moves (e.g. "Previous month"), shows the period it moves to on hover, disables
+	// the next link when that period would start after today, and hides both when the period can't be stepped
 	function updateReportPeriodSteps() {
 		var today = moment().startOf("day");
+		// Hide the links when there's no period, or it can't be stepped (e.g. 13 days)
+		$(".report-period-steps").css("visibility", getSteppedReportPeriod(-1) ? "visible" : "hidden");
 		[[".report-period-previous", -1], [".report-period-next", 1]].forEach(function (step) {
 			var period = getSteppedReportPeriod(step[1]);
 			var disabled = !period || period.start.isAfter(today);
-			$(step[0]).toggleClass("disabled", disabled).attr("title", disabled ? "" :
-				period.start.format(REPORT_PERIOD_FORMAT) + REPORT_PERIOD_SEPARATOR +
-				moment.min(period.end, today).format(REPORT_PERIOD_FORMAT));
+			var link = $(step[0]);
+			link.find(".report-period-step-label").text(getReportPeriodStepLabel(step[1], period && period.length));
+			link.toggleClass("disabled", disabled).attr({
+				"aria-disabled": disabled,
+				title: disabled ? "" : period.start.format(REPORT_PERIOD_FORMAT) + REPORT_PERIOD_SEPARATOR +
+					moment.min(period.end, today).format(REPORT_PERIOD_FORMAT)
+			});
 		});
 	}
 
@@ -1530,6 +1737,10 @@
 		var endDate = $("#endDate").val();
 		if (startDate && endDate) {
 			setReportPeriod(moment(startDate, "MM/DD/YYYY").toDate(), moment(endDate, "MM/DD/YYYY").toDate());
+			// The length the period stepped by when the report was run (e.g. 3 months for this quarter). Set after
+			// setReportPeriod, since the picker's change event resets it.
+			reportPeriodLength = parseReportPeriodLength("${(params.periodLength ?: '').toString().encodeAsJavaScript()}");
+			updateReportPeriodSteps();
 		} else {
 			var lastMonth = getShortcutPeriod("lastMonth");
 			setReportPeriod(lastMonth[0], lastMonth[1]);
@@ -1604,8 +1815,25 @@
 				initializeDataTable(true);
 				// Put the report's settings in the URL, so that reloading the page or sharing the link runs it again
 				history.replaceState(null, "", window.location.pathname + "?" +
-					$.param($.extend(getFormParams(), { run: true }), true));
+					$.param($.extend(getFormParams(), {
+						periodLength: formatReportPeriodLength(getReportPeriodLength(
+							moment($("#startDate").val(), "MM/DD/YYYY"), moment($("#endDate").val(), "MM/DD/YYYY"))),
+						run: true
+					}), true));
 			}
+		});
+
+		// Reload the page without the report's settings in the URL, which clears the report and the form
+		$(".report-overlay-cancel").click(cancelReportRequest);
+		$(document).keydown(function (event) {
+			if (event.key === "Escape" && reportRequestInProgress) {
+				cancelReportRequest();
+			}
+		});
+
+		$(".reset-button").click(function (event) {
+			event.preventDefault();
+			window.location.href = window.location.pathname;
 		});
 
 		$(".download-button").click(function(event) {

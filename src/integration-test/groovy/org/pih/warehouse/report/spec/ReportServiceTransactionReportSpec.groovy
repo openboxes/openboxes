@@ -225,10 +225,10 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         Map<String, Map> rows = report(includeDetails: true, includeProductsWithNoActivity: true)
 
         then:
-        rows.A.subMap("Opening", "Transfer In", "Transfer Out", "Differences", "Closing") ==
-                [Opening: 100, "Transfer In": 0, "Transfer Out": -20, "Differences": 0, Closing: 80]
-        rows.B.subMap("Opening", "Transfer In", "Transfer Out", "Differences", "Closing") ==
-                [Opening: 5, "Transfer In": 0, "Transfer Out": 0, "Differences": 0, Closing: 5]
+        rows.A.subMap("Opening", "Transferred In", "Transferred Out", "Differences from Backdated Entry", "Closing") ==
+                [Opening: 100, "Transferred In": 0, "Transferred Out": -20, "Differences from Backdated Entry": 0, Closing: 80]
+        rows.B.subMap("Opening", "Transferred In", "Transferred Out", "Differences from Backdated Entry", "Closing") ==
+                [Opening: 5, "Transferred In": 0, "Transferred Out": 0, "Differences from Backdated Entry": 0, Closing: 5]
 
         and: 'B had no activity, so it is only listed when products with no activity are included'
         report().keySet() == ["A"] as Set
@@ -238,9 +238,9 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
 
         then:
         rows.keySet() == ["A", "B"] as Set
-        rows.A.subMap("Opening", "Transfer In", "Transfer Out", "Differences", "Closing") ==
-                [Opening: 100, "Transfer In": 30, "Transfer Out": -50, "Differences": 0, Closing: 80]
-        rows.B.subMap("Transfer In", "Transfer Out") == ["Transfer In": 5, "Transfer Out": -5]
+        rows.A.subMap("Opening", "Transferred In", "Transferred Out", "Differences from Backdated Entry", "Closing") ==
+                [Opening: 100, "Transferred In": 30, "Transferred Out": -50, "Differences from Backdated Entry": 0, Closing: 80]
+        rows.B.subMap("Transferred In", "Transferred Out") == ["Transferred In": 5, "Transferred Out": -5]
     }
 
     void 'filters by category, tag, catalog and product'() {
@@ -286,19 +286,19 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         Map row = report(includeDetails: true, includeDataQuality: true).A
 
         then: 'each transaction type has its net quantity: what it added is positive and what it removed is negative'
-        row["Transfer In"] == 10
-        row["Transfer Out"] == -5
-        row["Consumption"] == -(3 + 2)
-        row["Expired"] == 0
-        row["Damaged"] == 0
+        row["Transferred In"] == 10
+        row["Transferred Out"] == -5
+        row["Marked as Consumed"] == -(3 + 2)
+        row["Marked as Expired"] == 0
+        row["Marked as Damaged"] == 0
 
         and: 'Adjustment is the net of the adjustments up and down, including Adjustment - Debit, which has no column'
-        row["Adjustment"] == 4 - 1 - 2 + 6
+        row["Inventory Adjustment"] == 4 - 1 - 2 + 6
         !row.containsKey("Adjustment - Debit")
 
         and:
-        row.subMap("Opening", "Differences", "Closing") == ["Opening": 0, "Differences": 0, "Closing": 7]
-        row["Backdated (included above)"] == 6 - 2
+        row.subMap("Opening", "Differences from Backdated Entry", "Closing") == ["Opening": 0, "Differences from Backdated Entry": 0, "Closing": 7]
+        row["Data Check: Quantity Backdated"] == 6 - 2
         assertDetailedRowAddsUp(row)
     }
 
@@ -312,17 +312,17 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
 
         then: 'the product, Opening, the transaction types in a fixed order, Differences, Closing'
         columns.subList(0, 15) == ["Code", "Name", "Product Family", "Display Name", "Category", "Formulary", "Tag",
-                                   "Unit Cost", "Opening", "Transfer In", "Transfer Out", "Consumption", "Expired",
-                                   "Damaged", "Adjustment"]
-        columns.subList(columns.size() - 2, columns.size()) == ["Differences", "Closing"]
+                                   "Unit Cost", "Opening", "Transferred In", "Transferred Out", "Marked as Consumed", "Marked as Expired",
+                                   "Marked as Damaged", "Inventory Adjustment"]
+        columns.subList(columns.size() - 2, columns.size()) == ["Differences from Backdated Entry", "Closing"]
 
         when: 'the data quality columns are included'
         columns = report(includeDetails: true, includeDataQuality: true).A.keySet() as List<String>
 
         then: 'they follow Closing'
-        columns.subList(columns.indexOf("Closing"), columns.size()) == ["Closing", "Backdated (included above)",
-                "Entered after period end (included above)", "Debits with a negative quantity (entries)",
-                "Expired stock at closing"]
+        columns.subList(columns.indexOf("Closing"), columns.size()) == ["Closing", "Data Check: Quantity Backdated",
+                "Data Check: Quantity Backdated after Period End", "Data Check: Debit Transaction Entered with Wrong Sign",
+                "Data Check: Expired Stock at Closing"]
     }
 
     void 'the data quality columns flag late entries, negative debits and expired stock'() {
@@ -344,15 +344,15 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         Map row = report(includeDetails: true, includeDataQuality: true).A
 
         then:
-        row["Backdated (included above)"] == -3
-        row["Entered after period end (included above)"] == -3
-        row["Debits with a negative quantity (entries)"] == 1
-        row["Expired stock at closing"] == 4
+        row["Data Check: Quantity Backdated"] == -3
+        row["Data Check: Quantity Backdated after Period End"] == -3
+        row["Data Check: Debit Transaction Entered with Wrong Sign"] == 1
+        row["Data Check: Expired Stock at Closing"] == 4
 
         and: 'the negative debit is counted as a debit, but quantity on hand adds it, so the difference is in Differences'
-        row["Consumption"] == -(3 + 2)
-        row.subMap("Opening", "Transfer In", "Differences", "Closing") ==
-                ["Opening": 0, "Transfer In": 24, "Differences": 4, "Closing": 20 - 3 + 2 + 4]
+        row["Marked as Consumed"] == -(3 + 2)
+        row.subMap("Opening", "Transferred In", "Differences from Backdated Entry", "Closing") ==
+                ["Opening": 0, "Transferred In": 24, "Differences from Backdated Entry": 4, "Closing": 20 - 3 + 2 + 4]
         assertDetailedRowAddsUp(row)
     }
 
@@ -363,7 +363,7 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
         insertTransaction(ADJUSTMENT_CREDIT, day(6), [[itemA1, 7]], day(10))
 
         expect: 'note that the previous implementation only counted one of them'
-        report(includeDetails: true, includeDataQuality: true).A["Backdated (included above)"] == 12
+        report(includeDetails: true, includeDataQuality: true).A["Data Check: Quantity Backdated"] == 12
     }
 
     void 'matches the previous implementation for a random transaction history'() {
@@ -537,8 +537,8 @@ class ReportServiceTransactionReportSpec extends IntegrationSpec {
      */
     private static void assertDetailedRowAddsUp(Map row) {
         List<String> columns = row.keySet() as List<String>
-        List<String> typeColumns = columns.subList(columns.indexOf("Opening") + 1, columns.indexOf("Differences"))
-        Integer sum = row.Opening + (typeColumns.sum { row[it] } ?: 0) + row.Differences
+        List<String> typeColumns = columns.subList(columns.indexOf("Opening") + 1, columns.indexOf("Differences from Backdated Entry"))
+        Integer sum = row.Opening + (typeColumns.sum { row[it] } ?: 0) + row["Differences from Backdated Entry"]
         assert sum == row.Closing, "Opening + ${typeColumns} + Differences doesn't add up to Closing: ${row}"
     }
 
