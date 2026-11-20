@@ -22,6 +22,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.pih.warehouse.requisition.Requisition
 
 class Shipment implements Comparable, Serializable, Historizable {
@@ -110,6 +111,7 @@ class Shipment implements Comparable, Serializable, Historizable {
             "consignorAddress",
             "consigneeAddress",
             "receipt",
+            "receivedReceipts",
             "isFromPurchaseOrder",
             "purchaseOrder",
             "purchaseOrders",
@@ -477,6 +479,10 @@ class Shipment implements Comparable, Serializable, Historizable {
 
     Receipt getReceipt() {
         return receipts ? receipts.first() : null
+    }
+
+    List<Receipt> getReceivedReceipts() {
+        return (receipts?.findAll { Receipt receipt -> receipt.receiptStatusCode == ReceiptStatusCode.RECEIVED } ?: []) as List<Receipt>
     }
 
     /**
