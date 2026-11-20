@@ -340,7 +340,7 @@ class MobileServicesIntegrationSpec extends ObafEventsIntegrationSpec {
         'product code of another product'        | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"<code>"}}'             || 409    | null                                                 | null
     }
 
-    void 'updateIdentifier: a set UPC is saved trimmed and every product notification recipient is told; an empty value is rejected; clear removes it and notifies nobody'() {
+    void 'updateIdentifier: a set UPC is saved trimmed and every product notification recipient is told; an empty or unstorable value is rejected; clear removes it and notifies nobody'() {
         given:
         String p = product('UPCS')
         String pm = productManager()
@@ -363,6 +363,14 @@ class MobileServicesIntegrationSpec extends ObafEventsIntegrationSpec {
 
         then:
         empty.status == 400
+        tx { Product.get(p).upc } == upc
+        mail.sent.isEmpty()
+
+        when: 'a value the product cannot store'
+        Map tooLong = call('updateIdentifier', [id: p], '{"identifier":{"type":"upc","value":"' + '9' * 256 + '"}}', pm)
+
+        then:
+        tooLong.status == 400
         tx { Product.get(p).upc } == upc
         mail.sent.isEmpty()
 

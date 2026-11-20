@@ -210,7 +210,8 @@ class MobileProductApiController extends BaseDomainApiController {
      *
      * 404 unknown product, 401 no session user, 403 not a product manager (checked before the body is read),
      * 400 {errorCode, errorMessage} for a malformed body, a missing or unsupported type, a missing, blank or
-     * non-string value, or a value together with clear; 409 when another product already uses the value.
+     * non-string value, a value together with clear, or a value the product cannot store (e.g. longer than
+     * 255 characters); 409 when another product already uses the value.
      *
      * Initially supports only 'upc' type but structured for easy expansion.
      */
@@ -316,7 +317,7 @@ class MobileProductApiController extends BaseDomainApiController {
 
     private void renderSaveFailure(Product product) {
         String message = product.errors.hasFieldErrors('upc') ? "Identifier value is not valid" : "Product could not be saved"
-        log.info("Product identifier for ${product.id} not saved: ${product.errors}")
+        log.info("Product identifier for ${product.id} not saved; invalid fields: ${product.errors.fieldErrors*.field}")
         product.discard()
         renderBadRequest(message)
     }
