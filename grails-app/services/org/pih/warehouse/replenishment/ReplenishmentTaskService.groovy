@@ -101,7 +101,8 @@ class ReplenishmentTaskService {
     /**
      * The replenishment lists of the facility still to work on, oldest first: with tasks to pick (status PENDING
      * when none is started yet, otherwise PICKING), or with all tasks picked and picks in a container still to stage
-     * (PICKED). A list with neither is staged and ready for putaway, and is left out.
+     * (PICKED). A list with neither is staged and ready for putaway, and is left out. Each list counts all its tasks
+     * (tasksCount) and the ones still to pick (openTasksCount).
      *
      * @param statuses the list statuses to return; all of them when empty
      */
@@ -128,7 +129,7 @@ class ReplenishmentTaskService {
                 status = PickTaskStatus.PICKED.name()
             }
             return [id: orderId, orderNumber: tasks[0][1], status: status, dateCreated: tasks[0][2],
-                    tasksCount: openTasksCount]
+                    tasksCount: tasks.size(), openTasksCount: openTasksCount]
         }
 
         return lists.findAll { Map list -> list.status && (!statuses || list.status in statuses) }
