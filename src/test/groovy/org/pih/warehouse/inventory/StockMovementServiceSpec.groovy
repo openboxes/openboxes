@@ -5,6 +5,7 @@ import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.core.Comment
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -13,6 +14,10 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 class StockMovementServiceSpec extends Specification implements ServiceUnitTest<StockMovementService>, DataTest {
+
+    void setupSpec() {
+        mockDomains(Shipment, Comment)
+    }
 
     void 'getStockMovementReceiptItems should return all receipt items by default'() {
         given:
@@ -60,6 +65,52 @@ class StockMovementServiceSpec extends Specification implements ServiceUnitTest<
 
         then:
         assert result == [receiptItem1, receiptItem2, receiptItem3, receiptItem4, receiptItem5]
+    }
+
+    void 'createOrUpdateComment should add a comment when none matches the previous additional information'() {
+        given:
+        Comment otherComment = new Comment(comment: 'other')
+        Shipment shipment = new Shipment(additionalInformation: null, comments: [otherComment])
+
+        when:
+        service.createOrUpdateComment(shipment, 'new comment')
+
+        then:
+        assert shipment.comments*.comment == ['other', 'new comment']
+    }
+
+    void 'createOrUpdateComment should edit the comment matching the previous additional information'() {
+        given:
+        Comment otherComment = new Comment(comment: 'other')
+        Comment sendPageComment = new Comment(comment: 'old comment')
+        Shipment shipment = new Shipment(additionalInformation: 'old comment', comments: [otherComment, sendPageComment])
+
+        when:
+        service.createOrUpdateComment(shipment, 'edited comment')
+
+        then:
+        assert shipment.comments == [otherComment, sendPageComment]
+        assert sendPageComment.comment == 'edited comment'
+        assert otherComment.comment == 'other'
+    }
+
+    void 'createOrUpdateComment should not touch comments when additional information is #scenario'() {
+        given:
+        Comment sendPageComment = new Comment(comment: 'old comment')
+        Shipment shipment = new Shipment(additionalInformation: 'old comment', comments: [sendPageComment])
+
+        when:
+        service.createOrUpdateComment(shipment, additionalInformation)
+
+        then:
+        assert shipment.comments == [sendPageComment]
+        assert sendPageComment.comment == 'old comment'
+
+        where:
+        scenario    | additionalInformation
+        'unchanged' | 'old comment'
+        'empty'     | ''
+        'null'      | null
     }
 
     private static StockMovement buildStockMovement(List<Receipt> receipts) {

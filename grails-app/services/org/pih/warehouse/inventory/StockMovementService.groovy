@@ -3078,14 +3078,12 @@ class StockMovementService {
             }
         }
 
+        createOrUpdateComment(shipment, stockMovement.comments)
         shipment.additionalInformation = stockMovement.comments
         shipment.shipmentType = stockMovement.shipmentType
         shipment.driverName = stockMovement.driverName
         shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate
         shipment.expectedShippingDate = stockMovement.dateShipped
-        if (stockMovement.comments) {
-            shipment.addToComments(new Comment(comment: stockMovement.comments))
-        }
         if (shipment.destination != stockMovement.destination) {
             shipment.name = stockMovement.generateName()
             shipment.destination = stockMovement.destination
@@ -3093,6 +3091,26 @@ class StockMovementService {
 
         shipmentService.createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
         shipment.save()
+    }
+
+    /**
+     * Mirrors shipment.additionalInformation, which is displayed on the send page, in shipment.comments.
+     * The comment whose content matches the current additionalInformation is updated to the new value,
+     * or a new comment is added when none matches.
+     * Nothing changes when the new value is empty or the same as the current one.
+     * Must be called before shipment.additionalInformation is overwritten.
+     */
+    private void createOrUpdateComment(Shipment shipment, String newComment) {
+        String previousAdditionalInformation = shipment.additionalInformation
+        if (!newComment || newComment == previousAdditionalInformation) {
+            return
+        }
+        Comment existingComment = shipment.comments?.find { it.comment == previousAdditionalInformation }
+        if (existingComment) {
+            existingComment.comment = newComment
+            return
+        }
+        shipment.addToComments(new Comment(comment: newComment))
     }
 
     Shipment updateShipmentForRequisitionBasedStockMovement(StockMovement stockMovement) {
