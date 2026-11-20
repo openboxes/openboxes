@@ -1655,6 +1655,19 @@ class ReportService implements ApplicationContextAware {
     ]
 
     /**
+     * The column names of the common transaction types in the CSV download, which say what happened to the stock.
+     * Other types use their own name.
+     */
+    private static final Map<String, String> CSV_TRANSACTION_TYPE_COLUMN_NAMES = [
+            (Constants.TRANSFER_IN_TRANSACTION_TYPE_ID): "Transferred In",
+            (Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID): "Transferred Out",
+            (Constants.CONSUMPTION_TRANSACTION_TYPE_ID): "Marked as Consumed",
+            (Constants.EXPIRATION_TRANSACTION_TYPE_ID): "Marked as Expired",
+            (Constants.DAMAGE_TRANSACTION_TYPE_ID): "Marked as Damaged",
+            (Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID): "Inventory Adjustment",
+    ]
+
+    /**
      * Transaction types that share another type's column in the CSV download: an Adjustment - Debit is in the
      * Adjustment column, so that it has the net of all the adjustments.
      */
@@ -1666,19 +1679,20 @@ class ReportService implements ApplicationContextAware {
      * A row of the CSV download. Each transaction type has one column with its net quantity: what it added is
      * positive and what it removed is negative. So a row can be summed straight across:
      *
-     *   Opening + the transaction type columns + Differences = Closing
+     *   Opening + the transaction type columns + Differences from Backdated Entry = Closing
      *
-     * Differences is the change that the transactions don't account for, usually from counts that didn't match the
-     * expected stock.
+     * Differences from Backdated Entry is the change that the transactions don't account for, usually from a
+     * transaction entered or edited with a date before a stock count, or a count that didn't match the expected stock.
      *
-     * With data.includeDataQuality, data quality columns follow, for review. They aren't part of the sum:
-     *   - Backdated: the part of the transactions that was entered more than a day after its transaction date. It's
-     *     already included in the transaction type columns.
-     *   - Entered after period end: the part of Backdated that was entered after the period ended, so the period's
-     *     numbers changed after the fact.
-     *   - Debits with a negative quantity: the number of debit entries with a negative quantity, a data error. They're
-     *     counted as debits, but quantity on hand adds them, so the difference shows in Differences.
-     *   - Expired stock at closing: the quantity at closing in lots that had expired by then
+     * With data.includeDataQuality, data check columns follow, for review. They aren't part of the sum:
+     *   - Data Check: Quantity Backdated: the part of the transactions that was entered more than a day after its
+     *     transaction date. It's already included in the transaction type columns.
+     *   - Data Check: Quantity Backdated after Period End: the part of that which was entered after the period ended,
+     *     so the period's numbers changed after the fact.
+     *   - Data Check: Debit Transaction Entered with Wrong Sign: the number of debit entries with a negative quantity,
+     *     a data error. They're counted as debits, but quantity on hand adds them, so the gap shows in Differences
+     *     from Backdated Entry.
+     *   - Data Check: Expired Stock at Closing: the quantity at closing in lots that had expired by then
      *
      * @param data.typeTotals the credits and debits of each transaction type, keyed on transaction type id
      * @param data.availableTransactionTypes the CREDIT and DEBIT transaction types, which each get a column
@@ -1690,7 +1704,9 @@ class ReportService implements ApplicationContextAware {
             Map totals = typeTotals[typeId]
             return ((totals?.credits ?: 0) - (totals?.debits ?: 0)) as Integer
         }
-        Closure<String> columnName = { TransactionType type -> LocalizationUtil.getLocalizedString(type.name) }
+        Closure<String> columnName = { TransactionType type ->
+            CSV_TRANSACTION_TYPE_COLUMN_NAMES[type.id] ?: LocalizationUtil.getLocalizedString(type.name)
+        }
         Closure<Integer> position = { TransactionType type ->
             int index = CSV_TRANSACTION_TYPE_ORDER.indexOf(type.id)
             return index >= 0 ? index : CSV_TRANSACTION_TYPE_ORDER.size()
@@ -1720,15 +1736,15 @@ class ReportService implements ApplicationContextAware {
         }
 
         row += [
-                "Differences": data.differences,
+                "Differences from Backdated Entry": data.differences,
                 "Closing": data.closingBalance,
         ]
         if (data.includeDataQuality) {
             row += [
-                    "Backdated (included above)": data.backdatedQuantity ?: 0,
-                    "Entered after period end (included above)": data.afterPeriodQuantity ?: 0,
-                    "Debits with a negative quantity (entries)": data.negativeDebitEntries ?: 0,
-                    "Expired stock at closing": data.expiredAtClosing ?: 0,
+                    "Data Check: Quantity Backdated": data.backdatedQuantity ?: 0,
+                    "Data Check: Quantity Backdated after Period End": data.afterPeriodQuantity ?: 0,
+                    "Data Check: Debit Transaction Entered with Wrong Sign": data.negativeDebitEntries ?: 0,
+                    "Data Check: Expired Stock at Closing": data.expiredAtClosing ?: 0,
             ]
         }
         return row
