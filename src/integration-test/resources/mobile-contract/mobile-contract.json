@@ -17,7 +17,7 @@
       "PUT /chooseLocation/{location.id}"
     ]
   },
-  "entryCount": 81,
+  "entryCount": 82,
   "entries": [
     {
       "id": "src/apis/auth.ts#getSession",
@@ -5319,6 +5319,51 @@
         }
       ],
       "requestNotes": "PUT /mobile/products/{id}/identifiers; type 'upc' from src/screens/ProductDetails/index.tsx:120."
+    },
+    {
+      "id": "src/apis/products.ts#removeProductIdentifier",
+      "file": "src/apis/products.ts",
+      "function": "removeProductIdentifier",
+      "method": "PUT",
+      "path": "/mobile/products/{id}/identifiers",
+      "pathParams": [
+        "id"
+      ],
+      "query": [],
+      "extraQueryFrom": null,
+      "axiosConfig": null,
+      "body": {
+        "identifier": {
+          "type": {
+            "$param": "type",
+            "$type": "string"
+          },
+          "clear": true
+        }
+      },
+      "referencedFrom": [
+        "src/redux/sagas/products.ts"
+      ],
+      "response": {
+        "envelope": "none",
+        "expectedStatus": "2xx",
+        "used": true,
+        "notes": "Same handling as updateProductIdentifier (one saga, branching on payload.remove). Response data.identifier.value is null. Always called with type 'upc'.",
+        "fields": []
+      },
+      "requestVariants": [
+        {
+          "label": "literal",
+          "body": {
+            "identifier": {
+              "type": "upc",
+              "clear": true
+            }
+          },
+          "evidence": "src/apis/products.ts (removeProductIdentifier, OBLS-1060)"
+        }
+      ],
+      "requestNotes": "PUT /mobile/products/{id}/identifiers with clear: true removes the UPC (OBLS-1060: an empty value is rejected with 400). From the Remove barcode confirm step in src/screens/ProductDetails/EditBarcodeModal.tsx."
     },
     {
       "id": "src/apis/pua.ts#allocate",
