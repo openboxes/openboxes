@@ -141,7 +141,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                     organizationName    : origin?.organization?.name,
                     organizationCode    : origin?.organization?.code,
                     isDepot             : origin?.isDepot(),
-                    supportedActivities : origin?.supportedActivities,
+                    supportedActivities : origin?.supportedActivities ?: origin?.locationType?.supportedActivities,
                 ],
                 destination         : [
                     id                  : destination?.id,
@@ -151,7 +151,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                     locationGroup       : destination?.locationGroup,
                     organizationName    : destination?.organization?.name,
                     organizationCode    : destination?.organization?.code,
-                    supportedActivities : destination?.supportedActivities,
+                    supportedActivities : destination?.supportedActivities ?: destination?.locationType?.supportedActivities,
                 ],
                 hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
                 stocklist           : [
