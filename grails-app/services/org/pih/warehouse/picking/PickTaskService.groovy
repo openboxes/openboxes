@@ -71,7 +71,7 @@ class PickTaskService {
         List<String> requisitionIds = findRequisitionIdsForPicking(command)
 
         List<PickTaskStatus> statusesToSearch = command.status
-        if (!statusesToSearch  && !command.outboundContainerId && !command.requisitionId) {
+        if (!statusesToSearch  && !command.outboundContainerId && !command.outboundContainerIds && !command.requisitionId) {
             statusesToSearch = [PickTaskStatus.PENDING, PickTaskStatus.PICKING]
         }
 
@@ -106,13 +106,19 @@ class PickTaskService {
                 eq("priority", command.priority)
             }
 
-            if (command.outboundContainerId) {
+            if (command.outboundContainerId || command.outboundContainerIds) {
                 createAlias("outboundContainer", "oc")
+            }
 
+            if (command.outboundContainerId) {
                 or {
                     eq("oc.id", command.outboundContainerId)
                     eq("oc.locationNumber", command.outboundContainerId)
                 }
+            }
+
+            if (command.outboundContainerIds) {
+                'in'("oc.id", command.outboundContainerIds)
             }
 
             if (command.requisitionId) {
@@ -560,6 +566,22 @@ class PickTaskService {
             throw new IllegalStateException("No picked items found for the given scope")
         }
 
+        // Explicit ids must all be stageable, otherwise the caller would believe items were staged
+        // that another device already staged or that sit outside the scope
+        if (command.pickTaskIds) {
+            Set<String> missing = (command.pickTaskIds as Set<String>) - (tasks*.id as Set<String>)
+            if (missing) {
+                throw new IllegalStateException("Pick tasks ${missing.join(', ')} are not picked or are outside the given scope")
+            }
+        }
+
+        // Every pick lands in a container since the bypass resolves to the picker's own location
+        tasks.each { PickTask task ->
+            if (!task.outboundContainer) {
+                throw new IllegalStateException("Pick task ${task.identifier ?: task.id} has no outbound container")
+            }
+        }
+
         // Validate the zone for every task up front so the drop fails atomically rather than
         // partially transferring stock before hitting a mismatch on a later item.
         boolean overrideStagingLocationZone = command.overrideStagingLocationZone ?: false
@@ -567,8 +589,7 @@ class PickTaskService {
 
         Person stagedBy = AuthService.currentUser
         tasks.each { PickTask task ->
-            Location sourceBin = task.outboundContainer ?: task.location
-            transferToStaging(task, sourceBin, stagingLocation)
+            transferToStaging(task, task.outboundContainer, stagingLocation)
 
             executeStateTransition(task, PickTaskStatus.STAGED)
             PicklistItem existingPickItem = PicklistItem.get(task.id)

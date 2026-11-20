@@ -100,9 +100,9 @@ class LocationService {
     }
 
     // Username rather than Person.identifier: it is unique and never blank, where identifier is
-    // neither, so it cannot collide between two people or change once the location exists. Both
-    // halves still fall back to an id - a facility need not have a location number, and a person
-    // picked for need not have a user account.
+    // neither, so it cannot collide between two people. A renamed user gets a new location; the old
+    // one keeps whatever it holds. Both halves still fall back to an id - a facility need not have a
+    // location number, and a person picked for need not have a user account.
     private static String employeeLocationNumber(Location facility, Person person) {
         String employeeKey = User.get(person.id)?.username ?: person.id
         return "EMP-${facility.locationNumber ?: facility.id}-${employeeKey}"
