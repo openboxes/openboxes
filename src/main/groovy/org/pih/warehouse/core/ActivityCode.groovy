@@ -158,6 +158,13 @@ enum ActivityCode {
     // Outbound container codes
     OUTBOUND_CONTAINER('OUTBOUND_CONTAINER'),
 
+    // Facility-level gate: lets the picker skip the outbound container scan
+    ALLOW_OUTBOUND_CONTAINER_BYPASS('ALLOW_OUTBOUND_CONTAINER_BYPASS'),
+
+    // Marks a location scoped to one employee rather than to a physical container.
+    // Such locations have no barcode, so they must stay out of container search.
+    EMPLOYEE_LOCATION('EMPLOYEE_LOCATION'),
+
     // Staging location codes
     STAGING_LOCATION('STAGING_LOCATION'),
 
@@ -262,6 +269,8 @@ enum ActivityCode {
 
                 // Internal locations used for picking
                 OUTBOUND_CONTAINER,
+                ALLOW_OUTBOUND_CONTAINER_BYPASS,
+                EMPLOYEE_LOCATION,
                 STAGING_LOCATION,
                 PREPICK_STOCK,
                 VALIDATE_STAGING_LOCATION_ZONE,
