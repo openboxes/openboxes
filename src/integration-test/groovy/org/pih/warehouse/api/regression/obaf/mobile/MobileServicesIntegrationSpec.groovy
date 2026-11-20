@@ -302,33 +302,42 @@ class MobileServicesIntegrationSpec extends ObafEventsIntegrationSpec {
         then:
         r.status == status
         status != 400 || r.json == [errorCode: 400, errorMessage: message]
-        status < 400 || tx { Product.get(p).upc } == original
+        tx { Product.get(p).upc } == (status == 200 ? stored : original)
 
         where:
-        label                                   | asUser  | productId | body                                                         || status | message
-        'set by a product manager'              | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"NEW-1"}}'              || 200    | null
-        'type is case-insensitive and trimmed'  | 'pm'    | 'p'       | '{"identifier":{"type":" UPC ","value":" NEW-2 "}}'          || 200    | null
-        'no session user'                       | null    | 'p'       | '{"identifier":{"type":"upc","value":"NEW-3"}}'              || 401    | null
-        'admin without ROLE_PRODUCT_MANAGER'    | 'admin' | 'p'       | '{"identifier":{"type":"upc","value":"NEW-4"}}'              || 403    | null
-        'no session user, malformed body'       | null    | 'p'       | '{"identifier":"upc"}'                                       || 401    | null
-        'not a product manager, malformed body' | 'admin' | 'p'       | '{"identifier":{"type":7,"value":5}}'                        || 403    | null
-        'unknown product'                       | 'pm'    | 'unknown' | '{"identifier":{"type":"upc","value":"NEW-5"}}'              || 404    | null
-        'missing type'                          | 'pm'    | 'p'       | '{"identifier":{"value":"NEW-6"}}'                           || 400    | 'Identifier type is required'
-        'type is not a string'                  | 'pm'    | 'p'       | '{"identifier":{"type":7,"value":"NEW-6"}}'                  || 400    | 'Identifier type is required'
-        'identifier is not an object'           | 'pm'    | 'p'       | '{"identifier":"upc"}'                                       || 400    | 'Identifier type is required'
-        'no identifier'                         | 'pm'    | 'p'       | '{}'                                                         || 400    | 'Identifier type is required'
-        'body is not an object'                 | 'pm'    | 'p'       | '"upc"'                                                      || 400    | 'Identifier type is required'
-        'body is not JSON'                      | 'pm'    | 'p'       | '{"identifier":'                                             || 400    | 'Request body must be JSON'
-        'unsupported type'                      | 'pm'    | 'p'       | '{"identifier":{"type":"gtin","value":"NEW-7"}}'             || 400    | "Unsupported identifier type 'gtin'"
-        'empty value'                           | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":""}}'                   || 400    | 'Identifier value is required'
-        'blank value'                           | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"   "}}'                || 400    | 'Identifier value is required'
-        'missing value'                         | 'pm'    | 'p'       | '{"identifier":{"type":"upc"}}'                              || 400    | 'Identifier value is required'
-        'null value'                            | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":null}}'                 || 400    | 'Identifier value is required'
-        'numeric value'                         | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":96619756803}}'          || 400    | 'Identifier value is required'
-        'clear is not boolean true'             | 'pm'    | 'p'       | '{"identifier":{"type":"upc","clear":"true"}}'               || 400    | 'Identifier value is required'
-        'clear with a value'                    | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"NEW-8","clear":true}}' || 400    | 'Send either an identifier value or clear, not both'
-        'UPC of another product'                | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"<taken>"}}'            || 409    | null
-        'product code of another product'       | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"<code>"}}'             || 409    | null
+        label                                    | asUser  | productId | body                                                         || status | message                                              | stored
+        'set by a product manager'               | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"NEW-1"}}'              || 200    | null                                                 | 'NEW-1'
+        'type is case-insensitive and trimmed'   | 'pm'    | 'p'       | '{"identifier":{"type":" UPC ","value":" NEW-2 "}}'          || 200    | null                                                 | 'NEW-2'
+        'clear removes it'                       | 'pm'    | 'p'       | '{"identifier":{"type":"upc","clear":true}}'                 || 200    | null                                                 | null
+        'clear with a null value'                | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":null,"clear":true}}'    || 200    | null                                                 | null
+        'clear with a blank value'               | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":" ","clear":true}}'     || 200    | null                                                 | null
+        'no session user'                        | null    | 'p'       | '{"identifier":{"type":"upc","value":"NEW-3"}}'              || 401    | null                                                 | null
+        'admin without ROLE_PRODUCT_MANAGER'     | 'admin' | 'p'       | '{"identifier":{"type":"upc","value":"NEW-4"}}'              || 403    | null                                                 | null
+        'no session user, unparseable body'      | null    | 'p'       | '{"identifier":'                                             || 401    | null                                                 | null
+        'not a product manager, unparseable body'| 'admin' | 'p'       | '{"identifier":'                                             || 403    | null                                                 | null
+        'unknown product'                        | 'pm'    | 'unknown' | '{"identifier":{"type":"upc","value":"NEW-5"}}'              || 404    | null                                                 | null
+        'unknown product, unparseable body'      | 'pm'    | 'unknown' | '{"identifier":'                                             || 404    | null                                                 | null
+        'body is not JSON'                       | 'pm'    | 'p'       | '{"identifier":'                                             || 400    | 'Request body must be JSON'                          | null
+        'body is a JSON array'                   | 'pm'    | 'p'       | '[{"identifier":{"type":"upc","value":"NEW-6"}}]'            || 400    | 'Identifier type is required'                        | null
+        'no identifier'                          | 'pm'    | 'p'       | '{}'                                                         || 400    | 'Identifier type is required'                        | null
+        'identifier is not an object'            | 'pm'    | 'p'       | '{"identifier":"upc"}'                                       || 400    | 'Identifier type is required'                        | null
+        'missing type'                           | 'pm'    | 'p'       | '{"identifier":{"value":"NEW-6"}}'                           || 400    | 'Identifier type is required'                        | null
+        'blank type'                             | 'pm'    | 'p'       | '{"identifier":{"type":"  ","value":"NEW-6"}}'               || 400    | 'Identifier type is required'                        | null
+        'type is not a string'                   | 'pm'    | 'p'       | '{"identifier":{"type":7,"value":"NEW-6"}}'                  || 400    | 'Identifier type is required'                        | null
+        'unsupported type'                       | 'pm'    | 'p'       | '{"identifier":{"type":"gtin","value":"NEW-7"}}'             || 400    | "Unsupported identifier type 'gtin'"                 | null
+        'empty value'                            | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":""}}'                   || 400    | 'Identifier value is required'                       | null
+        'blank value'                            | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"   "}}'                || 400    | 'Identifier value is required'                       | null
+        'missing value'                          | 'pm'    | 'p'       | '{"identifier":{"type":"upc"}}'                              || 400    | 'Identifier value is required'                       | null
+        'null value'                             | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":null}}'                 || 400    | 'Identifier value is required'                       | null
+        'numeric value'                          | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":96619756803}}'          || 400    | 'Identifier value is required'                       | null
+        'clear is not boolean true'              | 'pm'    | 'p'       | '{"identifier":{"type":"upc","clear":"true"}}'               || 400    | 'Identifier value is required'                       | null
+        'clear false'                            | 'pm'    | 'p'       | '{"identifier":{"type":"upc","clear":false}}'                || 400    | 'Identifier value is required'                       | null
+        'clear with a value'                     | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"NEW-8","clear":true}}' || 400    | 'Send either an identifier value or clear, not both' | null
+        'clear with a numeric value'             | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":5,"clear":true}}'       || 400    | 'Send either an identifier value or clear, not both' | null
+        'clear with an object value'             | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":{},"clear":true}}'      || 400    | 'Send either an identifier value or clear, not both' | null
+        'value longer than the column'           | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"' + '9' * 256 + '"}}'     || 400    | 'Identifier value is not valid'                      | null
+        'UPC of another product'                 | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"<taken>"}}'            || 409    | null                                                 | null
+        'product code of another product'        | 'pm'    | 'p'       | '{"identifier":{"type":"upc","value":"<code>"}}'             || 409    | null                                                 | null
     }
 
     void 'updateIdentifier: a set UPC is saved trimmed and every product notification recipient is told; an empty value is rejected; clear removes it and notifies nobody'() {

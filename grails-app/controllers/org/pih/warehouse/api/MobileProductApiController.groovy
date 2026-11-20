@@ -199,13 +199,18 @@ class MobileProductApiController extends BaseDomainApiController {
     /**
      * Update a product identifier (e.g., UPC etc.)
      * Endpoint: PUT /mobile/products/{id}/identifiers
-     * Request body:
+     * Request body to set the identifier:
      * {
      *   "identifier": {
      *     "type": "upc",
      *     "value": "123456789012"
      *   }
      * }
+     * To remove it, send "clear": true instead of a value: { "identifier": { "type": "upc", "clear": true } }.
+     *
+     * 404 unknown product, 401 no session user, 403 not a product manager (checked before the body is read),
+     * 400 {errorCode, errorMessage} for a malformed body, a missing or unsupported type, a missing, blank or
+     * non-string value, or a value together with clear; 409 when another product already uses the value.
      *
      * Initially supports only 'upc' type but structured for easy expansion.
      */
@@ -253,12 +258,15 @@ class MobileProductApiController extends BaseDomainApiController {
             }
 
             if (clear) {
-                if (value instanceof String && value.trim()) {
+                if (value != null && !(value instanceof String && !value.trim())) {
                     renderBadRequest("Send either an identifier value or clear, not both")
                     return
                 }
                 product.upc = null
-                product.save(flush: true)
+                if (!product.save(flush: true)) {
+                    renderSaveFailure(product)
+                    return
+                }
                 render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
                 return
             }
@@ -291,7 +299,10 @@ class MobileProductApiController extends BaseDomainApiController {
             }
 
             product.upc = newValue
-            product.save(flush: true)
+            if (!product.save(flush: true)) {
+                renderSaveFailure(product)
+                return
+            }
 
             sendProductBarcodeUpdateNotification(user, product, oldValue, newValue)
 
@@ -301,6 +312,13 @@ class MobileProductApiController extends BaseDomainApiController {
             log.error("Error updating identifier for product ${params.id}: ${e.message}", e)
             render(status: 500, text: "Server error while updating product identifier")
         }
+    }
+
+    private void renderSaveFailure(Product product) {
+        String message = product.errors.hasFieldErrors('upc') ? "Identifier value is not valid" : "Product could not be saved"
+        log.info("Product identifier for ${product.id} not saved: ${product.errors}")
+        product.discard()
+        renderBadRequest(message)
     }
 
     private void renderBadRequest(String message) {
