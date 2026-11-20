@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 import groovy.xml.XmlParser
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.plugins.csv.CSVReaderUtils
 import grails.validation.ValidationException
 import groovy.xml.Namespace
 import java.time.Instant
@@ -662,7 +663,7 @@ class ProductService {
         ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
 
         // Iterate over each line and either update an existing product or create a new product
-        csv.toCsvReader(['skipLines': 1, 'separatorChar': delimiter]).eachLine { tokens ->
+        CSVReaderUtils.eachLine(CSVReaderUtils.toCsvReader(csv, ['skipLines': 1, 'separatorChar': delimiter])) { String[] tokens ->
 
             rowCount++
             println "Processing line: " + tokens
@@ -1481,7 +1482,7 @@ class ProductService {
         def rootCategory = findOrCreateRootCategory(rootCategoryName)
 
         def settings = [separatorChar: ',', skipLines: 1]
-        csv.toCsvReader(settings).eachLine { tokens ->
+        CSVReaderUtils.eachLine(CSVReaderUtils.toCsvReader(csv, settings)) { String[] tokens ->
             def categoryName = tokens[categoryNameColumnIndex]
             def parentCategoryName = tokens[parentCategoryNameColumnIndex]
 
