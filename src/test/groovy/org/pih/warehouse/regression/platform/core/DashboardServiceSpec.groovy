@@ -101,9 +101,14 @@ class DashboardServiceSpec extends Specification implements ServiceUnitTest<Dash
         }
     }
 
-    /** The inventory levels of the depot as getDashboardAlerts reads them: plain values by product id. */
+    /**
+     * The inventory levels of the depot as getDashboardAlerts reads them: plain values by product id. The fixture has
+     * one level per product, so the choice between several levels (InventoryLevelService) does not apply here.
+     */
     private Map<String, Map> levelsByProduct() {
-        return InventoryLevel.findAllByInventory(depot.inventory).collectEntries { InventoryLevel level ->
+        List<InventoryLevel> levels = InventoryLevel.findAllByInventory(depot.inventory)
+        assert levels*.product*.id.unique(false).size() == levels.size(): 'the fixture has one inventory level per product'
+        return levels.collectEntries { InventoryLevel level ->
             [(level.product.id): [status: level.status, minQuantity: level.minQuantity, reorderQuantity: level.reorderQuantity,
                                   maxQuantity: level.maxQuantity, abcClass: level.abcClass]]
         }
@@ -135,7 +140,7 @@ class DashboardServiceSpec extends Specification implements ServiceUnitTest<Dash
         alerts.inStock == 5
     }
 
-    @PendingFeature(reason = 'getTotalCost: price ?: 0 * qty ?: 0 (operator precedence), so band costs ignore the quantity')
+    @PendingFeature(reason = '#6394: the dashboard cost totals sum unit prices and ignore the quantity on hand')
     void 'getDashboardAlerts values each stock band at unit price times quantity on hand'() {
         when:
         Map alerts = service.getDashboardAlerts(depot)

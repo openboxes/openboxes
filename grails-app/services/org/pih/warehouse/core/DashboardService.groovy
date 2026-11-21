@@ -109,7 +109,7 @@ class DashboardService {
     def getExpirationSummary(location) {
         def expirationSummary = [:]
         def daysToExpiry = [30, 60, 90, 180, 365]
-        getDaysToExpiryOfLotsInStock(location).each { Integer daysToExpiryOfLot ->
+        daysUntilExpiry(location).each { Integer daysToExpiryOfLot ->
             // Lots without an expiration date never expire
             if (daysToExpiryOfLot != null) {
                 if (daysToExpiryOfLot > 0) {
@@ -136,36 +136,17 @@ class DashboardService {
     }
 
     /**
-     * The days to expiry of each lot with stock at the location, or null for a lot without an expiration date. The
-     * expiration summaries count lots by days to expiry; reading only the dates avoids loading every lot and product.
+     * The days until expiry of each lot with stock at a facility, or null for a lot without an expiration date. The
+     * expiration summaries count lots by days until expiry; reading only the dates avoids loading every lot and product.
+     *
+     * @param location the facility (depot or ward) whose inventory is summarized, not an internal (bin) location: a lot
+     *        counts with its quantity on hand over all bins of the facility, and a bin location returns no lots
      */
-    List<Integer> getDaysToExpiryOfLotsInStock(Location location) {
+    List<Integer> daysUntilExpiry(Location location) {
         Date today = new Date()
         return productAvailabilityService.getExpirationDatesOfLotsInStock(location).collect { Date expirationDate ->
             expirationDate ? (expirationDate - today) : null
         }
-    }
-
-    def getExpirationAlerts(location) {
-        def startTime = System.currentTimeMillis()
-
-        def expirationAlerts = []
-        def today = new Date()
-        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
-        quantityMap.each { key, value ->
-            if (value > 0) {
-                def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
-                expirationAlerts << [id            : key.id, lotNumber: key.lotNumber, quantity: value,
-                                     expirationDate: key.expirationDate, daysToExpiry: daysToExpiry,
-                                     product       : key.product.toJson(), inventoryItem: key.toJson()
-                ]
-            }
-        }
-
-        log.info "Expiration alerts: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        return expirationAlerts
-
     }
 
     /**
@@ -418,7 +399,7 @@ class DashboardService {
         Map<String, Object> costs = [:]
         Closure count = { String category, Map product ->
             counts[category] = counts.containsKey(category) ? counts[category] + 1 : 1
-            def cost = productCost(product.pricePerUnit, product.quantityOnHand)
+            def cost = unitPriceOrZero(product.pricePerUnit)
             costs[category] = costs.containsKey(category) ? costs[category] + cost : 0 + cost
         }
 
@@ -502,16 +483,9 @@ class DashboardService {
     }
 
 
-    def getTotalCost(quantityMap) {
-        def totalCost = 0
-        quantityMap.each { k, v ->
-            totalCost += productCost(k.pricePerUnit, v)
-        }
-        return totalCost
-    }
-
-    private static def productCost(pricePerUnit, quantity) {
-        return pricePerUnit ?: 0 * quantity ?: 0
+    // FIXME #6394 the dashboard cost totals sum unit prices and ignore quantity (kept for parity, see pending spec)
+    private static def unitPriceOrZero(pricePerUnit) {
+        return pricePerUnit ?: 0
     }
 
     def getInventoryStatus(Location location) {

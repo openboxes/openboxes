@@ -86,7 +86,7 @@ class IndicatorDataService {
             }
         }
 
-        List<Integer> daysToExpiryOfLots = dashboardService.getDaysToExpiryOfLotsInStock(location)
+        List<Integer> daysToExpiryOfLots = dashboardService.daysUntilExpiry(location)
 
         daysToExpiryOfLots.each { Integer daysToExpiry ->
             // Count only items that expire

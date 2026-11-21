@@ -141,31 +141,36 @@ class DashboardServiceIntegrationSpec extends ServiceIntegrationSpec {
         stock(edges, twoBins, twoBinsLot, new Date() + 200, 5, bin)
         stock(edges, twoBins, twoBinsLot, new Date() + 200, -2, newBin(edges, uniqueName('BIN')))
         level(edges, twoBins, InventoryStatus.SUPPORTED, 10, 20, 100, 'A')
-        // Two levels: the one with the lower id is the product's level (a deterministic tie-break, the order the unsorted read returned in practice)
-        Product twoLevels = stocked(0, 512)
-        InventoryLevel facilityLevel = level(edges, twoLevels, InventoryStatus.SUPPORTED, 10, 20, 100, 'A')
-        InventoryLevel binLevel = level(edges, twoLevels, InventoryStatus.NOT_SUPPORTED, 10, 20, 100, 'A', bin)
-        boolean facilityLevelFirst = facilityLevel.id < binLevel.id
+        // Two levels, a facility-wide SUPPORTED one and a NOT_SUPPORTED one for a bin: the level with the lower id applies.
+        // The two products create them in opposite orders, so a rule that always took the facility level, or always
+        // the bin level, would get one of them wrong.
+        Product facilityLevelFirst = stocked(0, 512)                                                // out, class A, low, reorder
+        InventoryLevel facilityLevel = level(edges, facilityLevelFirst, InventoryStatus.SUPPORTED, 10, 20, 100, 'A')
+        InventoryLevel binLevel = level(edges, facilityLevelFirst, InventoryStatus.NOT_SUPPORTED, 10, 20, 100, 'A', bin)
+        Product binLevelFirst = stocked(0, 8192)                                                    // zero only
+        InventoryLevel binLevelOfSecond = level(edges, binLevelFirst, InventoryStatus.NOT_SUPPORTED, 10, 20, 100, 'A', bin)
+        InventoryLevel facilityLevelOfSecond = level(edges, binLevelFirst, InventoryStatus.SUPPORTED, 10, 20, 100, 'A')
+        // Hibernate's uuid generator puts the creation time and a counter in the id, so ids sort in creation order
+        assert facilityLevel.id < binLevel.id && binLevelOfSecond.id < facilityLevelOfSecond.id
 
         when:
         Map alerts = asAdminAt(edges) { dashboardService.getDashboardAlerts(Location.get(edges.id)) }
         Map summary = asAdminAt(edges) { indicatorDataService.getInventorySummaryData(Location.get(edges.id)) }
 
         then:
-        int first = facilityLevelFirst ? 1 : 0
         alerts == [
-                lowStock               : 4 + first, lowStockCost: 4137 + 512 * first,
-                reorderStock           : 4 + first, reorderStockCost: 4137 + 512 * first,
+                lowStock               : 5, lowStockCost: 4649,
+                reorderStock           : 5, reorderStockCost: 4649,
                 overStock              : 1, overStockCost: 4,
-                totalStock             : 15, totalStockCost: 6147,
+                totalStock             : 16, totalStockCost: 14339,
                 reconditionedStock     : 1, reconditionedStockCost: 2.5,
                 healthyStock           : 1, healthyStockCost: 2,
-                outOfStock             : 4 + first, outOfStockCost: 360 + 512 * first,
-                outOfStockClassA       : 1 + first, outOfStockCostClassA: 8 + 512 * first,
+                outOfStock             : 5, outOfStockCost: 872,
+                outOfStockClassA       : 2, outOfStockCostClassA: 520,
                 outOfStockClassB       : 1, outOfStockCostClassB: 32,
                 outOfStockClassC       : 1, outOfStockCostClassC: 64,
                 outOfStockClassNone    : 1, outOfStockCostClassNone: 256,
-                onHandQuantityZero     : 8, onHandQuantityZeroCost: 2040,
+                onHandQuantityZero     : 9, onHandQuantityZeroCost: 10232,
                 inStock                : 7, inStockCost: 4107,
         ]
         noLevel != null
@@ -176,7 +181,7 @@ class DashboardServiceIntegrationSpec extends ServiceIntegrationSpec {
 
         and: 'the inventory summary panel shows five of them'
         summary.data.labels == ['In stock', 'Above maximum', 'Below reorder', 'Below minimum', 'No longer in stock']
-        summary.data.datasets*.data == [[7, 1, 4 + first, 4 + first, 8]]
+        summary.data.datasets*.data == [[7, 1, 5, 5, 9]]
         summary.data.datasets*.links*.size() == [5]
     }
 
