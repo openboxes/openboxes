@@ -1,0 +1,326 @@
+package org.pih.warehouse.report.spec
+
+import grails.gorm.transactions.Rollback
+import grails.util.GrailsWebMockUtil
+import org.hibernate.SessionFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.context.request.RequestContextHolder
+
+import org.pih.warehouse.common.base.IntegrationSpec
+import org.pih.warehouse.common.domain.builder.core.LocationTestBuilder
+import org.pih.warehouse.common.domain.builder.product.CategoryTestBuilder
+import org.pih.warehouse.common.domain.builder.product.ProductTestBuilder
+import org.pih.warehouse.common.util.RandomUtil
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.date.JavaUtilDateFormatter
+import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.report.ReportService
+
+/**
+ * Tests ReportService.getTransactionReportModalData, which lists the transactions of a product over a period with a
+ * running balance, for the details dialog of the transaction report.
+ *
+ * Transactions are inserted with SQL instead of GORM so that we control date_created (GORM always sets it to now)
+ * and so that saving them doesn't trigger a product availability refresh.
+ */
+@Rollback
+class ReportServiceTransactionReportModalDataSpec extends IntegrationSpec {
+
+    private static final String ADJUSTMENT_CREDIT = Constants.ADJUSTMENT_CREDIT_TRANSACTION_TYPE_ID
+    private static final String TRANSFER_OUT = Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID
+    private static final String TRANSFER_IN = Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
+    private static final String PRODUCT_INVENTORY = Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID
+    private static final String INVENTORY_BASELINE = Constants.INVENTORY_BASELINE_TRANSACTION_TYPE_ID
+
+    @Autowired
+    ReportService reportService
+
+    @Autowired
+    SessionFactory sessionFactory
+
+    Location facility
+    Product product
+    InventoryItem item1
+    InventoryItem item2
+
+    // The report period: transactions after day 5 (exclusive) and before day 15 (exclusive)
+    Date startDate = day(5)
+    Date endDate = day(15)
+
+    void setup() {
+        // The transaction type names are localized with the locale of the current request
+        GrailsWebMockUtil.bindMockWebRequest()
+
+        facility = new LocationTestBuilder()
+                .name(new RandomUtil().randomStringFieldValue("facility"))
+                .asFacility()
+                .build(true)
+        product = new ProductTestBuilder().randomizedName().category(new CategoryTestBuilder().build(true)).build(true)
+        item1 = new InventoryItem(product: product, lotNumber: "L1").save(failOnError: true)
+        item2 = new InventoryItem(product: product, lotNumber: "L2").save(failOnError: true)
+        sessionFactory.currentSession.flush()
+    }
+
+    void cleanup() {
+        RequestContextHolder.resetRequestAttributes()
+    }
+
+    void 'a #type count sets the balance to the counted quantity'() {
+        given: 'a count that recorded 80 when the transactions add up to 90, e.g. because a transaction was deleted'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(TRANSFER_OUT, day(6), [[item1, 10]])
+        insertTransaction(transactionTypeId, day(7), [[item1, 80]])
+        insertTransaction(ADJUSTMENT_CREDIT, day(8), [[item1, 5]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then: 'a ghost row before the count shows the 10 that no transaction recorded'
+        assert rows.transactionCode ==
+                ["BALANCE_OPENING", "DEBIT", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "CREDIT", "BALANCE_CLOSING"]
+        assert rows.balance == [100, 90, 80, 80, 85, 85]
+        assert rows[2].quantityChange == -10
+
+        where:
+        type                   | transactionTypeId
+        "product inventory"    | PRODUCT_INVENTORY
+        "inventory baseline"   | INVENTORY_BASELINE
+    }
+
+    void 'the balance of a count with several entries is the sum of its entries'() {
+        given:
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 30], [item2, 20]])
+        insertTransaction(TRANSFER_OUT, day(8), [[item2, 5]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then: 'a ghost row for each lot shows its difference, and the balance is the total of the count for each entry'
+        assert rows.transactionCode == ["BALANCE_OPENING", "UNRECORDED_CHANGE", "UNRECORDED_CHANGE",
+                                        "PRODUCT_INVENTORY", "PRODUCT_INVENTORY", "DEBIT", "BALANCE_CLOSING"]
+        assert rows.balance == [100, 30, 50, 50, 50, 45, 45]
+        assert rows[1].subMap("lotNumber", "quantityChange") == [lotNumber: "L1", quantityChange: -70]
+        assert rows[2].subMap("lotNumber", "quantityChange") == [lotNumber: "L2", quantityChange: 20]
+    }
+
+    void 'transactions with the same transaction date are in the order they were created'() {
+        given: 'a debit entered after a count with the same transaction date, inserted first'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(TRANSFER_OUT, day(7), [[item1, 10]], day(7, 20))
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 50]], day(7, 10))
+
+        when:
+        List<Map> rows = modalData()
+
+        then: 'the count comes first, so the debit is taken from the counted quantity, like quantity on hand'
+        assert rows.transactionCode ==
+                ["BALANCE_OPENING", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "DEBIT", "BALANCE_CLOSING"]
+        assert rows.balance == [100, 50, 50, 40, 40]
+    }
+
+    void 'a count comes before a credit with exactly the same dates, like it does for quantity on hand'() {
+        given: 'a credit with the same transaction date and date created as a count, inserted first'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(ADJUSTMENT_CREDIT, day(7), [[item1, 5]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 50]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.transactionCode ==
+                ["BALANCE_OPENING", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "CREDIT", "BALANCE_CLOSING"]
+        assert rows.balance == [100, 50, 50, 55, 55]
+    }
+
+    void 'a count that leaves out a lot sets it to zero, with a ghost row for the lot'() {
+        given: 'a count of lot 1 only, when lot 2 has 20'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100], [item2, 20]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 100]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.transactionCode == ["BALANCE_OPENING", "UNRECORDED_CHANGE", "PRODUCT_INVENTORY", "BALANCE_CLOSING"]
+        assert rows[1].subMap("lotNumber", "quantityChange", "balance") ==
+                [lotNumber: "L2", quantityChange: -20, balance: 100]
+        assert rows.last().balance == 100
+    }
+
+    void 'each row has the expiration date of its lot, including the ghost rows'() {
+        given: 'lot 2 expires, lot 1 does not'
+        setExpirationDate(item2, day(400))
+
+        and: 'a credit of both lots, then a count that leaves out lot 2'
+        insertTransaction(ADJUSTMENT_CREDIT, day(6), [[item1, 100], [item2, 20]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 100]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.transactionCode == ["BALANCE_OPENING", "CREDIT", "CREDIT", "UNRECORDED_CHANGE",
+                                        "PRODUCT_INVENTORY", "BALANCE_CLOSING"]
+        assert rows[1].subMap("lotNumber", "expirationDate") == [lotNumber: "L1", expirationDate: null]
+        assert rows[2].subMap("lotNumber", "expirationDate") ==
+                [lotNumber: "L2", expirationDate: JavaUtilDateFormatter.formatAsDate(day(400))]
+        assert rows[3].subMap("lotNumber", "expirationDate") ==
+                [lotNumber: "L2", expirationDate: JavaUtilDateFormatter.formatAsDate(day(400))]
+    }
+
+    void 'the entries of a transaction are sorted by lot number'() {
+        given: 'a credit whose entries were saved with lot 2 first'
+        insertTransaction(ADJUSTMENT_CREDIT, day(6), [[item2, 20], [item1, 100]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.lotNumber == [null, "L1", "L2", null]
+    }
+
+    void 'a count that matches the balance has no ghost row'() {
+        given:
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(TRANSFER_OUT, day(6), [[item1, 10]])
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 90]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.transactionCode == ["BALANCE_OPENING", "DEBIT", "PRODUCT_INVENTORY", "BALANCE_CLOSING"]
+        assert rows.balance == [100, 90, 90, 90]
+    }
+
+    void 'the ghost rows add up to the change that the credits and debits do not account for'() {
+        given: 'two counts that each recorded less than the balance before them'
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100]])
+        insertTransaction(INVENTORY_BASELINE, day(6), [[item1, 95]])
+        insertTransaction(ADJUSTMENT_CREDIT, day(7), [[item2, 20]])
+        insertTransaction(INVENTORY_BASELINE, day(8), [[item1, 90], [item2, 18]])
+
+        when:
+        List<Map> rows = modalData()
+        Integer credits = rows.findAll { it.transactionCode == "CREDIT" }.sum { it.quantityChange } as Integer ?: 0
+
+        then: 'closing - opening - credits + debits, i.e. the Differences column of the report'
+        assert rows.findAll { it.transactionCode == "UNRECORDED_CHANGE" }
+                .collect { [it.lotNumber, it.quantityChange] } ==
+                [["L1", -5], ["L1", -5], ["L2", -2]]
+        assert rows.last().balance - rows.first().balance - credits == -12
+        assert !rows.any { it.transactionCode == "UNRECONCILED" }
+    }
+
+    void 'an internal transfer is marked and moves stock between bins without changing the balance'() {
+        given:
+        Location binA = new LocationTestBuilder().name(new RandomUtil().randomStringFieldValue("bin")).asBinLocation(facility).build(true)
+        Location binB = new LocationTestBuilder().name(new RandomUtil().randomStringFieldValue("bin")).asBinLocation(facility).build(true)
+        // So that the transaction entries inserted with SQL can reference the bin locations
+        sessionFactory.currentSession.flush()
+        insertTransaction(ADJUSTMENT_CREDIT, day(1), [[item1, 100, binA]])
+
+        and: 'a putaway of 30 from bin A to bin B'
+        insertLocalTransfer(
+                insertTransaction(TRANSFER_OUT, day(6), [[item1, 30, binA]]),
+                insertTransaction(TRANSFER_IN, day(6, 1), [[item1, 30, binB]]))
+
+        and: 'a count that matches the quantity in each bin after the putaway'
+        insertTransaction(INVENTORY_BASELINE, day(7), [[item1, 70, binA], [item1, 30, binB]])
+
+        when:
+        List<Map> rows = modalData()
+
+        then:
+        assert rows.transactionCode == ["BALANCE_OPENING", "DEBIT", "CREDIT", "PRODUCT_INVENTORY", "PRODUCT_INVENTORY",
+                                        "BALANCE_CLOSING"]
+        assert rows.internal == [null, true, true, false, false, null]
+        assert rows.quantityChange == [null, -30, 30, null, null, null]
+        assert rows.balance == [100, 100, 100, 100, 100, 100]
+    }
+
+    private List<Map> modalData() {
+        // So that the transaction entries inserted with SQL are loaded from the database
+        sessionFactory.currentSession.clear()
+        return reportService.getTransactionReportModalData(facility, product, startDate, endDate) as List<Map>
+    }
+
+    /**
+     * MySQL doesn't store milliseconds in a datetime column, so we stay at whole seconds.
+     */
+    private static Date day(int day, int seconds = 0) {
+        Calendar calendar = Calendar.getInstance()
+        calendar.clear()
+        calendar.set(2025, Calendar.JANUARY, day, 0, 0, seconds)
+        return calendar.time
+    }
+
+    /**
+     * Inserts a transaction with the given entries, each given as [inventory item, quantity] or [inventory item,
+     * quantity, bin location].
+     *
+     * @return the id of the transaction
+     */
+    private String insertTransaction(String transactionTypeId, Date transactionDate, List<List> entries,
+                                   Date dateCreated = transactionDate) {
+        String transactionId = UUID.randomUUID().toString()
+        sessionFactory.currentSession.createSQLQuery("""
+                INSERT INTO transaction (id, version, date_created, last_updated, inventory_id, transaction_date,
+                                         transaction_type_id)
+                VALUES (:id, 0, :dateCreated, :dateCreated, :inventoryId, :transactionDate, :transactionTypeId)
+            """)
+                .setString("id", transactionId)
+                .setTimestamp("dateCreated", dateCreated)
+                .setString("inventoryId", facility.inventory.id)
+                .setTimestamp("transactionDate", transactionDate)
+                .setString("transactionTypeId", transactionTypeId)
+                .executeUpdate()
+
+        entries.eachWithIndex { entry, int index ->
+            sessionFactory.currentSession.createSQLQuery("""
+                    INSERT INTO transaction_entry (id, version, transaction_id, inventory_item_id, quantity,
+                                                   bin_location_id, transaction_entries_idx)
+                    VALUES (:id, 0, :transactionId, :inventoryItemId, :quantity, :binLocationId, :index)
+                """)
+                    .setString("id", UUID.randomUUID().toString())
+                    .setString("transactionId", transactionId)
+                    .setString("inventoryItemId", (entry[0] as InventoryItem).id)
+                    .setInteger("quantity", entry[1] as Integer)
+                    .setString("binLocationId", entry.size() > 2 ? (entry[2] as Location).id : null)
+                    .setInteger("index", index)
+                    .executeUpdate()
+        }
+        return transactionId
+    }
+
+    /**
+     * Links a Transfer Out and a Transfer In, like InventoryService.transferStock and saveLocalTransfer do.
+     */
+    private void insertLocalTransfer(String sourceTransactionId, String destinationTransactionId) {
+        sessionFactory.currentSession.createSQLQuery("""
+                INSERT INTO local_transfer (id, version, date_created, last_updated, source_transaction_id,
+                                            destination_transaction_id)
+                VALUES (:id, 0, NOW(), NOW(), :sourceTransactionId, :destinationTransactionId)
+            """)
+                .setString("id", UUID.randomUUID().toString())
+                .setString("sourceTransactionId", sourceTransactionId)
+                .setString("destinationTransactionId", destinationTransactionId)
+                .executeUpdate()
+    }
+
+    /**
+     * Sets the expiration date of a lot with SQL. Saving a change to an existing inventory item with GORM fails in
+     * these tests (a NullPointerException in the timestamp handling), so it's updated directly and then reloaded.
+     */
+    private void setExpirationDate(InventoryItem item, Date expirationDate) {
+        sessionFactory.currentSession.createSQLQuery("UPDATE inventory_item SET expiration_date = :expirationDate WHERE id = :id")
+                .setTimestamp("expirationDate", expirationDate)
+                .setString("id", item.id)
+                .executeUpdate()
+        sessionFactory.currentSession.refresh(item)
+    }
+}

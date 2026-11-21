@@ -13,7 +13,7 @@
     <div class="menu-icon" data-testid="navbar-icon" aria-label="help">
         <div class="tooltip2">
             <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
-                <i class="ri-question-line" onclick="Beacon('toggle');"></i>
+                <i class="ri-question-line" onclick="openHelp();"></i>
             </g:if>
             <g:else>
                 <i class="ri-question-line"></i>
@@ -198,7 +198,7 @@
     </li>
     </g:if>
     <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
-        <li class="nav-item mobile-help-scout dropdown align-items-center" onclick="Beacon('toggle');">
+        <li class="nav-item mobile-help-scout dropdown align-items-center" onclick="openHelp();">
             <a class="d-flex">
                 <i class="ri-question-line mr-2" ></i>
                 ${warehouse.message(code:'default.support.label', default: 'Help')}
@@ -242,5 +242,39 @@
           window.Beacon('init', configJson.localizedHelpScoutKey);
           window.Beacon('config', configJson)
         })
+
+      // Opens or closes the help widget. A page with a help article sets window.helpArticle to
+      // {articleId, searchText}. The help icon then opens the article in full, in the widget's sidebar, when articleId
+      // is a Help Scout article id (24 hexadecimal characters), or else searches the widget for searchText, or for the
+      // page title if there's no searchText.
+      var helpWidgetOpen = false;
+      window.Beacon('on', 'open', function () { helpWidgetOpen = true; });
+      window.Beacon('on', 'close', function () { helpWidgetOpen = false; });
+
+      // Opens a Help Scout article in the widget's sidebar. Returns false if articleId isn't a valid article id.
+      window.openHelpArticle = function (articleId) {
+        if (!/^[0-9a-f]{24}$/i.test(articleId || '')) {
+          return false;
+        }
+        window.Beacon('article', articleId, { type: 'sidebar' });
+        return true;
+      };
+
+      function openHelp() {
+        var help = window.helpArticle;
+        if (help && !helpWidgetOpen) {
+          if (window.openHelpArticle(help.articleId)) {
+            return;
+          }
+          var searchText = help.searchText || document.title;
+          if (searchText) {
+            // search only fills in the search; it doesn't open the widget
+            window.Beacon('open');
+            window.Beacon('search', searchText);
+            return;
+          }
+        }
+        window.Beacon('toggle');
+      }
     </script>
 </g:if>

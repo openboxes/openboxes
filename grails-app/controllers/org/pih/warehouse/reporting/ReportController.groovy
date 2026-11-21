@@ -12,7 +12,6 @@ package org.pih.warehouse.reporting
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
-import grails.plugins.quartz.GrailsJobClassConstants
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -30,13 +29,12 @@ import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 
-import org.quartz.JobKey
-import org.quartz.impl.StdScheduler
 import org.springframework.web.util.UriUtils
 import util.ReportUtil
 
 import java.math.RoundingMode
 import java.text.DateFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 
 @Transactional
@@ -55,7 +53,6 @@ class ReportController {
     def shipmentService
     def orderService
     def userService
-    StdScheduler quartzScheduler
 
     def refreshProductDemand() {
         reportService.refreshProductDemandData()
@@ -281,27 +278,33 @@ class ReportController {
         [transactions: transactions]
     }
 
+    // The page puts the report's settings in the URL when it runs, so that reloading or sharing the link runs the same
+    // report. The facility defaults to the current one, and the other settings to the page's defaults.
     def showTransactionReport() {
         InventoryReportCommand command = new InventoryReportCommand()
-        command.location = Location.get(session.warehouse.id)
+        command.location = (params['location.id'] ? Location.get(params['location.id']) : null) ?: Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
 
-        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob", GrailsJobClassConstants.DEFAULT_GROUP))
-        def previousFireTime = triggers*.previousFireTime.max()
-        def nextFireTime = triggers*.nextFireTime.max()
-        def locationKey = LocationDimension.findByLocationId(command?.location?.id)
-        def model = [
-                command           : command,
-                locationKey       : locationKey,
-                transactionCount  : locationKey ? TransactionFact.countByLocationKey(locationKey) : 0,
-                productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).get(),
-                minTransactionDate: TransactionFact.minTransactionDate(locationKey?.locationId).get(),
-                maxTransactionDate: TransactionFact.maxTransactionDate(locationKey?.locationId).get(),
-                previousFireTime  : previousFireTime,
-                nextFireTime      : nextFireTime,
+        return [
+                command: command,
+                startDate: parseTransactionReportDate(params.startDate),
+                endDate: parseTransactionReportDate(params.endDate),
+                products: params.products ? Product.getAll(params.list('products')).findAll() : []
         ]
+    }
 
-        return model
+    // A date from the transaction report page's URL (MM/dd/yyyy), or null if it isn't one
+    private static Date parseTransactionReportDate(String date) {
+        if (!date) {
+            return null
+        }
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy")
+        format.lenient = false
+        try {
+            return format.parse(date)
+        } catch (ParseException ignored) {
+            return null
+        }
     }
 
     def showTransactionReportDialog() {

@@ -273,9 +273,12 @@ class SelectTagLib {
 
     //@Cacheable("selectTagsCache")
     def selectTags = { attrs, body ->
-        def tags = Tag.list(sort: "tag", fetch: [products: "eager"]).collect {
-            [id: it.id, name: it.tag, productCount: it?.products?.size()]
-        }
+        // Count the products in the database rather than loading every tag's products into the session
+        def tags = Tag.executeQuery("""
+            select new map(t.id as id, t.tag as name, count(p.id) as productCount)
+            from Tag t left join t.products p
+            group by t.id, t.tag order by t.tag
+        """)
         attrs.from = tags
         attrs.multiple = true
         attrs.value = attrs.value
@@ -286,9 +289,12 @@ class SelectTagLib {
 
     //@Cacheable("selectCatalogsCache")
     def selectCatalogs = { attrs, body ->
-        def catalogs = ProductCatalog.list(sort: "name").collect {
-            [id: it.id, name: it.name, productCount: it?.productCatalogItems?.size()]
-        }
+        // Count the products in the database rather than loading every catalog's items into the session
+        def catalogs = ProductCatalog.executeQuery("""
+            select new map(c.id as id, c.name as name, count(i.id) as productCount)
+            from ProductCatalog c left join c.productCatalogItems i
+            group by c.id, c.name order by c.name
+        """)
         attrs.from = catalogs
         attrs.multiple = true
         attrs.value = attrs.value

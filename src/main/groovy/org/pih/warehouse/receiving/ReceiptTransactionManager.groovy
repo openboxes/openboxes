@@ -38,10 +38,35 @@ class ReceiptTransactionManager {
     /**
      * Records the inbound stock transaction of a completed receipt: one entry per line that received something,
      * crediting the received quantities to the destination's inventory. Lines completed with nothing received get
-     * no entry.
+     * no entry. A receipt that received nothing records no transaction, so null is returned for it.
      */
     Transaction createInboundTransaction(Receipt receipt) {
         Shipment shipment = receipt.shipment
+
+        boolean hasReceivedLines = receipt.receiptItems.any { ReceiptItem receiptItem ->
+            (receiptItem.quantityReceived ?: 0) > 0
+        }
+
+        // Nothing was received, so no transaction is recorded. The order summary is refreshed by the shipment's
+        // afterUpdate, but if the shipment has nothing to update (such as when it is already partially received and
+        // its status does not change), afterUpdate is not called, so the refresh is published by hand after the save.
+        // The save has to flush, because the refresh reads the data straight from the database with plain SQL, so
+        // without the flush it would still see the data from before this receipt
+        if (!hasReceivedLines) {
+            if (!shipment.save(flush: true)) {
+                throw new ValidationException("Shipment is invalid", shipment.errors)
+            }
+
+            // Has to stay after the save. The shipment has disableRefresh = true by default, so the refresh that its
+            // afterUpdate publishes during the save is ignored. If this line were moved above the save, a shipment
+            // that does get updated (its status changes, for example on the receipt that closes it) would refresh the
+            // order summary twice, once in afterUpdate during the save and once in publishRefreshEvent below. The
+            // result would be the same, only the refresh query would run twice
+            shipment.disableRefresh = false
+            shipment.publishRefreshEvent()
+            return null
+        }
+
         if (!shipment.destination?.inventory) {
             throw new IllegalStateException(
                     "Destination ${shipment.destination?.name} must have an inventory in order to receive stock")
