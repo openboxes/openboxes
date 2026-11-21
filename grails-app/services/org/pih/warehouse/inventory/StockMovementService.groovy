@@ -116,8 +116,10 @@ class StockMovementService {
     StockMovementHistoryProvider stockMovementHistoryProvider
     MessageLocalizer messageLocalizer
     PersonService personService
+    StockMovementForElectronicRequestValidator stockMovementForElectronicRequestValidator
 
     def createStockMovement(StockMovement stockMovement) {
+        stockMovementForElectronicRequestValidator.validate(stockMovement)
         if (!stockMovement.validate()) {
             throw new ValidationException("Invalid stock movement", stockMovement.errors)
         }
@@ -126,6 +128,7 @@ class StockMovementService {
     }
 
     void transitionStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
+        stockMovementForElectronicRequestValidator.validateForStatusTransition(stockMovement, jsonObject.status)
         if (stockMovement.requisition) {
             transitionRequisitionBasedStockMovement(stockMovement, jsonObject)
         }
@@ -310,6 +313,7 @@ class StockMovementService {
 
 
     StockMovement updateStockMovement(StockMovement stockMovement) {
+        stockMovementForElectronicRequestValidator.validate(stockMovement)
         if (!stockMovement.validate()) {
             throw new ValidationException("Invalid stock movement", stockMovement.errors)
         }
@@ -2581,6 +2585,7 @@ class StockMovementService {
     }
 
     StockMovement updateItems(StockMovement stockMovement, boolean removeEmptyItems) {
+        stockMovementForElectronicRequestValidator.validate(stockMovement)
         if (stockMovement.requisition) {
             return updateRequisitionBasedStockMovementItems(stockMovement, removeEmptyItems)
         }

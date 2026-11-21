@@ -147,7 +147,7 @@ class StockMovement implements Validateable, Historizable {
                 organizationName    : origin?.organization?.name,
                 organizationCode    : origin?.organization?.code,
                 isDepot             : origin?.isDepot(),
-                supportedActivities : origin?.supportedActivities,
+                supportedActivities : origin?.supportedActivities ?: origin?.locationType?.supportedActivities,
             ],
             destination         : [
                 id                  : destination?.id,
@@ -156,7 +156,7 @@ class StockMovement implements Validateable, Historizable {
                 locationType        : destination?.locationType,
                 locationGroup       : destination?.locationGroup,
                 organizationName    : destination?.organization?.name,
-                supportedActivities : destination?.supportedActivities,
+                supportedActivities : destination?.supportedActivities ?: destination?.locationType?.supportedActivities,
                 organizationCode    : destination?.organization?.code,
             ],
             order                : [
