@@ -160,13 +160,18 @@ bootRun {
     addResources = true
     jvmArgs = [
             '-Dspring.output.ansi.enabled=never',
-            '-Xms1g',
-            '-Xmx4g'
+            "-Xms${findProperty('bootRunMinHeap') ?: '1g'}",
+            "-Xmx${findProperty('bootRunMaxHeap') ?: '4g'}"
     ]
     // Remote debugging is on by default (port 5005). Set DEBUG_PORT to run several
     // apps at once, or DEBUG_ENABLED=false to turn it off. See .envrc.example.
     if (System.getenv('DEBUG_ENABLED') != 'false') {
         jvmArgs += ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=' + (System.getenv('DEBUG_PORT') ?: '5005')]
+    }
+    // e.g. ./gradlew bootRun -PbootRunMaxHeap=1800m -PheapDumpOnOom
+    if (project.hasProperty('heapDumpOnOom')) {
+        jvmArgs '-XX:+HeapDumpOnOutOfMemoryError', "-XX:HeapDumpPath=${buildDir}/heapdumps"
+        doFirst { mkdir "${buildDir}/heapdumps" }
     }
     systemProperties System.properties
 

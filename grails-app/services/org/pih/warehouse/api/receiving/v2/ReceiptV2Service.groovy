@@ -361,9 +361,11 @@ class ReceiptV2Service {
                 new ShipmentStatusTransitionEvent(receipt, ShipmentStatusCode.RECEIVED))
 
         // Trigger product availability refresh
-        transaction.disableRefresh = Boolean.FALSE
-        grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(
-                transaction, transaction.associatedLocation, transaction.associatedProducts, false))
+        if (transaction) {
+            transaction.disableRefresh = Boolean.FALSE
+            grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(
+                    transaction, transaction.associatedLocation, transaction.associatedProducts, false))
+        }
 
         return ReceiptDto.from(receipt)
     }

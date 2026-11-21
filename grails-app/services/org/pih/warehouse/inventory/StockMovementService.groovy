@@ -3063,11 +3063,11 @@ class StockMovementService {
             throw new IllegalArgumentException("Could not find shipment for stock movement with ID ${stockMovement.id}")
         }
 
-        if (stockMovement.statusCode == StockMovementStatusCode.DISPATCHED.toString()) {
+        if (stockMovement.statusCode == RequisitionStatus.ISSUED.toString() && shipment.destination != stockMovement.destination) {
             String inventoryLocationName = locationService.getReceivingLocationName(stockMovement.identifier)
             Location inventoryLocation = locationService.findInternalLocation(shipment.destination, inventoryLocationName)
             if (inventoryLocation != null) {
-                if (stockMovement.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED.toString()) {
+                if (shipment.currentStatus == ShipmentStatusCode.PARTIALLY_RECEIVED) {
                     throw new IllegalArgumentException("You can not change destination if shipment is partially received!")
                 }
                 if (stockMovement.destination.organization == null) {

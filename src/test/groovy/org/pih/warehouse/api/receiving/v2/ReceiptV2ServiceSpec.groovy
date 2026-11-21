@@ -1244,6 +1244,10 @@ class ReceiptV2ServiceSpec extends Specification implements ServiceUnitTest<Rece
 
         then: 'the "nothing entered yet" null does not outlive the pending receipt'
         assert receiptItem.quantityReceived == 0
+
+        and: 'nothing was received, so no transaction is recorded'
+        assert Transaction.count() == 0
+        1 * mainContext.publishEvent(_ as ShipmentStatusTransitionEvent)
     }
 
     void 'completeReceipt should not record a transaction entry for a line left out of a partial receipt'() {

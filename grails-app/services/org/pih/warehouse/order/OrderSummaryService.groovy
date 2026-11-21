@@ -414,7 +414,13 @@ class OrderSummaryService {
         }
 
         if (statements && checkIfOrderSummaryExists()) {
-            dataService.executeStatements(statements, false)
+            try {
+                dataService.executeStatements(statements)
+            } catch (Exception e) {
+                // Don't fail the order/picklist save that triggered this refresh. The nightly
+                // RefreshOrderSummaryJob rebuilds the whole materialized view. See #6189.
+                log.error("Failed to refresh order summary for orders ${orderIds}", e)
+            }
         }
     }
 

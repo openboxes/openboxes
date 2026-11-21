@@ -1194,6 +1194,17 @@ openboxes.supportLinks = [
     manageBinLocations: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1311572061/Manage+Bin+Locations',
     discussionForum: 'https://discuss.openboxes.com/',
     knowledgeBase: 'https://openboxes.helpscoutdocs.com/',
+    // The transaction report's help article, linked from the Report Details header ("How to read this report") and
+    // opened by the help icon. With the Help Scout widget enabled, both open the article in the widget if articleId is
+    // set (the 24-character id of the article in Help Scout). Otherwise the help icon searches the widget for
+    // searchText, or the page's title if there's none, and the link opens url in a new tab. title is the link's
+    // tooltip. Set url to '' to hide the link.
+    transactionReport: [
+        title: 'Transaction Report (0.9.9 Hotfix and Later)',
+        url: 'https://help.openboxes.com/article/497-transaction-report-0-9-9-hotfix-and-later',
+        articleId: '6b006157624668825aa91906',
+        searchText: '',
+    ],
 ]
 
 // Reset an instance
