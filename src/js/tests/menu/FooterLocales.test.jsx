@@ -7,7 +7,11 @@ import configureStore from 'redux-mock-store';
 import { DISABLE_LOCALIZATION } from 'api/urls';
 import Footer from 'components/Layout/Footer';
 
-jest.mock('utils/Translate', () => ({ defaultMessage }) => defaultMessage);
+jest.mock('utils/Translate', () => ({
+  __esModule: true,
+  default: ({ defaultMessage }) => defaultMessage,
+  translateWithDefaultMessage: () => (id, defaultMessage) => defaultMessage,
+}));
 jest.mock('actions', () => ({
   changeCurrentLocale: (locale) => ({ type: 'CHANGE_LOCALE', locale }),
 }));

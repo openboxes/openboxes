@@ -237,15 +237,24 @@
             </tbody>
         </table>
     </div>
-    <div class="box">
+    %{-- Attributes are configured data, so an installation with none active
+         for products rendered this as a bare heading over an empty table.
+         Resolve the list once here: it decides whether the section has
+         anything to show, and is handed to the template so the check and
+         the render cannot disagree. --}%
+    <g:set var="showUnlinkedAttributes" value="${true}"/>
+    <g:set var="productAttributeList" value="${org.pih.warehouse.product.Attribute.findAllByActive(true).findAll {
+            ((it.entityTypeCodes.any { code -> code in [org.pih.warehouse.core.EntityTypeCode.PRODUCT] }) ||
+             it.entityTypeCodes.empty) }}"/>
+    <div class="box ${productAttributeList ? '' : 'is-empty'}">
         <h2>${g.message(code: 'attributes.label')}</h2>
-        <g:set var="showUnlinkedAttributes" value="${true}"/>
         <table>
             <tbody>
                 <g:render template="/attribute/renderFormList"
                           model="[fieldPrefix: 'productAttributes.',
                                   populatedAttributes:productInstance?.attributes,
                                   entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT],
+                                  availableAttributes: productAttributeList,
                                   showUnlinkedAttributes: true]"/>
             </tbody>
         </table>
