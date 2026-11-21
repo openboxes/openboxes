@@ -2384,7 +2384,7 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "openboxes (generated)", id: "1700664714834-85") {
+    changeSet(author: "openboxes (generated)", id: "1700664714834-85", objectQuotingStrategy: "QUOTE_ALL_OBJECTS") {
         createTable(tableName: "product_price") {
             column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
