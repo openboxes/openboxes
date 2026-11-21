@@ -552,8 +552,8 @@
                                 <warehouse:message code="stockMovement.dateReceived.label"/>
                             </td>
                             <td class="value">
-                                <g:if test="${stockMovement?.shipment?.receipts}">
-                                    <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
+                                <g:if test="${stockMovement?.shipment?.receivedReceipts}">
+                                    <g:each var="receipt" in="${stockMovement?.shipment?.receivedReceipts}">
                                         <span title="${g.formatDate(date: receipt?.actualDeliveryDate, format: Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT)}">
                                             <g:formatDate
                                                     format="${Constants.DEFAULT_MONTH_YEAR_DATE_FORMAT}"
