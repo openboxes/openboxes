@@ -86,13 +86,13 @@ class IndicatorDataService {
             }
         }
 
-        List expirationAlerts = dashboardService.getExpirationAlerts(location)
+        List<Integer> daysToExpiryOfLots = dashboardService.daysUntilExpiry(location)
 
-        expirationAlerts.each {
+        daysToExpiryOfLots.each { Integer daysToExpiry ->
             // Count only items that expire
-            if (it.inventoryItem.expires != "never") {
+            if (daysToExpiry != null) {
                 // The first element of the dataset represents expired items
-                if (it.daysToExpiry <= 0) {
+                if (daysToExpiry <= 0) {
                     expirationSummary[0] += 1
                 } else {
                     // Verifies if item expires within querySize * 30 days
@@ -100,7 +100,7 @@ class IndicatorDataService {
                         Integer daysCounter = i * 30
 
                         // if item expires in daysCounter incoming days, count it
-                        if (it.daysToExpiry <= daysCounter) {
+                        if (daysToExpiry <= daysCounter) {
                             expirationSummary[i] += 1
                         }
                     }

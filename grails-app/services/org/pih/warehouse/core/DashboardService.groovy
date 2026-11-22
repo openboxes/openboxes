@@ -20,6 +20,7 @@ import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelService
 import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.ReorderReportFilterCommand
@@ -39,6 +40,7 @@ class DashboardService {
 
     ConfigService configService
     def productAvailabilityService
+    InventoryLevelService inventoryLevelService
     ForecastingService forecastingService
     UserService userService
     MessageLocalizer messageLocalizer
@@ -106,16 +108,16 @@ class DashboardService {
 
     def getExpirationSummary(location) {
         def expirationSummary = [:]
-        def expirationAlerts = getExpirationAlerts(location)
         def daysToExpiry = [30, 60, 90, 180, 365]
-        expirationAlerts.each {
-            if(it.inventoryItem.expires != "never") {
-                if (it.daysToExpiry > 0) {
-                    if (it.daysToExpiry > 365) {
+        daysUntilExpiry(location).each { Integer daysToExpiryOfLot ->
+            // Lots without an expiration date never expire
+            if (daysToExpiryOfLot != null) {
+                if (daysToExpiryOfLot > 0) {
+                    if (daysToExpiryOfLot > 365) {
                         expirationSummary["greaterThan365Days"] = expirationSummary["greaterThan365Days"] ? expirationSummary["greaterThan365Days"] + 1 : 1
                     }
                     daysToExpiry.each { day ->
-                        if (it.daysToExpiry <= day ) {
+                        if (daysToExpiryOfLot <= day ) {
                             expirationSummary["within${day}Days"] =  expirationSummary["within${day}Days"] ? expirationSummary["within${day}Days"] + 1 : 1
                         }
                     }
@@ -133,26 +135,18 @@ class DashboardService {
         return expirationSummary
     }
 
-    def getExpirationAlerts(location) {
-        def startTime = System.currentTimeMillis()
-
-        def expirationAlerts = []
-        def today = new Date()
-        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
-        quantityMap.each { key, value ->
-            if (value > 0) {
-                def daysToExpiry = key.expirationDate ? (key.expirationDate - today) : null
-                expirationAlerts << [id            : key.id, lotNumber: key.lotNumber, quantity: value,
-                                     expirationDate: key.expirationDate, daysToExpiry: daysToExpiry,
-                                     product       : key.product.toJson(), inventoryItem: key.toJson()
-                ]
-            }
+    /**
+     * The days until expiry of each lot with stock at a facility, or null for a lot without an expiration date. The
+     * expiration summaries count lots by days until expiry; reading only the dates avoids loading every lot and product.
+     *
+     * @param location the facility (depot or ward) whose inventory is summarized, not an internal (bin) location: a lot
+     *        counts with its quantity on hand over all bins of the facility, and a bin location returns no lots
+     */
+    List<Integer> daysUntilExpiry(Location location) {
+        Date today = new Date()
+        return productAvailabilityService.getExpirationDatesOfLotsInStock(location).collect { Date expirationDate ->
+            expirationDate ? (expirationDate - today) : null
         }
-
-        log.info "Expiration alerts: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        return expirationAlerts
-
     }
 
     /**
@@ -395,106 +389,103 @@ class DashboardService {
         log.info "Dashboard alerts for ${location}"
 
         long startTime = System.currentTimeMillis()
-        def quantityMap = productAvailabilityService.getCurrentInventory(location)
-        def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
-            it.product
+
+        // Plain values instead of products and inventory levels: loading them as entities takes minutes at a location
+        // with tens of thousands of products
+        List<Map> products = productAvailabilityService.getQuantityOnHandSummaryByProduct(location)
+        Map<String, Map> inventoryLevelMap = inventoryLevelService.getFirstInventoryLevelByProduct(location.inventory)
+
+        Map<String, Integer> counts = [:]
+        Map<String, Object> costs = [:]
+        Closure count = { String category, Map product ->
+            counts[category] = counts.containsKey(category) ? counts[category] + 1 : 1
+            def cost = unitPriceOrZero(product.pricePerUnit)
+            costs[category] = costs.containsKey(category) ? costs[category] + cost : 0 + cost
         }
 
-        def totalStock = quantityMap
-        def reconditionedStock = quantityMap.findAll { it.key.reconditioned }
-        def onHandQuantityZero = quantityMap.findAll { it.value <= 0 }
-        def inStock = quantityMap.findAll { it.value > 0 }
-
-        def outOfStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0
-        }
-
-        def lowStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
+        products.each { Map product ->
+            def quantity = product.quantityOnHand
+            def inventoryLevel = inventoryLevelMap[product.productId]
+            def supported = inventoryLevel?.status >= InventoryStatus.SUPPORTED
             def minQuantity = inventoryLevel?.minQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
-        }
-
-        def reorderStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
             def reorderQuantity = inventoryLevel?.reorderQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
-        }
-
-        def healthyStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity > reorderQuantity && quantity <= maxQuantity
-        }
-
-
-        def overStock = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
             def maxQuantity = inventoryLevel?.maxQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
-        }
 
-        def outOfStockClassA = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "A"
-        }
-
-        def outOfStockClassB = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "B"
-        }
-
-        def outOfStockClassC = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == "C"
-        }
-
-        def outOfStockClassNone = quantityMap.findAll { product, quantity ->
-            def inventoryLevel = inventoryLevelMap[product]?.first()
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && quantity <= 0 && inventoryLevel?.abcClass == null
+            count("totalStock", product)
+            if (product.reconditioned) {
+                count("reconditionedStock", product)
+            }
+            if (quantity <= 0) {
+                count("onHandQuantityZero", product)
+            }
+            if (quantity > 0) {
+                count("inStock", product)
+            }
+            if (supported && quantity <= 0) {
+                count("outOfStock", product)
+                if (inventoryLevel?.abcClass == "A") {
+                    count("outOfStockClassA", product)
+                } else if (inventoryLevel?.abcClass == "B") {
+                    count("outOfStockClassB", product)
+                } else if (inventoryLevel?.abcClass == "C") {
+                    count("outOfStockClassC", product)
+                } else if (inventoryLevel?.abcClass == null) {
+                    count("outOfStockClassNone", product)
+                }
+            }
+            if (supported && minQuantity && quantity <= minQuantity) {
+                count("lowStock", product)
+            }
+            if (supported && reorderQuantity && quantity <= reorderQuantity) {
+                count("reorderStock", product)
+            }
+            if (supported && quantity > reorderQuantity && quantity <= maxQuantity) {
+                count("healthyStock", product)
+            }
+            if (supported && maxQuantity && quantity > maxQuantity) {
+                count("overStock", product)
+            }
         }
 
         log.debug "Get low stock: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        [lowStock               : lowStock.keySet().size(),
-         lowStockCost           : getTotalCost(lowStock),
-         reorderStock           : reorderStock.keySet().size(),
-         reorderStockCost       : getTotalCost(reorderStock),
-         overStock              : overStock.keySet().size(),
-         overStockCost          : getTotalCost(overStock),
-         totalStock             : totalStock.keySet().size(),
-         totalStockCost         : getTotalCost(totalStock),
-         reconditionedStock     : reconditionedStock.keySet().size(),
-         reconditionedStockCost : getTotalCost(reconditionedStock),
-         healthyStock           : healthyStock.keySet().size(),
-         healthyStockCost       : getTotalCost(healthyStock),
-         outOfStock             : outOfStock.keySet().size(),
-         outOfStockCost         : getTotalCost(outOfStock),
-         outOfStockClassA       : outOfStockClassA.keySet().size(),
-         outOfStockCostClassA   : getTotalCost(outOfStockClassA),
-         outOfStockClassB       : outOfStockClassB.keySet().size(),
-         outOfStockCostClassB   : getTotalCost(outOfStockClassB),
-         outOfStockClassC       : outOfStockClassC.keySet().size(),
-         outOfStockCostClassC   : getTotalCost(outOfStockClassC),
-         outOfStockClassNone    : outOfStockClassNone.keySet().size(),
-         outOfStockCostClassNone: getTotalCost(outOfStockClassNone),
+        // An empty category has the count and cost 0, as the size and total of an empty map
+        Closure total = { String category -> counts.containsKey(category) ? counts[category] : 0 }
+        Closure cost = { String category -> costs.containsKey(category) ? costs[category] : 0 }
+        [lowStock               : total("lowStock"),
+         lowStockCost           : cost("lowStock"),
+         reorderStock           : total("reorderStock"),
+         reorderStockCost       : cost("reorderStock"),
+         overStock              : total("overStock"),
+         overStockCost          : cost("overStock"),
+         totalStock             : total("totalStock"),
+         totalStockCost         : cost("totalStock"),
+         reconditionedStock     : total("reconditionedStock"),
+         reconditionedStockCost : cost("reconditionedStock"),
+         healthyStock           : total("healthyStock"),
+         healthyStockCost       : cost("healthyStock"),
+         outOfStock             : total("outOfStock"),
+         outOfStockCost         : cost("outOfStock"),
+         outOfStockClassA       : total("outOfStockClassA"),
+         outOfStockCostClassA   : cost("outOfStockClassA"),
+         outOfStockClassB       : total("outOfStockClassB"),
+         outOfStockCostClassB   : cost("outOfStockClassB"),
+         outOfStockClassC       : total("outOfStockClassC"),
+         outOfStockCostClassC   : cost("outOfStockClassC"),
+         outOfStockClassNone    : total("outOfStockClassNone"),
+         outOfStockCostClassNone: cost("outOfStockClassNone"),
 
-         onHandQuantityZero     : onHandQuantityZero.keySet().size(),
-         onHandQuantityZeroCost : getTotalCost(onHandQuantityZero),
-         inStock                : inStock.keySet().size(),
-         inStockCost            : getTotalCost(inStock),
+         onHandQuantityZero     : total("onHandQuantityZero"),
+         onHandQuantityZeroCost : cost("onHandQuantityZero"),
+         inStock                : total("inStock"),
+         inStockCost            : cost("inStock"),
         ]
     }
 
 
-    def getTotalCost(quantityMap) {
-        def totalCost = 0
-        quantityMap.each { k, v ->
-            totalCost += k.pricePerUnit ?: 0 * v ?: 0
-        }
-        return totalCost
+    // FIXME #6394 the dashboard cost totals sum unit prices and ignore quantity (kept for parity, see pending spec)
+    private static def unitPriceOrZero(pricePerUnit) {
+        return pricePerUnit ?: 0
     }
 
     def getInventoryStatus(Location location) {
