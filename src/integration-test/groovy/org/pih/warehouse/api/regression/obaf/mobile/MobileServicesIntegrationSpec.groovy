@@ -5,6 +5,7 @@ import groovy.json.JsonSlurper
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
+import spock.lang.Unroll
 
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.MobileProductApiController
@@ -219,6 +220,7 @@ class MobileServicesIntegrationSpec extends ObafEventsIntegrationSpec {
         return fixtures.findAll { k, v -> found.contains(v) }.keySet()
     }
 
+    @Unroll
     void 'searchProducts finds a product code whatever its spacing and letter case (#label)'() {
         given:
         String n = uid()
@@ -241,7 +243,7 @@ class MobileServicesIntegrationSpec extends ObafEventsIntegrationSpec {
         'another prefix'            | { String k -> "ZZ ${k}Y" }            | []
     }
 
-    void 'searchProducts finds a product code typed without its prefix only when asked to (the mobile search)'() {
+    void 'searchProducts finds a product code typed without its prefix only with matchCodeAnywhere (the mobile search fallback)'() {
         given:
         String n = uid()
         Map<String, String> fixtures = [twoSpace: productWithCode("TL  ${n}Y"), oneSpace: productWithCode("DDE ${n}")]

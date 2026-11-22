@@ -101,6 +101,23 @@ class ProductContractSpec extends MobileContractSpec {
         (noPrefix.data.data as List<Map>)*.id.contains(spaced.id)
     }
 
+    @Covers('src/apis/products.ts#searchProductGlobally')
+    void 'POST /mobile/products/search {value} matches the code anywhere only when nothing starts with the value'() {
+        given: 'one code is the scanned value, another contains it after a prefix'
+        String n = uid()
+        Product exact = newProduct('WS', [productCode: "${n}Y".toString()])
+        Product spaced = newProduct('WS', [productCode: "TL  ${n}Y".toString()])
+
+        when:
+        CallResult scan = call('src/apis/products.ts#searchProductGlobally', [:], [value: "${n}Y".toString()])
+
+        then: 'the prefix match is the whole answer'
+        scan.holds()
+        List<String> ids = (scan.data.data as List<Map>)*.id as List<String>
+        ids.contains(exact.id)
+        !ids.contains(spaced.id)
+    }
+
     @Covers('src/apis/products.ts#searchProductByCode')
     void 'POST /generic/product/search by productCode like (search header, unreachable in the UI)'() {
         when:

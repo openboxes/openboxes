@@ -1372,13 +1372,14 @@ class ProductService {
     /**
      * Get all products matching the given terms and categories.
      *
-     * The product code also matches with spaces ignored (any whitespace in the term, spaces in the stored code),
-     * so a code stored as "TL  60272Y" is found by "TL 60272Y" or "TL60272Y".
+     * The product code also matches with spaces ignored and case-insensitive, so a code stored as "TL  60272Y" is
+     * found by the term "TL 60272Y" or "TL60272Y". This applies per term: callers that split the query on spaces
+     * (the web lookups) pass "TL" and "60272Y" as separate terms, so it helps them only for unsplit input.
      *
      * @param terms
      * @param categories
      * @param returnIds return product ids instead of products
-     * @param matchCodeAnywhere match the whitespace-free code anywhere instead of only as a prefix
+     * @param matchCodeAnywhere match the space-free code anywhere instead of only as a prefix
      *        (e.g. "60272Y" finds "TL  60272Y")
      * @return
      */
@@ -1402,7 +1403,7 @@ class ProductService {
             if (terms) {
                 terms.each { term ->
                     term = term + "%"
-                    String compactCode = term.replaceAll(/\s+/, '').toLowerCase(Locale.ROOT)
+                    String compactCode = term.replace(' ', '').toLowerCase(Locale.ROOT)
                     or {
                         ilike("name", "%" + term)
                         ilike("productCode", term)
