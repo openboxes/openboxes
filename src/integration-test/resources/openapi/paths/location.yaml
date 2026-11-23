@@ -554,7 +554,7 @@
             schema:
               type: string
             example: |
-              id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description
+              id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description,zone,sortOrder,bgColor
       '401':
         $ref: ../components/responses.yaml#/Unauthorized
       '403':
