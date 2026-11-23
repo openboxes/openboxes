@@ -134,7 +134,7 @@ openboxes.security.rbac.rules = [
     [controller: 'requisition', actions: ['unassignPicker', 'reassignPicker', 'reassignPickerDialog'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN ]],
     // Warehouse task, allocation and label actions whose names match none of RoleInterceptor's change prefixes.
     // Pick and putaway task changes: Assistant, as for other stock movement changes
-    [controller: 'pickTaskApi', actions: ['patch', 'reallocate', 'drop'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'pickTaskApi', actions: ['patch', 'reallocate', 'drop', 'dropContainer'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
     [controller: 'putawayTaskApi', actions: ['patch'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
     // Allocation: Manager
     [controller: 'allocationApi', actions: ['allocate', 'deallocate'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],

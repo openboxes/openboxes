@@ -226,6 +226,8 @@ paths:
     $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1containers~1{outboundContainerId}'
   '/api/facilities/{facility}/pick-tasks/counts':
     $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1counts'
+  '/api/facilities/{facility}/pick-tasks/drop':
+    $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1drop'
   '/api/facilities/{facility}/pick-tasks/{id}':
     $ref: 'paths/pick-task.yaml#/~1api~1facilities~1{facility}~1pick-tasks~1{id}'
   '/api/facilities/{facility}/pick-tasks/{id}/reallocate':

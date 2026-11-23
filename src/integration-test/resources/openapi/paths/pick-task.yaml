@@ -25,12 +25,12 @@
 /api/facilities/{facility}/pick-tasks/containers/{outboundContainerId}:
   patch:
     operationId: pickTaskApi_drop
-    summary: pickTaskApi.drop
+    summary: pickTaskApi.dropContainer
     tags:
     - Pick Task
     x-doc-status: stub
     x-openboxes-controller: pickTaskApi
-    x-openboxes-action: drop
+    x-openboxes-action: dropContainer
     x-openboxes-source: explicit
     parameters:
     - name: facility
@@ -71,6 +71,31 @@
     responses:
       '200':
         $ref: ../components/responses.yaml#/StubSuccess
+      default:
+        $ref: ../components/responses.yaml#/Error
+/api/facilities/{facility}/pick-tasks/drop:
+  patch:
+    operationId: pickTaskApi_drop_patch
+    summary: pickTaskApi.drop
+    tags:
+    - Pick Task
+    x-doc-status: stub
+    x-openboxes-controller: pickTaskApi
+    x-openboxes-action: drop
+    x-openboxes-source: explicit
+    parameters:
+    - name: facility
+      in: path
+      required: true
+      schema:
+        type: string
+    requestBody:
+      $ref: ../components/request-bodies.yaml#/StubBody
+    responses:
+      '200':
+        $ref: ../components/responses.yaml#/StubSuccess
+      '204':
+        $ref: ../components/responses.yaml#/StubNoContent
       default:
         $ref: ../components/responses.yaml#/Error
 /api/facilities/{facility}/pick-tasks/{id}:

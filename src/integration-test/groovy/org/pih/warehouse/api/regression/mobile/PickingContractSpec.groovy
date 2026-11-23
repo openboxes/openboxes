@@ -543,7 +543,7 @@ class PickingContractSpec extends MobileContractSpec {
 
         then:
         r.status == 500
-        r.data.errorMessage.contains('is empty')
+        r.data.errorMessage.contains('No picked items')
         dropState(o) == before
     }
 

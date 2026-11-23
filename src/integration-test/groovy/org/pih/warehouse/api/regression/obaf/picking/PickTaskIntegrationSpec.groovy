@@ -113,8 +113,8 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
         expect:
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: 'no-such-tote']).message.contains('does not exist')
-        // no container, or a tote of another facility: there is no such tote at the task's facility
-        pickPatch(o.taskIds[0], [action: 'pick']).message.contains('does not exist')
+        // no container is required unless the facility allows the bypass; a tote of another facility does not exist here
+        pickPatch(o.taskIds[0], [action: 'pick']).message.contains('is required')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: otherTote]).message.contains('does not exist')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.alt]).message.contains('OUTBOUND_CONTAINER')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: noHold]).message.contains('HOLD_STOCK')

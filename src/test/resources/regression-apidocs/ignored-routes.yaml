@@ -155,6 +155,7 @@
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks', methods: [POST, PUT, PATCH, DELETE], target: pickTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/containers/{outboundContainerId}', methods: [GET, POST, PUT, DELETE], target: pickTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/counts', methods: [POST, PUT, PATCH, DELETE], target: pickTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/drop', methods: [GET, POST, PUT, DELETE], target: pickTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/{id}', methods: [POST, PUT, DELETE], target: pickTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/pick-tasks/{id}/reallocate', methods: [GET, PUT, PATCH, DELETE], target: pickTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks', methods: [PUT, PATCH, DELETE], target: putawayTaskApi/index, reason: *fallthrough}

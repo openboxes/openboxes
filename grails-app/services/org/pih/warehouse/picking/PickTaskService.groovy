@@ -486,12 +486,13 @@ class PickTaskService {
     }
 
     void save(PickTask task) {
+        task.discard()
+
         PicklistItem existingPickItem = PicklistItem.get(task.id)
         existingPickItem.status = task.status.toString()
         Requisition requisition = existingPickItem?.requisitionItem?.requisition
 
         if (!requisition) {
-            task.discard()
             return
         }
 
@@ -518,7 +519,6 @@ class PickTaskService {
         }
 
         requisition.save(cascade: true, failOnError: true)
-        task.discard()
     }
 
     void stageRequisition(Requisition requisition) {
@@ -590,6 +590,8 @@ class PickTaskService {
         Person stagedBy = AuthService.currentUser
         tasks.each { PickTask task ->
             transferToStaging(task, task.outboundContainer, stagingLocation)
+            // PickTask is backed by a view; transferToStaging only detaches it when it moves stock
+            task.discard()
 
             executeStateTransition(task, PickTaskStatus.STAGED)
             PicklistItem existingPickItem = PicklistItem.get(task.id)
