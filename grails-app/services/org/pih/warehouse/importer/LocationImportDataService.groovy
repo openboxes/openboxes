@@ -11,6 +11,7 @@ package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.apache.commons.lang.StringUtils
 import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
@@ -30,6 +31,9 @@ class LocationImportDataService implements ImportDataService {
 
         def locationNamesToImport = command.data.collect {it.name}
         def locationNumbersToImport = command.data.collect {it.locationNumber}
+        Set<String> zonesToImport = command.data.findAll { findLocationType(it.locationType as String)?.isZone() }.collect {
+            zoneKey(it.parentLocation ? Location.findByName(it.parentLocation) : null, it.name as String)
+        } as Set
 
         command.data.eachWithIndex { params, index ->
             Location location = params.id ? Location.findById(params.id) : null
@@ -111,6 +115,35 @@ class LocationImportDataService implements ImportDataService {
             if (params.locationType && location && (location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !(LocationType.findByNameLike(params.locationType + "%")?.isInternalLocation() || LocationType.findByNameLike(params.locationType + "%")?.isZone())) {
                 command.errors.reject("Row ${index + 1}: Changing Location Type from internal to '${params.locationType}' is not possible")
             }
+
+            String zoneName = StringUtils.trimToNull(params.zone as String)
+            if (zoneName && locationType) {
+                if (!locationType.isInternalLocation()) {
+                    command.errors.reject("Row ${index + 1}: Zone can only be assigned to internal locations such as bin locations")
+                } else if (parentLocation && !zonesToImport.contains(zoneKey(parentLocation, zoneName)) && !findZone(parentLocation, zoneName)) {
+                    command.errors.reject("Row ${index + 1}: Zone '${zoneName}' does not exist in '${parentLocation.name}'")
+                }
+            }
+
+            if (!StringUtils.isBlank(params.sortOrder as String)) {
+                if (parseSortOrder(params.sortOrder) == null) {
+                    command.errors.reject("Row ${index + 1}: Sort order '${params.sortOrder}' must be a whole number")
+                } else if (locationType && !(locationType.isInternalLocation() || locationType.isZone())) {
+                    command.errors.reject("Row ${index + 1}: Sort order can only be set on internal locations and zones")
+                }
+            }
+
+            if (!StringUtils.isBlank(params.bgColor as String)) {
+                String bgColor = normalizeColor(params.bgColor)
+                String fgColor = (location ?: new Location()).fgColor
+                if (!bgColor.matches(/[0-9A-F]{6}/)) {
+                    command.errors.reject("Row ${index + 1}: Background color '${params.bgColor}' must be a six-digit hex color code")
+                } else if (locationType && !locationType.isZone()) {
+                    command.errors.reject("Row ${index + 1}: Background color can only be set on zones")
+                } else if (bgColor.equalsIgnoreCase(fgColor)) {
+                    command.errors.reject("Row ${index + 1}: Background color must differ from the foreground color '${fgColor}'")
+                }
+            }
         }
     }
 
@@ -119,11 +152,17 @@ class LocationImportDataService implements ImportDataService {
         List<Map> data = command.data
 
         Map<Object, Organization> organizationsByIdentifier = bindExistingOrganizations(data)
+        Map<String, Location> importedZones = [:]
 
-        for (Map params in data) {
-            Location location = bindLocation(params, organizationsByIdentifier)
+        // Zones go first, so that bin locations can be assigned to a zone created by the same import
+        List<Map> zonesFirst = data.sort(false) { findLocationType(it.locationType as String)?.isZone() ? 0 : 1 }
+        for (Map params in zonesFirst) {
+            Location location = bindLocation(params, organizationsByIdentifier, importedZones)
             if (!location.validate() || !location.save(failOnError: true)) {
                 throw new ValidationException("Invalid location ${location.name}", location.errors)
+            }
+            if (location.locationType?.isZone()) {
+                importedZones[zoneKey(location.parentLocation, location.name)] = location
             }
         }
     }
@@ -147,7 +186,7 @@ class LocationImportDataService implements ImportDataService {
         return organizationsByIdentifier
     }
 
-    private Location bindLocation(Map params, Map<Object, Organization> organizationsByIdentifier) {
+    private Location bindLocation(Map params, Map<Object, Organization> organizationsByIdentifier, Map<String, Location> importedZones) {
         Location location
         if (params.id) {
             location = Location.findById(params.id)
@@ -206,7 +245,63 @@ class LocationImportDataService implements ImportDataService {
             location.organization = organization
         }
 
+        String zoneName = StringUtils.trimToNull(params.zone as String)
+        if (zoneName && location.parentLocation) {
+            Location zone = importedZones[zoneKey(location.parentLocation, zoneName)] ?: findZone(location.parentLocation, zoneName)
+            if (zone) {
+                location.zone = zone
+            }
+        }
+
+        Integer sortOrder = parseSortOrder(params.sortOrder)
+        if (sortOrder != null) {
+            location.sortOrder = sortOrder
+        }
+
+        if (!StringUtils.isBlank(params.bgColor as String)) {
+            location.bgColor = normalizeColor(params.bgColor)
+        }
+
         return location
+    }
+
+    private LocationType findLocationType(String name) {
+        if (!name) {
+            return null
+        }
+        String locationTypeName = LocalizationUtil.getDefaultString(name)
+        return LocationType
+                .findAllByNameLike(locationTypeName + "%")
+                .find{ LocalizationUtil.getDefaultString(it.name) == locationTypeName}
+    }
+
+    private Location findZone(Location parentLocation, String name) {
+        return Location.createCriteria().get {
+            eq("parentLocation", parentLocation)
+            eq("name", name)
+            locationType {
+                eq("locationTypeCode", LocationTypeCode.ZONE)
+            }
+        }
+    }
+
+    private static String zoneKey(Location parentLocation, String name) {
+        return "${parentLocation?.id}|${name?.trim()?.toLowerCase()}"
+    }
+
+    private static Integer parseSortOrder(def value) {
+        if (StringUtils.isBlank(value as String)) {
+            return null
+        }
+        try {
+            return new BigDecimal((value as String).trim()).intValueExact()
+        } catch (NumberFormatException | ArithmeticException e) {
+            return null
+        }
+    }
+
+    private static String normalizeColor(def value) {
+        return (value as String).trim().replaceFirst('^#', '').toUpperCase()
     }
 
     Address bindAddress(Map params, String addressId = null) {

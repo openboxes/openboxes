@@ -315,7 +315,7 @@ class LocationApiController extends BaseDomainApiController {
     }
 
     def downloadTemplate() {
-        def csv = "id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description\n"
+        def csv = "id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description,zone,sortOrder,bgColor\n"
 
         response.setHeader("Content-disposition", "attachment; filename=\"Location_template.csv\"")
         render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(csv.toString()), encoding: "UTF-8")

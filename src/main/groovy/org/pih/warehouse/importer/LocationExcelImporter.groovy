@@ -43,6 +43,9 @@ class LocationExcelImporter extends AbstractExcelImporter implements DataImporte
                     'M': 'postalCode',
                     'N': 'country',
                     'O': 'description',
+                    'P': 'zone',
+                    'Q': 'sortOrder',
+                    'R': 'bgColor',
             ]
     ]
 
@@ -62,6 +65,9 @@ class LocationExcelImporter extends AbstractExcelImporter implements DataImporte
             postalCode      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             country         : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             description     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            zone            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            sortOrder       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            bgColor         : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
     LocationExcelImporter(String fileName) {
