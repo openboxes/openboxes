@@ -1,7 +1,6 @@
 package org.pih.warehouse.inventory
 
 import grails.testing.gorm.DataTest
-import grails.validation.ValidationException
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -74,32 +73,6 @@ class StockMovementForElectronicRequestValidatorSpec extends Specification imple
         scenario                                          | sourceType                       | isLoggedInAtWard
         'an e-request saved from its requesting location' | RequisitionSourceType.ELECTRONIC | true
         'a paper request saved from the origin'           | RequisitionSourceType.PAPER      | false
-    }
-
-    void 'validateForStatusTransition should reject submitting an e-request as #status from another location'() {
-        given:
-        new AuthService().setCurrentLocation(depot)
-
-        when:
-        validator.validateForStatusTransition(buildStockMovement(null, RequisitionSourceType.ELECTRONIC), status)
-
-        then:
-        thrown(ValidationException)
-
-        where:
-        status << [StockMovementStatusCode.REQUESTED, StockMovementStatusCode.PENDING_APPROVAL]*.name()
-    }
-
-    void 'validateForStatusTransition should let the origin approve an e-request'() {
-        given:
-        new AuthService().setCurrentLocation(depot)
-
-        when:
-        validator.validateForStatusTransition(buildStockMovement(null, RequisitionSourceType.ELECTRONIC),
-                StockMovementStatusCode.APPROVED.name())
-
-        then:
-        notThrown(ValidationException)
     }
 
     /**

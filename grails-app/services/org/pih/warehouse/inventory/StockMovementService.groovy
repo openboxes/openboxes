@@ -128,7 +128,6 @@ class StockMovementService {
     }
 
     void transitionStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
-        stockMovementForElectronicRequestValidator.validateForStatusTransition(stockMovement, jsonObject.status)
         if (stockMovement.requisition) {
             transitionRequisitionBasedStockMovement(stockMovement, jsonObject)
         }
@@ -151,6 +150,12 @@ class StockMovementService {
     void transitionRequisitionBasedStockMovement(StockMovement stockMovement, JSONObject jsonObject) {
         StockMovementStatusCode status =
                 jsonObject.containsKey("status") ? jsonObject.status as StockMovementStatusCode : null
+
+        // These statuses mean the request is being submitted, which for an e-request has to be done
+        // at the requesting location
+        if (status in StockMovementStatusCode.listRequestedOrPendingApproval()) {
+            stockMovementForElectronicRequestValidator.validate(stockMovement)
+        }
 
         Boolean statusOnly =
                 jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false

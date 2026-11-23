@@ -147,7 +147,7 @@ class StockMovement implements Validateable, Historizable {
                 organizationName    : origin?.organization?.name,
                 organizationCode    : origin?.organization?.code,
                 isDepot             : origin?.isDepot(),
-                supportedActivities : origin?.supportedActivities ?: origin?.locationType?.supportedActivities,
+                supportedActivities : origin?.supportedActivitiesOrLocationTypeDefaults,
             ],
             destination         : [
                 id                  : destination?.id,
@@ -156,7 +156,7 @@ class StockMovement implements Validateable, Historizable {
                 locationType        : destination?.locationType,
                 locationGroup       : destination?.locationGroup,
                 organizationName    : destination?.organization?.name,
-                supportedActivities : destination?.supportedActivities ?: destination?.locationType?.supportedActivities,
+                supportedActivities : destination?.supportedActivitiesOrLocationTypeDefaults,
                 organizationCode    : destination?.organization?.code,
             ],
             order                : [
@@ -265,8 +265,11 @@ class StockMovement implements Validateable, Historizable {
         return shipment?.currentStatus == ShipmentStatusCode.RECEIVED
     }
 
+    /**
+     * A new stock movement has no requisition yet, so its own source type is checked as well.
+     */
     Boolean isElectronicType() {
-        requisition?.sourceType == RequisitionSourceType.ELECTRONIC
+        sourceType == RequisitionSourceType.ELECTRONIC || requisition?.sourceType == RequisitionSourceType.ELECTRONIC
     }
 
     Boolean isPendingApproval() {
