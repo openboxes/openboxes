@@ -305,8 +305,8 @@
                                 <g:message code="stockMovement.dateReceived.label"/>
                             </td>
                             <td class="value">
-                                <g:if test="${stockMovement?.shipment?.receipts}">
-                                    <g:each var="receipt" in="${stockMovement?.shipment?.receipts}">
+                                <g:if test="${stockMovement?.shipment?.receivedReceipts}">
+                                    <g:each var="receipt" in="${stockMovement?.shipment?.receivedReceipts}">
                                         <span title="${g.formatDate(date:receipt?.actualDeliveryDate)}">
                                             <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
                                         </span>
