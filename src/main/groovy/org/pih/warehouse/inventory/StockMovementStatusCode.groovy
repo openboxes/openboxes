@@ -62,7 +62,7 @@ enum StockMovementStatusCode {
         [CREATED, REQUESTED, VALIDATED, PICKING, PICKED, CHECKING, CHECKED, PACKED, REVIEWING, DISPATCHED, CANCELED]
     }
 
-    static List<StockMovementStatusCode> listRequestedOrPendingApproval() {
+    static List<StockMovementStatusCode> listRequestSubmitted() {
         [REQUESTED, PENDING_APPROVAL]
     }
 

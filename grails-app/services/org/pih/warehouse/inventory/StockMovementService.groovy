@@ -153,7 +153,7 @@ class StockMovementService {
 
         // These statuses mean the request is being submitted, which for an e-request has to be done
         // at the requesting location
-        if (status in StockMovementStatusCode.listRequestedOrPendingApproval()) {
+        if (status in StockMovementStatusCode.listRequestSubmitted()) {
             stockMovementForElectronicRequestValidator.validate(stockMovement)
         }
 
