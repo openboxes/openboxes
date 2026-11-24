@@ -1,5 +1,6 @@
 // Vendored from org.grails.plugins:excel-import:3.0.2 (Apache-2.0); the plugin has no Grails 7 release.
 // Source: repo.grails.org excel-import-3.0.2-sources.jar. Unmodified except this header.
+// Full license text: src/main/resources/META-INF/licenses/excel-import/LICENSE.txt
 package org.grails.plugins.excelimport
 
 import static org.grails.plugins.excelimport.ExpectedPropertyType.*
