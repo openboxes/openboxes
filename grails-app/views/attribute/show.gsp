@@ -16,9 +16,9 @@
 
 
             <div class="buttonBar">
-                <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
+                <g:link class="button" action="list"><i class="ri-list-unordered align-middle mr-1"></i><warehouse:message code="default.list.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
                 <g:isUserAdmin>
-                    <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
+                    <g:link class="button" action="create"><i class="ri-add-line align-middle mr-1"></i><warehouse:message code="default.add.label" args="[warehouse.message(code:'attribute.label').toLowerCase()]"/></g:link>
                 </g:isUserAdmin>
             </div>
 
