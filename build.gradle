@@ -19,13 +19,14 @@
  *
  * Plugins dropped because they have no Grails 7 release (replacements in-tree):
  *   csv, excel-import             -> vendored sources (src/main/groovy, services)
+ *   ajax-tags                     -> vendored sources (org.pih.warehouse.ajaxtags)
  *   rendering                     -> io.github.gpc:rendering:7.0.3 (community Grails 7 port)
  *   browser-detection             -> org.pih.warehouse.core.UserAgentIdentService
  *   grails-pretty-time            -> PrettyTimeTagLib + ocpsoft prettytime lib
  *   external-config               -> Grails 7 core loads grails.config.locations
  *   gpars + async usage           -> GparsService on java.util.concurrent
  *   quartz-monitor, console, views-json, joda-time plugin, code-coverage,
- *   ajax-tags (GSP tags pending), grails-test-mixins -> dropped
+ *   grails-test-mixins -> dropped
  * ---------------------------------------------------------------------------
  */
 
