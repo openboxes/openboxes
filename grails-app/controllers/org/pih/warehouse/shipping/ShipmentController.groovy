@@ -99,17 +99,17 @@ class ShipmentController {
     }
 
 
-    def create() {
-        def shipmentInstance = new Shipment()
-        shipmentInstance.properties = params
+    def index() {
+        redirect(action: "list", params: params)
+    }
 
-        if (params.type == "incoming") {
-            shipmentInstance.destination = session.warehouse
-        } else if (params.type == "outgoing") {
-            shipmentInstance.origin = session.warehouse
-        }
-        render(view: "create", model: [shipmentInstance: shipmentInstance,
-                                       warehouses      : Location.list(), eventTypes: EventType.list()])
+    def create() {
+        boolean isInbound = params.type?.toUpperCase() == "INCOMING"
+        redirect(
+                controller: "stockMovement",
+                action: isInbound ? "createInbound" : "createOutbound",
+                params: [direction: isInbound ? "INBOUND" : "OUTBOUND"]
+        )
     }
 
     def save() {
