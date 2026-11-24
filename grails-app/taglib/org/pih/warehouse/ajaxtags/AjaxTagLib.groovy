@@ -1,6 +1,6 @@
 // Vendored from org.grails.plugins:ajax-tags (Apache-2.0); the plugin has no Grails 7 release.
 // Source: github.com/grails-plugins/ajax-tags, branch 8.0.x, commit f715950b03c5. Unmodified except this header and the package.
-// Full license text: grails-app/taglib/org/pih/warehouse/ajaxtags/LICENSE.txt
+// Full license text: src/main/resources/META-INF/licenses/ajax-tags/LICENSE.txt
 /*
  * Copyright 2015 the original author or authors.
  *
