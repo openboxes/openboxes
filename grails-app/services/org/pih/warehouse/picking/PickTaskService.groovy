@@ -742,6 +742,24 @@ class PickTaskService {
         }?.assignee
     }
 
+    /**
+     * The picker to display for the order. Unlike getCurrentAssignee, which only looks at items that are still
+     * open (it decides whether the assignment can be changed), this also looks at picked and staged items, so the
+     * picker is still shown once the items are picked, and between picks on the mobile app, which assigns one
+     * picklist item at a time. An open item's assignee wins (it reflects a reassignment); otherwise the most
+     * recently assigned item's assignee is used.
+     */
+    Person getPicker(Requisition requisition) {
+        Person currentAssignee = getCurrentAssignee(requisition)
+        if (currentAssignee) {
+            return currentAssignee
+        }
+
+        return requisition?.picklist?.picklistItems?.findAll { PicklistItem item -> item.assignee }
+                ?.max { PicklistItem item -> item.dateAssigned?.time ?: 0L }
+                ?.assignee
+    }
+
     void unassign(Requisition requisition) {
         validateAssignmentChangeAllowed(requisition)
 
