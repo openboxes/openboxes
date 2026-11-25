@@ -571,5 +571,9 @@ class ReplenishmentTaskService {
         if (!stagingLocation.supports(ActivityCode.HOLD_STOCK)) {
             throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.HOLD_STOCK} activity")
         }
+        // Only lanes set aside for bin replenishment, not every outbound staging lane
+        if (!stagingLocation.supports(ActivityCode.BIN_REPLENISHMENT)) {
+            throw new IllegalArgumentException("Staging location ${stagingLocation.name} does not support ${ActivityCode.BIN_REPLENISHMENT} activity")
+        }
     }
 }

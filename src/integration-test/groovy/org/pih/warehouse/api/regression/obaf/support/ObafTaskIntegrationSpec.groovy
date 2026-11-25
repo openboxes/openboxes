@@ -17,12 +17,15 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picking.PickTaskService
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.putaway.PutawayService
 import org.pih.warehouse.putaway.PutawayTaskService
+import org.pih.warehouse.replenishment.ReplenishmentTask
+import org.pih.warehouse.replenishment.ReplenishmentTaskService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
@@ -50,6 +53,9 @@ abstract class ObafTaskIntegrationSpec extends ObafIntegrationSpec {
 
     @Autowired
     PutawayService putawayService
+
+    @Autowired
+    ReplenishmentTaskService replenishmentTaskService
 
     // ------------------------------------------------------------------ people
 
@@ -165,6 +171,75 @@ abstract class ObafTaskIntegrationSpec extends ObafIntegrationSpec {
              dateStaged         : t.dateStaged, reasonCode: t.reasonCode,
              orderTotalTaskCount: t.orderTotalTaskCount, orderOpenTaskCount: t.orderOpenTaskCount,
              orderPickStatusCode: t.orderPickStatusCode?.name()]
+        } as Map
+    }
+
+    // ------------------------------------------------------------------ replenishment
+
+    static class ReplenOrder {
+        String orderId, orderNumber
+        List<String> taskIds = []
+    }
+
+    /**
+     * An APPROVED transfer order of the site's depot: one line per quantity, each from BIN into the destination bin
+     * (ALT unless given; null makes a plain stock transfer line), with one picklist item (task) per line. The site's
+     * staging lane is set aside for bin replenishment (BIN_REPLENISHMENT), so the picks can be dropped there.
+     */
+    ReplenOrder replenOrder(PickSite s, List<Integer> quantities, String destinationBin = s.alt) {
+        tx {
+            Location staging = Location.get(s.staging)
+            staging.supportedActivities = ((staging.supportedActivities ?: []) as Set<String>) + ActivityCode.BIN_REPLENISHMENT.id
+            staging.save(flush: true, failOnError: true)
+        }
+        return tx {
+            String n = uid()
+            Location facility = Location.get(s.dc)
+            Order order = new Order(name: "Test replenishment ${n}".toString(), orderNumber: "R${n}".toString(),
+                    orderType: OrderType.findByCode(OrderTypeCode.TRANSFER_ORDER.name()), status: OrderStatus.APPROVED,
+                    origin: facility, destination: facility, orderedBy: Person.get('1'), dateOrdered: new Date())
+            List<OrderItem> items = quantities.collect { Integer q ->
+                OrderItem item = new OrderItem(product: Product.get(s.product), inventoryItem: InventoryItem.get(s.lotId),
+                        quantity: q, quantityPerUom: 1, originBinLocation: Location.get(s.bin),
+                        destinationBinLocation: destinationBin ? Location.get(destinationBin) : null,
+                        orderItemStatusCode: OrderItemStatusCode.PENDING)
+                order.addToOrderItems(item)
+                item
+            }
+            order.save(flush: true, failOnError: true)
+
+            Picklist picklist = new Picklist(name: order.name, order: order)
+            items.eachWithIndex { OrderItem item, int i ->
+                picklist.addToPicklistItems(new PicklistItem(orderItem: item, inventoryItem: item.inventoryItem,
+                        binLocation: item.originBinLocation, quantity: item.quantity, quantityPicked: 0, sortOrder: i))
+            }
+            picklist.save(flush: true, failOnError: true)
+            return new ReplenOrder(orderId: order.id, orderNumber: order.orderNumber,
+                    taskIds: picklist.picklistItems.sort { it.sortOrder }*.id)
+        } as ReplenOrder
+    }
+
+    Throwable replenPatch(String taskId, Map data) {
+        try {
+            tx { replenishmentTaskService.patch(taskId, data) }
+            return null
+        } catch (Throwable t) {
+            return t
+        }
+    }
+
+    Map replenTask(String id) {
+        return tx {
+            ReplenishmentTask t = ReplenishmentTask.get(id)
+            if (!t) {
+                return null
+            }
+            [id               : t.id, status: t.status?.name(), orderId: t.order?.id, facility: t.facility?.id,
+             location         : prefixOf(t.location?.name), destinationLocation: prefixOf(t.destinationLocation?.name),
+             outboundContainer: prefixOf(t.outboundContainer?.name), stagingLocation: prefixOf(t.stagingLocation?.name),
+             quantityRequired : t.quantityRequired as Integer, quantityPicked: t.quantityPicked as Integer,
+             assignee         : t.assignee?.id, pickedBy: t.pickedBy?.id, stagedBy: t.stagedBy?.id,
+             reasonCode       : t.reasonCode, identifier: t.identifier]
         } as Map
     }
 

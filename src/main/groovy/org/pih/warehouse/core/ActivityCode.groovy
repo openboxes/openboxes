@@ -161,6 +161,11 @@ enum ActivityCode {
     // Staging location codes
     STAGING_LOCATION('STAGING_LOCATION'),
 
+    // Bin replenishment: marks locations used by the bin replenishment flow, the location's other codes give the
+    // role. With STAGING_LOCATION and HOLD_STOCK it is a staging lane where replenishment picks are dropped. Not meant
+    // for openboxes.jobs.automaticReplenishmentJob.targetActivityCodes, which picks the bins to refill.
+    BIN_REPLENISHMENT('BIN_REPLENISHMENT'),
+
     // Pre-pick location codes
     PREPICK_STOCK('PREPICK_STOCK'),
 
@@ -263,6 +268,7 @@ enum ActivityCode {
                 // Internal locations used for picking
                 OUTBOUND_CONTAINER,
                 STAGING_LOCATION,
+                BIN_REPLENISHMENT,
                 PREPICK_STOCK,
                 VALIDATE_STAGING_LOCATION_ZONE,
 

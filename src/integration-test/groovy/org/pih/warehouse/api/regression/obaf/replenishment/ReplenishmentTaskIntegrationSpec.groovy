@@ -1,25 +1,15 @@
 package org.pih.warehouse.api.regression.obaf.replenishment
 
 import grails.validation.ValidationException
-import org.springframework.beans.factory.annotation.Autowired
 
 import org.pih.warehouse.api.regression.obaf.support.ObafTaskIntegrationSpec
 import org.pih.warehouse.api.replenishment.SearchReplenishmentTaskCommand
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderItemStatusCode
-import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.OrderType
-import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picking.StagingLocationNotFoundException
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.product.Product
 import org.pih.warehouse.replenishment.ReplenishmentTask
-import org.pih.warehouse.replenishment.ReplenishmentTaskService
 
 /**
  * ReplenishmentTaskService on a real database: the replenishment_task view, the lists to work on, start, pick, short
@@ -29,55 +19,6 @@ import org.pih.warehouse.replenishment.ReplenishmentTaskService
  * Uses the picking site of the base spec: the replenishment picks from BIN to refill ALT (the destination bin).
  */
 class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
-
-    @Autowired
-    ReplenishmentTaskService replenishmentTaskService
-
-    static class ReplenOrder {
-        String orderId, orderNumber
-        List<String> taskIds = []
-    }
-
-    /**
-     * An APPROVED transfer order of the site's depot: one line per quantity, each from BIN into the destination bin
-     * (ALT unless given; null makes a plain stock transfer line), with one picklist item (task) per line.
-     */
-    ReplenOrder replenOrder(PickSite s, List<Integer> quantities, String destinationBin = s.alt) {
-        return tx {
-            String n = uid()
-            Location facility = Location.get(s.dc)
-            Order order = new Order(name: "Test replenishment ${n}".toString(), orderNumber: "R${n}".toString(),
-                    orderType: OrderType.findByCode(OrderTypeCode.TRANSFER_ORDER.name()), status: OrderStatus.APPROVED,
-                    origin: facility, destination: facility, orderedBy: Person.get('1'), dateOrdered: new Date())
-            List<OrderItem> items = quantities.collect { Integer q ->
-                OrderItem item = new OrderItem(product: Product.get(s.product), inventoryItem: InventoryItem.get(s.lotId),
-                        quantity: q, quantityPerUom: 1, originBinLocation: Location.get(s.bin),
-                        destinationBinLocation: destinationBin ? Location.get(destinationBin) : null,
-                        orderItemStatusCode: OrderItemStatusCode.PENDING)
-                order.addToOrderItems(item)
-                item
-            }
-            order.save(flush: true, failOnError: true)
-
-            Picklist picklist = new Picklist(name: order.name, order: order)
-            items.eachWithIndex { OrderItem item, int i ->
-                picklist.addToPicklistItems(new PicklistItem(orderItem: item, inventoryItem: item.inventoryItem,
-                        binLocation: item.originBinLocation, quantity: item.quantity, quantityPicked: 0, sortOrder: i))
-            }
-            picklist.save(flush: true, failOnError: true)
-            return new ReplenOrder(orderId: order.id, orderNumber: order.orderNumber,
-                    taskIds: picklist.picklistItems.sort { it.sortOrder }*.id)
-        } as ReplenOrder
-    }
-
-    Throwable replenPatch(String taskId, Map data) {
-        try {
-            tx { replenishmentTaskService.patch(taskId, data) }
-            return null
-        } catch (Throwable t) {
-            return t
-        }
-    }
 
     Throwable drop(String containerId, String stagingLocationId) {
         try {
@@ -90,19 +31,12 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         }
     }
 
-    Map replenTask(String id) {
-        return tx {
-            ReplenishmentTask t = ReplenishmentTask.get(id)
-            if (!t) {
-                return null
-            }
-            [id               : t.id, status: t.status?.name(), orderId: t.order?.id, facility: t.facility?.id,
-             location         : prefixOf(t.location?.name), destinationLocation: prefixOf(t.destinationLocation?.name),
-             outboundContainer: prefixOf(t.outboundContainer?.name), stagingLocation: prefixOf(t.stagingLocation?.name),
-             quantityRequired : t.quantityRequired as Integer, quantityPicked: t.quantityPicked as Integer,
-             assignee         : t.assignee?.id, pickedBy: t.pickedBy?.id, stagedBy: t.stagedBy?.id,
-             reasonCode       : t.reasonCode, identifier: t.identifier]
-        } as Map
+    /** The tasks of the order (view rows), the original ones first, then those reallocated. */
+    List<Map> tasksOf(ReplenOrder o) {
+        List<String> ids = tx {
+            ReplenishmentTask.findAllByOrder(Order.get(o.orderId))*.id
+        } as List<String>
+        return ids.collect { replenTask(it) }.sort { o.taskIds.contains(it.id) ? o.taskIds.indexOf(it.id) : o.taskIds.size() }
     }
 
     List<Map> lists(PickSite s, List<String> statuses = []) {
@@ -110,7 +44,7 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
     }
 
     Map listOf(PickSite s, ReplenOrder o) {
-        return lists(s).find { it.id == o.orderId }?.subMap(['status', 'tasksCount']) as Map
+        return lists(s).find { it.id == o.orderId }?.subMap(['status', 'tasksCount', 'openTasksCount']) as Map
     }
 
     // ------------------------------------------------------------------ view
@@ -158,14 +92,14 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         ReplenOrder o = replenOrder(s, [2, 3])
 
         expect:
-        listOf(s, o) == [status: 'PENDING', tasksCount: 2]
+        listOf(s, o) == [status: 'PENDING', tasksCount: 2, openTasksCount: 2]
 
         when:
         replenPatch(o.taskIds[0], [action: 'start'])
         replenPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.tote])
 
         then:
-        listOf(s, o) == [status: 'PICKING', tasksCount: 1]
+        listOf(s, o) == [status: 'PICKING', tasksCount: 2, openTasksCount: 1]
         lists(s, ['PENDING']).every { it.id != o.orderId }
 
         when:
@@ -173,7 +107,7 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         replenPatch(o.taskIds[1], [action: 'pick', outboundContainerId: s.tote])
 
         then:
-        listOf(s, o) == [status: 'PICKED', tasksCount: 0]
+        listOf(s, o) == [status: 'PICKED', tasksCount: 2, openTasksCount: 0]
 
         when:
         Throwable e = drop(s.tote, s.staging)
@@ -247,7 +181,7 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
     // ------------------------------------------------------------------ short pick
 
-    void 'short pick with a reason: records the quantity and the reason, PICKED; the reason may be given as an object'() {
+    void 'short pick with a reason: records the quantity and the reason, PICKED, the shortage goes to lost and found; the reason may be given as an object'() {
         given:
         PickSite s = pickSite('RT-SP')
         ReplenOrder o = replenOrder(s, [5])
@@ -261,10 +195,12 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         e == null
         replenTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode', 'outboundContainer', 'pickedBy']) ==
                 [status: 'PICKED', quantityPicked: 2, reasonCode: 'DAMAGED', outboundContainer: 'TOTE', pickedBy: adminId()]
-        onHand(s.dc, s.product) == [BIN: 18, ALT: 20, TOTE: 2]
+        // the 3 not found are held in lost and found; ALT is the destination, so nothing is reallocated
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 2, LNF: 3]
+        tasksOf(o).size() == 1
     }
 
-    void 'short pick of zero with a reason: nothing moves, STAGED (nothing to stage)'() {
+    void 'short pick of zero with a reason: nothing is picked, the 5 go to lost and found, STAGED (nothing to stage)'() {
         given:
         PickSite s = pickSite('RT-SZ')
         ReplenOrder o = replenOrder(s, [5])
@@ -278,7 +214,7 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         e == null
         replenTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) ==
                 [status: 'STAGED', quantityPicked: 0, reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE']
-        onHand(s.dc, s.product) == [BIN: 20, ALT: 20]
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, LNF: 5]
     }
 
     void 'short pick of more than required is refused and moves nothing'() {
@@ -295,6 +231,112 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         e instanceof ValidationException
         replenTask(o.taskIds[0]).subMap(['status', 'quantityPicked']) == [status: 'PICKING', quantityPicked: 0]
         onHand(s.dc, s.product) == [BIN: 20, ALT: 20]
+    }
+
+    // ------------------------------------------------------------------ shortage: hold and reallocate
+
+    void 'shortage: the quantity not found is held in lost and found, and a new task picks it from another bin'() {
+        given: 'a replenishment of DISP, with stock in BIN and ALT'
+        PickSite s = pickSite('RT-SH')
+        String disp = bin(s.dc, 'DISP')
+        ReplenOrder o = replenOrder(s, [5], disp)
+        replenPatch(o.taskIds[0], [action: 'start'])
+
+        when:
+        Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 2,
+                                                 reasonCode: 'DIFFERENT_LOCATION'])
+
+        then:
+        e == null
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 2, LNF: 3]
+
+        and: 'a PENDING task of the same order picks the 3 from ALT, and the list has it to pick'
+        List<Map> reallocated = tasksOf(o).findAll { it.id != o.taskIds[0] }
+        reallocated*.subMap(['status', 'location', 'destinationLocation', 'quantityRequired']) ==
+                [[status: 'PENDING', location: 'ALT', destinationLocation: 'DISP', quantityRequired: 3]]
+        listOf(s, o) == [status: 'PICKING', tasksCount: 2, openTasksCount: 1]
+    }
+
+    void 'shortage: neither the bin that came up short nor the bin being replenished is reallocated from'() {
+        given: 'a replenishment of ALT, whose only other stock is in BIN'
+        PickSite s = pickSite('RT-SX')
+        ReplenOrder o = replenOrder(s, [5])
+        replenPatch(o.taskIds[0], [action: 'start'])
+
+        when:
+        Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                                 reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
+
+        then:
+        e == null
+        tasksOf(o)*.id == o.taskIds
+        listOf(s, o) == null
+    }
+
+    void 'shortage: only what is left in the bin is held, and only what is available elsewhere is reallocated'() {
+        given: '4 in BIN and 4 in ALT, 6 to replenish'
+        PickSite s = pickSite('RT-SC', DeliveryTypeCode.LOCAL_DELIVERY, true, 4)
+        String disp = bin(s.dc, 'DISP')
+        ReplenOrder o = replenOrder(s, [6], disp)
+        replenPatch(o.taskIds[0], [action: 'start'])
+
+        when:
+        Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                                 reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
+
+        then:
+        e == null
+        onHand(s.dc, s.product) == [ALT: 4, LNF: 4]
+        tasksOf(o).findAll { it.id != o.taskIds[0] }*.subMap(['location', 'quantityRequired']) ==
+                [[location: 'ALT', quantityRequired: 4]]
+    }
+
+    void 'shortage at a facility without lost and found: nothing is held, the shortage is still reallocated'() {
+        given:
+        PickSite s = pickSite('RT-SN', DeliveryTypeCode.LOCAL_DELIVERY, true, 20, false)
+        String disp = bin(s.dc, 'DISP')
+        ReplenOrder o = replenOrder(s, [5], disp)
+        replenPatch(o.taskIds[0], [action: 'start'])
+
+        when:
+        Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 2,
+                                                 reasonCode: 'DAMAGED'])
+
+        then:
+        e == null
+        onHand(s.dc, s.product) == [BIN: 18, ALT: 20, TOTE: 2]
+        tasksOf(o).findAll { it.id != o.taskIds[0] }*.subMap(['location', 'quantityRequired']) ==
+                [[location: 'ALT', quantityRequired: 3]]
+    }
+
+    void 'a short pick without a reason is no shortage, and a shortage is handled once'() {
+        given:
+        PickSite s = pickSite('RT-S1')
+        String disp = bin(s.dc, 'DISP')
+        ReplenOrder o = replenOrder(s, [5], disp)
+        replenPatch(o.taskIds[0], [action: 'start'])
+
+        when: 'part is picked without a reason: the task stays open'
+        Throwable partial = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 1])
+
+        then:
+        partial == null
+        replenTask(o.taskIds[0]).status == 'PICKING'
+        onHand(s.dc, s.product) == [BIN: 19, ALT: 20, TOTE: 1]
+        tasksOf(o).size() == 1
+
+        when: 'the rest is reported short, then reported short again'
+        Throwable first = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                                     reasonCode: 'DAMAGED'])
+        Throwable again = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                                     reasonCode: 'DAMAGED'])
+
+        then: 'the 4 are held and reallocated once'
+        first == null
+        again == null
+        replenTask(o.taskIds[0]).status == 'PICKED'
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 1, LNF: 4]
+        tasksOf(o).findAll { it.id != o.taskIds[0] }*.quantityRequired == [4]
     }
 
     // ------------------------------------------------------------------ drop
@@ -341,6 +383,24 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         empty.message.contains('is empty')
         other instanceof StagingLocationNotFoundException
         notStaging.message.contains('STAGING_LOCATION')
+        replenTask(o.taskIds[0]).status == 'PICKED'
+        onHand(s.dc, s.product) == [BIN: 17, ALT: 20, TOTE: 3]
+    }
+
+    void 'drop: a staging lane not set aside for bin replenishment (an outbound lane) is refused'() {
+        given:
+        PickSite s = pickSite('RT-DB')
+        ReplenOrder o = replenOrder(s, [3])
+        String outboundLane = bin(s.dc, 'OUTSTAGE', [ActivityCode.STAGING_LOCATION, ActivityCode.HOLD_STOCK], false)
+        replenPatch(o.taskIds[0], [action: 'start'])
+        replenPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.tote])
+
+        when:
+        Throwable e = drop(s.tote, outboundLane)
+
+        then:
+        e instanceof IllegalArgumentException
+        e.message.contains('BIN_REPLENISHMENT')
         replenTask(o.taskIds[0]).status == 'PICKED'
         onHand(s.dc, s.product) == [BIN: 17, ALT: 20, TOTE: 3]
     }
