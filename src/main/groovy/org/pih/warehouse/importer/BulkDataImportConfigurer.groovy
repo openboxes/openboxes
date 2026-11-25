@@ -42,7 +42,7 @@ abstract class BulkDataImportConfigurer<I extends Importable, E> implements
      * is safe to do because the config itself is functionally static.
      */
     @Lazy
-    private BulkDataImportExportConfig importExportConfig = getImportExportConfig()
+    private BulkDataImportExportConfig cachedImportExportConfig = getImportExportConfig()
 
     /**
      * A unified configuration for both import and export.
@@ -77,14 +77,14 @@ abstract class BulkDataImportConfigurer<I extends Importable, E> implements
     @Override
     CsvReaderConfig getCsvReaderConfig() {
         return new CsvReaderConfig(
-                columnMapping: importExportConfig.columnMapping,
+                columnMapping: cachedImportExportConfig.columnMapping,
         )
     }
 
     @Override
     ExcelReaderConfig getExcelReaderConfig() {
         return new ExcelReaderConfig(
-                columnMapping: importExportConfig.columnMapping,
+                columnMapping: cachedImportExportConfig.columnMapping,
         )
     }
 
@@ -104,7 +104,7 @@ abstract class BulkDataImportConfigurer<I extends Importable, E> implements
         return new BulkDataBinderConfig(
                 bindTo: getImportableType(),
                 bulkDataType: bulkDataType,
-                fields: importExportConfig.binderFieldConfigs,
+                fields: cachedImportExportConfig.binderFieldConfigs,
                 columnByFieldName: getColumnByFieldName(),
         )
     }
@@ -119,14 +119,14 @@ abstract class BulkDataImportConfigurer<I extends Importable, E> implements
     @Override
     CsvWriterConfig getCsvWriterConfig() {
         return new CsvWriterConfig(
-                fields: importExportConfig.writerFieldConfigs,
+                fields: cachedImportExportConfig.writerFieldConfigs,
         )
     }
 
     @Override
     ExcelWriterConfig getExcelWriterConfig() {
         return new ExcelWriterConfig(
-                fields: importExportConfig.writerFieldConfigs,
+                fields: cachedImportExportConfig.writerFieldConfigs,
                 // We know that our bulk data exports are always going to be structured like a table
                 // (header row + data) so we opt to add some quality of life styling to the Excel file.
                 excelStyle: ExcelStyle.TABLE,
@@ -146,7 +146,7 @@ abstract class BulkDataImportConfigurer<I extends Importable, E> implements
 
     private Map<String, String> getColumnByFieldName() {
         // Column index keyed on field name. The inverse of the column mapping that the readers use.
-        return importExportConfig.columnMapping.collectEntries { k, v -> [v, k] } as Map<String, String>
+        return cachedImportExportConfig.columnMapping.collectEntries { k, v -> [v, k] } as Map<String, String>
     }
 
     private Class<I> getImportableType() {

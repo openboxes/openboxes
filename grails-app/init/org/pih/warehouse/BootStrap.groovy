@@ -9,6 +9,7 @@ package org.pih.warehouse
  * You must not remove this notice, or any other, from this software.
  **/
 
+import com.zaxxer.hikari.HikariDataSource
 import grails.converters.JSON
 import grails.util.Holders
 import org.hibernate.Hibernate
@@ -139,24 +140,19 @@ class BootStrap {
         while (target instanceof DelegatingDataSource) {
             target = ((DelegatingDataSource) target).targetDataSource
         }
-        if (!(target instanceof org.apache.tomcat.jdbc.pool.DataSource)) {
+        if (!(target instanceof HikariDataSource)) {
             log.info("Data source: ${target?.class?.name}")
             return
         }
 
-        org.apache.tomcat.jdbc.pool.DataSource pool = (org.apache.tomcat.jdbc.pool.DataSource) target
-        log.info("Data source: url=${pool.url?.replaceAll(/(?i)(password=)[^&;]*/, '\$1****')}, " +
+        HikariDataSource pool = (HikariDataSource) target
+        log.info("Data source: url=${pool.jdbcUrl?.replaceAll(/(?i)(password=)[^&;]*/, '\$1****')}, " +
                 "username=${pool.username}, driverClassName=${pool.driverClassName}")
-        log.info("Data source pool: initialSize=${pool.initialSize}, maxActive=${pool.maxActive}, " +
-                "minIdle=${pool.minIdle}, maxIdle=${pool.maxIdle}, maxWait=${pool.maxWait}, maxAge=${pool.maxAge}, " +
-                "testOnBorrow=${pool.testOnBorrow}, testWhileIdle=${pool.testWhileIdle}, " +
-                "testOnReturn=${pool.testOnReturn}, validationQuery=${pool.validationQuery}, " +
-                "validationQueryTimeout=${pool.validationQueryTimeout}, validationInterval=${pool.validationInterval}, " +
-                "timeBetweenEvictionRunsMillis=${pool.timeBetweenEvictionRunsMillis}, " +
-                "minEvictableIdleTimeMillis=${pool.minEvictableIdleTimeMillis}, " +
-                "removeAbandoned=${pool.removeAbandoned}, removeAbandonedTimeout=${pool.removeAbandonedTimeout}, " +
-                "defaultTransactionIsolation=${pool.defaultTransactionIsolation}, " +
-                "jdbcInterceptors=${pool.jdbcInterceptors}")
+        log.info("Data source pool: maximumPoolSize=${pool.maximumPoolSize}, minimumIdle=${pool.minimumIdle}, " +
+                "connectionTimeout=${pool.connectionTimeout}, idleTimeout=${pool.idleTimeout}, " +
+                "maxLifetime=${pool.maxLifetime}, validationTimeout=${pool.validationTimeout}, " +
+                "keepaliveTime=${pool.keepaliveTime}, connectionTestQuery=${pool.connectionTestQuery}, " +
+                "transactionIsolation=${pool.transactionIsolation}")
     }
 
     void refreshAnalyticsData() {

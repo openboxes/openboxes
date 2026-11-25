@@ -230,7 +230,7 @@ dependencies {
     // carried over from Grails 3 (OBS-372): GrailsWebMockUtil mock requests need spring-test at runtime
     runtimeOnly 'org.springframework:spring-test'
 
-    runtimeOnly 'com.zaxxer:HikariCP'  // replaces tomcat-jdbc; Grails 7 default pool
+    implementation 'com.zaxxer:HikariCP'  // replaces tomcat-jdbc; Grails 7 default pool
     runtimeOnly 'cloud.wondrify:asset-pipeline-grails'
     runtimeOnly 'org.fusesource.jansi:jansi'
 
