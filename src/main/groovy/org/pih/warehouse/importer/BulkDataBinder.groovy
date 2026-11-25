@@ -3,8 +3,10 @@ package org.pih.warehouse.importer
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.date.DateParserContext
 import org.pih.warehouse.core.date.EpochDate
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.core.parser.DefaultTypeParser
 import org.pih.warehouse.core.parser.Parser
@@ -18,15 +20,18 @@ class BulkDataBinder {
 
     final private BulkDataImportComponentResolver componentResolver
     final private DefaultTypeParser defaultTypeParser
+    final private JavaUtilDateParser javaUtilDateParser
     final private MessageLocalizer messageLocalizer
     final private ApplicationContext context
 
     BulkDataBinder(final BulkDataImportComponentResolver componentResolver,
                    final DefaultTypeParser defaultTypeParser,
+                   final JavaUtilDateParser javaUtilDateParser,
                    final MessageLocalizer messageLocalizer,
                    final ApplicationContext context) {
         this.componentResolver = componentResolver
         this.defaultTypeParser = defaultTypeParser
+        this.javaUtilDateParser = javaUtilDateParser
         this.messageLocalizer = messageLocalizer
         this.context = context
     }
@@ -182,6 +187,12 @@ class BulkDataBinder {
     private def parseField(
             Object fieldValue, Class fieldType, BulkDataBinderFieldConfig fieldConfig, EpochDate epochDate) {
 
+        // We have custom data-binding handling for java.util.Date because it needs to know if it
+        // is a date-only (LocalDate) or a datetime (Instant).
+        if (fieldConfig.parser == null && fieldType != null && Date.isAssignableFrom(fieldType)) {
+            return parseJavaUtilDateField(fieldValue, fieldConfig, epochDate)
+        }
+
         Parser parser = fieldConfig.parser != null ?
                 context.getBean(fieldConfig.parser) :
                 defaultTypeParser.getDefaultParser(fieldType)
@@ -191,9 +202,27 @@ class BulkDataBinder {
         ParserContext context = fieldConfig.parserContext ?: parser.getDefaultContext()
         if (context instanceof DateParserContext) {
             context.epochDate = epochDate
+            // Excel can't store timezones, so datetimes in our exports don't have one.
+            context.allowDateTimesWithoutTimezone = true
         }
 
         return parser.parse(fieldValue, context)
+    }
+
+    private Date parseJavaUtilDateField(Object fieldValue, BulkDataBinderFieldConfig fieldConfig, EpochDate epochDate) {
+        DateFieldType dateFieldType = fieldConfig.dateFieldType
+        if (dateFieldType == null) {
+            throw new IllegalStateException("java.util.Date fields are used for both date-only and datetime fields, " +
+                    "so their binder config must specify a dateFieldType.")
+        }
+
+        DateParserContext<Date> parserContext = new DateParserContext<Date>(
+                epochDate: epochDate,
+                dateFieldType: dateFieldType,
+                // Excel can't store timezones, so datetimes in our exports don't have one.
+                allowDateTimesWithoutTimezone: true,
+        )
+        return javaUtilDateParser.parse(fieldValue, parserContext)
     }
 
     private Map<String, Class> mapFieldNamesToType(Class clazz) {

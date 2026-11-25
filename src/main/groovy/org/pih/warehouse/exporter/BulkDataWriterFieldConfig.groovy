@@ -1,5 +1,6 @@
 package org.pih.warehouse.exporter
 
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.formatter.Formatter
 import org.pih.warehouse.core.formatter.FormatterContext
 import org.pih.warehouse.importer.BulkDataColumnIndex
@@ -32,6 +33,14 @@ class BulkDataWriterFieldConfig {
      * If specified, will override headerPlainText
      */
     String headerMessageCode
+
+    /**
+     * What date type field represents. Only required for java.util.Date fields because Date is used
+     * for both date-only and datetime fields so we need to clarify. Ignored for all other types.
+     *
+     * See {@link BulkDataWriter#normalizeValue}.
+     */
+    DateFieldType dateFieldType
 
     /**
      * Overrides the formatter class to use when binding the field.

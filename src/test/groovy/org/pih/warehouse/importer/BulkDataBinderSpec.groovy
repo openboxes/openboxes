@@ -1,13 +1,18 @@
 package org.pih.warehouse.importer
 
+import java.time.Instant
+import java.time.LocalDate
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
+import org.pih.warehouse.core.date.DateFieldType
+import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.parser.DefaultTypeParser
 import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.parser.ParserContext
+import org.pih.warehouse.core.session.SessionManager
 
 @Unroll
 class BulkDataBinderSpec extends Specification {
@@ -38,9 +43,14 @@ class BulkDataBinderSpec extends Specification {
             getBulkDataBinderConfigurer(UNKNOWN_BULK_DATA_TYPE) >> null
         }
 
+        JavaUtilDateParser javaUtilDateParser = new JavaUtilDateParser(sessionManager: Stub(SessionManager) {
+            getTimezone() >> TimeZone.getTimeZone("Asia/Kolkata")  // +05:30
+        })
+
         bulkDataBinder = new BulkDataBinder(
                 componentResolverStub,
                 defaultTypeParserStub,
+                javaUtilDateParser,
                 MessageLocalizerStub.MESSAGE_LOCALIZER_STUB,
                 contextStub,
         )
@@ -69,6 +79,64 @@ class BulkDataBinderSpec extends Specification {
         assert rows[0].integerField == 1
 
         assert result.bindErrors.size() == 0
+    }
+
+    void "bindData binds a java.util.Date date-only field"() {
+        given:
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1),
+                        "dateField": new BulkDataCell(row: 0, column: 2, fieldName: "dateField", value: "2000-01-02"),
+                ],
+        ])
+
+        when:
+        BulkDataBinderResult result = bulkDataBinder.bindData(BULK_DATA_TYPE, readerResult)
+
+        then:
+        assert result.bindErrors.size() == 0
+        assert (result.boundRows[0] as ImportableStub).dateField ==
+                JavaUtilDateParser.asDate(LocalDate.parse("2000-01-02"))
+    }
+
+    void "bindData binds a java.util.Date datetime without a timezone in the user's timezone"() {
+        given:
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1),
+                        "dateTimeField": new BulkDataCell(
+                                row: 0, column: 3, fieldName: "dateTimeField", value: "2000-01-02 12:00:00"),
+                ],
+        ])
+
+        when:
+        BulkDataBinderResult result = bulkDataBinder.bindData(BULK_DATA_TYPE, readerResult)
+
+        then:
+        assert result.bindErrors.size() == 0
+        assert (result.boundRows[0] as ImportableStub).dateTimeField == Date.from(Instant.parse("2000-01-02T06:30:00Z"))
+    }
+
+    void "bindData errors for a java.util.Date field with no dateFieldType"() {
+        given:
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1),
+                        "dateFieldWithoutStyle": new BulkDataCell(
+                                row: 0, column: 4, fieldName: "dateFieldWithoutStyle", value: "2000-01-02"),
+                ],
+        ])
+
+        when:
+        BulkDataBinderResult result = bulkDataBinder.bindData(BULK_DATA_TYPE, readerResult)
+
+        then: "the field is not bound"
+        assert (result.boundRows[0] as ImportableStub).dateFieldWithoutStyle == null
+
+        and: "the error explains that the config is missing the style"
+        assert result.bindErrors.size() == 1
+        assert result.bindErrors[0].exception instanceof IllegalStateException
+        assert result.bindErrors[0].exception.message.contains("dateFieldType")
     }
 
     void "bindData should ignore fields that are not specified in the config"() {
@@ -187,6 +255,9 @@ class BulkDataBinderSpec extends Specification {
     class ImportableStub implements Importable {
         String stringField
         Integer integerField
+        Date dateField
+        Date dateTimeField
+        Date dateFieldWithoutStyle
     }
 
     /**
@@ -208,10 +279,18 @@ class BulkDataBinderSpec extends Specification {
                     fields: [
                             "stringField": BulkDataBinderFieldConfigDefaults.DEFAULT_CONFIG,
                             "integerField": BulkDataBinderFieldConfigDefaults.MANUALLY_BOUND,
+                            "dateField": new BulkDataBinderFieldConfig(dateFieldType: DateFieldType.LOCAL_DATE),
+                            "dateTimeField": new BulkDataBinderFieldConfig(dateFieldType: DateFieldType.INSTANT),
+
+                            // This is an invalid config (dateFieldType must always be specified for Date fields).
+                            "dateFieldWithoutStyle": BulkDataBinderFieldConfigDefaults.DEFAULT_CONFIG,
                     ],
                     columnByFieldName: [
                             "stringField": "0",
                             "integerField": "1",
+                            "dateField": "2",
+                            "dateTimeField": "3",
+                            "dateFieldWithoutStyle": "4",
                     ]
             )
         }

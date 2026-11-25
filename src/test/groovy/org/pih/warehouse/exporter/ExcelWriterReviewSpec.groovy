@@ -15,6 +15,7 @@ import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
 import org.pih.warehouse.core.ConfigService
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
 import org.pih.warehouse.core.formatter.Formatter
@@ -96,7 +97,11 @@ class ExcelWriterReviewSpec extends Specification {
         and: "a valid config"
         ExcelWriterConfig config = initConfig(new ExcelWriterConfig(
                 fields: [
-                        new BulkDataWriterFieldConfig(fieldName: "date", headerPlainText: "Date Header"),
+                        new BulkDataWriterFieldConfig(
+                                fieldName: "date",
+                                headerPlainText: "Date Header",
+                                dateFieldType: DateFieldType.LOCAL_DATE,
+                        ),
                 ],
         ))
 

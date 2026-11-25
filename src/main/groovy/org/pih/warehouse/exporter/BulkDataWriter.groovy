@@ -1,13 +1,21 @@
 package org.pih.warehouse.exporter
 
 import grails.validation.ValidationException
+import java.time.temporal.TemporalAccessor
 import org.apache.commons.lang.StringUtils
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Lazy
 import org.springframework.core.GenericTypeResolver
 
+import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.date.DateDisplayFormat
+import org.pih.warehouse.core.date.DateFieldType
+import org.pih.warehouse.core.date.DateFormatterContext
+import org.pih.warehouse.core.date.InstantParser
+import org.pih.warehouse.core.date.LocalDateParser
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
 import org.pih.warehouse.core.formatter.Formatter
+import org.pih.warehouse.core.formatter.FormatterContext
 import org.pih.warehouse.core.http.ContentType
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.importer.BulkDataType
@@ -164,14 +172,47 @@ abstract class BulkDataWriter<OutputType, Config extends BulkDataWriterConfig> {
             return formatter.format(value, config.formatterContext)
         }
 
-        // If a default formatter is associated with the type, use it.
+        Object normalizedValue = normalizeValue(value, config)
+
+        // Here, "CSV" represents the standardized display format to use when exporting dates.
+        // Excel writes dates natively, without needing to format them, so it will ignore this value.
+        FormatterContext formatterContext = normalizedValue instanceof TemporalAccessor ?
+                DateFormatterContext.builder().withDisplayFormat(DateDisplayFormat.CSV).build() :
+                null
+
         try {
-            return defaultTypeFormatter.format(value)
+            return defaultTypeFormatter.format(normalizedValue, formatterContext)
         } catch (IllegalArgumentException ignore) {
-            // There was no default formatter for the value type.
+            // There was no default formatter for the value type...
         }
 
-        // Otherwise simply stringify the value.
-        return value.toString()
+        // ... so simply stringify the value.
+        return normalizedValue.toString()
+    }
+
+    /**
+     * Converts values whose display format depends on the field config into an unambiguous type.
+     */
+    protected Object normalizeValue(Object value, BulkDataWriterFieldConfig config) {
+        // java.util.Date is used for both date-only and datetime fields and so its desired format is ambiguous.
+        if (!(value instanceof Date)) {
+            return value
+        }
+
+        // Instead of using the Date formatter to format the field, we opt to first convert it to the java.time type
+        // that is associated with the dateFieldType defined in the field's config. This guarantees dates will always
+        // follow the same behaviour when formatted (they will always use the Instant or LocalDate formatters).
+        switch (config?.dateFieldType) {
+            case DateFieldType.LOCAL_DATE:
+                // Convert to a LocalDate in the system timezone. This ensures the date never changes depending on
+                // the user's timezone since date-only Dates are stored as midnight in the system time.
+                return LocalDateParser.asLocalDate(value as Date, DateUtil.systemZoneId)
+            case DateFieldType.INSTANT:
+                // Convert to an Instant, which will be formatted in the requesting user's timezone.
+                return InstantParser.asInstant(value as Date)
+            default:
+                throw new IllegalStateException("Field '${config?.fieldName}' contains a java.util.Date, which is " +
+                        "used for both date-only and datetime fields, so its config must specify a dateFieldType.")
+        }
     }
 }

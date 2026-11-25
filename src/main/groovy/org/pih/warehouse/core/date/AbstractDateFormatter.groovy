@@ -15,6 +15,16 @@ import org.pih.warehouse.core.session.SessionManager
  */
 abstract class AbstractDateFormatter<T extends TemporalAccessor> extends Formatter<T, DateFormatterContext> {
 
+    /**
+     * The pattern used to format datetimes for CSV exports. Datetimes are formatted in the requesting user's timezone
+     * (see the getCsvFormatter implementations for details).
+     *
+     * We format the datetime the same way as Excel exports (see ExcelCellStyles) because CSVs are often opened in
+     * Excel. As with Excel imports/exports, the datetime is assumed to be in the user's timezone.
+     */
+    protected static final DateTimeFormatter CSV_DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
     @Autowired
     LocaleManager localeManager
 

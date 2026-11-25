@@ -3,6 +3,7 @@ package org.pih.warehouse.importer
 import java.lang.reflect.Field
 import org.springframework.util.ReflectionUtils
 
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.parser.ParserContext
 import org.pih.warehouse.exporter.BulkDataWriterFieldConfig
@@ -65,6 +66,8 @@ class BulkDataImportExportConfig {
          * Adds configuration for a field that will be automatically bound via a {@link Parser} that is either
          * explicitly given or determined based on the field type.
          *
+         * For java.util.Date fields, use {@link #autoBoundDateField} instead.
+         *
          * @param columnIndex The numerical or letter index of the column in the document.
          * @param fieldName The name of the field in the object.
          * @param headerMessageCode The localization message code of the header cell.
@@ -77,12 +80,14 @@ class BulkDataImportExportConfig {
                                                          Class<Parser> parser=null,
                                                          ParserContext parserContext=null) {
 
+            Field field = ReflectionUtils.findField(importableType, fieldName)
+            rejectJavaUtilDateField(field, "autoBoundDateField")
+
             BulkDataBinderFieldConfig binderConfig
             if (parser) {
                 binderConfig = new BulkDataBinderFieldConfig(parser: parser, parserContext: parserContext)
             }
             else {
-                Field field = ReflectionUtils.findField(importableType, fieldName)
                 if (!field) {
                     throw new IllegalArgumentException(
                             "No field '${fieldName}' on ${importableType.name} or its superclasses")
@@ -96,6 +101,24 @@ class BulkDataImportExportConfig {
             }
 
             return addField(binderConfig, columnIndex, fieldName, headerMessageCode)
+        }
+
+        /**
+         * Adds configuration for a java.util.Date field that will be automatically bound.
+         *
+         * @param columnIndex The numerical or letter index of the column in the document.
+         * @param fieldName The name of the java.util.Date field in the object.
+         * @param headerMessageCode The localization message code of the header cell.
+         * @param dateFieldType LOCAL_DATE for date-only fields or INSTANT for datetime fields.
+         */
+        BulkDataImportExportConfigBuilder autoBoundDateField(String columnIndex,
+                                                             String fieldName,
+                                                             String headerMessageCode,
+                                                             DateFieldType dateFieldType) {
+
+            requireJavaUtilDateField(fieldName, dateFieldType)
+            BulkDataBinderFieldConfig binderConfig = new BulkDataBinderFieldConfig(dateFieldType: dateFieldType)
+            return addField(binderConfig, columnIndex, fieldName, headerMessageCode, dateFieldType)
         }
 
         /**
@@ -117,7 +140,8 @@ class BulkDataImportExportConfig {
         private BulkDataImportExportConfigBuilder addField(BulkDataBinderFieldConfig binderConfig,
                                                            String columnIndex,
                                                            String fieldName,
-                                                           String headerMessageCode) {
+                                                           String headerMessageCode,
+                                                           DateFieldType dateFieldType=null) {
 
             config.columnMapping.put(columnIndex, fieldName)
             config.binderFieldConfigs.put(fieldName, binderConfig)
@@ -125,9 +149,33 @@ class BulkDataImportExportConfig {
                     fieldName: fieldName,
                     columnIndex: columnIndex,
                     headerMessageCode: headerMessageCode,
+                    dateFieldType: dateFieldType,
             ))
 
             return this
+        }
+
+        private static void rejectJavaUtilDateField(Field field, String builderMethodToUse) {
+            if (field != null && Date.isAssignableFrom(field.type)) {
+                throw new IllegalArgumentException("Field '${field.name}' is a java.util.Date, which is used for " +
+                        "both date-only and datetime fields. Use ${builderMethodToUse} to specify which it is.")
+            }
+        }
+
+        private void requireJavaUtilDateField(String fieldName, DateFieldType dateFieldType) {
+            Field field = ReflectionUtils.findField(importableType, fieldName)
+            if (!field) {
+                throw new IllegalArgumentException(
+                        "No field '${fieldName}' on ${importableType.name} or its superclasses")
+            }
+            if (!Date.isAssignableFrom(field.type)) {
+                throw new IllegalArgumentException("Field '${fieldName}' is a ${field.type.simpleName}, not a " +
+                        "java.util.Date. Date fields of other types (such as LocalDate or Instant) are unambiguous " +
+                        "and so don't need a dateFieldType.")
+            }
+            if (dateFieldType == null) {
+                throw new IllegalArgumentException("Date field '${fieldName}' must specify a dateFieldType.")
+            }
         }
 
         BulkDataImportExportConfig build() {

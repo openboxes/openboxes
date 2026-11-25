@@ -165,12 +165,17 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
         for (int i = 0; i < fieldConfigsOrdered.size(); i++) {
             BulkDataWriterFieldConfig fieldConfig = fieldConfigsOrdered.get(i)
             Object cellValue = rowToWrite.get(fieldConfig.fieldName)
-            Object excelCellValue = formatCellValueForExcel(cellValue, fieldConfig, timezone)
+
+            // Convert ambiguous types to an unambiguous type (unless given a specific formatter to use) so that we
+            // know how to write and style them. For example, we convert a java.util.Date to either a LocalDate or
+            // Instant depending on whether it is a date-only or a datetime, since we style them differently in Excel.
+            Object valueToWrite = fieldConfig?.formatter == null ? normalizeValue(cellValue, fieldConfig) : cellValue
+            Object excelCellValue = formatCellValueForExcel(valueToWrite, fieldConfig, timezone)
 
             Cell cell = excelRow.createCell(i)
             cell.setCellValue(excelCellValue)
 
-            CellStyle style = cellStyles.getStyleForValue(cellValue?.class)
+            CellStyle style = cellStyles.getStyleForValue(valueToWrite?.class)
             if (style) {
                 cell.setCellStyle(style)
             }
@@ -203,16 +208,13 @@ class ExcelWriter extends BulkDataWriter<Workbook, ExcelWriterConfig> {
                 // will always result in midnight in the given timezone. POI ignores the timezone, and the time will get
                 // stripped off when we format the field to a string, so we can pick any non-changing timezone here.
                 return GregorianCalendar.from(value.atStartOfDay(ZoneOffset.UTC))
-            // TODO: Be smarter about Date since it can also be a date-only. Pass in a dateFormat config option that
-            //       is set in the field config that we can use to conditionally format the date.
-            case Date:
-                return GregorianCalendar.from(ZonedDateTimeParser.asZonedDateTime(value, timezone))
             case Instant:
                 return GregorianCalendar.from(ZonedDateTimeParser.asZonedDateTime(value, timezone))
             case ZonedDateTime:
                 return GregorianCalendar.from(value.withZoneSameInstant(timezone))
 
             // For all other types, simply use the default formatting behaviour.
+            // java.util.Date never reaches here. It is converted to a LocalDate or Instant by normalizeValue.
             default:
                 return formatCellValue(value, config)
         }

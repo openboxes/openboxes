@@ -15,6 +15,13 @@ class ExcelCellStyles {
 
     // We standardize on ISO strings for dates, so that they display the same for every user regardless
     // of their timezone, locale, or the configuration of their Excel install.
+    //
+    // CSV exports use the same patterns (see the getCsvFormatter implementations), since CSVs are often opened in
+    // Excel. If you change these, change those as well. Note that Excel can't store timezones, so datetimes are
+    // written in the user's timezone (see ExcelWriter), which is also what imports assume.
+    //
+    // NOTE: These are Excel number format codes, NOT Java DateTimeFormatter patterns. In Excel, "mm" means month
+    //       unless it directly follows "hh" or precedes "ss", in which case it means minutes.
     private static final String DATE_FORMAT = "yyyy-mm-dd"
     private static final String DATE_TIME_FORMAT = "yyyy-mm-dd hh:mm:ss"
 
@@ -34,13 +41,10 @@ class ExcelCellStyles {
      * @return The style to apply to the cell, or null if the cell doesn't need styling
      */
     CellStyle getStyleForValue(Class valueClass) {
+        // java.util.Date is converted to a LocalDate or Instant by this point (see BulkDataWriter.normalizeValue)
         switch (valueClass) {
             case LocalDate:
                 return getDateStyle()
-            // TODO: Be smarter about Date since it can also be a date-only. Pass in a dateFormat config option that
-            //       is set in the field config that we can use to conditionally change the style.
-            case Date:
-                return getDateTimeStyle()
             case Instant:
                 return getDateTimeStyle()
             case ZonedDateTime:
