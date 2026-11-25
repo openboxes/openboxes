@@ -30,6 +30,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
             read: 'GET',
             patch: 'PATCH',
             drop: 'PATCH',
+            dropContainer: 'PATCH',
             reallocate: 'POST'
     ]
 
