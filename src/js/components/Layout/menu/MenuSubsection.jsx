@@ -6,7 +6,7 @@ import { RiArrowDropDownLine } from 'react-icons/ri';
 
 import useCheckRightSpace from 'hooks/useCheckRightSpace';
 
-const DropdownMenu = ({ section, active }) => {
+const DropdownMenu = ({ section, active = false }) => {
   const { elementReference, setIsVisible, shouldAlignLeft } = useCheckRightSpace();
 
   return (
@@ -42,7 +42,7 @@ const DropdownMenu = ({ section, active }) => {
   );
 };
 
-const CollapseMenu = ({ section, active }) => {
+const CollapseMenu = ({ section, active = false }) => {
   const id = `collapse-${section?.label?.replaceAll(' ', '-')}`;
   return (
     <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none">
@@ -75,10 +75,10 @@ const CollapseMenu = ({ section, active }) => {
   );
 };
 
-const MenuSubsection = (props) => (
+const MenuSubsection = ({ section, active = false }) => (
   <>
-    <DropdownMenu {...props} />
-    <CollapseMenu {...props} />
+    <DropdownMenu section={section} active={active} />
+    <CollapseMenu section={section} active={active} />
   </>
 );
 
@@ -104,11 +104,5 @@ MenuSubsection.propTypes = {
 };
 
 DropdownMenu.propTypes = { ...MenuSubsection.propTypes };
-DropdownMenu.defaultProps = { ...MenuSubsection.defaultProps };
 
 CollapseMenu.propTypes = { ...MenuSubsection.propTypes };
-CollapseMenu.defaultProps = { ...MenuSubsection.defaultProps };
-
-MenuSubsection.defaultProps = {
-  active: false,
-};

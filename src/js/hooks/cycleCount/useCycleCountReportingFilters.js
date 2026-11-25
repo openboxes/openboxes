@@ -4,7 +4,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
 import { setShouldRebuildFilterParams } from 'actions';
@@ -20,7 +20,8 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [shouldFetch, setShouldFetch] = useState(false);
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     currentLocation,
   } = useSelector((state) => ({
@@ -29,7 +30,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   const previousLocation = useRef(currentLocation?.id);
 
   const clearFilterValues = () => {
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(location.search);
     const defaultValues = Object.keys(filterFields).reduce(
       (acc, key) => ({ ...acc, [key]: '' }),
       { tab: queryProps.tab },
@@ -38,8 +39,8 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
       tab: { name: 'tab' },
     });
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
-    history.push({ pathname, search: queryFilterParams });
+    const { pathname } = location;
+    navigate({ pathname, search: queryFilterParams });
     setShouldFetch(false);
     setFiltersInitialized(false);
     setFilterParams(queryFilterParams);
@@ -57,7 +58,7 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
   const initializeDefaultFilterValues = async ({ isTabSwitch = false } = {}) => {
     setIsLoading(true);
     try {
-      const queryProps = queryString.parse(history.location.search);
+      const queryProps = queryString.parse(window.location.search);
       const defaultValues = Object.keys(filterFields).reduce(
         (acc, key) => ({ ...acc, [key]: '' }),
         { tab: queryProps.tab },
@@ -124,9 +125,9 @@ const useCycleCountReportingFilters = ({ filterFields }) => {
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

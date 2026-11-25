@@ -22,30 +22,29 @@ import 'components/Filter/FilterStyles.scss';
 const FilterForm = ({
   filterFields,
   updateFilterParams,
-  searchFieldPlaceholder,
-  searchFieldDefaultPlaceholder,
-  searchFieldId,
-  formProps,
-  defaultValues,
-  allowEmptySubmit,
-  hidden,
-  onClear,
-  ignoreClearFilters,
+  searchFieldPlaceholder = '',
+  searchFieldDefaultPlaceholder = 'Search',
+  searchFieldId = 'searchTerm',
+  formProps = {},
+  defaultValues = {},
+  allowEmptySubmit = false,
+  hidden = true,
+  onClear = undefined,
+  ignoreClearFilters = [],
   currentLocation,
   translate,
   setShouldRebuildFilterValues,
-  isLoading,
-  customSubmitButtonLabel,
-  customSubmitButtonDefaultLabel,
-  showFilterVisibilityToggler,
-  showSearchField,
-  disableAutoUpdateFilterParams,
-  alignButtonsToFilters,
-  onSubmit,
-  autoSubmit,
+  isLoading = false,
+  customSubmitButtonLabel = null,
+  customSubmitButtonDefaultLabel = null,
+  showFilterVisibilityToggler = true,
+  showSearchField = true,
+  disableAutoUpdateFilterParams = false,
+  alignButtonsToFilters = false,
+  onSubmit = () => {},
+  autoSubmit = false,
   debounceTime,
 }) => {
-  const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
   const formRef = useRef(null);
 
@@ -116,8 +115,8 @@ const FilterForm = ({
   useTranslation('button');
 
   // Calculate which object's values are not empty
-  const countFilled = (values) => {
-    setAmountFilled(Object.entries(values)
+  const countFilled = (values) => (
+    Object.entries(values)
       .filter(([key, value]) => {
         // Ignore accounting for filter that is disabled
         const dynamicAttributes = _.invoke(filterFields, `${key}.getDynamicAttr`, formProps);
@@ -130,8 +129,8 @@ const FilterForm = ({
         // evaluate filter value
         if (typeof value === 'object') return !_.isEmpty(value);
         return !!value;
-      }).length);
-  };
+      }).length
+  );
 
   const onClearHandler = (form) => {
     if (onClear && typeof onClear === 'function') {
@@ -188,7 +187,7 @@ const FilterForm = ({
         initialValues={{ ...defaultValues }}
         render={({ values, handleSubmit, form }) => {
           formRef.current = form;
-          countFilled(values);
+          const amountFilled = countFilled(values);
           return (
             <form onSubmit={handleSubmit} className="w-100 m-0">
               <div className="classic-form with-description align-items-center flex-wrap">
@@ -289,25 +288,4 @@ FilterForm.propTypes = {
   // When true, the form is submitted automatically after the values change
   autoSubmit: PropTypes.bool,
   debounceTime: PropTypes.number.isRequired,
-};
-
-FilterForm.defaultProps = {
-  searchFieldPlaceholder: '',
-  searchFieldDefaultPlaceholder: 'Search',
-  searchFieldId: 'searchTerm',
-  formProps: {},
-  defaultValues: {},
-  allowEmptySubmit: false,
-  hidden: true,
-  onClear: undefined,
-  ignoreClearFilters: [],
-  isLoading: false,
-  customSubmitButtonLabel: null,
-  showSearchField: true,
-  customSubmitButtonDefaultLabel: null,
-  showFilterVisibilityToggler: true,
-  disableAutoUpdateFilterParams: false,
-  alignButtonsToFilters: false,
-  onSubmit: () => {},
-  autoSubmit: false,
 };

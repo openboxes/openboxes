@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
@@ -87,7 +87,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
       const { status } = await purchaseOrderApi.deleteOrder(id);
       if (status === 204) {
         const successMessage = translate('react.purchaseOrder.delete.success.label', 'Purchase order has been deleted successfully');
-        Alert.success(successMessage);
+        toast.success(successMessage);
       }
     } finally {
       dispatch(hideSpinner());
@@ -119,7 +119,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
     try {
       const { status } = await purchaseOrderApi.rollbackOrder(id);
       if (status === 200) {
-        Alert.success(translate(
+        toast.success(translate(
           'react.purchaseOrder.rollback.success.label',
           'Rollback of order status has been done successfully',
         ));
@@ -132,7 +132,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
 
   const rollbackHandler = (id) => {
     if (!isUserApprover) {
-      Alert.error(translate(
+      toast.error(translate(
         'react.default.errors.noPermissions.label',
         'You do not have permissions to perform this action',
       ));
@@ -140,7 +140,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
     }
     const order = tableData.data.find((ord) => ord.id === id);
     if (order && order.shipmentsCount > 0) {
-      Alert.error(translate(
+      toast.error(translate(
         'react.purchaseOrder.rollback.error.label',
         'Cannot rollback order with associated shipments',
       ));
@@ -167,14 +167,14 @@ const usePurchaseOrderListTableData = (filterParams) => {
   const printOrder = (id) => {
     const order = tableData.data.find((ord) => ord.id === id);
     if (order && order.status && order.status.toUpperCase() === 'PENDING') {
-      Alert.error('Order must be placed in order to print');
+      toast.error('Order must be placed in order to print');
       return;
     }
     window.open(ORDER_URL.print(id), '_blank');
   };
 
   const cancelOrder = () => {
-    Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
+    toast.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
   };
 
   return {

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { RiCloseFill } from 'react-icons/all';
+import { RiCloseFill } from 'react-icons/ri';
 import Modal from 'react-modal';
 
 import Button from 'components/form-elements/Button';

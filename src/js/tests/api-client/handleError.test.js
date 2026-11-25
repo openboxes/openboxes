@@ -5,19 +5,17 @@ import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import { handleError } from 'utils/apiClient';
 
-const mockShowNotification = jest.fn();
+const mockShowNotification = vi.fn();
 
-jest.mock('components/Layout/notifications/notification', () => ({
-  __esModule: true,
-  default: jest.fn(() => mockShowNotification),
+vi.mock('components/Layout/notifications/notification', () => ({
+  default: vi.fn(() => mockShowNotification),
 }));
 
-jest.mock('react-confirm-alert', () => ({
-  confirmAlert: jest.fn(),
+vi.mock('react-confirm-alert', () => ({
+  confirmAlert: vi.fn(),
 }));
 
-jest.mock('components/LoginModal', () => ({
-  __esModule: true,
+vi.mock('components/LoginModal', () => ({
   default: () => null,
 }));
 
@@ -28,7 +26,7 @@ const buildResponseError = (status, data = {}) => Object.assign(
 
 describe('handleError', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('canceled requests', () => {
@@ -100,6 +98,18 @@ describe('handleError', () => {
         expect.objectContaining({ customUI: expect.any(Function) }),
       );
       expect(notification).not.toHaveBeenCalled();
+    });
+
+    it('warns about denied access for 403', async () => {
+      const error = buildResponseError(403, { errorMessage: 'You do not have permissions' });
+
+      await expect(handleError(error)).rejects.toBe(error);
+
+      expect(notification).toHaveBeenCalledWith(NotificationType.WARNING);
+      expect(mockShowNotification).toHaveBeenCalledWith({
+        message: 'Access denied',
+        details: 'You do not have permissions',
+      });
     });
 
     it('notifies about a missing resource for 404', async () => {

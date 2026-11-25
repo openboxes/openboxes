@@ -6,17 +6,14 @@ import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import Modal from 'react-modal';
-import connect from 'react-redux/es/connect/connect';
-import { Tooltip } from 'react-tippy';
+import { connect } from 'react-redux';
 
 import DateFormat from 'consts/dateFormat';
 import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import { formatDate } from 'utils/translation-utils';
-
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import 'react-tippy/dist/tippy.css';
+import CustomTooltip from 'wrappers/CustomTooltip';
 
 /**
  * Modal window where user can split put-away's line. It has details of the line
@@ -207,19 +204,15 @@ class SplitLineModal extends Component {
             <div>
               <h3 className="font-weight-bold">
                 <span>{this.props.putawayItem.product.productCode}</span>
-                <Tooltip
-                  arrow="true"
-                  delay="150"
-                  duration="250"
-                  hideDelay="50"
+                <CustomTooltip
                   className="text-overflow-ellipsis"
-                  disabled={this.props.putawayItem.product?.name
-                    === this.props.putawayItem.product?.displayNameOrDefaultName}
-                  html={this.props.putawayItem.product?.name}
+                  show={this.props.putawayItem.product?.name
+                    !== this.props.putawayItem.product?.displayNameOrDefaultName}
+                  content={this.props.putawayItem.product?.name}
                 >
                   {' '}
                   {this.props.putawayItem.product.displayNameOrDefaultName}
-                </Tooltip>
+                </CustomTooltip>
               </h3>
               <div className="font-weight-bold" data-testid="expiration-date">
                 <Translate id="react.putAway.expiry.label" defaultMessage="Expiry" />
@@ -298,16 +291,9 @@ class SplitLineModal extends Component {
                         />
                       </td>
                       <td className="py-1 align-middle">
-                        <Tooltip
-                          html={this.getErrorMessage()}
-                          disabled={
-                            !this.isQuantityGreaterThanOriginalPutaway() && item.quantity > 0
-                          }
-                          theme="transparent"
-                          arrow="true"
-                          delay="150"
-                          duration="250"
-                          hideDelay="50"
+                        <CustomTooltip
+                          content={this.getErrorMessage()}
+                          show={this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0}
                         >
                           <div
                             className={
@@ -327,7 +313,7 @@ class SplitLineModal extends Component {
                               }))}
                             />
                           </div>
-                        </Tooltip>
+                        </CustomTooltip>
                       </td>
                       <td width="120px" className="py-1">
                         <button

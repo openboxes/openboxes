@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentLocation } from 'selectors';
 
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
@@ -17,15 +17,16 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
 
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const spinner = useSpinner();
 
   const currentLocation = useSelector(getCurrentLocation);
 
   const clearFilterValues = () => {
-    const { pathname } = history.location;
-    history.push({ pathname });
+    const { pathname } = location;
+    navigate({ pathname });
     setShouldFetch(false);
   };
 
@@ -34,7 +35,7 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(window.location.search);
 
     defaultValues.location = {
       id: currentLocation?.id,
@@ -72,9 +73,9 @@ const useExpirationHistoryReportFilters = ({ filterFields }) => {
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

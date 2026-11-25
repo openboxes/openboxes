@@ -19,8 +19,6 @@ import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-
 const FIELDS = {
   replenishmentItems: {
     type: ArrayField,
@@ -173,7 +171,8 @@ class ReplenishmentSecondPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.replenishmentTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchReplenishment();

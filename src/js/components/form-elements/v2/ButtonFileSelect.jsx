@@ -11,11 +11,11 @@ import Translate from 'utils/Translate';
 const ButtonFileSelect = ({
   allowedExtensions,
   onFileUpload,
-  label,
-  defaultLabel,
-  variant,
-  disabled,
-  className,
+  label = 'react.default.importButton.label',
+  defaultLabel = 'Import File',
+  variant = 'primary',
+  disabled = false,
+  className = '',
 }) => {
   const translate = useTranslate();
 
@@ -93,12 +93,4 @@ ButtonFileSelect.propTypes = {
   ]),
   disabled: PropTypes.bool,
   className: PropTypes.string,
-};
-
-ButtonFileSelect.defaultProps = {
-  label: 'react.default.importButton.label',
-  defaultLabel: 'Import File',
-  variant: 'primary',
-  disabled: false,
-  className: '',
 };

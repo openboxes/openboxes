@@ -17,8 +17,8 @@ import CustomTooltip from 'wrappers/CustomTooltip';
  * @param param.children The child object that the tooltip wraps
  */
 const TooltipWrapper = ({
-  tooltipLabel,
-  defaultTooltipLabel,
+  tooltipLabel = null,
+  defaultTooltipLabel = '',
   children,
 }) => {
   const translate = useTranslate();
@@ -37,9 +37,4 @@ TooltipWrapper.propTypes = {
   tooltipLabel: PropTypes.string,
   defaultTooltipLabel: PropTypes.string,
   children: PropTypes.node.isRequired,
-};
-
-TooltipWrapper.defaultProps = {
-  tooltipLabel: null,
-  defaultTooltipLabel: '',
 };

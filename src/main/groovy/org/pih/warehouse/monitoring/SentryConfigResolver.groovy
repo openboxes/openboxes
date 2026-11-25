@@ -13,7 +13,7 @@ import org.pih.warehouse.core.parser.DoubleParser
 /**
  * Resolves the Sentry settings that the server passes to the frontend.
  *
- * Methods are static so that they can be called directly from GSPs. See webpack.config.js and _sentry.gsp for usages.
+ * Methods are static so that they can be called directly from GSPs. See vite.config.mjs and _sentry.gsp for usages.
  */
 class SentryConfigResolver {
 

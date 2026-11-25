@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import Alert from 'react-s-alert';
+import { toast } from 'react-toastify';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { LOCATION_IMPORT, LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
@@ -80,7 +80,7 @@ class ImportLocations extends Component {
     return apiClient.post(LOCATION_IMPORT, formData, config)
       .then(() => {
         this.props.hideSpinner();
-        Alert.success(this.props.translate('react.locationsConfiguration.importSuccess.label', 'Locations Created Successfully'));
+        toast.success(this.props.translate('react.locationsConfiguration.importSuccess.label', 'Locations Created Successfully'));
         this.setState({ showSuccessMessage: true });
       })
       .catch(() => {

@@ -14,9 +14,9 @@ import 'utils/utils.scss';
  */
 const BadgeTransition = ({
   current,
-  next,
-  clickable,
-  tooltip,
+  next = null,
+  clickable = true,
+  tooltip = '',
 }) => (
   <CustomTooltip content={tooltip} show={tooltip} className="badge-container">
     <div className="badge-transition">
@@ -41,12 +41,6 @@ BadgeTransition.propTypes = {
   next: badgeShape,
   clickable: PropTypes.bool,
   tooltip: PropTypes.string,
-};
-
-BadgeTransition.defaultProps = {
-  next: null,
-  clickable: true,
-  tooltip: '',
 };
 
 export default BadgeTransition;

@@ -9,7 +9,11 @@ import useTranslate from 'hooks/useTranslate';
  * Check step header rendered above the main content section: the "Confirm Receipt"
  * title with the action buttons on the right.
  */
-const ConfirmReceiptHeader = ({ onBackToReceive, onCompleteReceipt, isCompleteDisabled }) => {
+const ConfirmReceiptHeader = ({
+  onBackToReceive = undefined,
+  onCompleteReceipt = undefined,
+  isCompleteDisabled = false,
+}) => {
   const translate = useTranslate();
 
   return (
@@ -30,12 +34,6 @@ ConfirmReceiptHeader.propTypes = {
   onBackToReceive: PropTypes.func,
   onCompleteReceipt: PropTypes.func,
   isCompleteDisabled: PropTypes.bool,
-};
-
-ConfirmReceiptHeader.defaultProps = {
-  onBackToReceive: undefined,
-  onCompleteReceipt: undefined,
-  isCompleteDisabled: false,
 };
 
 export default ConfirmReceiptHeader;

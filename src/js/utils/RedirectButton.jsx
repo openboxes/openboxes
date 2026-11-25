@@ -2,7 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiArrowLeftSLine } from 'react-icons/ri';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Translate from 'utils/Translate';
 
@@ -20,9 +20,13 @@ import './utils.scss';
  * @constructor
  */
 const RedirectButton = ({
-  className, label, defaultMessage, redirectTo, handleOnClick,
+  className = '',
+  label,
+  defaultMessage,
+  redirectTo = null,
+  handleOnClick = null,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <div
@@ -33,7 +37,7 @@ const RedirectButton = ({
           return;
         }
         if (redirectTo) {
-          history.push(redirectTo);
+          navigate(redirectTo);
         }
       }}
       className={`redirect-button d-flex align-items-center ${className}`}
@@ -57,10 +61,4 @@ RedirectButton.propTypes = {
   defaultMessage: PropTypes.string.isRequired,
   redirectTo: PropTypes.string,
   handleOnClick: PropTypes.func,
-};
-
-RedirectButton.defaultProps = {
-  className: '',
-  handleOnClick: null,
-  redirectTo: null,
 };

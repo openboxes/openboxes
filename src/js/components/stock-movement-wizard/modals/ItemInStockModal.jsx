@@ -7,7 +7,7 @@ import useItemInStockModal from 'hooks/useItemInStockModal';
 import useTranslate from 'hooks/useTranslate';
 
 const ItemInStockModal = ({
-  isOpen, onCancel, item,
+  isOpen, onCancel, item = {},
 }) => {
   const translate = useTranslate();
   const { columns, data } = useItemInStockModal({ productId: item?.id });
@@ -42,10 +42,6 @@ ItemInStockModal.propTypes = {
     name: PropTypes.string.isRequired,
     productCode: PropTypes.string.isRequired,
   }),
-};
-
-ItemInStockModal.defaultProps = {
-  item: {},
 };
 
 export default ItemInStockModal;

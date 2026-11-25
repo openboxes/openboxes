@@ -1,6 +1,5 @@
 import update from 'immutability-helper';
 import _ from 'lodash';
-import { arrayMove } from 'react-sortable-hoc';
 
 import {
   FETCH_CONFIG,
@@ -23,6 +22,13 @@ function arrayArchive(array = [], index) {
 
     return { ...value, id: value.id - 1 };
   });
+  return newArray;
+}
+
+function arrayMove(array = [], oldIndex, newIndex) {
+  const newArray = [...array];
+  const [movedItem] = newArray.splice(oldIndex, 1);
+  newArray.splice(newIndex, 0, movedItem);
   return newArray;
 }
 
@@ -88,24 +94,17 @@ export default function (state = initialState, action) {
         numberData: [],
       };
     case REORDER_INDICATORS: {
-      if (action.payload.type === 'graph') {
+      const { oldIndex, newIndex, type } = action.payload;
+      if (type === 'graph') {
         return {
           ...state,
-          data: arrayMove(
-            state.data,
-            action.payload.oldIndex,
-            action.payload.newIndex,
-          ),
+          data: arrayMove(_.compact(state.data), oldIndex, newIndex),
         };
       }
-      if (action.payload.type === 'number') {
+      if (type === 'number') {
         return {
           ...state,
-          numberData: arrayMove(
-            state.numberData,
-            action.payload.oldIndex,
-            action.payload.newIndex,
-          ),
+          numberData: arrayMove(_.compact(state.numberData), oldIndex, newIndex),
         };
       }
       return state;
@@ -114,13 +113,13 @@ export default function (state = initialState, action) {
       if (action.payload.type === 'graph') {
         return {
           ...state,
-          data: arrayArchive(state.data, action.payload.index),
+          data: arrayArchive(_.compact(state.data), action.payload.index),
         };
       }
       if (action.payload.type === 'number') {
         return {
           ...state,
-          numberData: arrayArchive(state.numberData, action.payload.index),
+          numberData: arrayArchive(_.compact(state.numberData), action.payload.index),
         };
       }
       return state;

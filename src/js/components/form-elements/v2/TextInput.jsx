@@ -11,27 +11,27 @@ import InputWrapper from 'wrappers/InputWrapper';
 import './style.scss';
 
 const TextInput = ({
-  title,
-  tooltip,
-  required,
-  button,
-  disabled,
-  errorMessage,
-  placeholder,
-  id,
-  name,
-  type,
-  decimal,
-  className,
-  showErrorBorder,
-  hideErrorMessageWrapper,
-  onKeyDown,
+  title = null,
+  tooltip = null,
+  required = false,
+  button = null,
+  disabled = false,
+  errorMessage = null,
+  placeholder = '',
+  id = undefined,
+  name = undefined,
+  type = 'text',
+  decimal = undefined,
+  className = '',
+  showErrorBorder = false,
+  hideErrorMessageWrapper = false,
+  onKeyDown = null,
   focusProps = {},
-  onWheel,
-  customTooltip,
-  value,
-  ariaLabel,
-  hasErrors,
+  onWheel = null,
+  customTooltip = false,
+  value = '',
+  ariaLabel = null,
+  hasErrors = false,
   ...fieldProps
 }) => {
   const inputRef = useRef(null);
@@ -80,7 +80,6 @@ const TextInput = ({
       hasErrors={!!(errorMessage || hasErrors)}
     >
       <input
-        ref={inputRef}
         id={id || name}
         name={name}
         disabled={disabled}
@@ -90,6 +89,7 @@ const TextInput = ({
         step={numberIncrementValue}
         value={value}
         {...fieldProps}
+        ref={inputRef}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
         onKeyDown={onKeyDown}
@@ -151,28 +151,4 @@ TextInput.propTypes = {
     defaultMessage: PropTypes.string,
   }),
   hasErrors: PropTypes.bool,
-};
-
-TextInput.defaultProps = {
-  tooltip: null,
-  required: false,
-  title: null,
-  button: null,
-  errorMessage: null,
-  disabled: false,
-  placeholder: '',
-  id: undefined,
-  name: undefined,
-  type: 'text',
-  decimal: undefined,
-  className: '',
-  showErrorBorder: false,
-  hideErrorMessageWrapper: false,
-  onKeyDown: null,
-  focusProps: {},
-  onWheel: null,
-  customTooltip: false,
-  value: '',
-  ariaLabel: null,
-  hasErrors: false,
 };

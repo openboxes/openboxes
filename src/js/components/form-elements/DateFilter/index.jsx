@@ -1,1 +1,3 @@
-export { default } from 'components/form-elements/DateFilter/DateFilter';
+import DateFilter from 'components/form-elements/DateFilter/DateFilter';
+
+export default DateFilter;

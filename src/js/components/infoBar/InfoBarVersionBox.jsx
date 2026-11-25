@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine } from 'react-icons/all';
+import { RiInformationLine } from 'react-icons/ri';
 import { useDispatch } from 'react-redux';
 
 import { showInfoBarModal } from 'actions';
@@ -9,7 +9,7 @@ import { InfoBarVersionBoxVariant } from 'consts/infoBar';
 import Translate from 'utils/Translate';
 
 const InfoBarVersionBox = ({
-  versionLabel, withIcon, variant, name,
+  versionLabel, withIcon = true, variant = InfoBarVersionBoxVariant.OUTLINED, name,
 }) => {
   const dispatch = useDispatch();
 
@@ -35,9 +35,4 @@ InfoBarVersionBox.propTypes = {
   }).isRequired,
   withIcon: PropTypes.bool,
   variant: PropTypes.string,
-};
-
-InfoBarVersionBox.defaultProps = {
-  withIcon: true,
-  variant: InfoBarVersionBoxVariant.OUTLINED,
 };

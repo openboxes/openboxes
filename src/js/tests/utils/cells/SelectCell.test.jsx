@@ -6,9 +6,9 @@ import SelectCell from 'utils/cells/SelectCell';
 
 import '@testing-library/jest-dom';
 
-jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
+vi.mock('hooks/useTranslate', () => ({ default: () => (id, defaultMessage) => defaultMessage }));
 
-const SelectFieldStub = jest.fn(() => <input data-testid="select" />);
+const SelectFieldStub = vi.fn(() => <input data-testid="select" />);
 
 const renderCell = (props = {}) => render(
   <SelectCell

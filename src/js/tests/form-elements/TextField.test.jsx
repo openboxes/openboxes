@@ -1,11 +1,15 @@
 import React from 'react';
 
-import renderer from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import store from 'tests/__mocks__/formStore';
 
 import TextField from 'components/form-elements/TextField';
 import { renderFormField } from 'utils/form-utils';
 
-jest.mock('react-final-form', () => ({
+import '@testing-library/jest-dom';
+
+vi.mock('react-final-form', () => ({
   Field: (props) => {
     const { component: Component, name, ...others } = props;
     const input = { onChange: () => {}, name };
@@ -14,7 +18,8 @@ jest.mock('react-final-form', () => ({
   },
 }));
 
-jest.mock('react-localize-redux', () => ({
+vi.mock('react-localize-redux', async () => ({
+  ...(await vi.importActual('react-localize-redux')),
   Translate: (props) => {
     const { id } = props;
 
@@ -22,15 +27,16 @@ jest.mock('react-localize-redux', () => ({
   },
 }));
 
-xdescribe('TextField component is correctly rendering', () => {
-  it('renders correctly', () => {
+describe('TextField component is correctly rendering', () => {
+  it('renders a text input with its label', () => {
     const fieldConfig = {
       type: TextField,
       label: 'test label',
     };
 
-    const rendered = renderer.create(renderFormField(fieldConfig, 'test-field'));
+    render(<Provider store={store}>{renderFormField(fieldConfig, 'test-field')}</Provider>);
 
-    expect(rendered.toJSON()).toMatchSnapshot();
+    expect(screen.getByRole('textbox', { name: 'test label' })).toHaveAttribute('type', 'text');
+    expect(screen.getByTestId('input')).toHaveAttribute('id', 'test-field');
   });
 });

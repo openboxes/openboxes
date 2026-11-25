@@ -1,14 +1,14 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import { addDays, format, subDays } from 'date-fns';
 import { useSelector } from 'react-redux';
 
 import { DateFormatDateFns } from 'consts/timeFormat';
 import useConfirmReceiptValidation from 'hooks/receiving/v2/useConfirmReceiptValidation';
 
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn(),
 }));
-jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
+vi.mock('hooks/useTranslate', () => ({ default: () => (id, defaultMessage) => defaultMessage }));
 
 // The formats that useConfirmReceiptValidation expects
 const formatDelivered = (date) => format(date, DateFormatDateFns.DD_MMM_YYYY_HH_MM_SS);

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { fetchBuyers, fetchPaymentTerms, fetchPurchaseOrderStatuses } from 'actions';
 import filterFields from 'components/purchaseOrder/FilterFields';
@@ -15,7 +15,8 @@ const usePurchaseOrderFilters = () => {
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const {
     supportedActivities,
@@ -50,8 +51,8 @@ const usePurchaseOrderFilters = () => {
   }, [currentLocale]);
 
   const clearFilterValues = () => {
-    const { pathname } = history.location;
-    history.push({ pathname });
+    const { pathname } = location;
+    navigate({ pathname });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -72,7 +73,7 @@ const usePurchaseOrderFilters = () => {
         .find((org) => org.id === currentLocation.organization.id);
     }
 
-    const queryProps = queryString.parse(history.location.search);
+    const queryProps = queryString.parse(window.location.search);
 
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.status) {
@@ -147,9 +148,9 @@ const usePurchaseOrderFilters = () => {
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
-    const { pathname } = history.location;
+    const { pathname } = location;
     if (Object.keys(values).length) {
-      history.push({ pathname, search: queryFilterParams });
+      navigate({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };

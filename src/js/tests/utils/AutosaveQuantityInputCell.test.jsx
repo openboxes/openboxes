@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 
 // InputWrapper resolves its translate function from the store; the cell test
 // only cares about commit semantics, so translations resolve to the default message.
-jest.mock('hooks/useTranslate', () => () => (id, defaultMessage) => defaultMessage);
+vi.mock('hooks/useTranslate', () => ({ default: () => (id, defaultMessage) => defaultMessage }));
 
 describe('AutosaveQuantityInputCell', () => {
   let onCommit;
@@ -27,7 +27,7 @@ describe('AutosaveQuantityInputCell', () => {
   const getInput = () => screen.getByTestId('table-cell').querySelector('input');
 
   beforeEach(() => {
-    onCommit = jest.fn();
+    onCommit = vi.fn();
   });
 
   it('commits the entered value on every change, without waiting for blur', () => {

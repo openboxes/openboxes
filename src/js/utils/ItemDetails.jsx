@@ -10,7 +10,7 @@ import 'utils/ItemDetails.scss';
  * Generic component for displaying item details
  */
 const ItemDetails = ({
-  badge, fields, className, children,
+  badge = null, fields, className = '', children = null,
 }) => (
   <div className={`item-details ${className}`}>
     {badge && (
@@ -61,10 +61,4 @@ ItemDetails.propTypes = {
   className: PropTypes.string,
   /** Additional elements rendered as grid items after the fields */
   children: PropTypes.node,
-};
-
-ItemDetails.defaultProps = {
-  badge: null,
-  className: '',
-  children: null,
 };

@@ -10,6 +10,7 @@ import LocationDetails from 'components/locations-configuration/LocationDetails'
 import ZoneAndBinLocations from 'components/locations-configuration/ZoneAndBinLocations';
 import Wizard from 'components/wizard/Wizard';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
 
@@ -35,7 +36,8 @@ class LocationsConfigurationWizard extends Component {
     this.props.fetchTranslations('', 'locationsConfiguration');
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
     }
@@ -56,7 +58,7 @@ class LocationsConfigurationWizard extends Component {
   render() {
     const { values, currentPage } = this.state;
     const pageList = [LocationDetails, LocationAddress, ZoneAndBinLocations];
-    const { history } = this.props;
+    const { navigate } = this.props;
 
     return (
       <Wizard
@@ -67,7 +69,7 @@ class LocationsConfigurationWizard extends Component {
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         updateWizardValues={this.updateWizardValues}
         additionalProps={{
-          history, supportLinks: SUPPORT_LINKS,
+          navigate, supportLinks: SUPPORT_LINKS,
         }}
       />
     );
@@ -80,15 +82,13 @@ const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   fetchTranslations,
-})(LocationsConfigurationWizard);
+})(LocationsConfigurationWizard));
 
 LocationsConfigurationWizard.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  navigate: PropTypes.func.isRequired,
 };

@@ -13,7 +13,7 @@ import useTranslation from 'hooks/useTranslation';
  * change will reach.
  */
 const ConfirmExpiryChangeWithDepotsModal = ({
-  isOpen, data, onConfirm, onCancel,
+  isOpen, data = [], onConfirm, onCancel,
 }) => {
   useTranslation('confirmExpirationDate');
   const translate = useTranslate();
@@ -82,10 +82,6 @@ ConfirmExpiryChangeWithDepotsModal.propTypes = {
   })),
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-ConfirmExpiryChangeWithDepotsModal.defaultProps = {
-  data: [],
 };
 
 export default ConfirmExpiryChangeWithDepotsModal;

@@ -18,9 +18,9 @@ import useTranslate from 'hooks/useTranslate';
  */
 const ConfirmReceiptFilters = ({
   view,
-  onCancelAllRemaining,
-  onSaveAndExit,
-  onResetSort,
+  onCancelAllRemaining = () => {},
+  onSaveAndExit = () => {},
+  onResetSort = () => {},
   updateFilterParams,
   clearFilterParams,
 }) => {
@@ -100,12 +100,6 @@ ConfirmReceiptFilters.propTypes = {
   onResetSort: PropTypes.func,
   updateFilterParams: PropTypes.func.isRequired,
   clearFilterParams: PropTypes.func.isRequired,
-};
-
-ConfirmReceiptFilters.defaultProps = {
-  onCancelAllRemaining: () => {},
-  onSaveAndExit: () => {},
-  onResetSort: () => {},
 };
 
 export default ConfirmReceiptFilters;

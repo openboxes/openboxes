@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 import PropTypes from 'prop-types';
 import { SliderPicker } from 'react-color';
-import { Tooltip } from 'react-tippy';
 
 import Input from 'utils/Input';
+import PortalTooltip from 'wrappers/PortalTooltip';
 
-const ColorPicker = ({ value, onChange }) => {
+const ColorPicker = ({ value = null, onChange }) => {
+  const tooltipId = useId();
+
   const handleChange = (color) => {
     const hex = color.hex.split('#')[1];
     onChange(hex);
@@ -15,23 +17,8 @@ const ColorPicker = ({ value, onChange }) => {
   const colorHex = value ? `#${value}` : '#ffffff';
 
   return (
-    <Tooltip
-      html={(
-        <div style={{ width: 350 }}>
-          <SliderPicker
-            color={colorHex}
-            onChangeComplete={handleChange}
-          />
-        </div>
-      )}
-      theme="transparent"
-      arrow="true"
-      trigger="click"
-      interactive
-      delay="150"
-      duration="250"
-    >
-      <div className="input-group">
+    <>
+      <div className="input-group" data-tooltip-id={tooltipId}>
         <div className="input-group-prepend">
           <span className="input-group-text" style={{ backgroundColor: colorHex }}>&nbsp;&nbsp;</span>
         </div>
@@ -42,7 +29,15 @@ const ColorPicker = ({ value, onChange }) => {
           </button>
         </div>
       </div>
-    </Tooltip>
+      <PortalTooltip id={tooltipId} openOnClick clickable>
+        <div style={{ width: 350 }}>
+          <SliderPicker
+            color={colorHex}
+            onChangeComplete={handleChange}
+          />
+        </div>
+      </PortalTooltip>
+    </>
   );
 };
 
@@ -51,8 +46,4 @@ export default ColorPicker;
 ColorPicker.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
-};
-
-ColorPicker.defaultProps = {
-  value: null,
 };

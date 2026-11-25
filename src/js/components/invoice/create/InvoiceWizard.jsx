@@ -11,6 +11,7 @@ import ConfirmInvoicePage from 'components/invoice/create/ConfirmInvoicePage';
 import CreateInvoicePage from 'components/invoice/create/CreateInvoicePage';
 import Wizard from 'components/wizard/Wizard';
 import { translateWithDefaultMessage } from 'utils/Translate';
+import withRouter from 'utils/withRouter';
 
 import 'components/invoice/Invoice.scss';
 
@@ -35,7 +36,8 @@ class InvoiceWizard extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'invoice');
     }
@@ -140,9 +142,9 @@ const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchTranslations,
-})(InvoiceWizard);
+})(InvoiceWizard));
 
 InvoiceWizard.propTypes = {
   /** React router's object which contains information about url variables and params */

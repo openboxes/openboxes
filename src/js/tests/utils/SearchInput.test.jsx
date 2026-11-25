@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
 
 import SearchInput from 'utils/SearchInput';
 
@@ -13,14 +12,14 @@ let onChangeFunc;
 
 describe('search input', () => {
   beforeEach(() => {
-    onChangeFunc = jest.fn();
+    onChangeFunc = vi.fn();
     searchInput = (<SearchInput value="" onChange={onChangeFunc} />);
     searchInputWithValue = (<SearchInput value="test" onChange={onChangeFunc} />);
   });
 
   it('should match snapshot', () => {
-    const renderedInput = renderer.create(searchInput);
-    expect(renderedInput.toJSON())
+    const renderedInput = render(searchInput);
+    expect(renderedInput.asFragment())
       .toMatchSnapshot();
   });
 

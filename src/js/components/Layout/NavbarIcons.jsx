@@ -20,7 +20,7 @@ import useElementSize from 'hooks/useElementSize';
 import useTranslate from 'hooks/useTranslate';
 
 const NavbarIcons = ({
-  username, highestRole, menuItems, configurationMenuSection,
+  username, highestRole, menuItems, configurationMenuSection = {},
 }) => {
   const windowSize = useElementSize(window);
   const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
@@ -48,6 +48,22 @@ const NavbarIcons = ({
     }
   };
 
+  const SearchButton = ({ showSearchbar, isVisible, setIsTooltipDisabled }) => {
+    useEffect(() => {
+      setIsTooltipDisabled(isVisible);
+    }, [isVisible, setIsTooltipDisabled]);
+
+    return (
+      <button
+        type="button"
+        onClick={showSearchbar}
+        className="menu-icon"
+      >
+        <RiSearchLine />
+      </button>
+    );
+  };
+
   const configurationMenuSubsections = _.get(configurationMenuSection, 'subsections', []);
 
   const iconsList = [
@@ -56,18 +72,13 @@ const NavbarIcons = ({
       tooltip: translate('react.default.navbar.search', 'Search'),
       component: (renderProps) => (
         <GlobalSearch
-          renderButton={({ showSearchbar, isVisible }) => {
-            renderProps.setIsTooltipDisabled(isVisible);
-            return (
-              <button
-                type="button"
-                onClick={showSearchbar}
-                className="menu-icon"
-              >
-                <RiSearchLine />
-              </button>
-            );
-          }}
+          renderButton={({ showSearchbar, isVisible }) => (
+            <SearchButton
+              showSearchbar={showSearchbar}
+              isVisible={isVisible}
+              setIsTooltipDisabled={renderProps.setIsTooltipDisabled}
+            />
+          )}
         />
       ),
     },
@@ -280,8 +291,4 @@ NavbarIcons.propTypes = {
     label: PropTypes.string,
     subsections: PropTypes.shape([]),
   }),
-};
-
-NavbarIcons.defaultProps = {
-  configurationMenuSection: {},
 };

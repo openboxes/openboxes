@@ -8,23 +8,36 @@ import Select from 'react-select';
 
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-const TablePagination = (props) => {
-  const [currentPage, setCurrentPage] = useState(props.page + 1);
+const TablePagination = ({
+  page,
+  pages,
+  pageSize,
+  resolvedData,
+  pageSizeOptions,
+  onPageSizeChange,
+  onPageChange,
+  canNext,
+  canPrevious,
+  totalData = undefined,
+  translate,
+  className = '',
+}) => {
+  const [currentPage, setCurrentPage] = useState(page + 1);
 
   useEffect(() => {
-    setCurrentPage(props.page + 1);
-  }, [props.page]);
+    setCurrentPage(page + 1);
+  }, [page]);
 
   const nextPage = () => {
-    if (props.canNext) props.onPageChange(props.page + 1);
+    if (canNext) onPageChange(page + 1);
   };
 
   const previousPage = () => {
-    if (props.canPrevious) props.onPageChange(props.page - 1);
+    if (canPrevious) onPageChange(page - 1);
   };
 
   const pageSizeChangeHandler = ({ value }) => {
-    props.onPageSizeChange(value);
+    onPageSizeChange(value);
   };
 
   const changePageOnChangeHandler = (e) => {
@@ -32,36 +45,36 @@ const TablePagination = (props) => {
   };
   const changePageOnKeyPressHandler = (event) => {
     if (event.key === 'Enter') {
-      props.onPageChange(currentPage - 1);
+      onPageChange(currentPage - 1);
     }
   };
 
-  const totalDataSize = props.totalData || props.resolvedData.length;
-  const rangeNumberFrom = (props.page * props.pageSize) + 1;
-  let rangeNumberTo = (props.page * props.pageSize) + props.pageSize;
+  const totalDataSize = totalData || resolvedData.length;
+  const rangeNumberFrom = (page * pageSize) + 1;
+  let rangeNumberTo = (page * pageSize) + pageSize;
   if (totalDataSize < rangeNumberTo) {
     rangeNumberTo = totalDataSize;
   }
 
-  const pageSizeSelectOptions = props.pageSizeOptions.map((size) => ({
-    label: `${size} ${props.translate('react.reactTable.pagination.rows.label', 'rows')}`,
+  const pageSizeSelectOptions = pageSizeOptions.map((size) => ({
+    label: `${size} ${translate('react.reactTable.pagination.rows.label', 'rows')}`,
     value: size,
   }));
   const selectedPageSizeOption = pageSizeSelectOptions.find(({ value }) =>
-    value === props.pageSize);
+    value === pageSize);
 
   return (
-    <div className={`table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3 ${props.className}`}>
+    <div className={`table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3 ${className}`}>
       <div className="d-flex">
         <span>{`${rangeNumberFrom}-${rangeNumberTo}`}</span>
-        <span className="mx-1">{props.translate('react.reactTable.pagination.of.label', 'of')}</span>
+        <span className="mx-1">{translate('react.reactTable.pagination.of.label', 'of')}</span>
         <span>{totalDataSize}</span>
       </div>
       <div className="d-flex pages-selector">
         <nav className="d-flex justify-content-center align-items-center">
           <button
             type="button"
-            disabled={!props.canPrevious}
+            disabled={!canPrevious}
             className="table-pagination__btn-previous"
             onClick={previousPage}
           >
@@ -71,17 +84,17 @@ const TablePagination = (props) => {
             <input
               type="number"
               min={1}
-              max={props.pages}
+              max={pages}
               value={currentPage}
               onChange={changePageOnChangeHandler}
               onKeyPress={changePageOnKeyPressHandler}
             />
-            <span className="mx-1">{props.translate('react.reactTable.pagination.of.label', 'of')}</span>
-            <span>{props.pages}</span>
+            <span className="mx-1">{translate('react.reactTable.pagination.of.label', 'of')}</span>
+            <span>{pages}</span>
           </span>
           <button
             type="button"
-            disabled={!props.canNext}
+            disabled={!canNext}
             className="table-pagination__btn-next"
             onClick={nextPage}
           >
@@ -106,11 +119,6 @@ const TablePagination = (props) => {
 const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
-
-TablePagination.defaultProps = {
-  totalData: undefined,
-  className: '',
-};
 
 TablePagination.propTypes = {
   page: PropTypes.number.isRequired,

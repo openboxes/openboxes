@@ -35,7 +35,7 @@ class TableBodyVirtualized extends Component {
       ? 0.35 * window.innerHeight : 0.40 * window.innerHeight;
 
     if (!subfieldKey) {
-      height = fields.value.reduce((acc, field) => {
+      height = _.reduce(fields.value, (acc, field) => {
         const dynamicAttr = getDynamicRowAttr
           ? getDynamicRowAttr({ ...properties, rowValues: field }) : {};
         // If a row is supposed to be hidden or the height is already higher than max height,

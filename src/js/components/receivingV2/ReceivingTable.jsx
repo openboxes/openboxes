@@ -15,16 +15,16 @@ const ReceivingTable = ({
   lineItemsState,
   columns,
   loading,
-  receiptId,
+  receiptId = null,
   updateLineItem,
   updateLineItemComment,
   removeSplitItem,
   loadReceipt,
   onLocationAutofill,
   onPackLevelLocationChange,
-  sort,
-  order,
-  lineItemErrors,
+  sort = null,
+  order = null,
+  lineItemErrors = {},
 }) => {
   const commentModal = useCommentModal({ updateLineItemComment });
   const {
@@ -166,13 +166,6 @@ ReceivingTable.propTypes = {
   order: PropTypes.string,
   // Error messages of the invalid lines, keyed by row id and then by field.
   lineItemErrors: PropTypes.objectOf(PropTypes.objectOf(PropTypes.string)),
-};
-
-ReceivingTable.defaultProps = {
-  receiptId: null,
-  sort: null,
-  order: null,
-  lineItemErrors: {},
 };
 
 export default ReceivingTable;

@@ -9,8 +9,8 @@ import ItemInStockModal from 'components/stock-movement-wizard/modals/ItemInStoc
 import useOutboundImportItems from 'hooks/outboundImport/useOutboundImportItems';
 
 const OutboundImportItems = ({
-  data,
-  errors,
+  data = [],
+  errors = {},
 }) => {
   const { itemsWithErrors, itemsInOrder } = data;
 
@@ -68,11 +68,6 @@ const OutboundImportItems = ({
 };
 
 export default OutboundImportItems;
-
-OutboundImportItems.defaultProps = {
-  data: [],
-  errors: {},
-};
 
 OutboundImportItems.propTypes = {
   errors: PropTypes.shape({}),

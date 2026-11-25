@@ -23,13 +23,9 @@ export default {
     type: FilterSelectField,
     attributes: {
       async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
       valueKey: 'id',
       labelKey: 'name',
       options: [],
-      filterOptions: (options) => options,
       filterElement: true,
       placeholder: 'react.stockTransfer.filters.createdBy.placeholder.label',
       defaultPlaceholder: 'Created by',

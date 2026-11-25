@@ -112,18 +112,27 @@ npm install
 ```
 
 ### 7. Build React frontend
-You can build React frontend with this command, but it will be automatically build when starting the application.
+The frontend is bundled with [Vite](https://vite.dev/). You can build it with this command, but it will also be built automatically when starting the application.
 ```    
 npm run bundle
 ```
+The bundle is written to `src/main/webapp/dist`, and the `grails-app/views/common/react.gsp` and `grails-app/views/partialReceiving/create.gsp` templates are regenerated to point at it.
 
-### 8. React frontend Hot-Reload
-When using this command React fronted will be rebuild automatically after any change, you just need to refresh the browser to see the effect.
+### 8. Rebuild React frontend on change (watch mode)
+This command runs a development build and rebuilds the frontend automatically after every change in the source files.
 ```    
 npm run watch
 ```
+This is not hot module replacement: the Vite dev server is not used, because the pages are served by Grails. After each rebuild you need to refresh the browser to see the effect.
 
-### 9. Grails Upgrade or Grails Compile 
+### 9. Lint and test React frontend
+```    
+npm run lint
+npm test
+```
+`npm run lint` reports ESLint errors only and is the check run in CI together with the tests. Use `npm run eslint` to see warnings as well and auto-fix what can be fixed, and `npm run test:watch` to rerun tests on change.
+
+### 10. Grails Upgrade or Grails Compile 
 Either of the following actions (upgrade, compile, run-app) should generate the all important Spring configuration (`/WEB-INF/applicationContext.xml`) and start the dependency resolution process.  
 ```    
 grails upgrade
@@ -142,23 +151,17 @@ If you see any errors, run the command again.
 
 Once the dependency resolution phase has completed, all dependencies will be stored in a local ivy cache (usually under `$USER_HOME/.grails/ivy-cache`).  You do not have to worry about this, just know that the dependencies are now on your machine and Grails will attempt to find them there before it tries to resolve them in a remote repository. 
 
-### 10. Start application in development mode
+### 11. Start application in development mode
 The application can be run in development mode.  This starts the application running in an instance of Tomcat within the Grails console.
 You may need to run 'grails run-app' several times in order to download all dependencies.
 ```
 grails run-app
 ```
 
-### 11. Open application in Google Chrome 
+### 12. Open application in Google Chrome 
 ```
 http://localhost:8080/openboxes
 ```
 
-### 12. Log into OpenBoxes 
+### 13. Log into OpenBoxes 
 You can use the default accounts (manager:password OR admin:password).  Once you are logged in as an admin, you can create own account.  Or you can use the signup form to create a new account.
-
-##### 13. React tests
-To run new frontend (React) tests type:
-```
-npm test
-```

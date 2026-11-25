@@ -1,5 +1,3 @@
-import { EventEmitter } from 'events';
-
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -8,7 +6,6 @@ import { createColumnHelper } from '@tanstack/react-table';
 import _ from 'lodash';
 import { RiChat3Line, RiDeleteBinLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 import { getLotNumbersByProductId } from 'selectors';
 
 import { fetchReasonCodes } from 'actions';
@@ -16,13 +13,13 @@ import { FETCH_CYCLE_COUNT_REASON_CODES } from 'actions/types';
 import { TableCell } from 'components/DataTable';
 import TableHeaderCell from 'components/DataTable/TableHeaderCell';
 import ValueIndicator from 'components/DataTable/v2/ValueIndicator';
-import DateField from 'components/form-elements/v2/DateField';
+import DateFieldDateFns from 'components/form-elements/v2/DateFieldDateFns';
 import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import { NEW_ROW } from 'consts/cycleCount';
 import cycleCountColumn from 'consts/cycleCountColumn';
 import navigationKey from 'consts/navigationKey';
-import { DateFormat } from 'consts/timeFormat';
+import { DateFormat, DateFormatDateFns } from 'consts/timeFormat';
 import valueIndicatorVariant, { getCycleCountDifferencesVariant } from 'consts/valueIndicatorVariant';
 import useArrowsNavigation from 'hooks/useArrowsNavigation';
 import useTranslate from 'hooks/useTranslate';
@@ -30,6 +27,8 @@ import { getBinLocationToDisplay, groupBinLocationsByZone } from 'utils/groupBin
 import { checkBinLocationSupport } from 'utils/supportedActivitiesUtils';
 import { formatDate } from 'utils/translation-utils';
 import CustomTooltip from 'wrappers/CustomTooltip';
+
+const RECOUNT_CHANGED_EVENT = 'recountChanged';
 
 // Managing state for single table, mainly table configuration (from resolve step)
 const useResolveStepTable = ({
@@ -52,7 +51,9 @@ const useResolveStepTable = ({
 
   // State for saving data for binLocation dropdown
   const translate = useTranslate();
-  const events = new EventEmitter();
+  // Table data lives in a ref (no rerender on blur), so recount difference cells
+  // are notified about a changed recounted quantity through this event target
+  const [recountChanges] = useState(() => new EventTarget());
 
   const {
     users,
@@ -82,7 +83,7 @@ const useResolveStepTable = ({
   // Get appropriate input component based on table column
   const getFieldComponent = (fieldName) => {
     if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
-      return DateField;
+      return DateFieldDateFns;
     }
 
     if ([
@@ -131,7 +132,8 @@ const useResolveStepTable = ({
 
     if (fieldName === cycleCountColumn.EXPIRATION_DATE) {
       return {
-        customDateFormat: DateFormat.DD_MMM_YYYY,
+        customDateFormat: DateFormatDateFns.DD_MMM_YYYY,
+        outputDateFormat: DateFormatDateFns.MMM_DD_YYYY,
       };
     }
 
@@ -284,7 +286,7 @@ const useResolveStepTable = ({
           const parsedValue = value ? (parseInt(value, 10) || 0) : value;
           setValue(parsedValue);
           table.options.meta?.updateData(cycleCountId, original.id, id, parsedValue);
-          events.emit('refreshRecountDifference');
+          recountChanges.dispatchEvent(new Event(RECOUNT_CHANGED_EVENT));
         }
       };
 
@@ -551,19 +553,13 @@ const useResolveStepTable = ({
         <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
           {quantityCounted ?? <ValueIndicator variant={valueIndicatorVariant.EMPTY} />}
           {commentFromCount && (
-            <Tooltip
-              arrow="true"
-              delay="150"
-              duration="250"
-              hideDelay="50"
-              html={<span className="p-2">{commentFromCount}</span>}
-            >
+            <CustomTooltip content={<span className="p-2">{commentFromCount}</span>}>
               <RiChat3Line
                 role="button"
                 size={16}
                 className="ml-2"
               />
-            </Tooltip>
+            </CustomTooltip>
           )}
         </TableCell>
       ), []),
@@ -617,9 +613,11 @@ const useResolveStepTable = ({
           secondValue: value,
           shouldCheckSecondValue: true,
         });
-        events.on('refreshRecountDifference', () => {
-          setValue(tableData?.[index]?.quantityRecounted);
-        });
+        useEffect(() => {
+          const refreshValue = () => setValue(tableData?.[index]?.quantityRecounted);
+          recountChanges.addEventListener(RECOUNT_CHANGED_EVENT, refreshValue);
+          return () => recountChanges.removeEventListener(RECOUNT_CHANGED_EVENT, refreshValue);
+        }, [tableData, index]);
 
         return (
           <TableCell className="rt-td rt-td-count-step static-cell-count-step d-flex align-items-center">
@@ -663,13 +661,9 @@ const useResolveStepTable = ({
       header: useMemo(() => <TableHeaderCell />, []),
       cell: useCallback(({ row: { original } }) => (
         <TableCell className="rt-td d-flex justify-content-center count-step-actions">
-          <Tooltip
-            arrow="true"
-            delay="150"
-            duration="250"
-            hideDelay="50"
+          <CustomTooltip
             className="text-overflow-ellipsis"
-            html={(
+            content={(
               <span className="p-2">
                 {translate('react.default.button.delete.label', 'Delete')}
               </span>
@@ -682,7 +676,7 @@ const useResolveStepTable = ({
                 size={22}
               />
             )}
-          </Tooltip>
+          </CustomTooltip>
         </TableCell>
       ), [isFormDisabled]),
       meta: {

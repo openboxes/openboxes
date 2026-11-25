@@ -7,11 +7,17 @@ import { connect } from 'react-redux';
 
 import SupportButton from 'components/support-button/SupportButton';
 
-const HelpScout = ({ isHelpScoutEnabled, localizedHelpScoutKey, ...props }) => (
+const HelpScout = ({
+  isHelpScoutEnabled = false,
+  localizedHelpScoutKey = '',
+  text = '',
+  className = '',
+  ...props
+}) => (
   isHelpScoutEnabled
     ? (
       <LiveChatLoaderProvider provider="helpScout" providerKey={localizedHelpScoutKey}>
-        <SupportButton {...props} />
+        <SupportButton {...props} text={text} className={className} />
       </LiveChatLoaderProvider>
     )
     : <RiQuestionLine />
@@ -29,11 +35,4 @@ HelpScout.propTypes = {
   isHelpScoutEnabled: PropTypes.bool,
   text: PropTypes.string,
   className: PropTypes.string,
-};
-
-HelpScout.defaultProps = {
-  text: '',
-  className: '',
-  localizedHelpScoutKey: '',
-  isHelpScoutEnabled: false,
 };

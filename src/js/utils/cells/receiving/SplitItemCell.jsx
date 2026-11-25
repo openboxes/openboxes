@@ -8,8 +8,8 @@ import { TableCell } from 'components/DataTable';
 /**
  * Green arrow and/or product code, shown only on the first split item row of a product.
  */
-const SplitItemCell = React.memo(({
-  isFirstSplitItem, productCode, withArrow, className,
+const SplitItemCellComponent = ({
+  isFirstSplitItem = false, productCode = null, withArrow = false, className = '',
 }) => (
   <TableCell
     className={`rt-td ${className}`}
@@ -29,22 +29,17 @@ const SplitItemCell = React.memo(({
       </>
     )}
   </TableCell>
-));
+);
+
+const SplitItemCell = React.memo(SplitItemCellComponent);
 
 SplitItemCell.displayName = 'SplitItemCell';
 
-SplitItemCell.propTypes = {
+SplitItemCellComponent.propTypes = {
   isFirstSplitItem: PropTypes.bool,
   productCode: PropTypes.string,
   withArrow: PropTypes.bool,
   className: PropTypes.string,
-};
-
-SplitItemCell.defaultProps = {
-  isFirstSplitItem: false,
-  productCode: null,
-  withArrow: false,
-  className: '',
 };
 
 export default SplitItemCell;

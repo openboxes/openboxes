@@ -8,8 +8,6 @@ const reorderReportFilterFields = {
   additionalInventoryLocations: {
     type: FilterSelectField,
     attributes: {
-      openOnClick: false,
-      cache: false,
       multi: true,
       closeMenuOnSelect: false,
       blurInputOnSelect: false,

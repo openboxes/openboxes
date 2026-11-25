@@ -10,10 +10,19 @@ import CustomTooltip from 'wrappers/CustomTooltip';
 import './style.scss';
 
 const Switch = ({
-  defaultValue,
-  titles,
-  onChange,
-  className,
+  defaultValue = false,
+  titles = {
+    checked: {
+      id: '',
+      defaultMessage: '',
+    },
+    unchecked: {
+      id: '',
+      defaultMessage: '',
+    },
+  },
+  onChange = () => {},
+  className = '',
   ...fieldProps
 }) => {
   const translate = useTranslate();
@@ -94,20 +103,4 @@ Switch.propTypes = {
   }),
   onChange: PropTypes.func,
   className: PropTypes.string,
-};
-
-Switch.defaultProps = {
-  defaultValue: false,
-  titles: {
-    checked: {
-      id: '',
-      defaultMessage: '',
-    },
-    unchecked: {
-      id: '',
-      defaultMessage: '',
-    },
-  },
-  onChange: () => {},
-  className: '',
 };

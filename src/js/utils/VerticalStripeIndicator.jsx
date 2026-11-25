@@ -10,7 +10,7 @@ import 'utils/VerticalStripeIndicator.scss';
  * Full-height vertical stripe. Generic visual indicator.
  * Its colour is driven by the `status` prop. A null/omitted status hides the stripe.
  */
-const VerticalStripeIndicator = ({ status }) => {
+const VerticalStripeIndicator = ({ status = null }) => {
   if (!status) {
     return null;
   }
@@ -27,8 +27,4 @@ export default VerticalStripeIndicator;
 
 VerticalStripeIndicator.propTypes = {
   status: PropTypes.oneOf(Object.values(VerticalStripeStatus)),
-};
-
-VerticalStripeIndicator.defaultProps = {
-  status: null,
 };
