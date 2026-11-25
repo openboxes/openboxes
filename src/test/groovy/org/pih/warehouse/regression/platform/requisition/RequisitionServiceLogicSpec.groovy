@@ -143,7 +143,6 @@ class RequisitionServiceLogicSpec extends Specification implements ServiceUnitTe
         requisition.transactions.isEmpty()
     }
 
-    @PendingFeature(reason = 'OBAF builds LocalDate(day + 7), invalid in the last week of a month')
     void 'isDateOneWeekFromNow works on #today, in the last week of a month'() {
         given:
         DateTimeUtils.setCurrentMillisFixed(today.toDateTimeAtStartOfDay().millis)

@@ -22,7 +22,6 @@ import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptItem
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
@@ -31,8 +30,13 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.data.FileGenerationService
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.putaway.PutawayTask
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.receiving.GoodsReceiptNoteDto
+import org.pih.warehouse.receiving.GoodsReceiptNoteService
+import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -48,6 +52,7 @@ class NotificationService {
     MailService mailService
     GrailsApplication grailsApplication
     FileGenerationService fileGenerationService
+    GoodsReceiptNoteService goodsReceiptNoteService
     MessageLocalizer messageLocalizer
     def messageSource
 
@@ -182,34 +187,64 @@ class NotificationService {
     }
 
     void sendReceiptNotifications(PartialReceipt partialReceipt) {
-        Shipment shipment = partialReceipt?.shipment
-        EmailValidator emailValidator = EmailValidator.getInstance()
         Map<Person, List<PartialReceiptItem>> recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
-        recipientItems.each { Person recipient, items ->
-            if (emailValidator.isValid(recipient?.email)) {
-                String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
-                GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: partialReceipt.recipient])}"
+        sendReceiptNotificationEmails(partialReceipt?.shipment, partialReceipt.recipient, recipientItems)
+    }
 
-                File barcodeFile = fileGenerationService.generateBarcodeFile(shipment.shipmentNumber)
-                String barcodeFileUri = fileGenerationService.getFileUri(barcodeFile)
-                String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
+    /**
+     * Receiving v2 flavour of the receipt notifications, driven by the completed receipt itself instead of the
+     * PartialReceipt view of it. The receipt items are adapted to the property names that the (shared) email
+     * template expects, which was written against {@link PartialReceiptItem}.
+     */
+    void sendReceiptNotifications(Receipt receipt) {
+        Map<Person, List<Map>> recipientItems = receipt.receiptItems
+                .groupBy { ReceiptItem receiptItem -> receiptItem.recipient }
+                .collectEntries { Person recipient, List<ReceiptItem> receiptItems ->
+                    [(recipient): receiptItems.collect { ReceiptItem receiptItem ->
+                        [
+                                inventoryItem    : receiptItem.inventoryItem,
+                                quantityReceiving: receiptItem.quantityReceived,
+                                quantityCanceled : receiptItem.quantityCanceled,
+                                comment          : receiptItem.comment,
+                        ]
+                    }]
+                }
+        sendReceiptNotificationEmails(receipt.shipment, receipt.recipient, recipientItems)
+    }
 
-                byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
-                        shipment: shipment,
-                        currentLocation: AuthService.currentLocation,
-                        barcodeFileUri: barcodeFileUri
-                ])
+    private void sendReceiptNotificationEmails(Shipment shipment, Person receivedBy, Map<Person, List> recipientItems) {
+        EmailValidator emailValidator = EmailValidator.getInstance()
+        Map<Person, List> mailedRecipientItems = recipientItems.findAll { Person recipient, List items ->
+            emailValidator.isValid(recipient?.email)
+        }
+        if (!mailedRecipientItems) {
+            return
+        }
 
-                barcodeFile.delete()
-                mailService.sendHtmlMailWithAttachment(
-                        recipient.email,
-                        subject,
-                        body.toString(),
-                        goodsDeliveryNotePdf,
-                        fileName,
-                        MediaType.APPLICATION_PDF_VALUE
-                )
-            }
+        // Shared by every email, so it is built once, and only when there is someone to send it to
+        GoodsReceiptNoteDto goodsReceiptNote = goodsReceiptNoteService.buildGoodsReceiptNote(shipment.id)
+        mailedRecipientItems.each { Person recipient, List items ->
+            String subject = messageLocalizer.localize("email.yourItemReceived.message", shipment.destination.name, shipment.shipmentNumber)
+            GString body = "${applicationTagLib.render(template: "/email/shipmentItemReceived", model: [shipmentInstance: shipment, receiptItems: items, recipient: recipient, receivedBy: receivedBy])}"
+
+            File barcodeFile = fileGenerationService.generateBarcodeFile(shipment.shipmentNumber)
+            String barcodeFileUri = fileGenerationService.getFileUri(barcodeFile)
+            String fileName = "GoodsReceiptNote-${shipment.shipmentNumber}.pdf"
+
+            byte[] goodsDeliveryNotePdf = fileGenerationService.generatePdfFromTemplate("/email/goodsDeliveryNote", [
+                    goodsReceiptNote: goodsReceiptNote,
+                    barcodeFileUri: barcodeFileUri
+            ])
+
+            barcodeFile.delete()
+            mailService.sendHtmlMailWithAttachment(
+                    recipient.email,
+                    subject,
+                    body.toString(),
+                    goodsDeliveryNotePdf,
+                    fileName,
+                    MediaType.APPLICATION_PDF_VALUE
+            )
         }
     }
 
@@ -261,6 +296,38 @@ class NotificationService {
             }
         } catch (EmailException e) {
             log.error("Unable to send an email: " + e.message, e)
+        }
+    }
+
+    /**
+     * Notifies the discrepancy notification users and the creator of the order that a picker recorded a shortage.
+     */
+    def sendPickShortageNotification(PicklistItem picklistItem, Integer quantityMovedToLostAndFound, Location lostAndFound) {
+        try {
+            def emailValidator = EmailValidator.getInstance()
+            List<User> recipients = new ArrayList<User>(userService.findUsersByRoleType(RoleType.ROLE_DISCREPANCY_NOTIFICATION) ?: [])
+            User orderCreator = picklistItem?.requisitionItem?.requisition?.createdBy
+            if (orderCreator) {
+                recipients << orderCreator
+            }
+            List<String> emails = recipients*.email.findAll { emailValidator.isValid(it) }.unique()
+            if (!emails) {
+                return
+            }
+            def locale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
+            def subject = messageSource.getMessage('email.pickShortage.message', null, locale)
+            def body = renderTemplate("/email/pickShortage", [
+                    picklistItem               : picklistItem,
+                    quantityMovedToLostAndFound: quantityMovedToLostAndFound,
+                    lostAndFound               : lostAndFound,
+            ])
+            emails.each { String email ->
+                mailService.sendHtmlMail(subject, body.toString(), email)
+            }
+        } catch (Exception e) {
+            // Any failure here (mail, template, message lookup) must not reach the transactional event listener:
+            // it would mark the short pick's transaction rollback-only and silently undo the pick and stock moves.
+            log.error("Unable to send the pick shortage notification: " + e.message, e)
         }
     }
 

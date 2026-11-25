@@ -1,0 +1,40 @@
+.autosave-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--blue-primary);
+  }
+
+  &__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+    white-space: nowrap;
+  }
+
+  &__spinner {
+    animation: autosave-indicator-spin 1s linear infinite;
+  }
+
+  &--error &__icon {
+    color: var(--red-500);
+  }
+
+  &--saving &__icon {
+    color: var(--blue-primary);
+  }
+}
+
+@keyframes autosave-indicator-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

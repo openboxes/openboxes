@@ -11,53 +11,64 @@ import org.pih.warehouse.product.Product
 class InventoryItemManager {
 
     /**
-     * Finds the inventory item for the given product and lot number, creating it if it doesn't exist.
+     * Finds the inventory item for the given product lot, creating it if it doesn't exist, and otherwise updating its
+     * expiration date if it has changed.
      *
-     * @param product The product to get the item for.
-     * @param lotNumber The lot number of the item to get.
-     * @param expirationDate The expiration date of the lot. Will only be used if we need to create a new item.
+     * @param product The product associated with the lot.
+     * @param lotNumber The lot number of the item.
+     * @param expirationDate The expiration date of the lot. If the lot exists, it's expiration date will be updated
+     *                       to this one if they differ.
      * @param disableRefresh True if the creation of a new InventoryItem should NOT trigger an asynchronous
      *                       product availability refresh. Typically this is only true when callers want to
      *                       trigger the refresh themselves, manually.
      */
-    InventoryItem getOrCreateInventoryItem(Product product,
-                                           String lotNumber,
-                                           Date expirationDate,
-                                           boolean disableRefresh = false) {
+    InventoryItem upsertInventoryItem(Product product,
+                                      String lotNumber,
+                                      Date expirationDate,
+                                      boolean disableRefresh = false) {
         InventoryItem inventoryItem = getInventoryItem(product, lotNumber)
-        if (inventoryItem) {
-            return inventoryItem
+        if (!inventoryItem) {
+            inventoryItem = createInventoryItem(product, lotNumber, expirationDate, disableRefresh)
         }
-
-        return createInventoryItem(product, lotNumber, expirationDate, disableRefresh)
+        if (expirationDate != inventoryItem.expirationDate) {
+            inventoryItem = updateExpirationDate(inventoryItem, expirationDate)
+        }
+        return inventoryItem
     }
 
     /**
-     * Finds the inventory item for the given product lot, creating it if it doesn't exist.
+     * Finds the inventory item for the given product lot, creating it if it doesn't exist, and otherwise updating its
+     * expiration date if it has changed.
      *
-     * @param productLot The product + lot of the item to get or create.
+     * @param productLot The product + lot of the item to upsert.
      * @param disableRefresh True if the creation of a new InventoryItem should NOT trigger an asynchronous
      *                       product availability refresh. Typically this is only true when callers want to
      *                       trigger the refresh themselves, manually.
      */
-    InventoryItem getOrCreateInventoryItem(ProductLot productLot, boolean disableRefresh = false) {
-        return getOrCreateInventoryItem(
-                productLot.product, productLot.lotNumber, productLot.expirationDate, disableRefresh)
+    InventoryItem upsertInventoryItem(ProductLot productLot, boolean disableRefresh = false) {
+        return upsertInventoryItem(productLot.product, productLot.lotNumber, productLot.expirationDate, disableRefresh)
     }
 
     /**
-     * Bulk method for finding the inventory items for the given product lots, creating them if they don't exist.
+     * Finds the inventory items for the given product lots, creating them if they don't exist, and otherwise
+     * updating their expiration dates if they have changed.
+     *
+     * @param productLot The product + lot of the items to upsert.
+     * @param disableRefresh True if the creation of a new InventoryItem should NOT trigger an asynchronous
+     *                       product availability refresh. Typically this is only true when callers want to
+     *                       trigger the refresh themselves, manually.
      */
-    InventoryItemByProductLot getOrCreateInventoryItems(Collection<ProductLot> productLots,
-                                                        boolean disableRefresh = false) {
+    InventoryItemByProductLot upsertInventoryItems(Collection<ProductLot> productLots, boolean disableRefresh = false) {
         InventoryItemByProductLot inventoryItemMap = new InventoryItemByProductLot()
         for (ProductLot productLot in productLots) {
+            // We might have been given the same lot multiple times, so ignore any repeats that we've already processed
             if (inventoryItemMap.containsKey(productLot)) {
-                // We could consider adding some validation here, such as checking that the expiration dates match,
-                // but for now we simply continue if we've already fetched or created this inventory item.
+                // We could consider adding some validation here, such as checking that the expiration dates match
+                // across repeat lots.
                 continue
             }
-            InventoryItem inventoryItem = getOrCreateInventoryItem(productLot, disableRefresh)
+
+            InventoryItem inventoryItem = upsertInventoryItem(productLot, disableRefresh)
             inventoryItemMap.put(productLot, inventoryItem)
         }
         return inventoryItemMap
@@ -69,9 +80,9 @@ class InventoryItemManager {
     InventoryItem getInventoryItem(Product product, String lotNumber) {
         // First check if an inventory item exists for the lotNumber as given. We do this check to ensure
         // that any pre-existing lots (from before we were sanitizing inputs) can still be found.
-        List<InventoryItem> inventoryItems = InventoryItem.createCriteria().list {
+        InventoryItem inventoryItem = InventoryItem.createCriteria().get() {
             and {
-                eq("product.id", product.id)
+                eq("product", product)
                 if (lotNumber) {
                     eq("lotNumber", lotNumber)
                 } else {
@@ -81,17 +92,10 @@ class InventoryItemManager {
                     }
                 }
             }
-        } as List<InventoryItem>
+        } as InventoryItem
 
-        // We call list instead of get, because of stale data that both empty string and null lot number can exist for a product.
-        // calling createCriteria().get() with eq("lotNumber", null) or eq("lotNumber", "")
-        // can return either of those records, which can cause "query did not return a unique result" exception.
-        if (inventoryItems?.size() == 1) {
-            return inventoryItems.get(0)
-        }
-
-        if (inventoryItems?.size() > 1) {
-            return inventoryItems.find { it.lotNumber == null } ?: inventoryItems.get(0)
+        if (inventoryItem) {
+            return inventoryItem
         }
 
         // Otherwise, sanitize the given lot number and look again (unless the given lot is already sanitized, which
@@ -105,6 +109,50 @@ class InventoryItemManager {
         return InventoryItem.findByProductAndLotNumber(product, sanitizedLotNumber)
     }
 
+    /**
+     * Finds the inventory items for the given product lots, matching each lot number as it is given.
+     */
+    List<InventoryItem> getInventoryItems(List<ProductLot> productLots) {
+        if (!productLots) {
+            return []
+        }
+
+        return InventoryItem.createCriteria().list {
+            or {
+                productLots.each { ProductLot productLot ->
+                    and {
+                        eq("product", productLot.product)
+                        if (productLot.lotNumber) {
+                            eq("lotNumber", productLot.lotNumber)
+                        } else {
+                            or {
+                                isNull("lotNumber")
+                                eq("lotNumber", "")
+                            }
+                        }
+                    }
+                }
+            }
+        } as List<InventoryItem>
+    }
+
+    /**
+     * Updates the expiration date of an existing inventory item, clearing it when none is given. An inventory item
+     * is a product lot shared by every depot, so the change reaches all of them.
+     */
+    InventoryItem updateExpirationDate(InventoryItem inventoryItem, Date expirationDate) {
+        if (inventoryItem.expirationDate == expirationDate) {
+            return inventoryItem
+        }
+
+        inventoryItem.expirationDate = expirationDate
+
+        if (!inventoryItem.validate()) {
+            throw new ValidationException("Error saving inventory item", inventoryItem.errors)
+        }
+        return inventoryItem
+    }
+
     private InventoryItem createInventoryItem(Product product,
                                               String lotNumber,
                                               Date expirationDate,
@@ -113,8 +161,9 @@ class InventoryItemManager {
                 product: product,
                 lotNumber: sanitizeLotNumber(lotNumber),
                 expirationDate: expirationDate,
-                disableRefresh: disableRefresh,
         )
+        inventoryItem.disableRefresh = disableRefresh  // Transient fields can't be set via map constructor
+
         if (!inventoryItem.save()) {
             throw new ValidationException("Error saving inventory item", inventoryItem.errors)
         }

@@ -3,6 +3,7 @@ package org.pih.warehouse.importer
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+import testutil.MessageLocalizerStub
 import testutil.ResourceUtil
 
 import org.pih.warehouse.core.http.ContentType
@@ -19,11 +20,14 @@ class CsvReaderSpec extends Specification {
     MultipartFileSource csvFile
 
     void setupSpec() {
-        csvFile = new MultipartFileSource(source: ResourceUtil.getMultipartFile(TEST_CSV_FILE_PATH))
+        // BulkDataReader calls validate on the source, but since we're not testing the source we stub that behaviour.
+        csvFile = Spy(MultipartFileSource, constructorArgs: [source: ResourceUtil.getMultipartFile(TEST_CSV_FILE_PATH)]) {
+            validate() >> true
+        }
     }
 
     void setup() {
-        reader = new CsvReader()
+        reader = new CsvReader(Stub(BulkDataImportComponentResolver), MessageLocalizerStub.MESSAGE_LOCALIZER_STUB)
     }
 
     void "read should successfully read from csv file for case: #scenario"() {
@@ -74,27 +78,25 @@ class CsvReaderSpec extends Specification {
 
     void "read should successfully read from csv String for case: #scenario"() {
         given:
-        StringSource csvString = new StringSource(
-                source: "field1,field2\n" +
-                        "ABC,ABC\n" +
-                        "ABC,\n" +
-                        ",ABC\n" +
-                        ",\n" +
-                        " ABC , ABC \n" +
-                        "\"ABC,123,\",\"ABC,\"\n" +
-                        // To represent double quotes, CSV encoding requires the whole cell to be wrapped in quotes,
-                        // then the quote character being stringified must be escaped by ANOTHER quote.
-                        // So """ABC""" becomes "ABC" and """ABC" becomes "ABC.
-                        "\"\"\"ABC\"\"\",\"\"\"ABC\"\n" +
-                        "\"ABC\\n\",\"\\nABC\"\n" +
-                        "'ABC,ABC'\n" +
-                        "\\\\ABC,\\\\\\\\ABC\n" +
-                        "jabłko,苹果\n" +
-                        "1, 1 \n" +
-                        "1.1, 1.1 \n" +
-                        "2000-01-01,2000-01-01T00:00Z",
-                contentType: ContentType.CSV,
-        )
+        StringSource csvString = initStringSource(
+                "field1,field2\n" +
+                "ABC,ABC\n" +
+                "ABC,\n" +
+                ",ABC\n" +
+                ",\n" +
+                " ABC , ABC \n" +
+                "\"ABC,123,\",\"ABC,\"\n" +
+                // To represent double quotes, CSV encoding requires the whole cell to be wrapped in quotes,
+                // then the quote character being stringified must be escaped by ANOTHER quote.
+                // So """ABC""" becomes "ABC" and """ABC" becomes "ABC.
+                "\"\"\"ABC\"\"\",\"\"\"ABC\"\n" +
+                "\"ABC\\n\",\"\\nABC\"\n" +
+                "'ABC,ABC'\n" +
+                "\\\\ABC,\\\\\\\\ABC\n" +
+                "jabłko,苹果\n" +
+                "1, 1 \n" +
+                "1.1, 1.1 \n" +
+                "2000-01-01,2000-01-01T00:00Z")
 
         and:
         CsvReaderConfig config = new CsvReaderConfig(
@@ -143,14 +145,12 @@ class CsvReaderSpec extends Specification {
 
     void "read should successfully handle blank rows for case: #scenario"() {
         given:
-        StringSource csvString = new StringSource(
-                source: "\n" +
-                        "ABC,DEF\n" +
-                        "\n" +
-                        "GHI,JKL\n" +
-                        "\n",
-                contentType: ContentType.CSV,
-        )
+        StringSource csvString = initStringSource(
+                "\n" +
+                "ABC,DEF\n" +
+                "\n" +
+                "GHI,JKL\n" +
+                "\n")
 
         and:
         CsvReaderConfig config = new CsvReaderConfig(
@@ -191,11 +191,9 @@ class CsvReaderSpec extends Specification {
 
     void "read should successfully handle too many columns for case: #scenario"() {
         given:
-        StringSource csvString = new StringSource(
-                source: "ABC,DEF,GHI\n" +
-                        "ABC,,GHI",
-                contentType: ContentType.CSV,
-        )
+        StringSource csvString = initStringSource(
+                "ABC,DEF,GHI\n" +
+                "ABC,,GHI")
 
         and:
         CsvReaderConfig config = new CsvReaderConfig(
@@ -234,10 +232,9 @@ class CsvReaderSpec extends Specification {
 
     void "read should error when there are too few columns"() {
         given:
-        StringSource csvString = new StringSource(
-                source: "ABC",
-                contentType: ContentType.CSV,
-        )
+        StringSource csvString = initStringSource(
+                "ABC\n" +
+                "DEF,GHI")
 
         and:
         CsvReaderConfig config = new CsvReaderConfig(
@@ -250,18 +247,27 @@ class CsvReaderSpec extends Specification {
         )
 
         when:
-        reader.read(csvString, config)
+        BulkDataReaderResult result = reader.read(csvString, config)
 
-        then:
-        thrown(RuntimeException)
+        then: "The rows should still be parsed successfully"
+        List<Map<String, BulkDataCell>> rows = result.rows
+        assert rows.size() == 2
+        assert rows[0]["field1"].value == "ABC"
+        assert rows[0]["field2"] == null
+        assert rows[1]["field1"].value == "DEF"
+        assert rows[1]["field2"].value == "GHI"
+
+        and: "An error should be thrown indicating the incorrect number of columns"
+        List<BulkDataError> errors = result.readErrors
+        assert errors.size() == 1
+        assert errors[0].row == 0
+        assert errors[0].severity == BulkDataErrorSeverity.ERROR
+        assert errors[0].localizedMessage == "import.reader.unexpectedNumberCells"
     }
 
     void "read should successfully work with delimiter: #delimiter"() {
         given:
-        StringSource csvString = new StringSource(
-                source: "ABC${delimiter}DEF\nGHI${delimiter}JKL",
-                contentType: ContentType.CSV,
-        )
+        StringSource csvString = initStringSource("ABC${delimiter}DEF\nGHI${delimiter}JKL")
 
         and:
         CsvReaderConfig config = new CsvReaderConfig(
@@ -285,5 +291,12 @@ class CsvReaderSpec extends Specification {
 
         where:
         delimiter << ["|", ";", "\t", "‍"]
+    }
+
+    private StringSource initStringSource(String source) {
+        // BulkDataReader calls validate on the source, but since we're not testing the source we stub that behaviour.
+        return Spy(StringSource, constructorArgs: [source: source, contentType: ContentType.CSV]) {
+            validate() >> true
+        }
     }
 }

@@ -18,7 +18,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import DateFormat from 'consts/dateFormat';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -283,7 +283,7 @@ class SendMovementPage extends Component {
       const url = `/api/stockTransfers/${this.props.match.params.inboundReturnId}/sendShipment`;
       this.saveValues(payload)
         .then(() => {
-          apiClient.post(url, flattenRequest(payload))
+          apiClient.post(url, payload)
             .then(() => {
               window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.inboundReturnId);
             })
@@ -385,7 +385,7 @@ class SendMovementPage extends Component {
       expectedDeliveryDate: values.expectedDeliveryDate || '',
     };
 
-    return apiClient.put(url, flattenRequest(payload));
+    return apiClient.put(url, payload);
   }
 
   previousPage(values, invalid) {

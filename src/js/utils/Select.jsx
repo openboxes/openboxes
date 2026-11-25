@@ -99,6 +99,17 @@ Option.propTypes = {
   }).isRequired,
 };
 
+const ClearIndicator = (props) => (
+  <components.ClearIndicator
+    {...props}
+    innerProps={{ ...props.innerProps, 'data-testid': 'custom-select-clear' }}
+  />
+);
+
+ClearIndicator.propTypes = {
+  innerProps: PropTypes.shape({}).isRequired,
+};
+
 class Select extends Component {
   constructor(props) {
     super(props);
@@ -305,7 +316,10 @@ class Select extends Component {
       return ReactSelect;
     })();
     const SingleValue = (props) => (
-      <components.SingleValue {...props}>
+      <components.SingleValue
+        {...props}
+        innerProps={{ ...props.innerProps, 'data-testid': 'custom-select-value' }}
+      >
         {this.props.valueRenderer ? (
           this.props.valueRenderer({ ...props.data, showSelectedOptionColor })
         ) : (
@@ -413,6 +427,7 @@ class Select extends Component {
               Menu: customSelectComponents.Menu ?? Menu,
               Option: customSelectComponents.Option ?? Option,
               SingleValue: customSelectComponents.SingleValue ?? SingleValue,
+              ClearIndicator: customSelectComponents.ClearIndicator ?? ClearIndicator,
             }}
             ref={fieldRef}
             classNamePrefix={classNamePrefix}

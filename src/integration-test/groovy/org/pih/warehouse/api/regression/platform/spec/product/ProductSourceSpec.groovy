@@ -32,10 +32,10 @@ abstract class ProductSourceSpec extends RegressionApiSpec {
     ProductSupplierApi productSupplierApi
 
     @Autowired
-    ProductSupplierPreferenceApi productSupplierPreferenceApi
+    ProductSupplierPreferenceApi regressionProductSupplierPreferenceApi
 
     @Autowired
-    UnitOfMeasureApi unitOfMeasureApi
+    UnitOfMeasureApi regressionUnitOfMeasureApi
 
     /** A product of this test only, so earlier tests' sources don't show up in its lists. */
     Product item
@@ -67,7 +67,7 @@ abstract class ProductSourceSpec extends RegressionApiSpec {
         }
         // Through the API, as a user creates it (the unit list documents who created each unit)
         String code = "BX${UUID.randomUUID().toString().take(8)}"
-        String boxId = unitOfMeasureApi.create(new JSONObject().put('name', "Box ${code}".toString()).put('code', code)
+        String boxId = regressionUnitOfMeasureApi.create(new JSONObject().put('name', "Box ${code}".toString()).put('code', code)
                 .toString(), responseSpecUtil.CREATED_RESPONSE_SPEC).jsonPath().getString('data.id')
         box = UnitOfMeasure.withNewSession { UnitOfMeasure.get(boxId) }
     }

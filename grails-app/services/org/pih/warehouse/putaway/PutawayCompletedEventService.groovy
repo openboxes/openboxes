@@ -12,14 +12,16 @@ package org.pih.warehouse.putaway
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
-import org.springframework.context.ApplicationListener
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Transactional
-class PutawayCompletedEventService implements ApplicationListener<PutawayCompletedEvent> {
+class PutawayCompletedEventService {
 
     def productAvailabilityService
 
-    void onApplicationEvent(PutawayCompletedEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    void onPutawayCompletedEvent(PutawayCompletedEvent event) {
         log.info "Application event $event has been published!"
 
         Putaway putaway = event.source

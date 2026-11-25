@@ -356,6 +356,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return supports(ActivityCode.LOST_AND_FOUND)
     }
 
+    Boolean isSortationLocation() {
+        return supports(ActivityCode.INBOUND_SORTATION) || supports(ActivityCode.RETURN_SORTATION)
+    }
+
     Boolean isPickable() {
         return !onHold && !lostAndFound
     }

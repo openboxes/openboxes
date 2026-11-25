@@ -1076,7 +1076,7 @@ class RequisitionService {
 
     boolean isDateOneWeekFromNow(def date) {
         LocalDate today = LocalDate.now()
-        LocalDate oneWeekFromNow = new LocalDate(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth()+7)
+        LocalDate oneWeekFromNow = today.plusDays(7)
         if(date > oneWeekFromNow) {
             return true
         }
@@ -1259,13 +1259,14 @@ class RequisitionService {
         }
     }
 
-    List<String> findStagedRequisitionIds() {
+    List<String> findStagedRequisitionIds(List<Location> facilities) {
         List<String> requisitions = Requisition.createCriteria().list {
             projections {
                 property("id")
             }
             eq("isTemplate", Boolean.FALSE)
             eq("status", RequisitionStatus.STAGED)
+            'in'("origin", facilities)
         }
         return requisitions
     }

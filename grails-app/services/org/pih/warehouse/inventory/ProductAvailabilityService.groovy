@@ -46,6 +46,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductType
+import org.pih.warehouse.product.lot.ProductLot
 import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
@@ -56,6 +57,7 @@ class ProductAvailabilityService {
     def dataSource
     def gparsService
     GrailsApplication grailsApplication
+    InventoryItemManager inventoryItemManager
     def persistenceInterceptor
     def productService
     def locationService
@@ -468,6 +470,42 @@ class ProductAvailabilityService {
         return quantityOnHand
     }
 
+    /**
+     * Each requested lot's expiration date and the depots holding it, sorted by name. Bin locations roll up into
+     * their depot and only positive holdings count. Lots that are not in inventory yet are left out of the result.
+     */
+    List<LotAvailabilityDto> getAvailabilityInAllDepots(AvailabilityCommand command) {
+        List<ProductLot> productLots = command.productLots.collect {
+            new ProductLot(product: it.product, lotNumber: it.lotNumber)
+        }
+        List<InventoryItem> inventoryItems = inventoryItemManager.getInventoryItems(productLots)
+
+        if (!inventoryItems) {
+            return []
+        }
+
+        // The query returns one row per lot and depot, with the quantities of the depot's bin locations summed up.
+        // Those rows are then split per lot, since a single query covers all of the lots that were asked about.
+        Map<InventoryItem, List<DepotAvailabilityDto>> productAvailabilitiesByDepotAndLot = ProductAvailability.createCriteria().list {
+            resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+            projections {
+                groupProperty("inventoryItem", "inventoryItem")
+                groupProperty("location", "location")
+                sum("quantityOnHand", "qoh")
+            }
+            'in'("inventoryItem", inventoryItems)
+            gt("quantityOnHand", 0)
+        }.groupBy {
+            it.inventoryItem as InventoryItem
+        }.collectEntries { InventoryItem inventoryItem, List<Map> depotRows ->
+            [(inventoryItem): depotRows.collect {
+                DepotAvailabilityDto.from(it.location as Location, it.qoh as Integer)
+            }.sort { it.depot.name }]
+        }
+
+        return inventoryItems.collect { LotAvailabilityDto.from(it, productAvailabilitiesByDepotAndLot[it] ?: []) }
+    }
+
     Integer getQuantityOnHand(Product product, Location location) {
         def productAvailability = ProductAvailability.createCriteria().list {
             resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
@@ -670,6 +708,44 @@ class ProductAvailabilityService {
         }
 
         return quantityMap
+    }
+
+    /**
+     * The quantity on hand of each product at the location (over all its lots and bins), with the product fields the
+     * dashboard alerts use, as plain values: productId, reconditioned, pricePerUnit and quantityOnHand.
+     */
+    List<Map> getQuantityOnHandSummaryByProduct(Location location) {
+        if (!location) {
+            return []
+        }
+        List results = ProductAvailability.executeQuery("""
+                select p.id, p.reconditioned, p.pricePerUnit, sum(pa.quantityOnHand)
+                from ProductAvailability pa
+                join pa.product p
+                where pa.location = :location
+                group by p.id, p.reconditioned, p.pricePerUnit
+                """, [location: location])
+        return results.collect { row ->
+            [productId: row[0], reconditioned: row[1], pricePerUnit: row[2], quantityOnHand: row[3]]
+        }
+    }
+
+    /**
+     * The expiration date of each lot with stock at the location (its quantity on hand over all bins is above zero),
+     * or null for a lot without one.
+     */
+    List<Date> getExpirationDatesOfLotsInStock(Location location) {
+        if (!location) {
+            return []
+        }
+        return ProductAvailability.executeQuery("""
+                select ii.expirationDate
+                from ProductAvailability pa
+                join pa.inventoryItem ii
+                where pa.location = :location
+                group by ii.id, ii.expirationDate
+                having sum(pa.quantityOnHand) > 0
+                """, [location: location])
     }
 
     Map<Product, Integer> getQuantityOnHandByProduct(Location location, List<Product> products) {

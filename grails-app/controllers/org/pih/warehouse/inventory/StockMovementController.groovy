@@ -18,6 +18,7 @@ import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService
 import org.pih.warehouse.allocation.AllocationSourceStrategy
 import org.pih.warehouse.api.InboundWorkflowState
+import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
@@ -39,6 +40,9 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.picking.PickTaskService
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.receiving.ReceiptService
+import org.pih.warehouse.receiving.ShipmentItemReceivedQuantitiesDto
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -55,7 +59,8 @@ class StockMovementController {
     GrailsApplication grailsApplication
     UserService userService
     DocumentService documentService
-    def receiptService
+    ReceiptV2Service receiptV2Service
+    ReceiptService receiptService
     PickTaskService pickTaskService
     AllocationService allocationService
 
@@ -485,7 +490,12 @@ class StockMovementController {
 
     def packingList() {
         def stockMovement = getStockMovement(params.id)
-        render(template: "packingList", model: [stockMovement: stockMovement])
+        Map<String, ShipmentItemReceivedQuantitiesDto> receivedQuantitiesByShipmentItemId =
+                receiptV2Service.getReceivedQuantitiesByShipmentItemId(stockMovement?.shipment)
+        render(template: "packingList", model: [
+                stockMovement: stockMovement,
+                receivedQuantitiesByShipmentItemId: receivedQuantitiesByShipmentItemId,
+        ])
     }
 
     def saveSchedule() {
@@ -497,7 +507,7 @@ class StockMovementController {
 
     def receipts() {
         def stockMovement = getStockMovement(params.id)
-        def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
+        List<ReceiptItem> receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement, true)
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
 

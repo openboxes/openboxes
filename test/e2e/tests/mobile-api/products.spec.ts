@@ -180,6 +180,26 @@ test.describe('products', () => {
     }
   });
 
+  contractTest('PUT /mobile/products/{id}/identifiers refuses an empty value and removes the UPC only with clear', 'src/apis/products.ts#removeProductIdentifier', async ({ fx }) => {
+    await fx.grantAdminRole('ROLE_PRODUCT_MANAGER', true);
+    try {
+      const upc = String(Date.now()).slice(-12).padStart(12, '8');
+      (await app.call('src/apis/products.ts#updateProductIdentifier', { id: p.id, type: 'upc', value: upc }, { identifier: { type: 'upc', value: upc } })).holds();
+      await expect.poll(() => fx.productUpc(p.id), { timeout: 3000 }).toBe(upc);
+
+      const empty = await app.call('src/apis/products.ts#updateProductIdentifier', { id: p.id, type: 'upc', value: '' }, { identifier: { type: 'upc', value: '' } });
+      expect(empty.status).toBe(400);
+      expect(empty.data.errorMessage).toBe('Identifier value is required');
+      expect(await fx.productUpc(p.id)).toBe(upc);
+
+      const r = await app.call('src/apis/products.ts#removeProductIdentifier', { id: p.id, type: 'upc' }, { identifier: { type: 'upc', clear: true } });
+      r.holds();
+      await expect.poll(() => fx.productUpc(p.id), { timeout: 3000 }).toBe(null);
+    } finally {
+      await fx.grantAdminRole('ROLE_PRODUCT_MANAGER', false);
+    }
+  });
+
   contractTest('POST /stockAdjustments with the adjust stock body records the new quantity', 'src/apis/products.ts#stockAdjustments', async () => {
     // step past the record-stock second (InventoryService.adjustStock's same-second check is wiped by validate())
     await new Promise((r) => setTimeout(r, 1500));

@@ -29,7 +29,7 @@ import org.pih.warehouse.product.ProductGroup
 class SelectOptionsApiSpec extends RegressionApiSpec {
 
     @Autowired
-    SelectOptionsApi selectOptionsApi
+    SelectOptionsApi regressionSelectOptionsApi
 
     @Shared
     String suffix
@@ -64,7 +64,7 @@ class SelectOptionsApiSpec extends RegressionApiSpec {
     @Unroll
     void '#path lists #expectedLabel'() {
         expect:
-        selectOptionsApi.options(path, params, new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options(path, params, new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody("data.find { it.id == '${idOf()}' }.label".toString(), Matchers.equalTo(expectedLabel()))
                 .build())
@@ -81,7 +81,7 @@ class SelectOptionsApiSpec extends RegressionApiSpec {
 
     void 'GL account options leave out inactive accounts when asked for active ones'() {
         expect:
-        selectOptionsApi.options('/glAccountOptions', [active: false], new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options('/glAccountOptions', [active: false], new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.not(Matchers.hasItem(glAccount.id)))
                 .build())
@@ -89,7 +89,7 @@ class SelectOptionsApiSpec extends RegressionApiSpec {
 
     void 'category options label each category with its path from the root'() {
         expect:
-        selectOptionsApi.options('/categoryOptions', [:], new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options('/categoryOptions', [:], new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody("data.find { it.id == '${rootCategory.id}' }.label".toString(),
                         Matchers.equalTo(rootCategory.name))
@@ -98,7 +98,7 @@ class SelectOptionsApiSpec extends RegressionApiSpec {
 
     void 'handling requirement options are the four product flags'() {
         expect:
-        selectOptionsApi.options('/handlingRequirementsOptions', [:], new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options('/handlingRequirementsOptions', [:], new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.containsInAnyOrder(
                         'COLD_CHAIN', 'CONTROLLED_SUBSTANCE', 'HAZARDOUS_MATERIAL', 'RECONDITIONED'))

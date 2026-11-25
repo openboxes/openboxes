@@ -80,6 +80,7 @@ class Shipment implements Comparable, Serializable, Historizable {
     // One-to-one associations
     Location origin                    // the location from which the shipment will depart
     Location destination            // the location to which the shipment will arrive
+    Location receivingLocation
     ShipmentType shipmentType        // the shipment type: Air, Sea Freight, Suitcase
     ShipmentMethod shipmentMethod    // the shipping carrier and shipping service used
     Person carrier// the person or organization that actually carries the goods from A to B
@@ -182,6 +183,7 @@ class Shipment implements Comparable, Serializable, Historizable {
         origin(nullable: false,
                 validator: { value, obj -> !value.equals(obj.destination) })
         destination(nullable: false)
+        receivingLocation(nullable: true)
         expectedShippingDate(nullable: false,
                 validator: { value, obj -> !obj.expectedDeliveryDate || value.before(obj.expectedDeliveryDate + 1) })
         expectedDeliveryDate(nullable: true)    // optional
@@ -835,7 +837,8 @@ class Shipment implements Comparable, Serializable, Historizable {
                 packingLocation     : packingScheduled?.eventLocation?.name ?: "Unassigned",
                 loadingLocation     : loadingScheduled?.eventLocation?.name ?: "Unassigned",
                 loadingLocationNumber: loadingScheduled?.eventLocation?.locationNumber ?: "",
-                receivingLocation   : receivingScheduled?.eventLocation?.name ?: "Unassigned",
+                receivingLocation   : receivingLocation?.name ?: receivingScheduled?.eventLocation?.name ?: "Unassigned",
+                receivingLocationNumber: receivingLocation?.locationNumber ?: receivingScheduled?.eventLocation?.locationNumber ?: "",
 
                 shipmentItems       : shipmentItems,
                 containers          : containerList,

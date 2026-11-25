@@ -655,6 +655,7 @@ class Requisition implements Comparable<Requisition>, Serializable, Historizable
                 allocationSourceStrategy      : allocationSourceStrategy?.name(),
                 autoIssuanceRequested     : autoIssuanceRequested,
                 negativeAllocationAllowed: negativeAllocationAllowed,
+                deliveryTypeCode: deliveryTypeCode?.name(),
         ]
     }
 

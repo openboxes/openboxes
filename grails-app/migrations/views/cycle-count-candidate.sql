@@ -20,5 +20,9 @@ WHERE
 ORDER BY sort_order,
          abc_class IS NULL asc,
          abc_class asc,
-         days_until_next_count
+         days_until_next_count,
+         -- Tie-breaker. The columns above are far from unique (a single facility can have over a
+         -- thousand rows sharing all four), so without it the database is free to order tied rows
+         -- differently for each LIMIT/OFFSET window and the same product shows up on two pages.
+         id
     );

@@ -36,6 +36,7 @@ const useOutboundListTableData = (filterParams) => {
       updatedBy,
       shipmentType,
       approver,
+      priorityLevel,
     } = filterParams;
     return _.omitBy({
       ...filterParams,
@@ -50,6 +51,7 @@ const useOutboundListTableData = (filterParams) => {
       updatedBy: updatedBy?.id,
       shipmentType: shipmentType?.map?.(({ id }) => id),
       approver: approver?.map?.(({ id }) => id),
+      priorityLevel: priorityLevel?.map?.(({ id }) => id),
       ...sortingParams,
     }, (value) => {
       if (typeof value === 'object' && _.isEmpty(value)) return true;

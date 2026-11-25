@@ -36,7 +36,7 @@ class DirectoryApiSpec extends RegressionApiSpec {
     DirectoryApi directoryApi
 
     @Autowired
-    SelectOptionsApi selectOptionsApi
+    SelectOptionsApi regressionSelectOptionsApi
 
     @Autowired
     RegressionGenericApi regressionGenericApi
@@ -113,16 +113,16 @@ class DirectoryApiSpec extends RegressionApiSpec {
 
     void 'payment terms are listed as options (the purchase order filter)'() {
         expect:
-        selectOptionsApi.options('/paymentTermOptions', [:], responseSpecUtil.OK_RESPONSE_SPEC)
+        regressionSelectOptionsApi.options('/paymentTermOptions', [:], responseSpecUtil.OK_RESPONSE_SPEC)
     }
 
     void 'shipment status codes are listed, without the excluded ones (the inbound list filter)'() {
         expect:
-        selectOptionsApi.options('/stockMovements/shipmentStatusCodes', [:], new ResponseSpecBuilder()
+        regressionSelectOptionsApi.options('/stockMovements/shipmentStatusCodes', [:], new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data', Matchers.not(Matchers.empty()))
                 .build())
-        selectOptionsApi.options('/stockMovements/shipmentStatusCodes', [excludedStatuses: 'PENDING'],
+        regressionSelectOptionsApi.options('/stockMovements/shipmentStatusCodes', [excludedStatuses: 'PENDING'],
                 new ResponseSpecBuilder()
                         .expectStatusCode(HttpStatus.SC_OK)
                         .expectBody('data.id', Matchers.not(Matchers.hasItem('PENDING')))

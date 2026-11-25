@@ -221,6 +221,18 @@ test.describe('picking', () => {
     expect(await committed('SELECT status FROM picklist_item WHERE id = ?', [o.taskIds[0]], 'STAGED')).toBe('STAGED');
   });
 
+  test('PATCH pick-tasks/containers/{tote} drop at an unknown staging location answers 404 naming it', async ({ fx }) => {
+    const o = await pickOrder(fx);
+    (await start(o)).holds();
+    (await pick(o)).holds();
+    const r = await app.call('src/apis/picking.ts#dropPickTaskApi', { facilityId: o.dc, outboundContainerId: o.tote.id },
+      { action: 'drop', stagingLocationId: 'NO-SUCH-LANE', stagedById: '1' });
+    expect(r.status, r.toString()).toBe(404);
+    expect(r.data.errorCode).toBe(404);
+    expect(r.data.errorMessage).toBe('Staging location NO-SUCH-LANE not found');
+    expect((await task(o, o.taskIds[0])).status).toBe('PICKED');
+  });
+
   contractTest('POST pick-tasks/{id}/reallocate with the reallocate modal body moves the task to another bin', 'src/apis/picking.ts#reallocatePickTaskApi', async ({ fx }) => {
     const o = await pickOrder(fx);
     const other = await fx.bin(o.dc, 'PK-ALT', ['PICK_STOCK', 'PUTAWAY_STOCK']);

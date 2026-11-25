@@ -21,6 +21,8 @@ import org.pih.warehouse.core.http.HttpServletResponseConfigurer
 import org.pih.warehouse.data.DataExportController
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.inventory.InventoryAuditSummaryFormatter
+import org.pih.warehouse.receiving.GoodsReceiptNoteDto
+import org.pih.warehouse.receiving.GoodsReceiptNoteService
 import org.pih.warehouse.report.ReportService
 import org.pih.warehouse.shipping.Shipment
 
@@ -102,36 +104,38 @@ class InventoryAuditReportControllerSpec extends Specification implements Contro
 
 class GoodsReceiptNoteControllerSpec extends Specification implements ControllerUnitTest<GoodsReceiptNoteController>, DataTest {
 
-    void setupSpec() {
-        mockDomains(Location, Shipment)
+    // The note itself is built by GoodsReceiptNoteService (see GoodsReceiptNoteServiceSpec): the controller only
+    // hands the shipment id over and renders the result.
+    GoodsReceiptNoteService goodsReceiptNoteService = Mock(GoodsReceiptNoteService)
+
+    void setup() {
+        controller.goodsReceiptNoteService = goodsReceiptNoteService
     }
 
-    void "print renders the shipment with the current location"() {
+    void "print renders the goods receipt note of the shipment"() {
         given:
-        Location depot = new Location(name: "Depot").save(validate: false)
-        Shipment shipment = new Shipment(name: "S1").save(validate: false)
-        session.warehouse = depot
+        GoodsReceiptNoteDto goodsReceiptNote = new GoodsReceiptNoteDto(shipmentNumber: "S1")
 
         when:
-        params.id = shipment.id
+        params.id = "shipment-1"
         def model = controller.print()
 
         then:
-        model.shipment == shipment
-        model.currentLocation == depot
+        1 * goodsReceiptNoteService.buildGoodsReceiptNote("shipment-1") >> goodsReceiptNote
+        model.goodsReceiptNote == goodsReceiptNote
     }
 
     void "print fails for an unknown shipment"() {
-        given:
-        session.warehouse = new Location(name: "Depot").save(validate: false)
-
         when:
         params.id = "missing"
         controller.print()
 
         then:
+        1 * goodsReceiptNoteService.buildGoodsReceiptNote("missing") >> {
+            throw new IllegalStateException("Unable to locate shipment missing")
+        }
         IllegalStateException e = thrown()
-        e.message == "Unable to locate a shipment associated with stock movement missing"
+        e.message == "Unable to locate shipment missing"
     }
 }
 

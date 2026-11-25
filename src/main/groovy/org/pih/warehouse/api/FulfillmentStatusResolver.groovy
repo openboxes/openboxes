@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import org.pih.warehouse.api.PickTaskStatus
+import org.pih.warehouse.requisition.RequisitionStatus
 
 /**
  * Resolves the FulfillmentStatusCode based on stock movement line items.
@@ -76,7 +77,7 @@ class FulfillmentStatusResolver {
     // Helpers
 
     private static boolean isCanceled(StockMovementItem item) {
-        return item.getQuantityRequired() <= 0
+        return item.requisitionItem?.isCanceled() || item.getQuantityRequired() <= 0
     }
 
     private static boolean isBackordered(StockMovementItem item) {
@@ -139,11 +140,15 @@ class FulfillmentStatusResolver {
     }
 
     private static BigDecimal getQuantityShipped(StockMovementItem item) {
+        def requisitionItem = item.requisitionItem
+        def requisition = requisitionItem?.requisition
+        def shipment = requisition?.shipment
+        if (requisition?.status != RequisitionStatus.ISSUED && !shipment?.hasShipped()) {
+            return 0
+        }
         if (item.quantityShipped) {
             return item.quantityShipped
         }
-        def requisitionItem = item.requisitionItem
-        def shipment = requisitionItem?.requisition?.shipment
         if (!shipment) {
             return 0
         }

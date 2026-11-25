@@ -10,12 +10,18 @@ import filterFields from 'components/stock-movement/outbound/FilterFields';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
-import { fetchLocationById, fetchUserById, selectNullOption } from 'utils/option-utils';
+import {
+  fetchLocationById,
+  fetchPriorityLevels,
+  fetchUserById,
+  selectNullOption,
+} from 'utils/option-utils';
 
 const useOutboundFilters = (sourceType) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+  const [priorityLevels, setPriorityLevels] = useState([]);
 
   const history = useHistory();
   const dispatch = useDispatch();
@@ -119,6 +125,13 @@ const useOutboundFilters = (sourceType) => {
       const shipTypes = getParamList(queryProps.shipmentType);
       defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
     }
+    const priorityLevelOptions = await fetchPriorityLevels();
+    setPriorityLevels(priorityLevelOptions);
+    if (queryProps.priorityLevel) {
+      const selectedPriorityLevels = getParamList(queryProps.priorityLevel);
+      defaultValues.priorityLevel = priorityLevelOptions
+        .filter(({ id }) => selectedPriorityLevels.includes(id));
+    }
     if (sourceType === 'ELECTRONIC' && queryProps.approver) {
       const approvers = getParamList(queryProps.approver);
       defaultValues.approver = availableApprovers.filter(({ id }) => approvers.includes(id));
@@ -173,6 +186,7 @@ const useOutboundFilters = (sourceType) => {
       receiptStatusCode: { name: 'receiptStatusCode' },
       shipmentType: { name: 'shipmentType', accessor: 'id' },
       approver: { name: 'approver', accessor: 'id' },
+      priorityLevel: { name: 'priorityLevel', accessor: 'id' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
@@ -189,6 +203,7 @@ const useOutboundFilters = (sourceType) => {
     defaultFilterValues,
     setFilterValues,
     filterParams,
+    priorityLevels,
   };
 };
 

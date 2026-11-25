@@ -163,7 +163,8 @@ class AllocationService {
             Integer quantityOutstanding = quantityRequired - quantityPrepicked
             suggestedItems = quantityOutstanding > 0
                     ? getAutoSuggestedItems(requisitionItem, quantityOutstanding,
-                            request.allocationStrategies, [], request.crossDockRelease, mode)
+                            request.allocationStrategies, [], request.crossDockRelease, mode,
+                            request.keepExistingAllocation)
                     : []
         } else if (mode == AllocationMode.MANUAL) {
             List<AvailableItem> manualItems = request.availableItems?.findAll { it.inventoryItem.product?.id == requisitionItem.product?.id }
@@ -181,7 +182,7 @@ class AllocationService {
             // The cross-dock release only ever allocates the quantity still outstanding, so the
             // picklist is added to rather than rebuilt - clearing it would drop what an earlier
             // delivery already covered.
-            if (!request.crossDockRelease) {
+            if (!request.crossDockRelease && !request.keepExistingAllocation) {
                 stockMovementService.clearPicklist(requisitionItem)
             }
             stockMovementService.allocateSuggestedItems(requisitionItem, suggestedItems, mode == AllocationMode.AUTO)
@@ -364,7 +365,7 @@ class AllocationService {
     }
 
     private List<SuggestedItem> getAutoSuggestedItems(RequisitionItem requisitionItem, Integer quantityRequired, List<AllocationSourceStrategy> strategies, List<AvailableItem> excludeList = [], Boolean crossDockRelease = false,
-                                                      AllocationMode allocationMode = null) {
+                                                      AllocationMode allocationMode = null, Boolean keepExistingAllocation = false) {
         Location facility = requisitionItem.requisition.origin
         Product product = requisitionItem.product
 
@@ -376,7 +377,7 @@ class AllocationService {
         }
 
         List<AvailableItem> allAvailableItems =
-                stockMovementService.getAvailableItems(facility, requisitionItem, false, !crossDockRelease)
+                stockMovementService.getAvailableItems(facility, requisitionItem, false, !crossDockRelease && !keepExistingAllocation)
 
         allAvailableItems = allAvailableItems.findAll { !it.binLocation?.isNegativeInventoryFallbackLocation() }
 

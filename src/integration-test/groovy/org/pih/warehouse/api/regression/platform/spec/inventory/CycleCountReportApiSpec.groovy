@@ -24,7 +24,7 @@ class CycleCountReportApiSpec extends CycleCountSpec {
         Product product = stockedProduct(4)
         Map count = startCount(requestCount(product))
         recordCount(count.cycleCountItems[0].id as String, 3)
-        cycleCountApi.submitCount(facility.id, count.id as String, submitBody(false), ok().build())
+        regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(false), ok().build())
         return [product: product.id, count: count.id as String]
     }
 
@@ -34,7 +34,7 @@ class CycleCountReportApiSpec extends CycleCountSpec {
         Map<String, String> completed = completedCount()
 
         when:
-        Response report = cycleCountApi.report(kind, method,
+        Response report = regressionCycleCountApi.report(kind, method,
                 [facility: facility.id, products: completed.product, max: 10, offset: 0], ok().build())
 
         then:
@@ -62,14 +62,14 @@ class CycleCountReportApiSpec extends CycleCountSpec {
         Thread.sleep(2500)
         Map count = startCount(requestCount(product))
         recordCount(count.cycleCountItems[0].id as String, 3)
-        cycleCountApi.submitCount(facility.id, count.id as String, submitBody(false), ok().build())
+        regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(false), ok().build())
         String today = new Date().format('MM/dd/yyyy')
         String yesterday = (new Date() - 1).format('MM/dd/yyyy')
 
         when:
-        Response endToday = cycleCountApi.report(kind, method,
+        Response endToday = regressionCycleCountApi.report(kind, method,
                 [facility: facility.id, products: first.product, startDate: today, endDate: today], ok().build())
-        Response endYesterday = cycleCountApi.report(kind, method,
+        Response endYesterday = regressionCycleCountApi.report(kind, method,
                 [facility: facility.id, products: first.product, endDate: yesterday], ok().build())
 
         then: 'both counts are in up to the end of today, newest first; none ended yesterday'
@@ -89,6 +89,6 @@ class CycleCountReportApiSpec extends CycleCountSpec {
         Map<String, String> completed = completedCount()
 
         expect:
-        cycleCountApi.listAll([id: completed.count], ok().build()).jsonPath().getList('data.id') == [completed.count]
+        regressionCycleCountApi.listAll([id: completed.count], ok().build()).jsonPath().getList('data.id') == [completed.count]
     }
 }

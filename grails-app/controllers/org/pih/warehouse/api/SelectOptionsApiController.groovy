@@ -23,6 +23,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductField
 import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.requisition.PriorityLevel
 import org.pih.warehouse.shipping.ShipmentService
 
 class SelectOptionsApiController {
@@ -154,5 +155,17 @@ class SelectOptionsApiController {
             [id: it.name(), value: it.name(), label: g.message(code: "enum.ProductField.${it.name()}", default: it.name())]
         }
         render([data: handlingRequirements] as JSON)
+    }
+
+    def priorityLevelOptions() {
+        List priorityLevels = PriorityLevel.values().collect {
+            String label = g.message(
+                    code: "enum.PriorityLevel.${it.name()}.option",
+                    args: [it.minValue, it.maxValue],
+                    default: it.name()
+            )
+            [id: it.name(), value: it.name(), label: label]
+        }
+        render([data: priorityLevels] as JSON)
     }
 }

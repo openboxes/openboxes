@@ -1,23 +1,29 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.util.Holders
+import javax.validation.Valid
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
+
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.InventoryLevelImportDataService
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelService
+import org.pih.warehouse.inventory.PreferredBinLocationsCommand
+import org.pih.warehouse.inventory.PreferredBinLocationsDto
+import org.pih.warehouse.inventory.RefreshInventorySnapshotEvent
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.springframework.http.HttpStatus
 
-class InventoryLevelApiController {
+class InventoryLevelApiController extends BaseApiController {
 
     DataService dataService
     DocumentService documentService
     InventoryLevelImportDataService inventoryLevelImportDataService
-    def inventoryLevelService
-    def productAvailabilityService
-    def inventorySnapshotService
+    InventoryLevelService inventoryLevelService
 
     def list() {
         Location facility = Location.get(params.facilityId)
@@ -51,6 +57,15 @@ class InventoryLevelApiController {
         }
     }
 
+    /**
+     * Returns the preferred bin location of each given product, keyed by product id. Products without
+     * an inventory level or with no preferred bin location configured are omitted from the response.
+     */
+    def getPreferredBinLocations(@Valid PreferredBinLocationsCommand command) {
+        PreferredBinLocationsDto preferredBinLocations = inventoryLevelService.getPreferredBinLocations(command)
+        renderResponse(preferredBinLocations)
+    }
+
     def bulkUpsert() {
         Location facility = Location.get(params.facilityId)
         if (!facility) {
@@ -67,8 +82,8 @@ class InventoryLevelApiController {
 
         List<String> productIds = results.findAll { it.status == UpsertStatus.OK && it.productId }*.productId.unique()
         if (deferRefresh && productIds) {
-            productAvailabilityService.triggerRefreshProductAvailability(facility.id, productIds, true)
-            inventorySnapshotService.triggerRefreshInventorySnapshot(facility.id, productIds, true)
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(facility, productIds, true))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshInventorySnapshotEvent(facility, productIds, true))
         }
 
         render([

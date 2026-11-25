@@ -24,4 +24,9 @@ class AllocationRequest {
      * zone. Ordinary allocation must leave a backordered demand alone until then.
      */
     Boolean crossDockRelease = false
+
+    /**
+     * Allocates only the quantity required on top of the existing picklist, which is left as it is.
+     */
+    Boolean keepExistingAllocation = false
 }

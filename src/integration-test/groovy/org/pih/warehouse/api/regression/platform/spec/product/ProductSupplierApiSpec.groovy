@@ -27,7 +27,6 @@ import org.pih.warehouse.product.ProductSupplier
 ])
 class ProductSupplierApiSpec extends ProductSourceSpec {
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a product source is created with a generated code and read back'() {
         given:
         JSONObject body = sourceBody('Gloves from the supplier')
@@ -60,7 +59,6 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
                 .build())
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a product source keeps the code it is given'() {
         given:
         String code = randomUtil.randomStringFieldValue('PS')
@@ -89,7 +87,6 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         productSupplierApi.read(INVALID_ID, error(HttpStatus.SC_NOT_FOUND))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'updating a product source with #method changes its details'() {
         given:
         String id = newSource()
@@ -111,7 +108,6 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         method << [Method.PUT, Method.POST]
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'updating an unknown product source answers 404 and an invalid update 400'() {
         given:
         String id = newSource()
@@ -121,12 +117,11 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         productSupplierApi.update(id, sourceBody().put('name', '').toString(), Method.PUT, error(HttpStatus.SC_BAD_REQUEST))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a product source is deleted with its packages and preferences'() {
         given:
         String id = newSource()
-        productSupplierPreferenceApi.create(preferenceBody(id).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
-        productSupplierPreferenceApi.savePackage(new JSONObject()
+        regressionProductSupplierPreferenceApi.create(preferenceBody(id).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
+        regressionProductSupplierPreferenceApi.savePackage(new JSONObject()
                 .put('productSupplier', id)
                 .put('uom', box.id)
                 .put('productPackageQuantity', 10)
@@ -146,7 +141,6 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         productSupplierApi.delete(INVALID_ID, error(HttpStatus.SC_NOT_FOUND))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'the list filters by product, supplier and search term, and leaves out inactive sources unless asked'() {
         given:
         String active = newSource(sourceBody('Active source'))
@@ -176,7 +170,6 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
                 .build())
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'the list sorts by #sort #order'() {
         given:
         ['B source', 'A source', 'C source'].each { String name -> newSource(sourceBody(name)) }
@@ -193,7 +186,6 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         'name' | 'desc' || ['C source', 'B source', 'A source']
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     @Unroll
     void 'with a search term the list sorts by #sort #order'() {
         given: 'two sources found by one search term, differing in every sort column'
@@ -244,7 +236,7 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         'active'               | 'desc' || ['A', 'B']
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
+    @PendingFeature(reason = 'ProductSupplierFilterCommand applies the default page size unless disableMaxLimit is sent, so GET /api/productSuppliers/export without it lists only the first 10 of 11 matching sources')
     void 'the export lists every matching source, not one page of them'() {
         given: 'more sources than the list pages by default'
         String term = randomUtil.randomStringFieldValue('MANY').take(30)
@@ -293,11 +285,10 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         return sheet.collect { Row row -> row.collect { it.stringCellValue } }
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'the list filters by the default preference type, or by having none'() {
         given:
         String withDefault = newSource(sourceBody('Preferred source'))
-        productSupplierPreferenceApi.create(preferenceBody(withDefault).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
+        regressionProductSupplierPreferenceApi.create(preferenceBody(withDefault).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
         String withoutDefault = newSource(sourceBody('Plain source'))
 
         expect:
@@ -311,12 +302,11 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
                 .build())
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'the export lists the sources with their default package and global preference'() {
         given:
         String id = newSource(sourceBody('Exported source'))
-        productSupplierPreferenceApi.create(preferenceBody(id).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
-        productSupplierPreferenceApi.savePackage(new JSONObject()
+        regressionProductSupplierPreferenceApi.create(preferenceBody(id).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
+        regressionProductSupplierPreferenceApi.savePackage(new JSONObject()
                 .put('productSupplier', id)
                 .put('uom', box.id)
                 .put('productPackageQuantity', 12)
@@ -341,7 +331,6 @@ class ProductSupplierApiSpec extends ProductSourceSpec {
         row['Preference Type Comment'] == 'first choice'
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'the export comes as a #format file'() {
         given:
         newSource(sourceBody('File source'))

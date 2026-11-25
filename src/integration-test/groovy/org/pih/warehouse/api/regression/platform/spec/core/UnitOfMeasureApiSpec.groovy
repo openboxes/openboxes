@@ -22,11 +22,11 @@ import org.pih.warehouse.api.spec.base.ApiSpec
 class UnitOfMeasureApiSpec extends RegressionApiSpec {
 
     @Autowired
-    UnitOfMeasureApi unitOfMeasureApi
+    UnitOfMeasureApi regressionUnitOfMeasureApi
 
     private String createUnit() {
         String code = "T${UUID.randomUUID().toString().take(8)}"
-        Response created = unitOfMeasureApi.create(new JSONObject()
+        Response created = regressionUnitOfMeasureApi.create(new JSONObject()
                 .put('name', "Test unit ${code}".toString())
                 .put('code', code)
                 .put('description', 'A unit of measure created by a test')
@@ -41,7 +41,7 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
 
     void 'create unit of measure answers 400 without a code'() {
         expect:
-        unitOfMeasureApi.create(new JSONObject().put('name', 'No code').toString(),
+        regressionUnitOfMeasureApi.create(new JSONObject().put('name', 'No code').toString(),
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
     }
 
@@ -50,7 +50,7 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
         String id = createUnit()
 
         expect:
-        unitOfMeasureApi.list(new ResponseSpecBuilder()
+        regressionUnitOfMeasureApi.list(new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.hasItem(id))
                 .build())
@@ -61,7 +61,7 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
         String id = createUnit()
 
         expect:
-        unitOfMeasureApi.read(id, new ResponseSpecBuilder()
+        regressionUnitOfMeasureApi.read(id, new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.equalTo(id))
                 .expectBody('data.description', Matchers.equalTo('A unit of measure created by a test'))
@@ -70,7 +70,7 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
 
     void 'read unit of measure answers 404 for an unknown id'() {
         expect:
-        unitOfMeasureApi.read(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
+        regressionUnitOfMeasureApi.read(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
     void 'update unit of measure with #method changes the given fields'() {
@@ -78,7 +78,7 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
         String id = createUnit()
 
         expect:
-        unitOfMeasureApi.update(id, new JSONObject().put('description', "Updated with ${method}".toString()).toString(),
+        regressionUnitOfMeasureApi.update(id, new JSONObject().put('description', "Updated with ${method}".toString()).toString(),
                 method, new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.equalTo(id))
@@ -91,7 +91,7 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
 
     void 'update unit of measure answers 404 for an unknown id'() {
         expect:
-        unitOfMeasureApi.update(INVALID_ID, '{"description": "x"}', Method.PUT,
+        regressionUnitOfMeasureApi.update(INVALID_ID, '{"description": "x"}', Method.PUT,
                 responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
@@ -100,20 +100,20 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
         String id = createUnit()
 
         when:
-        unitOfMeasureApi.delete(id, responseSpecUtil.NO_CONTENT_RESPONSE_SPEC)
+        regressionUnitOfMeasureApi.delete(id, responseSpecUtil.NO_CONTENT_RESPONSE_SPEC)
 
         then:
-        unitOfMeasureApi.read(id, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
+        regressionUnitOfMeasureApi.read(id, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
     void 'delete unit of measure answers 404 for an unknown id'() {
         expect:
-        unitOfMeasureApi.delete(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
+        regressionUnitOfMeasureApi.delete(INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
     void 'currencies lists the currency units'() {
         expect:
-        unitOfMeasureApi.currencies(new ResponseSpecBuilder()
+        regressionUnitOfMeasureApi.currencies(new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data', Matchers.notNullValue())
                 .build())
@@ -121,7 +121,7 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
 
     void 'options lists the units of one type as select options'() {
         expect:
-        unitOfMeasureApi.options('QUANTITY', new ResponseSpecBuilder()
+        regressionUnitOfMeasureApi.options('QUANTITY', new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data', Matchers.notNullValue())
                 .build())
@@ -130,6 +130,6 @@ class UnitOfMeasureApiSpec extends RegressionApiSpec {
     @PendingFeature(reason = 'unit-of-measure options with an unknown type answer 500, not 400')
     void 'options answers 400 for an unknown type'() {
         expect:
-        unitOfMeasureApi.options('NOT_A_TYPE', responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
+        regressionUnitOfMeasureApi.options('NOT_A_TYPE', responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
     }
 }

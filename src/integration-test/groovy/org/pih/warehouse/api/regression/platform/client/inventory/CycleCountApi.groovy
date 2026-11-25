@@ -15,7 +15,9 @@ import org.pih.warehouse.api.client.base.AuthenticatedApi
 /**
  * The cycle count API (/api/facilities/{facility}/cycle-counts...): one method per operation.
  */
-@TestComponent
+// Named explicitly: org.pih.warehouse.api.client has a client of the same class name, and both are
+// component-scanned, so the default bean name would clash.
+@TestComponent("regressionCycleCountApi")
 @InheritConstructors
 class CycleCountApi extends AuthenticatedApi {
 

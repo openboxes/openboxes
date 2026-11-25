@@ -133,9 +133,9 @@ const useResolveStep = () => {
   }, [currentLocation?.id]);
 
   const mapRootCauseToSelectedOption = (rootCause) => (rootCause ? ({
-    id: rootCause?.name,
-    label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === rootCause?.name)?.label,
-    value: rootCause?.name,
+    id: rootCause,
+    label: reasonCodes?.find?.((reasonCode) => reasonCode?.id === rootCause)?.label,
+    value: rootCause,
   }) : null);
 
   const mergeCycleCountItems = (items) => {
@@ -207,29 +207,6 @@ const useResolveStep = () => {
       .filter((group) => group.length < 2 && group.every((item) => item.countIndex === 0)).flat();
   };
 
-  // Function used for maintaining the same order in the resolve tab between saves.
-  // It's needed because items are returned in the same order as they are on the record stock,
-  // but we want to have editable items at the bottom in the order that those items were
-  // added to the table.
-  const moveCustomItemsToTheBottom = (cycleCountItems) => {
-    const { false: originalItems, true: customItems } = _.groupBy(
-      cycleCountItems,
-      'custom',
-    );
-
-    if (!customItems) {
-      return originalItems;
-    }
-
-    const customItemsSortedByCreationDate = _.sortBy(customItems, 'dateCreated');
-
-    if (!originalItems) {
-      return customItemsSortedByCreationDate;
-    }
-
-    return [...originalItems, ...customItemsSortedByCreationDate];
-  };
-
   const refetchData = async ({ ids = cycleCountIds, showSpinner = true } = {}) => {
     if (ids.length === 0) {
       return;
@@ -243,10 +220,10 @@ const useResolveStep = () => {
         ids,
         sortByProductName && 'productName',
       );
-      tableData.current = data?.data?.map((cycleCount) => {
-        const mergedItems = mergeCycleCountItems(cycleCount.cycleCountItems);
-        return ({ ...cycleCount, cycleCountItems: moveCustomItemsToTheBottom(mergedItems) || [] });
-      });
+      tableData.current = data?.data?.map((cycleCount) => ({
+        ...cycleCount,
+        cycleCountItems: mergeCycleCountItems(cycleCount.cycleCountItems),
+      }));
       cycleCountsWithItemsWithoutRecount.current = data?.data?.reduce((acc, cycleCount) => {
         const cycleCountItems = getItemsWithoutRecountIndexes(cycleCount.cycleCountItems);
         if (!cycleCountItems.length) {

@@ -31,8 +31,9 @@ class LocalizationService {
     @Value('${openboxes.locale.custom.enabled}')
     boolean localizationDatabaseEnabled
 
-    @Value('${openboxes.locale.supportedLocales}')
-    String[] supportedLocales
+    String[] getSupportedLocales() {
+        return LocalizationUtil.supportedLocaleCodes as String[]
+    }
 
     String formatMetadata(Object object) {
         def format = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')

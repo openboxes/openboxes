@@ -86,8 +86,7 @@ describe('StockRequestDashboard', () => {
     expect(screen.getByText('Pending')).toBeInTheDocument();
     expect(screen.getByText('Central depot')).toBeInTheDocument();
     expect(screen.getByText('Nurse')).toBeInTheDocument();
-    // OBAF shows the date as the API sends it (OBAF has no formatted date column)
-    expect(screen.getByText('2026-09-15T12:00:00')).toBeInTheDocument();
+    expect(screen.getByText('15/Sep/2026')).toBeInTheDocument();
     expect(screen.getByText('Create New Request').closest('a'))
       .toHaveAttribute('href', '/openboxes/stockMovement/createRequest');
     // 25 requests at 10 per page

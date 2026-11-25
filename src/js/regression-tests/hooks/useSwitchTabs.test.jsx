@@ -18,7 +18,9 @@ describe('useSwitchTabs', () => {
 
     expect(history.location.pathname).toBe('/openboxes/cycleCount');
     expect(history.location.search).toBe('?max=10&tab=ALL');
-    expect(history.length).toBe(2);
+    // A redirect replaces the entry, so the back button does not land on the url without the tab
+    expect(history.length).toBe(1);
+    expect(history.action).toBe('REPLACE');
   });
 
   it('stays on the tab the url names', () => {

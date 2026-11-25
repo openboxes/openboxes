@@ -486,7 +486,7 @@ class EditItemsPage extends Component {
           this.fetchItems();
         }
       });
-    }).catch(() => {
+    }).finally(() => {
       this.props.hideSpinner();
     });
   }
@@ -997,7 +997,7 @@ class EditItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  disabled={!this.state.hasItemsLoaded || showOnly}
+                  disabled={!this.state.hasItemsLoaded || showOnly || !this.state.totalCount}
                   onClick={() => {
                     if (!invalid) {
                       this.nextPage(values);

@@ -173,7 +173,7 @@ input, .date-field-input {
 
 .select-wrapper-container {
 
-  div:nth-child(2) > div:first-child {
+  > div:nth-child(2) > div:first-child {
     width: 100%;
   }
 
@@ -331,6 +331,51 @@ input, .date-field-input {
       width: 10px;
       height: 2px;
       background-color: white !important;
+    }
+  }
+}
+
+// SLIDING BUTTON GROUP
+
+.sliding-button-group {
+  position: relative;
+  display: inline-flex;
+  border: 1px solid var(--gray-100);
+  border-radius: 4px;
+  padding: 8px;
+  gap: 8px;
+
+  &__slider {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    height: calc(100% - 16px);
+    background-color: var(--blue-200);
+    border-radius: 4px;
+    transition: 0.3s;
+    pointer-events: none;
+  }
+
+  &__button {
+    position: relative;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+    white-space: nowrap;
+
+    &:focus {
+      outline: none;
+    }
+
+    &[aria-disabled="true"] {
+      cursor: not-allowed !important;
+      color: var(--gray-300);
     }
   }
 }

@@ -44,10 +44,12 @@ class AutomaticAllocationJob {
 
         List<Location> facilities =
                 locationService.getLocationsSupportingActivities([ActivityCode.AUTOMATIC_ALLOCATION_ENABLED])
-        log.info "Running automatic allocation job for all pending requisitions... "
-        facilities.each { Location facility ->
-            requisitionService.getRequisitionsPendingAutoAllocation(facility).each { Requisition requisition ->
-                allocationService.allocateRequisition(requisition.id)
+        if (facilities) {
+            log.info "Running automatic allocation job for all pending requisitions... "
+            facilities.each { Location facility ->
+                requisitionService.getRequisitionsPendingAutoAllocation(facility).each { Requisition requisition ->
+                    allocationService.allocateRequisition(requisition.id)
+                }
             }
         }
     }

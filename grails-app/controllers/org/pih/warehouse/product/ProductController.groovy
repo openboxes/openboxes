@@ -200,7 +200,13 @@ class ProductController {
     }
 
 
-    def show() {}
+    /**
+     * There is no standalone product "show" page. Scaffolded views (e.g. productComponent) and legacy show pages
+     * link to product/show by convention, so send them to the stock card, the main read view for a product.
+     */
+    def show() {
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.id)
+    }
 
 
     def edit() {

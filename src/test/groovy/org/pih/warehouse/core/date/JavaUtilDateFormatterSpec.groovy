@@ -1,6 +1,7 @@
 package org.pih.warehouse.core.date
 
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.ZoneOffset
 import spock.lang.Shared
 import spock.lang.Specification
@@ -18,7 +19,12 @@ class JavaUtilDateFormatterSpec extends Specification {
     ZoneOffset systemZoneOffset
 
     void setupSpec() {
-        systemZoneOffset = DateUtil.getSystemZoneOffset()
+        // All of these tests use January 1st, 2000 as their date. We fetch the timezone offset that was active at that
+        // time so that we can factor in daylight savings. This is needed because different timezones can have different
+        // offsets depending on the time of year. Since date formatting is based on the system timezone, computing
+        // the offset here prevents flakey tests that depend on the timezone that your system is in when running them.
+        Instant instantForOffset = Instant.parse("2000-01-01T00:00:00Z")
+        systemZoneOffset = DateUtil.getSystemZoneOffset(instantForOffset)
     }
 
     void setup() {

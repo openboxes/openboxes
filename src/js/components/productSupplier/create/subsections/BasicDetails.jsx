@@ -7,6 +7,7 @@ import {
   getFormatLocalizedDate,
 } from 'selectors';
 
+import ProductSelectField from 'components/form-elements/v2/ProductSelectField';
 import SelectField from 'components/form-elements/v2/SelectField';
 import Switch from 'components/form-elements/v2/Switch';
 import TextInput from 'components/form-elements/v2/TextInput';
@@ -73,9 +74,8 @@ const BasicDetails = ({ control, errors, getValues }) => {
             name="basicDetails.product"
             control={control}
             render={({ field }) => (
-              <SelectField
+              <ProductSelectField
                 title={{ id: 'react.productSupplier.form.product.title', defaultMessage: 'Product Name' }}
-                productSelect
                 placeholder="Search for a product"
                 required
                 async

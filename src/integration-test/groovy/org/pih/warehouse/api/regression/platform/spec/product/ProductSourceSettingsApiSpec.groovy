@@ -31,13 +31,12 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
 
     // Preferences
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a default preference is created and shows on the product source'() {
         given:
         String sourceId = newSource()
 
         when:
-        Response created = productSupplierPreferenceApi.create(preferenceBody(sourceId).toString(), new ResponseSpecBuilder()
+        Response created = regressionProductSupplierPreferenceApi.create(preferenceBody(sourceId).toString(), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_CREATED)
                 .expectBody('data.comments', Matchers.equalTo('first choice'))
                 .build())
@@ -51,27 +50,25 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
                 .build())
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a preference without a preference type answers 400'() {
         given:
         JSONObject body = preferenceBody(newSource())
         body.remove('preferenceType')
 
         expect:
-        productSupplierPreferenceApi.create(body.toString(), error(HttpStatus.SC_BAD_REQUEST))
+        regressionProductSupplierPreferenceApi.create(body.toString(), error(HttpStatus.SC_BAD_REQUEST))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'updating a preference with #method changes it'() {
         given:
         String sourceId = newSource()
-        String id = productSupplierPreferenceApi.create(preferenceBody(sourceId).toString(),
+        String id = regressionProductSupplierPreferenceApi.create(preferenceBody(sourceId).toString(),
                 responseSpecUtil.CREATED_RESPONSE_SPEC).jsonPath().getString('data.id')
         Organization ward = organization('Ward')
         JSONObject change = preferenceBody(sourceId, ward).put('comments', 'only for the ward')
 
         when:
-        productSupplierPreferenceApi.update(id, change.toString(), method, new ResponseSpecBuilder()
+        regressionProductSupplierPreferenceApi.update(id, change.toString(), method, new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.equalTo(id))
                 .expectBody('data.comments', Matchers.equalTo('only for the ward'))
@@ -84,28 +81,27 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
         method << [Method.PUT, Method.POST]
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
+    @PendingFeature(reason = 'ProductSupplierPreferenceApiController.update binds an unknown id to a null preference and calls hasErrors() on it: 500 (NullPointerException), not 404')
     void 'updating an unknown preference answers 404'() {
         expect:
-        productSupplierPreferenceApi.update(INVALID_ID, preferenceBody(newSource()).toString(), Method.PUT,
+        regressionProductSupplierPreferenceApi.update(INVALID_ID, preferenceBody(newSource()).toString(), Method.PUT,
                 error(HttpStatus.SC_NOT_FOUND))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
+    @PendingFeature(reason = 'ProductSupplierPreferenceService.delete calls delete(id) on its data service, which does nothing for an unknown id, so DELETE answers 204, not 404')
     void 'a preference is deleted; an unknown one answers 404'() {
         given:
-        String id = productSupplierPreferenceApi.create(preferenceBody(newSource()).toString(),
+        String id = regressionProductSupplierPreferenceApi.create(preferenceBody(newSource()).toString(),
                 responseSpecUtil.CREATED_RESPONSE_SPEC).jsonPath().getString('data.id')
 
         when:
-        productSupplierPreferenceApi.delete(id, responseSpecUtil.NO_CONTENT_RESPONSE_SPEC)
+        regressionProductSupplierPreferenceApi.delete(id, responseSpecUtil.NO_CONTENT_RESPONSE_SPEC)
 
         then:
         ProductSupplierPreference.withNewSession { ProductSupplierPreference.get(id) } == null
-        productSupplierPreferenceApi.delete(id, error(HttpStatus.SC_NOT_FOUND))
+        regressionProductSupplierPreferenceApi.delete(id, error(HttpStatus.SC_NOT_FOUND))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a batch saves the default preference and one per destination'() {
         given:
         String sourceId = newSource()
@@ -115,7 +111,7 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
                 .put(batchPreference(sourceId, ward, 'ward')))
 
         when:
-        productSupplierPreferenceApi.saveBatch(batch.toString(), new ResponseSpecBuilder()
+        regressionProductSupplierPreferenceApi.saveBatch(batch.toString(), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.comments', Matchers.containsInAnyOrder('default', 'ward'))
                 .build())
@@ -126,29 +122,27 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
         } == ['default', 'ward'] as Set
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a batch that adds a second default preference answers 400'() {
         given:
         String sourceId = newSource()
-        productSupplierPreferenceApi.create(preferenceBody(sourceId).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
+        regressionProductSupplierPreferenceApi.create(preferenceBody(sourceId).toString(), responseSpecUtil.CREATED_RESPONSE_SPEC)
         JSONObject batch = new JSONObject().put('productSupplierPreferences', new JSONArray()
                 .put(batchPreference(sourceId, null, 'another default')))
 
         expect:
-        productSupplierPreferenceApi.saveBatch(batch.toString(), error(HttpStatus.SC_BAD_REQUEST))
+        regressionProductSupplierPreferenceApi.saveBatch(batch.toString(), error(HttpStatus.SC_BAD_REQUEST))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a batch updates an existing preference by its id'() {
         given:
         String sourceId = newSource()
-        String id = productSupplierPreferenceApi.create(preferenceBody(sourceId).toString(),
+        String id = regressionProductSupplierPreferenceApi.create(preferenceBody(sourceId).toString(),
                 responseSpecUtil.CREATED_RESPONSE_SPEC).jsonPath().getString('data.id')
         JSONObject batch = new JSONObject().put('productSupplierPreferences', new JSONArray()
                 .put(batchPreference(sourceId, null, 'changed').put('id', id)))
 
         when:
-        productSupplierPreferenceApi.saveBatch(batch.toString(), new ResponseSpecBuilder()
+        regressionProductSupplierPreferenceApi.saveBatch(batch.toString(), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.id', Matchers.contains(id))
                 .build())
@@ -170,14 +164,13 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
 
     // Attributes
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'attribute values of a product source are created, changed and removed'() {
         given:
         String sourceId = newSource()
         Attribute color = supplierAttribute(['red', 'blue'], false)
 
         when: 'a value is set'
-        Response created = productSupplierPreferenceApi.updateAttributes(attributes(sourceId, color, 'red'), new ResponseSpecBuilder()
+        Response created = regressionProductSupplierPreferenceApi.updateAttributes(attributes(sourceId, color, 'red'), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.createdAttributes.value', Matchers.contains('red'))
                 .expectBody('data.updatedAttributes', Matchers.empty())
@@ -188,7 +181,7 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
         attributeValues(sourceId) == ['red']
 
         when: 'it is changed'
-        productSupplierPreferenceApi.updateAttributes(attributes(sourceId, color, 'blue'), new ResponseSpecBuilder()
+        regressionProductSupplierPreferenceApi.updateAttributes(attributes(sourceId, color, 'blue'), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.updatedAttributes.value', Matchers.contains('blue'))
                 .expectBody('data.createdAttributes', Matchers.empty())
@@ -198,7 +191,7 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
         attributeValues(sourceId) == ['blue']
 
         when: 'it is cleared'
-        productSupplierPreferenceApi.updateAttributes(attributes(sourceId, color, ''), new ResponseSpecBuilder()
+        regressionProductSupplierPreferenceApi.updateAttributes(attributes(sourceId, color, ''), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.deletedAttributes', Matchers.contains(productAttributeId))
                 .build())
@@ -207,29 +200,26 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
         attributeValues(sourceId) == []
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a free-text attribute takes any value; a coded one only its options'() {
         given:
         String sourceId = newSource()
 
         expect:
-        productSupplierPreferenceApi.updateAttributes(attributes(sourceId, supplierAttribute([], true), 'anything'),
+        regressionProductSupplierPreferenceApi.updateAttributes(attributes(sourceId, supplierAttribute([], true), 'anything'),
                 responseSpecUtil.OK_RESPONSE_SPEC)
-        productSupplierPreferenceApi.updateAttributes(attributes(sourceId, supplierAttribute(['red'], false), 'green'),
+        regressionProductSupplierPreferenceApi.updateAttributes(attributes(sourceId, supplierAttribute(['red'], false), 'green'),
                 error(HttpStatus.SC_BAD_REQUEST))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'an attribute that is not for product sources answers 400'() {
         given:
         Attribute productOnly = supplierAttribute(['red'], false, EntityTypeCode.PRODUCT)
 
         expect:
-        productSupplierPreferenceApi.updateAttributes(attributes(newSource(), productOnly, 'red'),
+        regressionProductSupplierPreferenceApi.updateAttributes(attributes(newSource(), productOnly, 'red'),
                 error(HttpStatus.SC_BAD_REQUEST))
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a required attribute must be sent with a value'() {
         given:
         String sourceId = newSource()
@@ -237,13 +227,13 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
         Attribute other = supplierAttribute(['red'], false)
 
         expect: 'sent empty'
-        productSupplierPreferenceApi.updateAttributes(attributes(sourceId, required, ''), error(HttpStatus.SC_BAD_REQUEST))
+        regressionProductSupplierPreferenceApi.updateAttributes(attributes(sourceId, required, ''), error(HttpStatus.SC_BAD_REQUEST))
 
         and: 'not sent at all'
-        productSupplierPreferenceApi.updateAttributes(attributes(sourceId, other, 'red'), error(HttpStatus.SC_BAD_REQUEST))
+        regressionProductSupplierPreferenceApi.updateAttributes(attributes(sourceId, other, 'red'), error(HttpStatus.SC_BAD_REQUEST))
 
         and: 'sent with a value'
-        productSupplierPreferenceApi.updateAttributes(new JSONObject().put('productAttributes', new JSONArray()
+        regressionProductSupplierPreferenceApi.updateAttributes(new JSONObject().put('productAttributes', new JSONArray()
                 .put(attributeRow(sourceId, required, 'yes'))
                 .put(attributeRow(sourceId, other, 'red'))).toString(), responseSpecUtil.OK_RESPONSE_SPEC)
 
@@ -279,13 +269,12 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
 
     // Package and prices
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'the package sets the default package, its price and the contract price'() {
         given:
         String sourceId = newSource()
 
         when:
-        productSupplierPreferenceApi.savePackage(packageBody(sourceId, 10, 25)
+        regressionProductSupplierPreferenceApi.savePackage(packageBody(sourceId, 10, 25)
                 .put('minOrderQuantity', 20)
                 .put('contractPricePrice', 2)
                 .put('contractPriceValidUntil', '12/31/2030')
@@ -308,15 +297,14 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
                 .build())
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'saving the same package again changes its price; clearing the contract price removes it'() {
         given:
         String sourceId = newSource()
-        productSupplierPreferenceApi.savePackage(packageBody(sourceId, 10, 25).put('contractPricePrice', 2).toString(),
+        regressionProductSupplierPreferenceApi.savePackage(packageBody(sourceId, 10, 25).put('contractPricePrice', 2).toString(),
                 responseSpecUtil.OK_RESPONSE_SPEC)
 
         when:
-        productSupplierPreferenceApi.savePackage(packageBody(sourceId, 10, 40).toString(), new ResponseSpecBuilder()
+        regressionProductSupplierPreferenceApi.savePackage(packageBody(sourceId, 10, 40).toString(), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.packagePrice', Matchers.equalTo(40.0f))
                 .expectBody('data.contractPrice', Matchers.nullValue())
@@ -326,38 +314,36 @@ class ProductSourceSettingsApiSpec extends ProductSourceSpec {
         ProductSupplier.withNewSession { ProductSupplier.get(sourceId).productPackages.size() } == 1
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a package without a price keeps the source without a package price'() {
         given:
         String sourceId = newSource()
 
         expect:
-        productSupplierPreferenceApi.savePackage(packageBody(sourceId, 6, null).toString(), new ResponseSpecBuilder()
+        regressionProductSupplierPreferenceApi.savePackage(packageBody(sourceId, 6, null).toString(), new ResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody('data.defaultProductPackage.quantity', Matchers.equalTo(6))
                 .expectBody('data.packagePrice', Matchers.equalTo(0.0f))
                 .build())
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
+    @PendingFeature(reason = 'ProductPackageCommand accepts productPackageQuantity 0 (min: 0); rendering the product source then divides the package price by it (ProductSupplier.groovy:182): 500 (ArithmeticException), not 400')
     void 'a package of #quantity answers 400'() {
         expect:
-        productSupplierPreferenceApi.savePackage(packageBody(newSource(), quantity, 10).toString(),
+        regressionProductSupplierPreferenceApi.savePackage(packageBody(newSource(), quantity, 10).toString(),
                 error(HttpStatus.SC_BAD_REQUEST))
 
         where:
         quantity << [-1, 0]
     }
 
-    @PendingFeature(reason = 'ProductSupplierService.groovy:475 productSupplierGormService is not injected (null although the bean exists), so POST /api/productSuppliers answers 500')
     void 'a package without a product source or with a contract price that ended long ago answers 400'() {
         given:
         JSONObject withoutSource = packageBody(newSource(), 10, 10)
         withoutSource.remove('productSupplier')
 
         expect:
-        productSupplierPreferenceApi.savePackage(withoutSource.toString(), error(HttpStatus.SC_BAD_REQUEST))
-        productSupplierPreferenceApi.savePackage(packageBody(newSource(), 10, 10)
+        regressionProductSupplierPreferenceApi.savePackage(withoutSource.toString(), error(HttpStatus.SC_BAD_REQUEST))
+        regressionProductSupplierPreferenceApi.savePackage(packageBody(newSource(), 10, 10)
                 .put('contractPricePrice', 1).put('contractPriceValidUntil', '01/01/1990').toString(),
                 error(HttpStatus.SC_BAD_REQUEST))
     }

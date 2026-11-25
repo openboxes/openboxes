@@ -199,13 +199,19 @@ class MobileProductApiController extends BaseDomainApiController {
     /**
      * Update a product identifier (e.g., UPC etc.)
      * Endpoint: PUT /mobile/products/{id}/identifiers
-     * Request body:
+     * Request body to set the identifier:
      * {
      *   "identifier": {
      *     "type": "upc",
      *     "value": "123456789012"
      *   }
      * }
+     * To remove it, send "clear": true instead of a value: { "identifier": { "type": "upc", "clear": true } }.
+     *
+     * 404 unknown product, 401 no session user, 403 not a product manager (checked before the body is read),
+     * 400 {errorCode, errorMessage} for a malformed body, a missing or unsupported type, a missing, blank or
+     * non-string value, a value together with clear, or a value the product cannot store (e.g. longer than
+     * 255 characters); 409 when another product already uses the value.
      *
      * Initially supports only 'upc' type but structured for easy expansion.
      */
@@ -217,69 +223,89 @@ class MobileProductApiController extends BaseDomainApiController {
             return
         }
 
+        User user = session?.user
+        if (!user) {
+            render(status: 401, text: "Active user session required")
+            return
+        }
+
+        if (!(userService.hasRoleProductManager(user))) {
+            render(status: 403, text: "Insufficient privileges")
+            return
+        }
+
+        def body
         try {
-            def body = request.JSON
-            def identifier = body?.identifier
-            def type = identifier?.type?.trim()?.toLowerCase()
-            def newValue = identifier?.value?.trim()
+            body = request.JSON
+        } catch (Exception e) {
+            renderBadRequest("Request body must be JSON")
+            return
+        }
 
-            User user = session?.user
-            if (!user) {
-                render(status: 401, text: "Active user session required")
+        try {
+            def identifier = body instanceof Map ? body.identifier : null
+            if (!(identifier instanceof Map) || !(identifier.type instanceof String) || !identifier.type.trim()) {
+                renderBadRequest("Identifier type is required")
+                return
+            }
+            String type = identifier.type.trim().toLowerCase()
+            def value = identifier.value
+            // Removing a barcode must be asked for explicitly: an empty value is a client error, not a request to remove.
+            boolean clear = identifier.clear == true
+
+            if (type != "upc") {
+                renderBadRequest("Unsupported identifier type '${type}'")
                 return
             }
 
-            if (!(userService.hasRoleProductManager(user))) {
-                render(status: 403, text: "Insufficient privileges")
-                return
-            }
-
-            if (!type) {
-                render(status: 400, text: "Missing identifier type or value")
-                return
-            }
-
-            switch (type) {
-                case "upc":
-                    def oldValue = product.upc
-
-                    if (!newValue) {
-                        product.upc = null
-                        product.save(flush: true)
-                        render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
-                        return
-                    }
-
-                    Product upcDuplicate = Product.findByUpc(newValue)
-                    if (upcDuplicate && upcDuplicate.id != product.id) {
-                        render(
-                                status: 409,
-                                text: "Conflict: The UPC '${newValue}' is already assigned to product " +
-                                        "${upcDuplicate.productCode} – ${upcDuplicate.name}."
-                        )
-                        return
-                    }
-
-                    Product productCodeDuplicate = Product.findByProductCode(newValue)
-                    if (productCodeDuplicate && productCodeDuplicate.id != product.id) {
-                        render(
-                                status: 409,
-                                text: "Conflict: The UPC '${newValue}' is already used as a product code " +
-                                        "by product ${productCodeDuplicate.productCode} – ${productCodeDuplicate.name}."
-                        )
-                        return
-                    }
-
-                    product.upc = newValue
-                    product.save(flush: true)
-
-                    sendProductBarcodeUpdateNotification(user, product, oldValue, newValue)
-                    break
-
-                default:
-                    render(status: 400, text: "Unsupported identifier type '${type}'")
+            if (clear) {
+                if (value != null && !(value instanceof String && !value.trim())) {
+                    renderBadRequest("Send either an identifier value or clear, not both")
                     return
+                }
+                product.upc = null
+                if (!product.save(flush: true)) {
+                    renderSaveFailure(product)
+                    return
+                }
+                render([data: [id: product.id, identifier: [type: type, value: null]]] as JSON)
+                return
             }
+
+            if (!(value instanceof String) || !value.trim()) {
+                renderBadRequest("Identifier value is required")
+                return
+            }
+            String newValue = value.trim()
+            def oldValue = product.upc
+
+            Product upcDuplicate = Product.findByUpc(newValue)
+            if (upcDuplicate && upcDuplicate.id != product.id) {
+                render(
+                        status: 409,
+                        text: "Conflict: The UPC '${newValue}' is already assigned to product " +
+                                "${upcDuplicate.productCode} – ${upcDuplicate.name}."
+                )
+                return
+            }
+
+            Product productCodeDuplicate = Product.findByProductCode(newValue)
+            if (productCodeDuplicate && productCodeDuplicate.id != product.id) {
+                render(
+                        status: 409,
+                        text: "Conflict: The UPC '${newValue}' is already used as a product code " +
+                                "by product ${productCodeDuplicate.productCode} – ${productCodeDuplicate.name}."
+                )
+                return
+            }
+
+            product.upc = newValue
+            if (!product.save(flush: true)) {
+                renderSaveFailure(product)
+                return
+            }
+
+            sendProductBarcodeUpdateNotification(user, product, oldValue, newValue)
 
             render([data: [id: product.id, identifier: [type: type, value: newValue]]] as JSON)
 
@@ -287,6 +313,18 @@ class MobileProductApiController extends BaseDomainApiController {
             log.error("Error updating identifier for product ${params.id}: ${e.message}", e)
             render(status: 500, text: "Server error while updating product identifier")
         }
+    }
+
+    private void renderSaveFailure(Product product) {
+        String message = product.errors.hasFieldErrors('upc') ? "Identifier value is not valid" : "Product could not be saved"
+        log.info("Product identifier for ${product.id} not saved; invalid fields: ${product.errors.fieldErrors*.field}")
+        product.discard()
+        renderBadRequest(message)
+    }
+
+    private void renderBadRequest(String message) {
+        response.status = 400
+        render([errorCode: 400, errorMessage: message] as JSON)
     }
 
     void sendProductBarcodeUpdateNotification(User user, Product product, String oldUpc, String newUpc) {

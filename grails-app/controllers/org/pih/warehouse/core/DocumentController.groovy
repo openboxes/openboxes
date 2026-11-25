@@ -16,8 +16,8 @@ import grails.gorm.transactions.Transactional
 import grails.gorm.PagedResultList
 import grails.validation.Validateable
 import org.grails.gsp.GroovyPagesTemplateEngine
-import org.hibernate.SessionFactory
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.SessionFactory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.core.localization.MessageLocalizer
 import org.pih.warehouse.inventory.OutboundStockMovementService
@@ -515,6 +515,37 @@ class DocumentController {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
             documentTemplateService.renderInvoiceTemplate(documentInstance, shipmentInstance, outputStream)
+            response.setHeader("Content-disposition",
+                "attachment; filename=\"${stripFilenameExtension(documentInstance.filename)}-${shipmentInstance.shipmentNumber}.${documentInstance.extension}\"")
+            response.setContentType(documentInstance.contentType)
+            outputStream.writeTo(response.outputStream)
+            response.outputStream.flush()
+        } catch (Exception e) {
+            log.error("Unable to render document template ${documentInstance.name} for shipment ${shipmentInstance?.id}", e)
+            throw e
+        }
+    }
+
+    /**
+     * Render shipment-based XLS template. For now only used for custom Certificate of Donation spreadsheet document.
+     */
+    def renderShipmentXlsTemplate() {
+        Shipment shipmentInstance = Shipment.get(params.shipmentId)
+        if (!shipmentInstance) {
+            throw new IllegalArgumentException("Unable to locate shipment with ID ${params.shipmentId}")
+        }
+
+        Document documentInstance = params.id ? Document.get(params.id) : null
+        if (!documentInstance) {
+            throw new IllegalArgumentException("Unable to locate document with id ${params.id}")
+        }
+        if (documentInstance.documentType?.documentCode != DocumentCode.SHIPPING_XLS_TEMPLATE) {
+            throw new IllegalArgumentException("Render shipment xls template action only supports documents with document codes ${DocumentCode.SHIPPING_XLS_TEMPLATE}")
+        }
+
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+            documentTemplateService.renderShipmentXlsTemplate(documentInstance, shipmentInstance, outputStream)
             response.setHeader("Content-disposition",
                 "attachment; filename=\"${stripFilenameExtension(documentInstance.filename)}-${shipmentInstance.shipmentNumber}.${documentInstance.extension}\"")
             response.setContentType(documentInstance.contentType)

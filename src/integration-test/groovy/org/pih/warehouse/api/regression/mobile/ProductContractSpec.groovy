@@ -251,6 +251,37 @@ class ProductContractSpec extends MobileContractSpec {
         sql.execute("""DELETE FROM user_role WHERE user_id = '1' AND role_id IN (SELECT id FROM role WHERE role_type = 'ROLE_PRODUCT_MANAGER')""")
     }
 
+    @Covers('src/apis/products.ts#removeProductIdentifier')
+    void 'PUT /mobile/products/{id}/identifiers with clear removes the UPC; an empty value is refused and keeps it'() {
+        given:
+        Sql sql = new Sql(dataSource)
+        sql.execute("""INSERT INTO user_role (user_id, role_id) SELECT '1', id FROM role WHERE role_type = 'ROLE_PRODUCT_MANAGER'
+                       AND NOT EXISTS (SELECT 1 FROM user_role ur JOIN role ro ON ro.id = ur.role_id
+                                       WHERE ur.user_id = '1' AND ro.role_type = 'ROLE_PRODUCT_MANAGER')""")
+        String nano = String.valueOf(System.nanoTime())
+        String upc = nano.substring(nano.length() - 12)
+        Product.withNewTransaction { Product product = Product.get(p.id); product.upc = upc; product.save(flush: true, failOnError: true) }
+
+        when: 'the body the app sent for a hardware scan before OBLS-1060'
+        CallResult empty = call('src/apis/products.ts#updateProductIdentifier', [id: p.id, type: 'upc', value: ''],
+                [identifier: [type: 'upc', value: '']])
+
+        then:
+        empty.status == 400
+        Product.withNewTransaction { Product.get(p.id).upc } == upc
+
+        when:
+        CallResult r = call('src/apis/products.ts#removeProductIdentifier', [id: p.id, type: 'upc'],
+                [identifier: [type: 'upc', clear: true]])
+
+        then:
+        r.holds()
+        Product.withNewTransaction { Product.get(p.id).upc } == null
+
+        cleanup:
+        sql.execute("""DELETE FROM user_role WHERE user_id = '1' AND role_id IN (SELECT id FROM role WHERE role_type = 'ROLE_PRODUCT_MANAGER')""")
+    }
+
     @Covers('src/apis/products.ts#stockAdjustments')
     void 'POST /stockAdjustments with the adjust stock body records the new quantity'() {
         given:

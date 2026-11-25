@@ -71,6 +71,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     Boolean substitutable = false
     String comment
     Integer orderIndex = 0
+    String identifier
 
     Boolean autoAllocated
 
@@ -168,6 +169,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         lotNumber(nullable: true)
         expirationDate(nullable: true)
         orderIndex(nullable: true)
+        identifier(nullable: true)
         parentRequisitionItem(nullable: true)
         createdBy(nullable: true)
         updatedBy(nullable: true)
@@ -552,6 +554,29 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return isCanceled() || isSubstituted()
     }
 
+    /**
+     * The item itself, or the items that replaced it, leaving out any that are fully canceled. An empty
+     * list means the line has no demand left. A substitution is not carried any backorder recorded
+     * against the line it replaces: the product has usually changed, and even when it has not the
+     * substitution starts from its own quantity.
+     */
+    List<RequisitionItem> getEffectiveItems() {
+        if (isSubstituted()) {
+            // isSubstituted() also covers a substitution linked only through substitutionItem, in which
+            // case the typed child collection is empty
+            Collection<RequisitionItem> substitutions = substitutionItems ?: [substitutionItem].findAll()
+            return substitutions.collectMany { it.getEffectiveItems() }
+        }
+        if (modificationItem) {
+            return modificationItem.getEffectiveItems()
+        }
+        // Cancellation is all or nothing (cancelQuantity sets quantityCanceled to the full quantity), so
+        // a canceled line has no demand left. isCanceled() cannot be used here because it reports false
+        // while a backorder is still recorded against the item, and whenever the item has been replaced.
+        boolean isFullyCanceled = (quantityCanceled ?: 0) >= (quantity ?: 0)
+        return isFullyCanceled ? [] : [this]
+    }
+
 
     /**
      * @return true if the requisition is no longer in the reviewing stage and there are no changes
@@ -839,6 +864,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return picklistItems.findAll { it.pickable }
     }
 
+    List<String> getPicklistReasonCodes() {
+        List<String> reasonCodes = picklistItems?.findResults { it.reasonCode } ?: []
+        return ([pickReasonCode] + reasonCodes).findAll { it }.unique()
+    }
+
+    String getEffectiveCancelReasonCode() {
+        return cancelReasonCode?.contains("(") ? cancelReasonCode.split("\\(", 2)[1].replace(")", "") : cancelReasonCode
+    }
+
     /**
      * Sort by sort order, name
      *
@@ -884,7 +918,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                 isApproved            : isApproved(),
                 isCanceled            : isCanceled(),
                 isBackordered         : isBackordered(),
-                orderIndex            : orderIndex
+                orderIndex            : orderIndex,
+                identifier            : identifier
         ]
     }
 

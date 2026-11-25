@@ -73,6 +73,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.putaway.PutawayService
+import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptService
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
@@ -1012,7 +1013,12 @@ class StockMovementService {
 
         def template = requisition.requisitionTemplate
         if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-            def quantityDemand = forecastingService.getDemand(requisition.destination, null, editPageItem.product)
+            // If request FROM downstream consumer (location without managed inventory but supporting submitting requests),
+            // then pull demand from origin to that location.
+            // If request is NOT FROM downstream consumer, then pull demand outgoing FROM destination to all other locations.
+            Map<String, Object> quantityDemand = requisition?.destination?.isDownstreamConsumer() ?
+                    forecastingService.getDemand(requisition.origin, requisition.destination, editPageItem.product) :
+                    forecastingService.getDemand(requisition.destination, null, editPageItem.product)
             editPageItem << [
                     quantityDemandRequesting        : quantityDemand?.monthlyDemand?:0,
                     demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
@@ -1798,10 +1804,14 @@ class StockMovementService {
         }
     }
 
-    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
+    /**
+     * Returns the receipt items of a stock movement. When excludeItemsWithoutQuantityReceivedOrCanceled is true, the
+     * ones without a positive quantity received or canceled are filtered out.
+     */
+    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         return (stockMovement.requisition) ?
-                getRequisitionBasedStockMovementReceiptItems(stockMovement) :
-                getShipmentBasedStockMovementReceiptItems(stockMovement)
+                getRequisitionBasedStockMovementReceiptItems(stockMovement, excludeItemsWithoutQuantityReceivedOrCanceled) :
+                getShipmentBasedStockMovementReceiptItems(stockMovement, excludeItemsWithoutQuantityReceivedOrCanceled)
     }
 
     /**
@@ -1826,16 +1836,41 @@ class StockMovementService {
         return historyItems ? historyItems[0] : null
     }
 
-    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
-        def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        List<ReceiptItem> receiptItems = shipments*.receipts?.flatten()*.sortReceiptItemsBySortOrder()?.flatten()
+    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
+        List<Shipment> shipments = Shipment.findAllByRequisition(stockMovement.requisition)
+        List<ReceiptItem> receiptItems = []
+        shipments*.receipts?.flatten()?.each { Receipt receipt ->
+            List<ReceiptItem> receiptItemsOfReceipt = getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(receiptItemsOfReceipt)
+            receiptItems.addAll(receiptItemsOfReceipt)
+        }
         return receiptItems
     }
 
-    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
+    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement, boolean excludeItemsWithoutQuantityReceivedOrCanceled = false) {
         Shipment shipment = stockMovement.shipment
-        List<ReceiptItem> receiptItems = shipment.receipts*.sortReceiptItemsBySortOrder()?.flatten()
+        List<ReceiptItem> receiptItems = []
+        shipment.receipts?.each { Receipt receipt ->
+            List<ReceiptItem> receiptItemsOfReceipt = getReceiptItems(receipt, excludeItemsWithoutQuantityReceivedOrCanceled)
+            sortReceiptItemsBySortOrder(receiptItemsOfReceipt)
+            receiptItems.addAll(receiptItemsOfReceipt)
+        }
         return receiptItems
+    }
+
+    private List<ReceiptItem> getReceiptItems(Receipt receipt, boolean excludeItemsWithoutQuantityReceivedOrCanceled) {
+        return excludeItemsWithoutQuantityReceivedOrCanceled ?
+                receipt.receiptItems.findAll { it.quantityReceived > 0 || it.quantityCanceled > 0 }.toList() :
+                receipt.receiptItems.toList()
+    }
+
+    private void sortReceiptItemsBySortOrder(List<ReceiptItem> receiptItems) {
+        receiptItems.sort { ReceiptItem a, ReceiptItem b ->
+            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
+                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
+                            a.sortOrder <=> b.sortOrder ?:
+                                    a.inventoryItem?.product?.name <=> b.inventoryItem?.product?.name
+        }
     }
 
     // It expects to receive a stock movement id
@@ -2237,17 +2272,19 @@ class StockMovementService {
         return getAvailableItems(location, requisitionItem, calculateStatus, true)
     }
 
+    // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
+    private boolean isExcludedFromAllocation(Location binLocation) {
+        return binLocation?.isSortationLocation() ||
+                binLocation?.supports(ActivityCode.PUTAWAY_CART) ||
+                binLocation?.supports(ActivityCode.PREPICK_STOCK)
+    }
+
     List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus, Boolean releaseOwnAllocation) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
-        // FIXME Replace these activity markers with a dedicated ALLOCATE_STOCK activity code.
-        availableItems = availableItems.findAll {
-            !it.binLocation?.supports(ActivityCode.INBOUND_SORTATION) &&
-                    !it.binLocation?.supports(ActivityCode.PUTAWAY_CART) &&
-                    !it.binLocation?.supports(ActivityCode.PREPICK_STOCK)
-        }
+        availableItems = availableItems.findAll { !isExcludedFromAllocation(it.binLocation) }
         if (releaseOwnAllocation) {
             availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
         }
@@ -3568,6 +3605,25 @@ class StockMovementService {
         return shipmentItems
     }
 
+    /**
+     * Rebuilds the shipment items of a line whose picked quantity no longer matches them, e.g. after
+     * an amendment of an already picked line. {@link #createShipmentItems} skips a line that has any.
+     */
+    void refreshShipmentItems(RequisitionItem requisitionItem, Shipment shipment) {
+        Integer quantityShipped = ShipmentItem.findAllByRequisitionItem(requisitionItem).sum { it.quantity } ?: 0
+        if (quantityShipped == requisitionItem.calculateQuantityPicked()) {
+            return
+        }
+
+        removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
+        // createShipmentItems skips the line while the removed items are still in the database
+        shipment.save(flush: true)
+        createShipmentItems(requisitionItem).each { ShipmentItem shipmentItem ->
+            shipment.addToShipmentItems(shipmentItem)
+        }
+        shipment.save(flush: true)
+    }
+
     List<PackPageItem> updatePackPageItems(List<PackPageItem> packPageItems) {
         if (packPageItems) {
             packPageItems.each { PackPageItem packPageItem ->
@@ -3927,6 +3983,9 @@ class StockMovementService {
         switch (documentCode) {
             case DocumentCode.INVOICE_TEMPLATE:
                 action = "renderInvoiceTemplate"
+                break
+            case DocumentCode.SHIPPING_XLS_TEMPLATE:
+                action = "renderShipmentXlsTemplate"
                 break
             case DocumentCode.SHIPPING_TEMPLATE:
                 action = "render"

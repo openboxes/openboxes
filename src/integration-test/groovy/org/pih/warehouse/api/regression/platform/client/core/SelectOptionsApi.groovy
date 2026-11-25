@@ -14,7 +14,9 @@ import org.pih.warehouse.api.client.base.AuthenticatedApi
 /**
  * The option lists behind the product list page's filters: each answers {data: [{id, label, ...}]}.
  */
-@TestComponent
+// Named explicitly: org.pih.warehouse.api.client has a client of the same class name, and both are
+// component-scanned, so the default bean name would clash.
+@TestComponent("regressionSelectOptionsApi")
 @InheritConstructors
 class SelectOptionsApi extends AuthenticatedApi {
 

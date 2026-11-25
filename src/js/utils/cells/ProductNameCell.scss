@@ -1,0 +1,14 @@
+.product-name {
+  position: relative;
+
+  // The icons are placed at the end of the last visible line of the clamped name, which only a
+  // measurement can tell - the cell positions them, the line they land on sizes them. Until then
+  // they sit in the space kept for them at the end of the name.
+  &__icons--pinned {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+  }
+}

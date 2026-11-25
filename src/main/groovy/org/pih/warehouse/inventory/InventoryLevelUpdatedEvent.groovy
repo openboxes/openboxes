@@ -14,13 +14,13 @@ import org.springframework.context.ApplicationEvent
 class InventoryLevelUpdatedEvent extends ApplicationEvent {
 
     String facilityId
-    String productId
+    List<String> productIds
     Boolean forceRefresh
 
-    InventoryLevelUpdatedEvent(InventoryLevel source, String facilityId, String productId, Boolean forceRefresh) {
+    InventoryLevelUpdatedEvent(InventoryLevel source, String facilityId, List<String> productIds, Boolean forceRefresh) {
         super(source)
         this.facilityId = facilityId
-        this.productId = productId
+        this.productIds = productIds
         this.forceRefresh = forceRefresh
     }
 

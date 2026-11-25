@@ -16,7 +16,9 @@ import org.pih.warehouse.api.client.base.AuthenticatedApi
  * (/api/productSupplierPreferences...), attributes (/api/productSupplierAttributes/batch) and the package and prices
  * (/api/productPackages).
  */
-@TestComponent
+// Named explicitly: org.pih.warehouse.api.client has a client of the same class name, and both are
+// component-scanned, so the default bean name would clash.
+@TestComponent("regressionProductSupplierPreferenceApi")
 @InheritConstructors
 class ProductSupplierPreferenceApi extends AuthenticatedApi {
 

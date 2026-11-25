@@ -14,6 +14,12 @@ import spock.lang.Unroll
 
 import org.pih.warehouse.api.ProductApiController
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.AvailabilityCommand
+import org.pih.warehouse.inventory.DepotAvailabilityDto
+import org.pih.warehouse.inventory.LotAvailabilityDto
+import org.pih.warehouse.inventory.ProductAvailabilityService
+import org.pih.warehouse.inventory.ProductLotRequest
+import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.forecasting.ForecastingService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductService
@@ -99,6 +105,65 @@ class ProductApiControllerSpec extends Specification implements DataTest, Contro
 
         where:
         numProductsInDB << [0, 1, 3]
+    }
+
+    void 'getAvailabilityInAllDepots should render the availability of the given product lots'() {
+        given: 'the following db data'
+        Product product = new Product().save(validate: false)
+
+        and: 'the following command'
+        AvailabilityCommand command = new AvailabilityCommand(productLots: [
+                new ProductLotRequest(product: product, lotNumber: 'LOT-1'),
+                new ProductLotRequest(product: product, lotNumber: 'LOT-2'),
+        ])
+
+        and: 'the following mocks'
+        ProductAvailabilityService productAvailabilityService = Mock(ProductAvailabilityService)
+        controller.productAvailabilityService = productAvailabilityService
+
+        when:
+        controller.getAvailabilityInAllDepots(command)
+
+        then: 'all of the product lots are read in a single call'
+        1 * productAvailabilityService.getAvailabilityInAllDepots(command) >> [
+                new LotAvailabilityDto(
+                        productId: product.id,
+                        lotNumber: 'LOT-1',
+                        quantityOnHand: 5,
+                        depots: [new DepotAvailabilityDto(
+                                depot: new LocationSimpleDto(id: 'depot-1', name: 'Belladere Depot'),
+                                quantityOnHand: 5)]),
+        ]
+
+        and: 'their availability is rendered'
+        JSONObject json = getJsonObjectResponse(controller.response)
+        json.data.length() == 1
+        json.data[0].lotNumber == 'LOT-1'
+        json.data[0].quantityOnHand == 5
+        json.data[0].depots[0].depot.name == 'Belladere Depot'
+    }
+
+    void 'getAvailabilityInAllDepots should render nothing when the product lots are not in inventory'() {
+        given: 'the following db data'
+        Product product = new Product().save(validate: false)
+
+        and: 'the following command'
+        AvailabilityCommand command = new AvailabilityCommand(
+                productLots: [new ProductLotRequest(product: product, lotNumber: 'LOT-1')])
+
+        and: 'the following mocks'
+        ProductAvailabilityService productAvailabilityService = Mock(ProductAvailabilityService)
+        controller.productAvailabilityService = productAvailabilityService
+
+        when:
+        controller.getAvailabilityInAllDepots(command)
+
+        then:
+        1 * productAvailabilityService.getAvailabilityInAllDepots(command) >> []
+
+        and: 'nothing is rendered for them'
+        JSONObject json = getJsonObjectResponse(controller.response)
+        json.data.length() == 0
     }
 
     private List<Product> generateTestProducts(int numToGenerate) {

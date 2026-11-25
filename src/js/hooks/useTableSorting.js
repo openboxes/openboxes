@@ -25,6 +25,11 @@ const useTableSorting = () => {
     return `-sort-${order}`;
   };
 
+  const resetSort = () => {
+    setSort(null);
+    setOrder(null);
+  };
+
   return {
     sortableProps: {
       dynamicClassName: getClassName,
@@ -34,6 +39,7 @@ const useTableSorting = () => {
     order,
     setSort,
     setOrder,
+    resetSort,
   };
 };
 

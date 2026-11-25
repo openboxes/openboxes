@@ -35,7 +35,11 @@ class RecordInventoryCommand implements Validateable {
         inventoryLevel(nullable: true)
         totalQuantity(nullable: true)
         totalQuantityAvailableToPromise(nullable: true)
-        transactionDate(nullable: false)
+        transactionDate(nullable: false, validator: { value ->
+            if (value != null && value.after(new Date())) {
+                return ['future']
+            }
+        })
         comment(nullable: true)
         reasonCode(nullable: true)
         recordInventoryRow(nullable: true)

@@ -1,15 +1,17 @@
 package org.pih.warehouse.core.validation
 
-import grails.validation.Validateable
 import org.springframework.validation.Errors
 
 /**
- * A validator for a non-domain validatable object (such as a Command Object).
+ * A validator for an {@link ObjectValidatable} Grails object, such as a Request DTO / Command Object.
+ *
+ * Will be triggered automatically for command object instances in controller method args, or when calling
+ * x.validate() on an instance of the target object.
  */
-trait ObjectValidator<T extends Validateable> implements Validator<T> {
+abstract class ObjectValidator<T extends ObjectValidatable> extends Validator<T> {
 
     @Override
     Errors getErrors(T toValidate) {
-        return toValidate.errors
+        return toValidate?.errors
     }
 }

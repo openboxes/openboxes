@@ -21,7 +21,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import { REPLENISHMENT_URL } from 'consts/applicationUrls';
 import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -301,7 +301,7 @@ class CreateReplenishment extends Component {
       replenishmentItems: values.requirements.filter((item) => item.checked && item.quantity > 0),
     };
 
-    apiClient.post(url, flattenRequest(payload))
+    apiClient.post(url, payload)
       .then((response) => {
         this.props.hideSpinner();
         this.props.history.push(REPLENISHMENT_URL.edit(response.data?.data?.id));

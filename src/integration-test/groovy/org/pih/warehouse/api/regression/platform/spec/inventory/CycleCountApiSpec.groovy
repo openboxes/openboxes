@@ -42,9 +42,9 @@ class CycleCountApiSpec extends CycleCountSpec {
         Product product = stockedProduct(5)
 
         when:
-        Response json = cycleCountApi.candidates(facility.id, [searchTerm: product.productCode, max: 10, offset: 0],
+        Response json = regressionCycleCountApi.candidates(facility.id, [searchTerm: product.productCode, max: 10, offset: 0],
                 ok().build())
-        Response csv = cycleCountApi.candidates(facility.id, [searchTerm: product.productCode, format: 'csv'],
+        Response csv = regressionCycleCountApi.candidates(facility.id, [searchTerm: product.productCode, format: 'csv'],
                 ok().expectContentType('text/csv')
                         .expectHeader('Content-Disposition', Matchers.containsString('CycleCountReport-'))
                         .build())
@@ -61,8 +61,8 @@ class CycleCountApiSpec extends CycleCountSpec {
         String assignee = adminPersonId()
 
         when:
-        Response pending = cycleCountApi.pendingRequests(facility.id, [searchTerm: product.productCode], ok().build())
-        Response updated = cycleCountApi.updateRequests(facility.id, new JSONObject()
+        Response pending = regressionCycleCountApi.pendingRequests(facility.id, [searchTerm: product.productCode], ok().build())
+        Response updated = regressionCycleCountApi.updateRequests(facility.id, new JSONObject()
                 .put('commands', new JSONArray().put(new JSONObject()
                         .put('cycleCountRequest', requestId)
                         .put('assignments', new JSONObject()
@@ -88,7 +88,7 @@ class CycleCountApiSpec extends CycleCountSpec {
         Product product = stockedProduct(3)
         String requestId = requestCount(product)
         String assignee = adminPersonId()
-        cycleCountApi.updateRequests(facility.id, new JSONObject()
+        regressionCycleCountApi.updateRequests(facility.id, new JSONObject()
                 .put('commands', new JSONArray().put(new JSONObject()
                         .put('cycleCountRequest', requestId)
                         .put('assignments', new JSONObject()
@@ -98,9 +98,9 @@ class CycleCountApiSpec extends CycleCountSpec {
                    statuses: ['CREATED', 'REQUESTED', 'COUNTING'], countAssignees: assignee]
 
         expect: 'a deadline on or after the count deadline finds it, an earlier one does not'
-        cycleCountApi.pendingRequests(facility.id, tab + [countDeadline: '2030-01-15'], ok().build())
+        regressionCycleCountApi.pendingRequests(facility.id, tab + [countDeadline: '2030-01-15'], ok().build())
                 .jsonPath().getList('data.cycleCountRequest.id') == [requestId]
-        cycleCountApi.pendingRequests(facility.id, tab + [countDeadline: '2030-01-14'], ok().build())
+        regressionCycleCountApi.pendingRequests(facility.id, tab + [countDeadline: '2030-01-14'], ok().build())
                 .jsonPath().getList('data.cycleCountRequest.id') == []
     }
 
@@ -111,10 +111,10 @@ class CycleCountApiSpec extends CycleCountSpec {
         Product other = stockedProduct(2)
 
         expect:
-        cycleCountApi.createRequests(facility.id, new JSONObject()
+        regressionCycleCountApi.createRequests(facility.id, new JSONObject()
                 .put('requests', new JSONArray().put(new JSONObject().put('product', product.id)))
                 .toString(), responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
-        cycleCountApi.createRequests(facility.id, new JSONObject()
+        regressionCycleCountApi.createRequests(facility.id, new JSONObject()
                 .put('requests', new JSONArray()
                         .put(new JSONObject().put('product', other.id))
                         .put(new JSONObject().put('product', other.id)))
@@ -129,7 +129,7 @@ class CycleCountApiSpec extends CycleCountSpec {
         when:
         Map count = startCount(requestId)
         Map again = startCount(requestId)
-        Response listed = cycleCountApi.list(facility.id, [id: count.id], ok().build())
+        Response listed = regressionCycleCountApi.list(facility.id, [id: count.id], ok().build())
 
         then:
         count.status == 'COUNTING' || count.status == 'REQUESTED'
@@ -148,11 +148,11 @@ class CycleCountApiSpec extends CycleCountSpec {
         restock(product, 0)
 
         expect:
-        cycleCountApi.start(facility.id, startBody(requestId), null,
+        regressionCycleCountApi.start(facility.id, startBody(requestId), null,
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_CONFLICT))
-        cycleCountApi.start(facility.id, startBody(INVALID_ID), null,
+        regressionCycleCountApi.start(facility.id, startBody(INVALID_ID), null,
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
-        cycleCountApi.startRecount(facility.id, recountBody(INVALID_ID), null,
+        regressionCycleCountApi.startRecount(facility.id, recountBody(INVALID_ID), null,
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
     }
 
@@ -164,7 +164,7 @@ class CycleCountApiSpec extends CycleCountSpec {
         recordCount(count.cycleCountItems[0].id as String, 6)
 
         when:
-        Response submitted = cycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
+        Response submitted = regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
 
         then:
         submitted.jsonPath().getString('data.status') == 'COMPLETED'
@@ -181,19 +181,19 @@ class CycleCountApiSpec extends CycleCountSpec {
         recordCount(count.cycleCountItems[0].id as String, 8)
 
         when: 'the count is submitted with a discrepancy (8 counted, 10 on hand)'
-        Response submitted = cycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
+        Response submitted = regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
 
         then: 'the counted item waits for a recount'
         submitted.jsonPath().getString('data.status') == 'COUNTED'
         itemStatus(submitted.jsonPath(), 'data.cycleCountItems[0].status') == 'COUNTED'
 
         when: 'the recount starts, is counted and submitted'
-        Response recount = cycleCountApi.startRecount(facility.id, recountBody(requestId), null, ok().build())
+        Response recount = regressionCycleCountApi.startRecount(facility.id, recountBody(requestId), null, ok().build())
         Map recountItem = (recount.jsonPath().getList('data[0].cycleCountItems') as List<Map>).find { it.countIndex == 1 }
         assert recountItem: recount.asString()
         recordCount(recountItem.id as String, 9, true)
-        Response again = cycleCountApi.startRecount(facility.id, recountBody(requestId), null, ok().build())
-        Response completed = cycleCountApi.submitRecount(facility.id, count.id as String, submitBody(false), ok().build())
+        Response again = regressionCycleCountApi.startRecount(facility.id, recountBody(requestId), null, ok().build())
+        Response completed = regressionCycleCountApi.submitRecount(facility.id, count.id as String, submitBody(false), ok().build())
 
         then:
         again.jsonPath().getString('data[0].id') == count.id
@@ -208,17 +208,17 @@ class CycleCountApiSpec extends CycleCountSpec {
         Map count = startCount(requestId)
 
         expect: 'no recount before the count is submitted'
-        cycleCountApi.startRecount(facility.id, recountBody(requestId), null,
+        regressionCycleCountApi.startRecount(facility.id, recountBody(requestId), null,
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
-        cycleCountApi.submitRecount(facility.id, count.id as String, submitBody(false),
+        regressionCycleCountApi.submitRecount(facility.id, count.id as String, submitBody(false),
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
 
         when:
         recordCount(count.cycleCountItems[0].id as String, 3)
-        cycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
+        regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
 
         then:
-        cycleCountApi.submitCount(facility.id, count.id as String, submitBody(true),
+        regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(true),
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
     }
 
@@ -231,7 +231,7 @@ class CycleCountApiSpec extends CycleCountSpec {
         restock(product, 4)
 
         expect:
-        cycleCountApi.submitCount(facility.id, count.id as String, submitBody(true, true, true),
+        regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(true, true, true),
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_CONFLICT))
     }
 
@@ -241,10 +241,10 @@ class CycleCountApiSpec extends CycleCountSpec {
         String itemId = count.cycleCountItems[0].id
 
         when:
-        Response viaCount = cycleCountApi.itemBatchOfCount(facility.id, count.id as String, new JSONObject()
+        Response viaCount = regressionCycleCountApi.itemBatchOfCount(facility.id, count.id as String, new JSONObject()
                 .put('itemsToUpdate', new JSONArray().put(new JSONObject().put('id', itemId).put('quantityCounted', 3)))
                 .toString(), Method.PATCH, ok().build())
-        Response viaFacility = cycleCountApi.itemBatch(facility.id, new JSONObject()
+        Response viaFacility = regressionCycleCountApi.itemBatch(facility.id, new JSONObject()
                 .put('itemsToUpdate', new JSONArray().put(new JSONObject().put('id', itemId).put('quantityCounted', 4)))
                 .toString(), Method.PATCH, ok().build())
 
@@ -267,12 +267,12 @@ class CycleCountApiSpec extends CycleCountSpec {
                 .put('comment', 'found on a shelf')
 
         when:
-        Response one = cycleCountApi.createItem(facility.id, count.id as String, row.toString(), ok().build())
-        Response batch = cycleCountApi.itemBatchOfCount(facility.id, count.id as String, new JSONObject()
+        Response one = regressionCycleCountApi.createItem(facility.id, count.id as String, row.toString(), ok().build())
+        Response batch = regressionCycleCountApi.itemBatchOfCount(facility.id, count.id as String, new JSONObject()
                 .put('itemsToCreate', new JSONArray().put(new JSONObject(row.toString())
                         .put('inventoryItem', new JSONObject().put('product', product.id).put('lotNumber', "${lot}-B"))))
                 .toString(), Method.POST, ok().build())
-        Response batchOfFacility = cycleCountApi.itemBatch(facility.id, new JSONObject()
+        Response batchOfFacility = regressionCycleCountApi.itemBatch(facility.id, new JSONObject()
                 .put('itemsToCreate', new JSONArray().put(new JSONObject(row.toString())
                         .put('cycleCount', count.id)
                         .put('inventoryItem', new JSONObject().put('product', product.id).put('lotNumber', "${lot}-C"))))
@@ -285,10 +285,10 @@ class CycleCountApiSpec extends CycleCountSpec {
         batchOfFacility.jsonPath().getBoolean('data[0].custom')
 
         expect:
-        cycleCountApi.deleteItem(facility.id, one.jsonPath().getString('data.id'), responseSpecUtil.NO_CONTENT_RESPONSE_SPEC)
-        cycleCountApi.deleteItem(facility.id, count.cycleCountItems[0].id as String,
+        regressionCycleCountApi.deleteItem(facility.id, one.jsonPath().getString('data.id'), responseSpecUtil.NO_CONTENT_RESPONSE_SPEC)
+        regressionCycleCountApi.deleteItem(facility.id, count.cycleCountItems[0].id as String,
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
-        cycleCountApi.deleteItem(facility.id, INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
+        regressionCycleCountApi.deleteItem(facility.id, INVALID_ID, responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
     @PendingFeature(reason = 'refreshing a completed count answers 500, not 409')
@@ -299,7 +299,7 @@ class CycleCountApiSpec extends CycleCountSpec {
         restock(product, 8)
 
         when:
-        Response refreshed = cycleCountApi.refresh(facility.id, count.id as String,
+        Response refreshed = regressionCycleCountApi.refresh(facility.id, count.id as String,
                 [removeOutOfStockItemsImplicitly: false, countIndex: 0], ok().build())
 
         then:
@@ -307,12 +307,12 @@ class CycleCountApiSpec extends CycleCountSpec {
 
         when:
         recordCount(count.cycleCountItems[0].id as String, 8)
-        cycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
+        regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
 
         then:
-        cycleCountApi.refresh(facility.id, count.id as String, [:],
+        regressionCycleCountApi.refresh(facility.id, count.id as String, [:],
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_CONFLICT))
-        cycleCountApi.refresh(facility.id, INVALID_ID, [:], responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
+        regressionCycleCountApi.refresh(facility.id, INVALID_ID, [:], responseSpecUtil.NOT_FOUND_RESPONSE_SPEC)
     }
 
     void 'the count and recount forms download as a spreadsheet and as a PDF'() {
@@ -321,12 +321,12 @@ class CycleCountApiSpec extends CycleCountSpec {
         String requestId = requestCount(product)
 
         when:
-        Response startedAsXls = cycleCountApi.start(facility.id, startBody(requestId), 'xls',
+        Response startedAsXls = regressionCycleCountApi.start(facility.id, startBody(requestId), 'xls',
                 ok().expectContentType('application/vnd.ms-excel').build())
-        String countId = cycleCountApi.list(facility.id, [:], ok().build()).jsonPath()
+        String countId = regressionCycleCountApi.list(facility.id, [:], ok().build()).jsonPath()
                 .getList('data').find { it.requestId == requestId }?.id
-        Response countPdf = cycleCountApi.list(facility.id, [id: countId, format: 'pdf'], ok().build())
-        Response countXls = cycleCountApi.list(facility.id, [id: countId, format: 'xls'],
+        Response countPdf = regressionCycleCountApi.list(facility.id, [id: countId, format: 'pdf'], ok().build())
+        Response countXls = regressionCycleCountApi.list(facility.id, [id: countId, format: 'xls'],
                 ok().expectContentType('application/vnd.ms-excel').build())
 
         then:
@@ -335,11 +335,11 @@ class CycleCountApiSpec extends CycleCountSpec {
         countXls.asByteArray().length > 0
 
         when: 'the count goes to investigation and the recount starts'
-        Map count = cycleCountApi.list(facility.id, [id: countId], ok().build()).jsonPath().getMap('data[0]')
+        Map count = regressionCycleCountApi.list(facility.id, [id: countId], ok().build()).jsonPath().getMap('data[0]')
         recordCount(count.cycleCountItems[0].id as String, 1)
-        cycleCountApi.submitCount(facility.id, countId, submitBody(true), ok().build())
-        Response recountPdf = cycleCountApi.startRecount(facility.id, recountBody(requestId), 'pdf', ok().build())
-        Response recountXls = cycleCountApi.list(facility.id, [id: countId, format: 'xls'],
+        regressionCycleCountApi.submitCount(facility.id, countId, submitBody(true), ok().build())
+        Response recountPdf = regressionCycleCountApi.startRecount(facility.id, recountBody(requestId), 'pdf', ok().build())
+        Response recountXls = regressionCycleCountApi.list(facility.id, [id: countId, format: 'xls'],
                 ok().expectContentType('application/vnd.ms-excel').build())
 
         then:
@@ -352,10 +352,10 @@ class CycleCountApiSpec extends CycleCountSpec {
         Product product = stockedProduct(3)
         String requestId = requestCount(product)
         Map count = startCount(requestId)
-        byte[] countForm = cycleCountApi.list(facility.id, [id: count.id, format: 'xls'], ok().build()).asByteArray()
+        byte[] countForm = regressionCycleCountApi.list(facility.id, [id: count.id, format: 'xls'], ok().build()).asByteArray()
 
         when:
-        Response uploaded = cycleCountApi.upload(facility.id, false, 'count.xls', countForm, ok().build())
+        Response uploaded = regressionCycleCountApi.upload(facility.id, false, 'count.xls', countForm, ok().build())
 
         then:
         uploaded.jsonPath().getList('data.cycleCountItemId').contains(count.cycleCountItems[0].id)
@@ -363,10 +363,10 @@ class CycleCountApiSpec extends CycleCountSpec {
 
         when:
         recordCount(count.cycleCountItems[0].id as String, 1)
-        cycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
-        cycleCountApi.startRecount(facility.id, recountBody(requestId), null, ok().build())
-        byte[] recountForm = cycleCountApi.list(facility.id, [id: count.id, format: 'xls'], ok().build()).asByteArray()
-        Response recountUploaded = cycleCountApi.upload(facility.id, true, 'recount.xls', recountForm, ok().build())
+        regressionCycleCountApi.submitCount(facility.id, count.id as String, submitBody(true), ok().build())
+        regressionCycleCountApi.startRecount(facility.id, recountBody(requestId), null, ok().build())
+        byte[] recountForm = regressionCycleCountApi.list(facility.id, [id: count.id, format: 'xls'], ok().build()).asByteArray()
+        Response recountUploaded = regressionCycleCountApi.upload(facility.id, true, 'recount.xls', recountForm, ok().build())
 
         then:
         !recountUploaded.jsonPath().getList('data.cycleCountItemId').isEmpty()
@@ -375,9 +375,9 @@ class CycleCountApiSpec extends CycleCountSpec {
     @PendingFeature(reason = 'a cycle count sheet upload without a file answers 500')
     void 'an upload without a file answers 400'() {
         expect:
-        cycleCountApi.upload(facility.id, false, 'count.xls', new byte[0],
+        regressionCycleCountApi.upload(facility.id, false, 'count.xls', new byte[0],
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
-        cycleCountApi.upload(facility.id, true, 'recount.xls', new byte[0],
+        regressionCycleCountApi.upload(facility.id, true, 'recount.xls', new byte[0],
                 responseSpecUtil.buildStatusCodeResponseSpec(HttpStatus.SC_BAD_REQUEST))
     }
 

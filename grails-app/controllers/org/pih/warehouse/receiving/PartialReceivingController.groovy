@@ -51,6 +51,13 @@ class PartialReceivingController {
         Shipment shipment = Shipment.get(params.id)
         String stockMovementId = shipment?.requisition?.id ?: shipment?.returnOrder?.id ?: params.id
 
+        String blockedReason = shipment ? receiptService.getRollbackBlockedReason(shipment) : null
+        if (blockedReason) {
+            flash.error = blockedReason
+            redirect(controller: "stockMovement", action: "show", id: stockMovementId)
+            return
+        }
+
         if (shipment) {
             try {
                 receiptService.rollbackLastReceipt(shipment)

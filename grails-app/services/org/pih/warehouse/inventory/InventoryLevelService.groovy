@@ -25,6 +25,38 @@ class InventoryLevelService {
 
     GrailsApplication grailsApplication
 
+    /**
+     * The first inventory level of each product of the inventory, as plain values by product id: status, minQuantity,
+     * reorderQuantity, maxQuantity and abcClass. A product can have several levels (facility-wide and per bin): the
+     * first by id applies, so the choice is deterministic (the dashboard read the levels unsorted before).
+     */
+    Map<String, Map> getFirstInventoryLevelByProduct(Inventory inventory) {
+        String inventoryCondition = inventory ? "il.inventory = :inventory" : "il.inventory is null"
+        List results = InventoryLevel.executeQuery("""
+                select il.product.id, il.status, il.minQuantity, il.reorderQuantity, il.maxQuantity, il.abcClass
+                from InventoryLevel il
+                where ${inventoryCondition}
+                order by il.id
+                """.toString(), inventory ? [inventory: inventory] : [:])
+        Map<String, Map> levels = [:]
+        results.each { row ->
+            if (!levels.containsKey(row[0])) {
+                levels[row[0]] = [status: row[1], minQuantity: row[2], reorderQuantity: row[3], maxQuantity: row[4], abcClass: row[5]]
+            }
+        }
+        return levels
+    }
+
+    PreferredBinLocationsDto getPreferredBinLocations(PreferredBinLocationsCommand command) {
+        List<InventoryLevel> inventoryLevels = InventoryLevel.createCriteria().list {
+            eq("inventory", command.facility.inventory)
+            "in"("product", command.products)
+            isNotNull("preferredBinLocation")
+        }
+
+        return PreferredBinLocationsDto.from(inventoryLevels)
+    }
+
     // Associations are resolved explicitly (by id or natural key) rather than via data binding, so we don't
     // expose the raw domain bindings; everything else is bound.
     private static final List<String> NON_BINDABLE_FIELDS = [
@@ -62,7 +94,7 @@ class InventoryLevelService {
 
                 if (!deferRefresh && inventoryLevel.product?.id) {
                     grailsApplication.mainContext.publishEvent(
-                        new InventoryLevelUpdatedEvent(inventoryLevel, facility.id, inventoryLevel.product.id, true))
+                        new InventoryLevelUpdatedEvent(inventoryLevel, facility.id, [inventoryLevel.product.id], true))
                 }
 
                 return UpsertResult.ok(isNew, inventoryLevel.id, inventoryLevel.product?.id)

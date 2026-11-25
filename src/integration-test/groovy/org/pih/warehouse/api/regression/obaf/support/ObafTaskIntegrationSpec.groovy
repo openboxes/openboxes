@@ -69,17 +69,18 @@ abstract class ObafTaskIntegrationSpec extends ObafIntegrationSpec {
     // ------------------------------------------------------------------ picking
 
     static class PickSite {
-        String dc, bin, alt, tote, staging, product, lot, lotId
+        String dc, bin, alt, tote, staging, lostAndFound, product, lot, lotId
         DeliveryTypeCode deliveryType
     }
 
     /**
      * A depot with TRACK_INTERNAL_TRANSACTIONS (unless {@code internal} is false), a storage bin
      * and an alternative bin holding {@code onHand} each of one lot, a tote (outbound container)
-     * and a staging lane for {@code deliveryType}.
+     * and a staging lane for {@code deliveryType}, and a lost and found bin (unless {@code withLostAndFound} is false)
+     * that a short pick moves the shorted quantity to.
      */
     PickSite pickSite(String prefix, DeliveryTypeCode deliveryType = DeliveryTypeCode.LOCAL_DELIVERY,
-                      boolean internal = true, int onHand = 20) {
+                      boolean internal = true, int onHand = 20, boolean withLostAndFound = true) {
         PickSite s = new PickSite(deliveryType: deliveryType)
         s.dc = depot(prefix, internal ? [ActivityCode.TRACK_INTERNAL_TRANSACTIONS] : [])
         ActivityCode lane = deliveryType.activityCode
@@ -87,6 +88,9 @@ abstract class ObafTaskIntegrationSpec extends ObafIntegrationSpec {
         s.alt = bin(s.dc, 'ALT')
         s.tote = bin(s.dc, 'TOTE', [ActivityCode.OUTBOUND_CONTAINER, ActivityCode.HOLD_STOCK] + (lane ? [lane] : []), false)
         s.staging = bin(s.dc, 'STAGE', [ActivityCode.STAGING_LOCATION, ActivityCode.HOLD_STOCK] + (lane ? [lane] : []), false)
+        if (withLostAndFound) {
+            s.lostAndFound = bin(s.dc, 'LNF', [ActivityCode.LOST_AND_FOUND, ActivityCode.HOLD_STOCK], false)
+        }
         s.product = product(prefix)
         s.lot = "L-${uid()}".toString()
         stock(s.dc, s.product, [[s.bin, onHand, s.lot, SOON], [s.alt, onHand, s.lot, SOON]])

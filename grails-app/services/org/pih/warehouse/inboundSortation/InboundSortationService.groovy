@@ -30,8 +30,9 @@ class InboundSortationService {
 
     void createPutawayOrdersFromReceipt(Receipt receipt) {
         receipt.receiptItems.each { ReceiptItem receiptItem ->
-            if (!receiptItem.binLocation?.supports(ActivityCode.INBOUND_SORTATION)) {
-                log.warn "Receipt item destination does not support ${ActivityCode.INBOUND_SORTATION} activity code. " +
+            if (!receiptItem.binLocation?.isSortationLocation()) {
+                log.warn "Receipt item destination does not support ${ActivityCode.INBOUND_SORTATION} " +
+                        "or ${ActivityCode.RETURN_SORTATION} activity code. " +
                         "Putaway order will not be created."
                 return
             }

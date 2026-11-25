@@ -82,6 +82,9 @@ enum ActivityCode {
     // Auto allocation
     AUTOMATIC_ALLOCATION_ENABLED('AUTOMATIC_ALLOCATION_ENABLED'),
 
+    // Automatic issuance
+    AUTOMATIC_ISSUANCE_ENABLED('AUTOMATIC_ISSUANCE_ENABLED'),
+
     // Accounting (Budget Code, GL Account)
     REQUIRE_ACCOUNTING('REQUIRE_ACCOUNTING'),
 
@@ -129,12 +132,14 @@ enum ActivityCode {
     DELIVERY_TYPE_SHIPPING('DELIVERY_TYPE_SHIPPING'),
     DELIVERY_TYPE_WILL_CALL('DELIVERY_TYPE_WILL_CALL'),
     DELIVERY_TYPE_STOCK_TRANSFER_IBT('DELIVERY_TYPE_STOCK_TRANSFER_IBT'),
+    DELIVERY_TYPE_VENDOR_RETURN('DELIVERY_TYPE_VENDOR_RETURN'),
 
     // Picking strategies
     PICKING_STRATEGY_AUTOMATIC_REALLOCATION('PICKING_STRATEGY_AUTOMATIC_REALLOCATION'),
 
     // Inbound sortation
     INBOUND_SORTATION('INBOUND_SORTATION'),
+    RETURN_SORTATION('RETURN_SORTATION'),
 
     // Enables assigning a putaway container (cart) during inbound sortation, one code per assignment strategy
     PUTAWAY_CONTAINER_ASSIGNMENT_BY_ZONE('PUTAWAY_CONTAINER_ASSIGNMENT_BY_ZONE'),
@@ -204,6 +209,7 @@ enum ActivityCode {
                 DYNAMIC_RECEIVING,
                 AUTO_RECEIVING,
                 AUTOMATIC_ALLOCATION_ENABLED,
+                AUTOMATIC_ISSUANCE_ENABLED,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,
                 AUTOMATED_PUTAWAY_CREATION,
@@ -247,6 +253,7 @@ enum ActivityCode {
 
                 // Internal locations used for inbound sortation and putaway
                 INBOUND_SORTATION,
+                RETURN_SORTATION,
                 PUTAWAY_CONTAINER_ASSIGNMENT_BY_ZONE,
                 PUTAWAY_CONTAINER_ASSIGNMENT_BY_DELIVERY_TYPE,
                 LOST_AND_FOUND,
@@ -266,6 +273,7 @@ enum ActivityCode {
                 DELIVERY_TYPE_SHIPPING,
                 DELIVERY_TYPE_WILL_CALL,
                 DELIVERY_TYPE_STOCK_TRANSFER_IBT,
+                DELIVERY_TYPE_VENDOR_RETURN,
 
                 TRACK_INTERNAL_TRANSACTIONS,
                 DISPLAY_STOCK,

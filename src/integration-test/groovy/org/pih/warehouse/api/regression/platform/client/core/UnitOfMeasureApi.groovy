@@ -11,7 +11,9 @@ import org.springframework.boot.test.context.TestComponent
 
 import org.pih.warehouse.api.client.base.AuthenticatedApi
 
-@TestComponent
+// Named explicitly: org.pih.warehouse.api.client has a client of the same class name, and both are
+// component-scanned, so the default bean name would clash.
+@TestComponent("regressionUnitOfMeasureApi")
 @InheritConstructors
 class UnitOfMeasureApi extends AuthenticatedApi {
 

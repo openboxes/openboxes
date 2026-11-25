@@ -1,0 +1,89 @@
+import React from 'react';
+
+import * as locales from 'date-fns/locale';
+import { useSelector } from 'react-redux';
+import { getCurrentLocale, getIsShipmentFromPurchaseOrder } from 'selectors';
+
+import { DateFormatDateFns } from 'consts/timeFormat';
+import useFormatNumber from 'hooks/useFormatNumber';
+import useTranslate from 'hooks/useTranslate';
+import { formatApiDateToString } from 'utils/dateUtils';
+import ProductHandlingIcons from 'utils/ProductHandlingIcons';
+import getShippedQuantityInPoUom from 'utils/receiving/getShippedQuantityInPoUom';
+
+/**
+ * Badge and fields of the edited line item for the ItemDetails box.
+ */
+const useShipmentItemDetails = (lineItem) => {
+  const translate = useTranslate();
+  const formatNumber = useFormatNumber();
+  const currentLocale = useSelector(getCurrentLocale);
+  const isShipmentFromPurchaseOrder = useSelector(getIsShipmentFromPurchaseOrder);
+
+  // Only a purchase order has a unit of measure to convert the quantity into.
+  const quantityInPoUom = isShipmentFromPurchaseOrder
+    ? getShippedQuantityInPoUom({ item: lineItem, formatNumber })
+    : null;
+  const quantityShipped = formatNumber(lineItem?.quantityShipped);
+  const shippedValue = quantityInPoUom ? (
+    <>
+      {quantityShipped}
+      <span className="item-details__value-secondary">
+        {` (${quantityInPoUom.quantity} `}
+        <span className="item-details__label">{quantityInPoUom.unitOfMeasure}</span>
+        )
+      </span>
+    </>
+  ) : quantityShipped;
+
+  const badge = {
+    current: {
+      label: translate('react.receiving.status.shipped.label', 'Shipped'),
+      variant: 'badge--grey text-uppercase rounded',
+    },
+    clickable: false,
+  };
+
+  const fields = [
+    {
+      label: translate('react.receiving.product.label', 'Product'),
+      value: (
+        <>
+          {lineItem?.product?.name}
+          <ProductHandlingIcons handlingLabels={lineItem?.product?.handlingLabels} />
+        </>
+      ),
+    },
+    ...(isShipmentFromPurchaseOrder ? [{
+      label: translate('react.receiving.supplierItemCode.label', 'Supplier Item Code'),
+      value: lineItem?.supplierCode,
+    }] : []),
+    {
+      label: translate('react.receiving.lotSerialNo.short.label', 'Lot/SN'),
+      value: lineItem?.lotNumber,
+    },
+    {
+      label: translate('react.receiving.expiration.label', 'Expiration'),
+      value: formatApiDateToString({
+        date: lineItem?.expirationDate,
+        dateFormat: DateFormatDateFns.DD_MMM_YYYY,
+        options: { locale: locales[currentLocale] },
+      }),
+    },
+    {
+      label: translate('react.receiving.recipient.label', 'Recipient'),
+      value: lineItem?.shippedRecipient?.name,
+      // Without the supplier item code there are five fields, so the recipient spans two
+      // columns to keep the shipped quantity in the last column
+      className: isShipmentFromPurchaseOrder ? '' : 'item-details__field--span-2',
+    },
+    {
+      label: translate('react.receiving.shipped.label', 'Shipped'),
+      value: shippedValue,
+    },
+  ];
+
+  return { badge, fields };
+};
+
+export default useShipmentItemDetails;
