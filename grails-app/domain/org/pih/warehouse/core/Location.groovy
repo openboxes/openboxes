@@ -143,6 +143,13 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
 
+    /**
+     * The supported activities of the location, or the default ones of its location type when it has none.
+     */
+    Set<String> getSupportedActivitiesOrLocationTypeDefaults() {
+        return supportedActivities ?: locationType?.supportedActivities
+    }
+
     Boolean supportsAll(ActivityCode[] activityCodes) {
         activityCodes.every { supports(it) }
     }
@@ -411,7 +418,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
                 organization               : organization,
                 manager                    : manager,
                 address                    : address,
-                supportedActivities        : supportedActivities ?: locationType?.supportedActivities,
+                supportedActivities        : supportedActivitiesOrLocationTypeDefaults,
         ]
     }
 

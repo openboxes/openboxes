@@ -52,6 +52,20 @@ class LocationSpec extends Specification implements DomainUnitTest<Location> {
         assert domain.supports(ActivityCode.MANAGE_INVENTORY) == true
     }
 
+    void 'getSupportedActivitiesOrLocationTypeDefaults should return #scenario'() {
+        given:
+        ownActivities.each { String activity -> domain.addToSupportedActivities(activity) }
+        domain.locationType = new LocationType(supportedActivities: [ActivityCode.MANAGE_INVENTORY.id])
+
+        expect:
+        assert domain.supportedActivitiesOrLocationTypeDefaults == expectedActivities as Set
+
+        where:
+        scenario                       | ownActivities                   | expectedActivities
+        'its own activities'           | [ActivityCode.RECEIVE_STOCK.id] | [ActivityCode.RECEIVE_STOCK.id]
+        'the location type activities' | []                              | [ActivityCode.MANAGE_INVENTORY.id]
+    }
+
     void 'supportsAny should return true if the location has at least one of the activities'() {
         given:
         domain.addToSupportedActivities(ActivityCode.MANAGE_INVENTORY.id)

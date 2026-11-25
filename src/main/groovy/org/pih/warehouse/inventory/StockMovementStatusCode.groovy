@@ -62,6 +62,10 @@ enum StockMovementStatusCode {
         [CREATED, REQUESTED, VALIDATED, PICKING, PICKED, CHECKING, CHECKED, PACKED, REVIEWING, DISPATCHED, CANCELED]
     }
 
+    static List<StockMovementStatusCode> listRequestSubmitted() {
+        [REQUESTED, PENDING_APPROVAL]
+    }
+
     String getName() { return name() }
 
     String toString() { return name() }
