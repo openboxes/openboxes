@@ -12,10 +12,10 @@ package org.pih.warehouse.report
 import grails.core.GrailsApplication
 import grails.util.GrailsWebMockUtil
 import grails.util.Holders
-import org.apache.commons.mail.EmailException
+import org.apache.commons.mail2.core.EmailException
 import org.apache.commons.validator.EmailValidator
 import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.grails.plugins.web.taglib.RenderTagLib
+import org.grails.taglib.TagLibraryLookup
 import grails.web.context.ServletContextHolder
 import org.grails.web.errors.GrailsWrappedRuntimeException
 import org.pih.warehouse.api.PartialReceipt
@@ -48,20 +48,33 @@ class NotificationService {
     FileGenerationService fileGenerationService
     GoodsReceiptNoteService goodsReceiptNoteService
     MessageLocalizer messageLocalizer
+    TagLibraryLookup gspTagLibraryLookup
     def messageSource
 
     ApplicationTagLib getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 
-    def renderTemplate(String template, Map model) {
-        def webRequest = RequestContextHolder.getRequestAttributes()
-        if(!webRequest) {
-            def servletContext = ServletContextHolder.getServletContext()
-            def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-            GrailsWebMockUtil.bindMockWebRequest(applicationContext)
+    /**
+     * Renders a GSP template within the current HTTP request. Outside of a request (ex: jobs), a mock request
+     * with an empty session is bound for the duration of the rendering.
+     */
+    String renderTemplate(String template, Map model) {
+        // Not PageRenderer: its request throws on getSession() and getScheme(), which the email templates
+        // need for the user's locale, session.warehouse and absolute links.
+        boolean isMockRequestBound = false
+        if (RequestContextHolder.getRequestAttributes() == null) {
+            GrailsWebMockUtil.bindMockWebRequest(
+                    WebApplicationContextUtils.getRequiredWebApplicationContext(ServletContextHolder.getServletContext()))
+            isMockRequestBound = true
         }
-        return new RenderTagLib().render(template: template, model: model)
+        try {
+            return gspTagLibraryLookup.lookupNamespaceDispatcher('g').render(template: template, model: model)?.toString()
+        } finally {
+            if (isMockRequestBound) {
+                RequestContextHolder.resetRequestAttributes()
+            }
+        }
     }
 
     def getExpiryAlertsByLocation(Location location, Integer daysUntilExpiry = 0) {

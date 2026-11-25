@@ -9,42 +9,56 @@
  */
 package org.pih.warehouse.jobs
 
-import groovyx.gpars.GParsPool
-import groovyx.gpars.util.PoolUtils
-import jsr166y.ForkJoinPool
-import jsr166y.ForkJoinWorkerThread
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.ForkJoinPool
+import java.util.concurrent.ForkJoinWorkerThread
 import java.util.concurrent.TimeUnit
 
 /**
- * A thin service that wraps GPars to improve logging and exception handling.
+ * A thin service that provides named worker pools with logged exceptions.
  *
- * gparsService.withPool() behaves just like GParsPool.withPool(),
- * with the following modifications:
+ * Historically this wrapped GPars; GPars is unmaintained and does not run
+ * on Groovy 4, so the same behavior is now implemented directly on
+ * java.util.concurrent. Within a withPool() closure, collections gain
+ * eachParallel/collectParallel via org.pih.warehouse.concurrent.ParallelExtensions,
+ * mirroring the two GPars enhancements OpenBoxes used:
  *
- * (a) it assigns names to pool workers to clarify log messages,
- * (b) it logs uncaught exceptions instead of printing them.
- *
- * Cf. https://github.com/GPars/GPars/blob/release-0.12/src/main/groovy/groovyx/gpars/GParsPool.groovy
+ * (a) pool workers get names to clarify log messages,
+ * (b) uncaught exceptions are logged instead of printed.
  */
 class GparsService {
 
     private static final Logger logger = LoggerFactory.getLogger(GparsService)
 
     /**
-     * Factory that creates named threads for use by GPars.
+     * The pool bound to the thread currently executing a withPool() closure.
+     * ParallelExtensions reads this to dispatch eachParallel/collectParallel.
      */
-    private static class GParsForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinWorkerThreadFactory {
+    private static final ThreadLocal<ForkJoinPool> CURRENT_POOL = new ThreadLocal<>()
+
+    static ForkJoinPool currentPool() {
+        ForkJoinPool pool = CURRENT_POOL.get()
+        if (pool == null) {
+            throw new IllegalStateException(
+                'eachParallel/collectParallel must be called inside GparsService.withPool()')
+        }
+        return pool
+    }
+
+    /**
+     * Factory that creates named threads for the pool.
+     */
+    private static class NamedForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinWorkerThreadFactory {
 
         private static int indexCounter = 0
 
         private final String poolName
         private final int poolIndex
 
-        GParsForkJoinWorkerThreadFactory(String poolName = null) {
+        NamedForkJoinWorkerThreadFactory(String poolName = null) {
             this.poolIndex = indexCounter++
             this.poolName = poolName ?: 'OpenBoxes'
         }
@@ -58,36 +72,28 @@ class GparsService {
     }
 
     /**
-     * Create threads for use by GPars; the poolName field makes logs clearer.
-     */
-    private static ForkJoinPool.ForkJoinWorkerThreadFactory createForkJoinWorkerThreadFactoryForPool(String poolName) {
-        return new GParsForkJoinWorkerThreadFactory(poolName)
-    }
-
-    /**
-     * Log any uncaught exceptions from pool workers.
-     *
-     * GPars 0.12 prints them to stdout, which is invisible to Sentry.
+     * Log any uncaught exceptions from pool workers so they reach Sentry.
      */
     private static class LogEveryUncaughtExceptionHandler implements UncaughtExceptionHandler {
 
         @Override
         void uncaughtException(Thread failedThread, Throwable throwable) {
-            logger.error("GPars thread ${failedThread.name} threw ${throwable.message}", throwable)
+            logger.error("Worker thread ${failedThread.name} threw ${throwable.message}", throwable)
         }
     }
 
     /**
-     * Create a named pool for GPars with `poolSize` workers.
+     * Create a named pool with `poolSize` workers.
      *
-     * GPars 0.12's implementation (q.v.) defaults to one more than the
-     * core count, which is high for a host that also runs a database.
+     * Defaults used to come from GPars, which picked one more than the
+     * core count; we keep that default (see withPool below), which is
+     * high for a host that also runs a database.
      */
     private static ForkJoinPool createPool(String poolName, int poolSize) {
         logger.info("creating new pool '${poolName}' of size ${poolSize}")
         return new ForkJoinPool(
             poolSize,
-            createForkJoinWorkerThreadFactoryForPool(poolName),
+            new NamedForkJoinWorkerThreadFactory(poolName),
             new LogEveryUncaughtExceptionHandler(),
             false
         )
@@ -96,13 +102,21 @@ class GparsService {
     /**
      * Create a pool, run a closure within it and wait for it to finish.
      *
-     * Behaves like GParsPool.withPool().
+     * Behaves like GParsPool.withPool() did: collections used inside the
+     * closure support eachParallel/collectParallel on this pool.
      */
     static withPool(String poolName, int poolSize, Closure cl) {
         ForkJoinPool pool = createPool(poolName, poolSize)
+        ForkJoinPool previous = CURRENT_POOL.get()
+        CURRENT_POOL.set(pool)
         try {
-            return GParsPool.withExistingPool(pool, cl)
+            return cl.call()
         } finally {
+            if (previous == null) {
+                CURRENT_POOL.remove()
+            } else {
+                CURRENT_POOL.set(previous)
+            }
             logger.info("draining pool '${poolName}' of size ${poolSize}")
             pool.shutdown()
             pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
@@ -112,10 +126,8 @@ class GparsService {
 
     /**
      * Create a pool, run a closure within it and wait for it to finish.
-     *
-     * Behaves like GParsPool.withPool().
      */
     static withPool(String poolName, Closure cl) {
-        return withPool(poolName, PoolUtils.retrieveDefaultPoolSize(), cl)
+        return withPool(poolName, Runtime.runtime.availableProcessors() + 1, cl)
     }
 }

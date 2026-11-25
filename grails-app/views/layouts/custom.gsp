@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html lang="en">
 <head>
-    <%= NewRelic.getBrowserTimingHeader() %>
+    <%= raw(NewRelic.getBrowserTimingHeader()) %>
     <g:render template="/common/sentry"/>
 
     <!-- Include default page title -->
@@ -755,6 +755,5 @@
     </g:if>
 </g:if>
 <r:layoutResources/>
-<%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>

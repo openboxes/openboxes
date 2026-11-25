@@ -1,6 +1,6 @@
 package org.pih.warehouse.api
 
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 import org.pih.warehouse.importer.BulkDataImportResult
 import org.pih.warehouse.importer.ImportService

@@ -1,16 +1,20 @@
 package org.pih.warehouse
 
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.web.UrlMappingsUnitTest
 import org.pih.warehouse.UrlMappings
 import org.pih.warehouse.api.CategoryApiController
 import org.pih.warehouse.api.StockMovementItemApiController
 import org.pih.warehouse.api.UserRoleApiController
 import spock.lang.Specification
 
-@TestFor(UrlMappings)
-@Mock([CategoryApiController, StockMovementItemApiController, UserRoleApiController])
-class UrlMappingsSpec extends Specification {
+class UrlMappingsSpec extends Specification implements UrlMappingsUnitTest<UrlMappings> {
+
+    void setup() {
+        mockController(CategoryApiController)
+        mockController(StockMovementItemApiController)
+        mockController(UserRoleApiController)
+    }
+
     void "test forward mapping for GETs"() {
         when:
         request.method = 'GET'

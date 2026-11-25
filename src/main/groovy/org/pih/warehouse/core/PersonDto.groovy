@@ -1,5 +1,7 @@
 package org.pih.warehouse.core
 
+import org.hibernate.Hibernate
+
 import org.pih.warehouse.core.dtos.DomainDto
 
 /**
@@ -15,6 +17,8 @@ class PersonDto implements DomainDto<Person> {
     Boolean active = true
 
     static PersonDto from(Person person) {
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+        person = Hibernate.unproxy(person) as Person
         return !person ? null : new PersonDto(
                 id: person.id,
                 name: person.name,

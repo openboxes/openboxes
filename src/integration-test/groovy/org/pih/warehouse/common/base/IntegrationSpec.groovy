@@ -1,7 +1,7 @@
 package org.pih.warehouse.common.base
 
 import grails.buildtestdata.TestDataBuilder
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import org.pih.warehouse.Application
 import org.springframework.context.annotation.Import
 import spock.lang.Specification

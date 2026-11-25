@@ -1,15 +1,19 @@
 package org.pih.warehouse.core
 
-import grails.test.mixin.TestFor
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
+import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.PasswordCodec
 import org.pih.warehouse.user.UserController
 import spock.lang.Specification
 
-@TestFor(UserController)
-@Mock([User, UserService])
-class UserControllerSpec extends Specification {
+class UserControllerSpec extends Specification implements ControllerUnitTest<UserController>, DataTest {
     def stubMessager = new Expando()
+
+    Class[] getDomainClassesToMock() { [User] }
+
+    Closure doWithSpring() {{ ->
+        userService(UserService)
+    }}
 
     void setup() {
         mockCodec(PasswordCodec)

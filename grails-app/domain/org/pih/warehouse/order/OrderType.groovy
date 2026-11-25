@@ -36,19 +36,19 @@ class OrderType implements Serializable {
     User createdBy
     User updatedBy
 
-    Boolean isReturnOrder() {
+    boolean isReturnOrder() {
         return code == Constants.RETURN_ORDER
     }
 
-    Boolean isPurchaseOrder() {
+    boolean isPurchaseOrder() {
         return orderTypeCode == OrderTypeCode.PURCHASE_ORDER
     }
 
-    Boolean isPutawayOrder() {
+    boolean isPutawayOrder() {
         return code == Constants.PUTAWAY_ORDER
     }
 
-    Boolean isTransferOrder() {
+    boolean isTransferOrder() {
         return orderTypeCode == OrderTypeCode.TRANSFER_ORDER
     }
 

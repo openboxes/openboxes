@@ -11,7 +11,8 @@ import org.pih.warehouse.core.dtos.DomainDto
  * @param <E> The domain entity to be converted from
  * @param <D> The DTO to be converted into
  */
-trait EntityToDtoMapper<E extends GormEntity, D extends DomainDto> implements Mapper<E, D> {
+// Groovy 4 validates generic bounds before the GORM AST weaves GormEntity into domains, so the E bound must stay implicit
+trait EntityToDtoMapper<E, D extends DomainDto> implements Mapper<E, D> {
 
     /**
      * Defines the actual logic of converting a domain entity into a DTO.

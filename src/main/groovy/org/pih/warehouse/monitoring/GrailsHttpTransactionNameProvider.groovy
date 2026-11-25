@@ -2,8 +2,8 @@ package org.pih.warehouse.monitoring
 
 import grails.util.Holders
 import io.sentry.protocol.TransactionNameSource
-import io.sentry.spring.tracing.TransactionNameProvider
-import javax.servlet.http.HttpServletRequest
+import io.sentry.spring.jakarta.tracing.TransactionNameProvider
+import jakarta.servlet.http.HttpServletRequest
 
 /**
  * Defines how Sentry transaction names for HTTP requests should be structured.

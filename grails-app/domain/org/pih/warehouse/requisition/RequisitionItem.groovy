@@ -510,11 +510,11 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return !(isApproved() || isSubstituted() || isChanged() || isCanceled())
     }
 
-    Boolean isParentRequisitionPending() {
+    boolean isParentRequisitionPending() {
         return requisition.status in [RequisitionStatus.CREATED, RequisitionStatus.PENDING, RequisitionStatus.PENDING_APPROVAL]
     }
 
-    Boolean isParentRequisitionRejected() {
+    boolean isParentRequisitionRejected() {
         return requisition.status == RequisitionStatus.REJECTED
     }
 

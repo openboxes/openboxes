@@ -47,7 +47,7 @@ class TransactionType implements Serializable {
     // because it's saved as a "localized string", so it has
     // to be split by localized string separator
     // and then compared
-    Boolean isAdjustment() {
+    boolean isAdjustment() {
         compareName(Constants.ADJUSTMENT)
     }
 }

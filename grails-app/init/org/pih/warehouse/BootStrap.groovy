@@ -9,8 +9,10 @@ package org.pih.warehouse
  * You must not remove this notice, or any other, from this software.
  **/
 
+import com.zaxxer.hikari.HikariDataSource
 import grails.converters.JSON
 import grails.util.Holders
+import org.hibernate.Hibernate
 
 import org.pih.warehouse.core.mapper.MapperComponentResolver
 import org.pih.warehouse.core.serialization.Serializable
@@ -138,24 +140,19 @@ class BootStrap {
         while (target instanceof DelegatingDataSource) {
             target = ((DelegatingDataSource) target).targetDataSource
         }
-        if (!(target instanceof org.apache.tomcat.jdbc.pool.DataSource)) {
+        if (!(target instanceof HikariDataSource)) {
             log.info("Data source: ${target?.class?.name}")
             return
         }
 
-        org.apache.tomcat.jdbc.pool.DataSource pool = (org.apache.tomcat.jdbc.pool.DataSource) target
-        log.info("Data source: url=${pool.url?.replaceAll(/(?i)(password=)[^&;]*/, '\$1****')}, " +
+        HikariDataSource pool = (HikariDataSource) target
+        log.info("Data source: url=${pool.jdbcUrl?.replaceAll(/(?i)(password=)[^&;]*/, '\$1****')}, " +
                 "username=${pool.username}, driverClassName=${pool.driverClassName}")
-        log.info("Data source pool: initialSize=${pool.initialSize}, maxActive=${pool.maxActive}, " +
-                "minIdle=${pool.minIdle}, maxIdle=${pool.maxIdle}, maxWait=${pool.maxWait}, maxAge=${pool.maxAge}, " +
-                "testOnBorrow=${pool.testOnBorrow}, testWhileIdle=${pool.testWhileIdle}, " +
-                "testOnReturn=${pool.testOnReturn}, validationQuery=${pool.validationQuery}, " +
-                "validationQueryTimeout=${pool.validationQueryTimeout}, validationInterval=${pool.validationInterval}, " +
-                "timeBetweenEvictionRunsMillis=${pool.timeBetweenEvictionRunsMillis}, " +
-                "minEvictableIdleTimeMillis=${pool.minEvictableIdleTimeMillis}, " +
-                "removeAbandoned=${pool.removeAbandoned}, removeAbandonedTimeout=${pool.removeAbandonedTimeout}, " +
-                "defaultTransactionIsolation=${pool.defaultTransactionIsolation}, " +
-                "jdbcInterceptors=${pool.jdbcInterceptors}")
+        log.info("Data source pool: maximumPoolSize=${pool.maximumPoolSize}, minimumIdle=${pool.minimumIdle}, " +
+                "connectionTimeout=${pool.connectionTimeout}, idleTimeout=${pool.idleTimeout}, " +
+                "maxLifetime=${pool.maxLifetime}, validationTimeout=${pool.validationTimeout}, " +
+                "keepaliveTime=${pool.keepaliveTime}, connectionTestQuery=${pool.connectionTestQuery}, " +
+                "transactionIsolation=${pool.transactionIsolation}")
     }
 
     void refreshAnalyticsData() {
@@ -333,7 +330,8 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Party) { Party party ->
-            return party.toJson()
+            // A lazy Party association is a Hibernate proxy of Party even when the row is an Organization
+            return Hibernate.unproxy(party).toJson()
         }
 
         JSON.registerObjectMarshaller(PartyRole) { PartyRole partyRole ->
@@ -345,7 +343,8 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Person) { Person person ->
-            return person.toJson()
+            // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+            return Hibernate.unproxy(person).toJson()
         }
 
         JSON.registerObjectMarshaller(Picklist) { Picklist picklist ->

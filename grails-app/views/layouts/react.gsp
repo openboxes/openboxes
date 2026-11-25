@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <%= NewRelic.getBrowserTimingHeader() %>
+    <%= raw(NewRelic.getBrowserTimingHeader()) %>
     <title><g:layoutTitle default="OpenBoxes" /></title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css">
     <g:render template="/localization/crowdin"/>
@@ -16,6 +16,5 @@
     <div style="flex: 1">
         <g:layoutBody />
     </div>
-<%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>

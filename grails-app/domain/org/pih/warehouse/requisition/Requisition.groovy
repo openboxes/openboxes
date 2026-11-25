@@ -262,19 +262,19 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return requisitionItems?.findAll { it.parentRequisitionItem }
     }
 
-    Boolean isWardRequisition() {
+    boolean isWardRequisition() {
         return (type in [RequisitionType.NON_STOCK, RequisitionType.STOCK, RequisitionType.ADHOC])
     }
 
-    Boolean isOpen() {
+    boolean isOpen() {
         return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING])
     }
 
-    Boolean isPending() {
+    boolean isPending() {
         return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING, RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING])
     }
 
-    Boolean isRequested() {
+    boolean isRequested() {
         return (status in [RequisitionStatus.VERIFYING, RequisitionStatus.PICKING, RequisitionStatus.PENDING, RequisitionStatus.ISSUED, RequisitionStatus.RECEIVED])
     }
 

@@ -1,8 +1,9 @@
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import util.LiquibaseUtil
 import util.TaggedMigrationVersion
 
-final Logger LOGGER = Logger.getLogger('changelog')
+final Logger LOGGER = LoggerFactory.getLogger('changelog')
 
 /**
  * The entrypoint changelog for all liquibase migrations.
