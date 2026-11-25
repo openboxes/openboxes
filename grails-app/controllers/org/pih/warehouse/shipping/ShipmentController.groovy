@@ -15,6 +15,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.lang.text.StrSubstitutor
+import org.pih.warehouse.api.StockMovementDirection
 
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
@@ -105,10 +106,11 @@ class ShipmentController {
 
     def create() {
         boolean isInbound = params.type?.toUpperCase() == "INCOMING"
+        StockMovementDirection direction = isInbound ? StockMovementDirection.INBOUND : StockMovementDirection.OUTBOUND
         redirect(
                 controller: "stockMovement",
                 action: isInbound ? "createInbound" : "createOutbound",
-                params: [direction: isInbound ? "INBOUND" : "OUTBOUND"]
+                params: [direction: direction]
         )
     }
 
