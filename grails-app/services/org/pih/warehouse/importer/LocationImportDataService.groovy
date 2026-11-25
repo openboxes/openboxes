@@ -125,12 +125,8 @@ class LocationImportDataService implements ImportDataService {
                 }
             }
 
-            if (!StringUtils.isBlank(params.sortOrder as String)) {
-                if (parseSortOrder(params.sortOrder) == null) {
-                    command.errors.reject("Row ${index + 1}: Sort order '${params.sortOrder}' must be a whole number")
-                } else if (locationType && !(locationType.isInternalLocation() || locationType.isZone())) {
-                    command.errors.reject("Row ${index + 1}: Sort order can only be set on internal locations and zones")
-                }
+            if (!StringUtils.isBlank(params.sortOrder as String) && parseSortOrder(params.sortOrder) == null) {
+                command.errors.reject("Row ${index + 1}: Sort order '${params.sortOrder}' must be a whole number")
             }
 
             if (!StringUtils.isBlank(params.bgColor as String)) {
@@ -138,8 +134,6 @@ class LocationImportDataService implements ImportDataService {
                 String fgColor = (location ?: new Location()).fgColor
                 if (!bgColor.matches(/[0-9A-F]{6}/)) {
                     command.errors.reject("Row ${index + 1}: Background color '${params.bgColor}' must be a six-digit hex color code")
-                } else if (locationType && !locationType.isZone()) {
-                    command.errors.reject("Row ${index + 1}: Background color can only be set on zones")
                 } else if (bgColor.equalsIgnoreCase(fgColor)) {
                     command.errors.reject("Row ${index + 1}: Background color must differ from the foreground color '${fgColor}'")
                 }
@@ -301,7 +295,8 @@ class LocationImportDataService implements ImportDataService {
     }
 
     private static String normalizeColor(def value) {
-        return (value as String).trim().replaceFirst('^#', '').toUpperCase()
+        String color = (value as String).trim().replaceFirst('^#', '').toUpperCase()
+        return color.matches(/\d{1,5}/) ? color.padLeft(6, '0') : color
     }
 
     Address bindAddress(Map params, String addressId = null) {
