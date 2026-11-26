@@ -434,6 +434,7 @@ class PickTaskService {
 
     void save(PickTask task) {
         PicklistItem existingPickItem = PicklistItem.get(task.id)
+        boolean statusChanged = existingPickItem.status != task.status.toString()
         existingPickItem.status = task.status.toString()
         Requisition requisition = existingPickItem?.requisitionItem?.requisition
 
@@ -454,13 +455,15 @@ class PickTaskService {
                 requisition.status = RequisitionStatus.PICKED
             }
         } else if (task.status == PickTaskStatus.STAGED) {
-            // Notify once per requisition item, when the last of its tasks is staged
-            // (published before REQUISITION_STAGED so item events precede the order-level event)
             RequisitionItem requisitionItem = existingPickItem.requisitionItem
             boolean allItemTasksStaged = allOrderTasks.findAll { it.requisitionItem?.id == requisitionItem.id }.every {
                 it.status == PickTaskStatus.STAGED.name()
             }
-            if (allItemTasksStaged) {
+            // Notify once per requisition item, when the last of its tasks is staged
+            // (published before REQUISITION_STAGED so item events precede the order-level event)
+            // Send the event only if the status changed, all tasks are staged and the item
+            // has a quantity picked (it is not canceled)
+            if (statusChanged && allItemTasksStaged && requisitionItem.calculateQuantityPicked() > 0) {
                 grailsApplication.mainContext.publishEvent(new RequisitionItemEvent(requisitionItem.id, WebhookEventType.REQUISITION_ITEM_STAGED))
             }
 
