@@ -27,6 +27,9 @@
                             <tr class="prop">
                                 <td></td>
                                 <td class="value">
+                                    <g:link class="button" action="index">
+                                        <g:message code="default.button.cancel.label" default="Cancel" />
+                                    </g:link>
                                     <button type="submit" class="button">
                                         <g:message code="default.button.update.label" default="Update" />
                                     </button>
