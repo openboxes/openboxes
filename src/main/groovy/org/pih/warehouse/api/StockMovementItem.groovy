@@ -230,7 +230,7 @@ class StockMovementItem {
                         return StockMovementItem.createFromRequisitionItem(it)
                     } : []
         } else if (requisitionItem.substitutionItem) {
-            substitutionItems.push(StockMovementItem.createFromRequisitionItem(requisitionItem.substitutionItem))
+            substitutionItems.add(StockMovementItem.createFromRequisitionItem(requisitionItem.substitutionItem))
         }
 
         return new StockMovementItem(
