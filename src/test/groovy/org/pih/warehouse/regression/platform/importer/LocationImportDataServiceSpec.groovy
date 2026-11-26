@@ -27,6 +27,7 @@ class LocationImportDataServiceSpec extends Specification implements ServiceUnit
     LocationType depotType
     LocationType supplierType
     LocationType binType
+    LocationType zoneType
     LocationGroup bostonGroup
     Organization acme
     Location bostonDepot
@@ -45,6 +46,7 @@ class LocationImportDataServiceSpec extends Specification implements ServiceUnit
         depotType = saveLocationType('lt-depot', 'Depot|fr:D\u00e9p\u00f4t', LocationTypeCode.DEPOT)
         supplierType = saveLocationType('lt-supplier', 'Supplier', LocationTypeCode.SUPPLIER)
         binType = saveLocationType('lt-bin', 'Bin Location', LocationTypeCode.BIN_LOCATION)
+        zoneType = saveLocationType('lt-zone', 'Zone', LocationTypeCode.ZONE)
         // A second type whose name starts like the depot type, to prove the lookup matches the whole default name
         saveLocationType('lt-depot-2', 'Depot Annex', LocationTypeCode.DEPOT)
 
@@ -366,6 +368,97 @@ class LocationImportDataServiceSpec extends Specification implements ServiceUnit
         e.errors.getFieldError('locationType')
     }
 
+    void 'validateData should accept a bin location assigned to a zone created by the same import'() {
+        given:
+        ImportDataCommand command = new ImportDataCommand(data: [binRow(zone: 'Zone 01'), zoneRow()])
+
+        when:
+        service.validateData(command)
+
+        then:
+        !command.errors.hasErrors()
+    }
+
+    void 'importData should assign a bin location to a zone created by the same import'() {
+        given: 'the bin comes before its zone in the file'
+        ImportDataCommand command = new ImportDataCommand(data: [binRow(zone: 'Zone 01'), zoneRow(sortOrder: '1', bgColor: 'FF0000')])
+
+        when:
+        service.importData(command)
+
+        then:
+        Location zone = Location.findByName('Zone 01')
+        zone.locationType == zoneType
+        zone.parentLocation == bostonDepot
+        zone.sortOrder == 1
+        zone.bgColor == 'FF0000'
+
+        and:
+        Location.findByName('Bin A').zone == zone
+    }
+
+    void 'validateData should reject a zone that does not exist under the parent location'() {
+        given:
+        ImportDataCommand command = new ImportDataCommand(data: [binRow(zone: 'Unknown Zone')])
+
+        when:
+        service.validateData(command)
+
+        then:
+        command.errors.allErrors*.code == ["Row 1: Zone 'Unknown Zone' does not exist in 'Boston Depot'"]
+    }
+
+    void 'validateData should accept the sort order #sortOrder'() {
+        given:
+        ImportDataCommand command = new ImportDataCommand(data: [binRow(sortOrder: sortOrder)])
+
+        when:
+        service.validateData(command)
+
+        then:
+        !command.errors.hasErrors()
+
+        where:
+        sortOrder << ['5', '5.0']
+    }
+
+    void 'importData should store the sort order 5.0 as 5'() {
+        when:
+        service.importData(new ImportDataCommand(data: [binRow(sortOrder: '5.0')]))
+
+        then:
+        Location.findByName('Bin A').sortOrder == 5
+    }
+
+    void 'validateData should reject a sort order that is not a whole number'() {
+        given:
+        ImportDataCommand command = new ImportDataCommand(data: [binRow(sortOrder: 'abc')])
+
+        when:
+        service.validateData(command)
+
+        then:
+        command.errors.allErrors*.code == ["Row 1: Sort order 'abc' must be a whole number"]
+    }
+
+    void 'importData should store the background color #bgColor as #expected'() {
+        given:
+        ImportDataCommand command = new ImportDataCommand(data: [zoneRow(bgColor: bgColor)])
+
+        when:
+        service.validateData(command)
+        service.importData(command)
+
+        then:
+        !command.errors.hasErrors()
+        Location.findByName('Zone 01').bgColor == expected
+
+        where:
+        bgColor   || expected
+        '#ff0000' || 'FF0000'
+        '8000'    || '008000'
+    }
+
     void 'bindAddress should create a new address when the id is unknown and default blank street lines'() {
         when:
         Address address = service.bindAddress([city: 'Boston', country: 'US'], 'missing')
@@ -384,6 +477,10 @@ class LocationImportDataServiceSpec extends Specification implements ServiceUnit
 
     private Map binRow(Map overrides = [:]) {
         return [name: 'Bin A', active: true, locationType: 'Bin Location', parentLocation: 'Boston Depot'] + overrides
+    }
+
+    private Map zoneRow(Map overrides = [:]) {
+        return [name: 'Zone 01', active: true, locationType: 'Zone', parentLocation: 'Boston Depot'] + overrides
     }
 
     private static List<Organization> findOrganizations(String name, String code) {

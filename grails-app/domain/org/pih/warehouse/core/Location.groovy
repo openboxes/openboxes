@@ -522,5 +522,8 @@ class Location implements Comparable<Location>, java.io.Serializable {
             "postalCode"      : "address.postalCode",
             "country"         : "address.country",
             "description"     : "address.description",
+            "zone"            : "zone.name",
+            "sortOrder"       : "sortOrder",
+            "bgColor"         : "bgColor",
     ]
 }
