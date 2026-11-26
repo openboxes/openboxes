@@ -1,10 +1,9 @@
 package org.pih.warehouse.exporter
 
-import java.lang.reflect.Field
-
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.core.mapper.MapperComponentResolver
+import org.pih.warehouse.core.reflection.PropertyFields
 import org.pih.warehouse.core.serialization.SerializationMapper
 import org.pih.warehouse.core.serialization.TabularSerializable
 
@@ -41,6 +40,16 @@ class BulkDataUnbinder {
     }
 
     private Map<String, Object> unbindObject(Object objectToUnbind) {
+        // Write null rows as empty rows so that we preserve the number of rows given.
+        if (objectToUnbind == null) {
+            return [:]
+        }
+
+        // A Map is already in the "unbound" format so there's nothing to do.
+        if (objectToUnbind instanceof Map) {
+            return objectToUnbind as Map<String, Object>
+        }
+
         // If a mapper exists that defines how the object should be serialized for export, use it to unbind the object.
         if (objectToUnbind instanceof TabularSerializable) {
             SerializationMapper serializationMapper = mapperComponentResolver.getSerializationMapper(objectToUnbind.class)
@@ -54,19 +63,9 @@ class BulkDataUnbinder {
             }
         }
 
-        // Otherwise, simply collect all fields declared on the object as a Map.
-        return getDeclaredFields(objectToUnbind.class).collectEntries { [it.name, objectToUnbind."${it.name}"] }
-    }
-
-    /**
-     * Collects the declared fields of the given class, including any fields declared in superclasses (except Object).
-     */
-    private List<Field> getDeclaredFields(Class clazz) {
-        List<Field> fields = []
-        for (Class current = clazz; current != Object; current = current.superclass) {
-            fields.addAll(current.declaredFields)
+        // Otherwise, simply collect all of the object's properties (including inherited ones) as a Map.
+        return PropertyFields.getPropertyFields(objectToUnbind.class).collectEntries {
+            [it.name, objectToUnbind."${it.name}"]
         }
-        // We exclude synthetic fields since those are injected by the compiler (e.g. Groovy metaClasses)
-        return fields.findAll { !it.synthetic }
     }
 }

@@ -67,6 +67,22 @@ class BulkDataUnbinderSpec extends Specification {
         ]]
     }
 
+    void "unbindData passes Map rows through unchanged"() {
+        given:
+        List<Map> toUnbind = [[string: "A", integer: 1]]
+
+        expect:
+        assert unbinder.unbindData(toUnbind) == [[string: "A", integer: 1]]
+    }
+
+    void "unbindData converts null rows to empty rows"() {
+        given:
+        List<Object> toUnbind = [null, [string: "A"]]
+
+        expect:
+        assert unbinder.unbindData(toUnbind) == [[:], [string: "A"]]
+    }
+
     /**
      * Modify the component resolver to either find or not find a response mapper for the object.
      */

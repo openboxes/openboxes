@@ -6,18 +6,20 @@ import org.springframework.util.ReflectionUtils
 import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.parser.ParserContext
+import org.pih.warehouse.exporter.BulkDataExportConfig
 import org.pih.warehouse.exporter.BulkDataWriterFieldConfig
 
 /**
  * Wraps all import and export configuration options, unifying them into a single config for the sake of simplicity.
  *
- * Designed to be used by implementations of {@link BulkDataImportConfigurer}.
+ * Designed to be used by implementations of {@link BulkDataImportExportConfigurer}. The export half of the config
+ * is a regular {@link BulkDataExportConfig}, so it is handled the same as for export-only features.
  */
 class BulkDataImportExportConfig {
 
     private Map<String, String> columnMapping = [:]
     private Map<String, BulkDataBinderFieldConfig> binderFieldConfigs = [:]
-    private List<BulkDataWriterFieldConfig> writerFieldConfigs = []
+    private BulkDataExportConfig exportConfig
 
     static BulkDataImportExportConfigBuilder builder(final Class importableType) {
         return new BulkDataImportExportConfigBuilder(importableType)
@@ -46,10 +48,25 @@ class BulkDataImportExportConfig {
     }
 
     /**
-     * Configuration for writing each field of the object. Keyed on field name.
+     * Configuration for exporting the object (the writer field configs and file name).
+     */
+    BulkDataExportConfig getExportConfig() {
+        return exportConfig
+    }
+
+    /**
+     * Configuration for writing each field of the object, in the order that they were added.
+     * A shortcut for exportConfig.fieldConfigs.
      */
     List<BulkDataWriterFieldConfig> getWriterFieldConfigs() {
-        return writerFieldConfigs
+        return exportConfig.fieldConfigs
+    }
+
+    /**
+     * The fields to join together to construct the exported file name.
+     */
+    List<Object> getFileNameArgs() {
+        return exportConfig.fileNameArgs
     }
 
     static class BulkDataImportExportConfigBuilder {
@@ -57,9 +74,25 @@ class BulkDataImportExportConfig {
         Class importableType
         BulkDataImportExportConfig config
 
+        /**
+         * Builds the export half of the config. We delegate to the export builder so that the export logic
+         * (such as validating fields and setting the file name) is shared with export-only features.
+         */
+        private final BulkDataExportConfig.BulkDataExportConfigBuilder exportConfigBuilder =
+                BulkDataExportConfig.builder()
+
         BulkDataImportExportConfigBuilder(final Class importableType) {
             this.importableType = importableType
             this.config = new BulkDataImportExportConfig()
+        }
+
+        /**
+         * Sets the fields to join together to construct the exported file name.
+         * See {@link BulkDataExportConfig.BulkDataExportConfigBuilder#fileName}.
+         */
+        BulkDataImportExportConfigBuilder fileName(Object... args) {
+            exportConfigBuilder.fileName(args)
+            return this
         }
 
         /**
@@ -143,14 +176,18 @@ class BulkDataImportExportConfig {
                                                            String headerMessageCode,
                                                            DateFieldType dateFieldType=null) {
 
-            config.columnMapping.put(columnIndex, fieldName)
-            config.binderFieldConfigs.put(fieldName, binderConfig)
-            config.writerFieldConfigs.add(new BulkDataWriterFieldConfig(
+            // Add the writer config first because it rejects fields that were already added.
+            exportConfigBuilder.fieldConfig(new BulkDataWriterFieldConfig(
                     fieldName: fieldName,
                     columnIndex: columnIndex,
                     headerMessageCode: headerMessageCode,
                     dateFieldType: dateFieldType,
             ))
+            if (config.columnMapping.containsKey(columnIndex)) {
+                throw new IllegalArgumentException("Column '${columnIndex}' was mapped to more than one field.")
+            }
+            config.columnMapping.put(columnIndex, fieldName)
+            config.binderFieldConfigs.put(fieldName, binderConfig)
 
             return this
         }
@@ -179,6 +216,7 @@ class BulkDataImportExportConfig {
         }
 
         BulkDataImportExportConfig build() {
+            config.@exportConfig = exportConfigBuilder.build()
             return config
         }
     }

@@ -7,9 +7,11 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.parser.DefaultTypeParser
+import org.pih.warehouse.core.parser.EnumParser
 import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.parser.ParserContext
 import org.pih.warehouse.core.session.SessionManager
@@ -31,6 +33,7 @@ class BulkDataBinderSpec extends Specification {
     void setup() {
         parserStub = Stub(Parser)
         ApplicationContext contextStub = Stub(ApplicationContext) {
+            getBean(EnumParser) >> new EnumParser()
             getBean(_ as Class<Parser>) >> parserStub
         }
 
@@ -235,6 +238,49 @@ class BulkDataBinderSpec extends Specification {
         VALUE_THAT_WARNS_CUSTOM_BINDING || "warn.code"     | BulkDataErrorSeverity.WARNING
     }
 
+    void "bindData should use the enum parser for enum fields when no parser is specified"() {
+        given: "the raw data being bound"
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1),
+                        "enumField": new BulkDataCell(row: 0, column: 5, fieldName: "enumField", value: "CREATED"),
+                ],
+        ])
+
+        when:
+        BulkDataBinderResult result = bulkDataBinder.bindData(BULK_DATA_TYPE, readerResult)
+        List<ImportableStub> rows = result.boundRows as List<ImportableStub>
+
+        then:
+        assert rows.size() == 1
+        assert rows[0].enumField == EventCode.CREATED
+
+        assert result.bindErrors.size() == 0
+    }
+
+    void "bindData should bind fields that are inherited from a superclass"() {
+        given: "the raw data being bound"
+        BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
+                [
+                        "integerField": new BulkDataCell(row: 0, column: 1, fieldName: "integerField", value: 1),
+                        "inheritedField": new BulkDataCell(row: 0, column: 6, fieldName: "inheritedField", value: "Hi"),
+                ],
+        ])
+
+        and: "stubbed values for the parser to return"
+        parserStub.parse("Hi", _ as ParserContext) >> "Hi"
+
+        when:
+        BulkDataBinderResult result = bulkDataBinder.bindData(BULK_DATA_TYPE, readerResult)
+        List<ImportableStub> rows = result.boundRows as List<ImportableStub>
+
+        then:
+        assert rows.size() == 1
+        assert rows[0].inheritedField == "Hi"
+
+        assert result.bindErrors.size() == 0
+    }
+
     void "bindData should fail if there is no configurer associated with the given bulk data type"() {
         given: "the raw data being bound"
         BulkDataReaderResult readerResult = new BulkDataReaderResult(rows: [
@@ -252,12 +298,17 @@ class BulkDataBinderSpec extends Specification {
         assert e.message.contains("No bulk data binder config was found for type CATEGORY")
     }
 
-    class ImportableStub implements Importable {
+    class ImportableStubParent implements Importable {
+        String inheritedField  // For testing that inherited fields are bound properly for the child object.
+    }
+
+    class ImportableStub extends ImportableStubParent {
         String stringField
         Integer integerField
         Date dateField
         Date dateTimeField
         Date dateFieldWithoutStyle
+        EventCode enumField  // For testing enum edge-cases. Any enum will do.
     }
 
     /**
@@ -279,6 +330,8 @@ class BulkDataBinderSpec extends Specification {
                     fields: [
                             "stringField": BulkDataBinderFieldConfigDefaults.DEFAULT_CONFIG,
                             "integerField": BulkDataBinderFieldConfigDefaults.MANUALLY_BOUND,
+                            "enumField": BulkDataBinderFieldConfigDefaults.buildDefaultEnumFieldConfig(EventCode),
+                            "inheritedField": BulkDataBinderFieldConfigDefaults.DEFAULT_CONFIG,
                             "dateField": new BulkDataBinderFieldConfig(dateFieldType: DateFieldType.LOCAL_DATE),
                             "dateTimeField": new BulkDataBinderFieldConfig(dateFieldType: DateFieldType.INSTANT),
 
@@ -291,6 +344,8 @@ class BulkDataBinderSpec extends Specification {
                             "dateField": "2",
                             "dateTimeField": "3",
                             "dateFieldWithoutStyle": "4",
+                            "enumField": "5",
+                            "inheritedField": "6",
                     ]
             )
         }

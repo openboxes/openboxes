@@ -2,6 +2,8 @@ package org.pih.warehouse.core.http
 
 import org.apache.commons.lang.StringUtils
 
+import org.pih.warehouse.importer.BulkDataType
+
 /**
  * Holds the context required to build/render an HTTP response object.
  */
@@ -32,6 +34,12 @@ class HttpResponseContext {
      * Only needed if we intend for the API to render HTML.
      */
     String htmlFile
+
+    /**
+     * Identifies the configuration to use when exporting the data.
+     * Only needed if we've defined specific export behaviour for the data type.
+     */
+    BulkDataType bulkDataType
 
     /**
      * Will be concatenated to construct the file name of the file being output.
@@ -92,6 +100,20 @@ class HttpResponseContext {
         HttpResponseContextBuilder forResponseBody(Object data, Map<String, Object> additionalFields=[:]) {
             context.data = data
             context.additionalFields = additionalFields
+            return this
+        }
+
+        /**
+         * For when the API should support exporting the data as a bulk data file.
+         *
+         * Content types: CSV, XLS, XLSX
+         */
+        HttpResponseContextBuilder forExport(Object data,
+                                             BulkDataType bulkDataType,
+                                             Collection<Object> fileNameArgs=[]) {
+            context.data = data
+            context.bulkDataType = bulkDataType
+            context.fileNameArgs = fileNameArgs
             return this
         }
 

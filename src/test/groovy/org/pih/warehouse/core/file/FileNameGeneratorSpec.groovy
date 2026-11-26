@@ -44,6 +44,10 @@ class FileNameGeneratorSpec extends Specification {
         FileExtension.XLS  | [new Date()]          || "2000-01-01.xls"       | "using Java.util.Date"
         FileExtension.XLS  | ["你好"]               || "你好.xls"             | "Unicode characters"
         FileExtension.XLS  | ["a​b"]            || "a​b.xls"           | "OBS-1960: Zero width joiner"
+    }
 
+    void "generate resolves CURRENT_TIME correctly"() {
+        expect:
+        assert fileNameGenerator.generate(FileExtension.CSV, [FileNamePart.CURRENT_TIME]) == "2000-01-01.csv"
     }
 }

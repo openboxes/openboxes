@@ -4,7 +4,6 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import java.time.Instant
 import javax.validation.Valid
-import org.apache.commons.csv.CSVPrinter
 import org.springframework.web.multipart.MultipartFile
 
 import org.pih.warehouse.core.Constants
@@ -12,6 +11,7 @@ import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.dtos.BatchCommandUtils
 import org.pih.warehouse.core.http.HttpResponseContext
+import org.pih.warehouse.importer.BulkDataType
 import org.pih.warehouse.importer.CycleCountItemsExcelImporter
 import org.pih.warehouse.importer.CycleCountRecountItemsExcelImporter
 import org.pih.warehouse.importer.DataImporter
@@ -48,13 +48,8 @@ class CycleCountApiController extends BaseApiController {
     def getCandidates(@Valid CycleCountCandidateFilterCommand filterParams) {
         List<CycleCountCandidate> cycleCounts = cycleCountService.getCandidates(filterParams, params.facilityId)
 
-        if (filterParams.format == "csv") {
-            CSVPrinter csv = cycleCountService.getCycleCountCsv(cycleCounts)
-            response.setHeader("Content-disposition", "attachment; filename=\"CycleCountReport-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: csv.out.toString())
-            return
-        }
-        renderResponse(cycleCounts)
+        renderResponse(HttpResponseContext.builder()
+                .forExport(cycleCounts, BulkDataType.CYCLE_COUNT_CANDIDATE))
     }
 
     def getPendingCycleCountRequests(@Valid CycleCountCandidateFilterCommand filterParams) {

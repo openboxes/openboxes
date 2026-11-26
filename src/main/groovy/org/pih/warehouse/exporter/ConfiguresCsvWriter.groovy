@@ -20,6 +20,15 @@ trait ConfiguresCsvWriter implements ConfiguresBulkDataWriter {
 
     @Override
     Set<ContentType> getSupportedContentTypes() {
-        return [ContentType.CSV]
+        return csvWriterContentTypes
+    }
+
+    /**
+     * Exists for traits that combine writers (see ConfiguresAllBulkDataWriters).
+     *
+     * @return The content types that the CSV writer supports.
+     */
+    Set<ContentType> getCsvWriterContentTypes() {
+        return [ContentType.CSV] as Set
     }
 }

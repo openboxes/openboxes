@@ -24,7 +24,7 @@ class FileNameGenerator {
      * Generates a file name for the given file extension using the given fields.
      *
      * @param fileExtension the file extension to use when generating the file name
-     * @param fields the fields to include in the file name
+     * @param fields the fields to include in the file name. Can include {@link FileNamePart} placeholders.
      * @param delimiter the separator between each field in the file name
      */
     String generate(FileExtension fileExtension, Collection<Object> fields, String delimiter=FILE_NAME_PART_DELIMITER) {
@@ -55,6 +55,9 @@ class FileNameGenerator {
     private String formatFieldForFileName(Object field) {
         String fieldString
         switch (field) {
+            case FileNamePart.CURRENT_TIME:
+                fieldString = dateFormatter.formatForFileName(Instant.now())
+                break
             case Instant:
             case LocalDate:
             case ZonedDateTime:

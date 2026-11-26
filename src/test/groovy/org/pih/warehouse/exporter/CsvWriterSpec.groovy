@@ -231,6 +231,38 @@ class CsvWriterSpec extends Specification {
                 "jabłko\r\n"
     }
 
+    void "write escapes values containing special characters exactly once"() {
+        given:
+        List<Map> toWrite = [
+                [string: 'a, b'],
+                [string: 'say "hi"'],
+                [string: "line1\nline2"],
+                [string: 'plain'],
+        ]
+
+        and: "a valid config"
+        CsvWriterConfig config = initConfig(true, new CsvWriterConfig(
+                addHeaderRow: true,
+                fields: [
+                        new BulkDataWriterFieldConfig(
+                                fieldName: "string",
+                                headerPlainText: "Header, with comma",
+                        ),
+                ],
+        ))
+
+        when:
+        BulkDataWriterResult<String> result = writer.write(toWrite, ContentType.CSV, config)
+
+        then:
+        assert result.result == "﻿" +
+                '"Header, with comma"\r\n' +
+                '"a, b"\r\n' +
+                '"say ""hi"""\r\n' +
+                '"line1\nline2"\r\n' +
+                'plain\r\n'
+    }
+
     void "write succeeds with an empty dataset"() {
         given:
         List<Map> toWrite = []

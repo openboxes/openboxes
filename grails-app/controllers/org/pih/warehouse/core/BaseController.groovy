@@ -1,17 +1,24 @@
 package org.pih.warehouse.core
 
 import java.nio.charset.StandardCharsets
-import java.time.Instant
 import org.apache.commons.lang.StringUtils
+import org.apache.poi.ss.usermodel.Workbook
 import org.springframework.http.HttpStatus
 
 import org.pih.warehouse.core.file.FileExtension
+import org.pih.warehouse.core.file.FileNamePart
 import org.pih.warehouse.core.file.FileNameGenerator
 import org.pih.warehouse.core.http.ContentType
+import org.pih.warehouse.core.http.HttpServletResponseConfigurer
 import org.pih.warehouse.core.http.JsonSerializer
 import org.pih.warehouse.core.http.JsonSerializerContext
 import org.pih.warehouse.core.http.RenderType
 import org.pih.warehouse.core.http.HttpResponseContext
+import org.pih.warehouse.exporter.BulkDataExportComponentResolver
+import org.pih.warehouse.exporter.BulkDataExportRequest
+import org.pih.warehouse.exporter.BulkDataExporter
+import org.pih.warehouse.exporter.BulkDataWriterResult
+import org.pih.warehouse.importer.BulkDataType
 
 /**
  * Base class for all Grails Controller components.
@@ -23,6 +30,9 @@ abstract class BaseController {
 
     FileNameGenerator fileNameGenerator
     JsonSerializer jsonSerializer
+    HttpServletResponseConfigurer httpServletResponseConfigurer
+    BulkDataExporter bulkDataExporter
+    BulkDataExportComponentResolver bulkDataExportComponentResolver
 
     /**
      * Returns an empty 204 NO RESPONSE status.
@@ -61,7 +71,7 @@ abstract class BaseController {
      *
      * The renderer/content-type that will be used can be controlled by the client via:
      *  1) The HTTP Accept header                      -> Accept: text/csv
-     *  2) The value of the "format" request parameter -> /api/products?format=CSV
+     *  2) The value of the "format" request parameter -> /api/products?format=csv
      *  3) The extension at the end of the URI         -> /api/products.csv
      */
     void renderResponse(HttpResponseContext context) {
@@ -69,34 +79,29 @@ abstract class BaseController {
             throw new RuntimeException("Response context is required to render an API response.")
         }
 
-        // https://grails.apache.org/docs/latest/guide/theWebLayer.html#contentNegotiation
-        withFormat {
-            // When the client sends the "Accept: */*" header (meaning it accepts any format), the first format
-            // defined here is used. We put JSON first since it's our preferred format. This is only relevant for
-            // requests coming from non-browsers. All modern browsers send a variation of the following:
-            // "Accept: text/html,application/xhtml+xml,application/xml" which will correctly enter the "html" block.
-            json {
+        switch (contentType) {
+            case ContentType.JSON:
                 renderJsonResponse(context.data, context.additionalFields, context.status)
-            }
-            csv {
-                renderCsvResponse(context.data)
-            }
-            xls {
-                renderXlsResponse(context.data)
-            }
-            xlsx {
-                renderXlsxResponse(context.data)
-            }
-            pdf {
+                break
+            case ContentType.CSV:
+                renderCsvResponse(context.data, context.bulkDataType, context.fileNameArgs)
+                break
+            case ContentType.XLS:
+                renderXlsResponse(context.data, context.bulkDataType, context.fileNameArgs)
+                break
+            case ContentType.XLSX:
+                // TODO: Implement once ExcelWriter supports XLSX (see ExcelWriter.getSupportedContentTypes).
+                throw new UnsupportedOperationException("Exporting to XLSX is not currently supported. " +
+                        "Please use 'xls' instead (via the format=xls query parameter).")
+            case ContentType.PDF:
                 renderPdfResponse(context.data, context.htmlFile, context.fileNameArgs)
-            }
-            html {
+                break
+            case ContentType.HTML:
                 renderHtmlResponse(context.data, context.renderType, context.htmlFile)
-            }
-            // If we cannot resolve the requested format, fallback to returning JSON.
-            '*' {
-                renderJsonResponse(context.data, context.additionalFields, context.status)
-            }
+                break
+            default:
+                // getContentType() should only ever return one of the content types handled above.
+                throw new IllegalStateException("Unable to render a response for content type ${contentType}.")
         }
     }
 
@@ -122,33 +127,59 @@ abstract class BaseController {
      * Renders a response that returns a CSV file.
      *
      * @param data Holds all of the data that will be used during rendering
-     * @param config Configuration for how the file should be written.
+     * @param bulkDataType Identifies the configuration to use when exporting the data
+     * @param fileNameArgs Will be concatenated to construct the name of the file being output
      */
-    void renderCsvResponse(Object data) {
-        // TODO: to be implemented
-        throw new RuntimeException("This endpoint does not support formatting to CSV.")
+    void renderCsvResponse(Object data,
+                           BulkDataType bulkDataType,
+                           Collection<Object> fileNameArgs) {
+
+        BulkDataWriterResult result = bulkDataExporter.exportData(new BulkDataExportRequest(
+                contentType: ContentType.CSV,
+                dataType: bulkDataType,
+                toExport: toExportRows(data),
+        ))
+
+        try {
+            Collection<Object> fileName = buildFileName(bulkDataType, ContentType.CSV, fileNameArgs)
+            httpServletResponseConfigurer.withFile(response, ContentType.CSV, fileName)
+
+            render((Map) [
+                    contentType: ContentType.CSV.mediaType.toString(),
+                    text: result.result as String,
+                    encoding: StandardCharsets.UTF_8.name(),
+            ])
+        } finally {
+            result.close()
+        }
     }
 
     /**
      * Renders a response that returns an XLS Excel file.
      *
      * @param data Holds all of the data that will be used during rendering
-     * @param config Configuration for how the file should be written.
+     * @param bulkDataType Identifies the configuration to use when exporting the data
+     * @param fileNameArgs Will be concatenated to construct the name of the file being output
      */
-    void renderXlsResponse(Object data) {
-        // TODO: to be implemented
-        throw new RuntimeException("This endpoint does not support formatting to XLS.")
-    }
+    void renderXlsResponse(Object data,
+                           BulkDataType bulkDataType,
+                           Collection<Object> fileNameArgs) {
 
-    /**
-     * Renders a response that returns an XLSX Excel file.
-     *
-     * @param data Holds all of the data that will be used during rendering
-     * @param config Configuration for how the file should be written.
-     */
-    void renderXlsxResponse(Object data) {
-        // TODO: to be implemented
-        throw new RuntimeException("This endpoint does not support formatting to XLSX.")
+        BulkDataWriterResult result = bulkDataExporter.exportData(new BulkDataExportRequest(
+                contentType: ContentType.XLS,
+                dataType: bulkDataType,
+                toExport: toExportRows(data),
+        ))
+
+        try {
+            Collection<Object> fileName = buildFileName(bulkDataType, ContentType.XLS, fileNameArgs)
+            httpServletResponseConfigurer.withFile(response, ContentType.XLS, fileName)
+
+            (result.result as Workbook).write(response.outputStream)
+            response.outputStream.flush()
+        } finally {
+            result.close()
+        }
     }
 
     /**
@@ -190,9 +221,83 @@ abstract class BaseController {
     }
 
     /**
+     * Determines the desired content type of the response. This can be controlled by the client via:
+     *  1) The HTTP Accept header                      -> Accept: text/csv
+     *  2) The value of the "format" request parameter -> /api/products?format=csv
+     *  3) The extension at the end of the URI         -> /api/products.csv
+     *
+     *  TODO: Option 1 is currently disabled via the following property: grails.mime.use.accept.header: false
+     *        We should investigate re-enabling that. As a part of this, we'll need to ensure Grails plays nice with
+     *        all modern browsers, which are notorious for sending complex accept headers that mess with Grails.
+     */
+    ContentType getContentType() {
+        // https://grails.apache.org/docs/latest/guide/theWebLayer.html#contentNegotiation
+        return withFormat {
+            // When the client sends the "Accept: */*" header (meaning it accepts any format), the first format
+            // defined here is used. We put JSON first since it's our preferred format. This is only relevant for
+            // requests coming from non-browsers. All modern browsers send a variation of the following:
+            // "Accept: text/html,application/xhtml+xml,application/xml" which will correctly enter the "html" block.
+            json {
+                return ContentType.JSON
+            }
+            csv {
+                return ContentType.CSV
+            }
+            xls {
+                return ContentType.XLS
+            }
+            xlsx {
+                return ContentType.XLSX
+            }
+            pdf {
+                return ContentType.PDF
+            }
+            html {
+                return ContentType.HTML
+            }
+            // If we cannot resolve the requested format, fallback to returning JSON.
+            '*' {
+                return ContentType.JSON
+            }
+        } as ContentType
+    }
+
+    /**
      * The file name to use when returning a file and a name isn't specified in the configuration.
      */
     private Collection<Object> getDefaultFileName() {
-        return ["openboxes_download", Instant.now()]
+        return ["openboxes_download", FileNamePart.CURRENT_TIME]
+    }
+
+    /**
+     * Determines the parts of the name of an exported file. In order of precedence:
+     *  1) The fileNameArgs given by the controller
+     *  2) The fileNameArgs configured for the bulk data type (see BulkDataExportConfig/BulkDataImportExportConfig)
+     *  3) The bulk data type and the current time
+     *  4) The default file name
+     */
+    protected Collection<Object> buildFileName(BulkDataType bulkDataType,
+                                               ContentType contentType,
+                                               Collection<Object> fileNameArgs) {
+        if (fileNameArgs) {
+            return fileNameArgs
+        }
+
+        if (!bulkDataType) {
+            return getDefaultFileName()
+        }
+
+        List<Object> configuredFileNameArgs = bulkDataExportComponentResolver.getFileNameArgs(bulkDataType, contentType)
+        return configuredFileNameArgs ?: [bulkDataType, FileNamePart.CURRENT_TIME]
+    }
+
+    /**
+     * Normalizes the data to be exported as a list of rows.
+     */
+    private List<Object> toExportRows(Object data) {
+        if (data == null) {
+            return []
+        }
+        return data instanceof Collection ? data as List<Object> : [data]
     }
 }
