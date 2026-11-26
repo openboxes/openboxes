@@ -261,25 +261,27 @@
                                     <warehouse:message code="stockMovement.redoAllocation.label" default="Redo Allocation"/>
                                 </g:link>
                             </g:else>
-                            <g:if test="${currentAssignee}">
-                                <g:form controller="requisition" action="unassignPicker" style="display:inline-block; float:left; margin: 0;">
-                                    <g:hiddenField name="id" value="${stockMovement?.requisition?.id}"/>
-                                    <button
-                                            class="button"
-                                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                                    >
-                                        <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
-                                        Unassign picker
-                                    </button>
-                                </g:form>
+                            <g:if test="${stockMovement?.requisition?.status < RequisitionStatus.PICKED}">
+                                <g:if test="${currentAssignee}">
+                                    <g:form controller="requisition" action="unassignPicker" style="display:inline-block; float:left; margin: 0;">
+                                        <g:hiddenField name="id" value="${stockMovement?.requisition?.id}"/>
+                                        <button
+                                                class="button"
+                                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                        >
+                                            <img src="${resource(dir: 'images/icons/silk/', file: 'user_delete.png')}" />&nbsp;
+                                            Unassign picker
+                                        </button>
+                                    </g:form>
+                                </g:if>
+                                <a href="javascript:void(0);" class="button btn-show-dialog"
+                                   data-height="200" data-width="500"
+                                   data-title="Reassign picker"
+                                   data-url="${request.contextPath}/requisition/reassignPickerDialog/${stockMovement?.requisition?.id}">
+                                    <img src="${resource(dir: 'images/icons/silk/', file: 'user_add.png')}" />&nbsp;
+                                    Reassign picker
+                                </a>
                             </g:if>
-                            <a href="javascript:void(0);" class="button btn-show-dialog"
-                               data-height="200" data-width="500"
-                               data-title="Reassign picker"
-                               data-url="${request.contextPath}/requisition/reassignPickerDialog/${stockMovement?.requisition?.id}">
-                                <img src="${resource(dir: 'images/icons/silk/', file: 'user_add.png')}" />&nbsp;
-                                Reassign picker
-                            </a>
                         </g:if>
                 </g:isUserAdmin>
 
