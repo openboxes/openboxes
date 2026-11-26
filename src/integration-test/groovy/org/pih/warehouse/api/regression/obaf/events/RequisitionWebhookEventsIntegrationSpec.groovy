@@ -124,7 +124,7 @@ class RequisitionWebhookEventsIntegrationSpec extends ObafEventsIntegrationSpec 
 
     // ------------------------------------------------------------------ the pick flow: pick.started, requisition.staged
 
-    void 'pick flow at an ENABLE_WEBHOOKS depot: created, then pick.started per task, then requisition.staged once when the last task is dropped'() {
+    void 'pick flow at an ENABLE_WEBHOOKS depot: created, then pick.started per task, then requisitionItem.staged and requisition.staged once when the last task is dropped'() {
         given:
         PickSite s = pickSite('WH-PK')
         addActivities(s.dc, [ActivityCode.ENABLE_WEBHOOKS])
@@ -142,7 +142,15 @@ class RequisitionWebhookEventsIntegrationSpec extends ObafEventsIntegrationSpec 
         status(o.requisitionId) == RequisitionStatus.STAGED
         eventually { events(r, 'requisition.staged', o.requestNumber) }
         settle()
-        payloads(r, o.requestNumber)*.eventType == ['requisition.created', 'pick.started', 'pick.started', 'requisition.staged']
+        payloads(r, o.requestNumber)*.eventType == ['requisition.created', 'pick.started', 'pick.started', 'requisitionItem.staged', 'requisition.staged']
+
+        and: 'the item payload carries the fully staged line (both of its tasks)'
+        Map itemStaged = events(r, 'requisitionItem.staged', o.requestNumber)[0]
+        itemStaged.requisitionStatus == 'STAGED'
+        itemStaged.item.quantityPicked == 5
+        itemStaged.item.stagingLocations*.id == [s.staging]
+        itemStaged.item.outboundContainers*.id == [s.tote]
+        itemStaged.item.stagedBy*.id == [adminId()]
 
         and: 'the staged payload shows the staging lane and who staged each line (the signed-in user)'
         Map staged = events(r, 'requisition.staged', o.requestNumber)[0]
@@ -153,6 +161,37 @@ class RequisitionWebhookEventsIntegrationSpec extends ObafEventsIntegrationSpec 
 
         and: 'nothing ever sends pick.completed (no emitter), even though every task was picked'
         events(r, 'pick.completed', o.requestNumber).isEmpty()
+    }
+
+    void 'requisitionItem.staged is sent once per line, only when the last of its tasks is dropped'() {
+        given: 'one line split into two tasks, picked into two different totes'
+        PickSite s = pickSite('WH-PI')
+        addActivities(s.dc, [ActivityCode.ENABLE_WEBHOOKS])
+        String tote2 = bin(s.dc, 'TOTE2', [ActivityCode.OUTBOUND_CONTAINER, ActivityCode.HOLD_STOCK, s.deliveryType.activityCode], false)
+        LoopbackReceiver r = webhookReceiver()
+        PickOrder o = pickOrder(s, [3, 2])
+        String picker = person()
+        eventually { events(r, 'requisition.created', o.requestNumber) }
+        o.taskIds.each { assert !pickPatch(it, [action: 'start', assigneeId: picker]) }
+        assert !pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.tote, pickedById: picker])
+        assert !pickPatch(o.taskIds[1], [action: 'pick', outboundContainerId: tote2, pickedById: picker])
+
+        when: 'the first tote is dropped'
+        tx { pickTaskService.drop(s.tote, [action: 'drop', stagingLocationId: s.staging]) }
+        settle()
+
+        then: 'the line is only partly staged, so nothing is sent for it'
+        events(r, 'requisitionItem.staged', o.requestNumber).isEmpty()
+
+        when: 'the second tote is dropped'
+        tx { pickTaskService.drop(tote2, [action: 'drop', stagingLocationId: s.staging]) }
+        eventually { events(r, 'requisition.staged', o.requestNumber) }
+        settle()
+
+        then: 'exactly one item event, before the order-level event'
+        events(r, 'requisitionItem.staged', o.requestNumber).size() == 1
+        payloads(r, o.requestNumber)*.eventType.findAll { it.endsWith('.staged') } == ['requisitionItem.staged', 'requisition.staged']
+        events(r, 'requisitionItem.staged', o.requestNumber)[0].item.outboundContainers*.id as Set == [s.tote, tote2] as Set
     }
 
     @PendingFeature(reason = 'PickTaskService.groovy:234 publishes pick.started synchronously inside start(), before the PicklistItem changes and before the transaction commits: a start that is rolled back (a later failure in the same request) has already told the webhook receiver the pick started')
