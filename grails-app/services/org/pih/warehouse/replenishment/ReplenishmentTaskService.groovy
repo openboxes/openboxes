@@ -19,6 +19,7 @@ import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.replenishment.SearchReplenishmentTaskCommand
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
@@ -31,7 +32,10 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionAction
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransferStockCommand
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picking.StagingLocationNotFoundException
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
@@ -40,7 +44,8 @@ import org.pih.warehouse.picklist.PicklistService
 /**
  * Picking and staging of replenishment lists (transfer orders with destination bins) on the mobile app, modelled
  * on PickTaskService: a task is picked from its bin into an outbound container, and a container is dropped at a
- * staging location. Moving the stock into the destination bins (putaway) is not part of it.
+ * staging location. Staged stock is put away into the destination bins by the putaway flow (see
+ * {@link #getStagedForPutaway}), which completes the order once all of it is put away ({@link #completeStagedOrders}).
  */
 @Transactional
 class ReplenishmentTaskService {
@@ -134,6 +139,111 @@ class ReplenishmentTaskService {
 
         return lists.findAll { Map list -> list.status && (!statuses || list.status in statuses) }
                 .sort { it.dateCreated }
+    }
+
+    /**
+     * Staged replenishment stock still to put away, one entry per staging lane, lot and destination bin:
+     * [stagingLocation, inventoryItem, product, destinationLocation, quantity, tasks]. The quantity is what the
+     * staged tasks picked less what completed putaways already moved from that lane into that bin (see
+     * {@link #getOutstandingQuantities}).
+     */
+    @Transactional(readOnly = true)
+    List<Map> getStagedForPutaway(Location facility) {
+        Map<ReplenishmentTask, BigDecimal> outstanding = getOutstandingQuantities(findStagedTasks(facility))
+        return outstanding.findAll { it.value > 0 }
+                .groupBy { ReplenishmentTask task, BigDecimal quantity -> stagedKey(task) }
+                .collect { String key, Map<ReplenishmentTask, BigDecimal> group ->
+                    ReplenishmentTask task = group.keySet().first()
+                    [
+                            stagingLocation    : task.stagingLocation,
+                            inventoryItem      : task.inventoryItem,
+                            product            : task.product,
+                            destinationLocation: task.destinationLocation,
+                            quantity           : group.values().sum() as BigDecimal,
+                            tasks              : group.keySet() as List<ReplenishmentTask>,
+                    ]
+                }
+    }
+
+    /**
+     * Completes the replenishment orders of the facility whose tasks are all staged and whose staged stock is all
+     * put away. Called after a putaway out of a bin replenishment lane.
+     */
+    void completeStagedOrders(Location facility) {
+        // The putaway that just completed may not be flushed yet (mobile saves its line without flushing), and the
+        // putaway lines are read with a query
+        OrderItem.withSession { it.flush() }
+        List<ReplenishmentTask> tasks = ReplenishmentTask.findAllByFacility(facility)
+        Map<ReplenishmentTask, BigDecimal> outstanding = getOutstandingQuantities(
+                tasks.findAll { it.status == PickTaskStatus.STAGED && it.stagingLocation && (it.quantityPicked ?: 0) > 0 })
+
+        List<String> orderIds = tasks.groupBy { it.order.id }.findAll { String orderId, List<ReplenishmentTask> orderTasks ->
+            orderTasks.every { it.status == PickTaskStatus.STAGED && !outstanding[it] }
+        }.keySet() as List<String>
+        tasks*.discard()
+
+        User completedBy = AuthService.currentUser
+        orderIds.each { String orderId ->
+            Order order = Order.get(orderId)
+            order.status = OrderStatus.COMPLETED
+            order.dateCompleted = new Date()
+            order.completedBy = completedBy
+            order.save(failOnError: true, flush: true)
+            log.info "Completed replenishment order ${order.orderNumber}: all its staged stock is put away"
+        }
+    }
+
+    private List<ReplenishmentTask> findStagedTasks(Location facility) {
+        return ReplenishmentTask.createCriteria().list {
+            eq("facility", facility)
+            eq("status", PickTaskStatus.STAGED)
+            gt("quantityPicked", BigDecimal.ZERO)
+            isNotNull("stagingLocation")
+            isNotNull("destinationLocation")
+        } as List<ReplenishmentTask>
+    }
+
+    /**
+     * What each staged task still has to put away. A task cannot record that it was put away, so completed putaway
+     * lines (also those of a putaway order still in progress on mobile) from its lane into its destination bin, for its lot, done since it was staged, are taken off its picked
+     * quantity. Tasks sharing a lane, lot and bin share those lines, oldest staged first.
+     */
+    private Map<ReplenishmentTask, BigDecimal> getOutstandingQuantities(List<ReplenishmentTask> stagedTasks) {
+        Map<ReplenishmentTask, BigDecimal> outstanding = [:]
+        if (!stagedTasks) {
+            return outstanding
+        }
+
+        List<Object[]> putawayLines = OrderItem.executeQuery("""
+            select oi.originBinLocation.id, oi.inventoryItem.id, oi.destinationBinLocation.id, oi.quantity,
+                   coalesce(o.dateCompleted, oi.lastUpdated)
+            from OrderItem oi join oi.order o
+            where o.orderType.code = :putawayOrder
+              and oi.orderItemStatusCode = :itemCompleted
+              and oi.originBinLocation.id in (:lanes)
+        """, [putawayOrder : Constants.PUTAWAY_ORDER,
+              itemCompleted: OrderItemStatusCode.COMPLETED,
+              lanes        : stagedTasks*.stagingLocation*.id.unique()]) as List<Object[]>
+        Map<String, List<Object[]>> putawayLinesByKey = putawayLines.groupBy { "${it[0]}:${it[1]}:${it[2]}".toString() }
+
+        stagedTasks.groupBy { stagedKey(it) }.each { String key, List<ReplenishmentTask> tasks ->
+            List<ReplenishmentTask> oldestFirst = tasks.sort(false) { it.dateStaged }
+            Date since = oldestFirst.first().dateStaged
+            BigDecimal putAway = (putawayLinesByKey[key] ?: []).findAll { Object[] line ->
+                !since || !line[4] || (line[4] as Date) >= since
+            }.sum { (it[3] ?: 0) as BigDecimal } as BigDecimal ?: 0
+            oldestFirst.each { ReplenishmentTask task ->
+                BigDecimal picked = task.quantityPicked ?: 0
+                BigDecimal covered = [putAway, picked].min()
+                putAway -= covered
+                outstanding[task] = picked - covered
+            }
+        }
+        return outstanding
+    }
+
+    private static String stagedKey(ReplenishmentTask task) {
+        return "${task.stagingLocation?.id}:${task.inventoryItem?.id}:${task.destinationLocation?.id}".toString()
     }
 
     @Transactional(readOnly = true)

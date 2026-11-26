@@ -60,8 +60,9 @@ class PutawayItem implements Validateable {
         return currentBins
     }
 
+    // A location level inventory level (staged replenishment) is the bin itself, a facility level one names its bin
     Location getPreferredBin() {
-        return inventoryLevel?.preferredBinLocation
+        return inventoryLevel?.internalLocation ?: inventoryLevel?.preferredBinLocation
     }
 
     String getCurrentBinsAbbreviated() {
