@@ -573,6 +573,8 @@ openboxes:
         defaultCurrencySymbol: '\$'
         supportedCurrencyCodes: ["USD", "CAD", "EUR", "GBP"]
         currencyApi:
+            # %s is replaced by defaultCurrencyCode. The response must have a
+            # "base" code and a "rates" map. apiKey, when set, is sent as access_key.
             url: "https://api.exchangeratesapi.io/latest?base=%s"
             apiKey: ""
             password: ""
