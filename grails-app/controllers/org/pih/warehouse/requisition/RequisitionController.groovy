@@ -368,7 +368,7 @@ class RequisitionController {
         }
         try {
             pickTaskService.unassign(requisition)
-            flash.message = g.message(code: 'picklist.unassign.success.message', default: 'Picker was unassigned and the order was returned to the pick queue')
+            flash.message = g.message(code: 'picklist.unassign.success.message', default: 'Picker was unassigned')
         } catch (Exception e) {
             flash.error = g.message(code: 'picklist.unassign.error.message', args: [e.message], default: 'Unable to unassign picker: {0}')
         }
