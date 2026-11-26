@@ -188,7 +188,6 @@ class StockMovementController {
                     currentLocation: currentLocation,
                     latestHistoryItem: latestHistoryItem,
                     currentAssignee: pickTaskService.getCurrentAssignee(stockMovement?.requisition),
-                    picker: pickTaskService.getPicker(stockMovement?.requisition),
             ])
         }
     }

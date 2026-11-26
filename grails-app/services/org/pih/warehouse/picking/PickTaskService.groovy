@@ -735,29 +735,11 @@ class PickTaskService {
      * That assumption can currently be violated by the mobile app, which assigns one picklist item at a time
      * and could let different items on the same order end up with different assignees. Unassign/reassign exist
      * precisely to let an admin recover from that kind of stuck/inconsistent state from the web app.
+     *
+     * Items in any status count, so the picker is still shown once the items are picked or staged.
      */
     Person getCurrentAssignee(Requisition requisition) {
-        return requisition?.picklist?.picklistItems?.find { PicklistItem item ->
-            item.assignee && (!item.status || item.status in [PickTaskStatus.PENDING.name(), PickTaskStatus.PICKING.name()])
-        }?.assignee
-    }
-
-    /**
-     * The picker to display for the order. Unlike getCurrentAssignee, which only looks at items that are still
-     * open (it decides whether the assignment can be changed), this also looks at picked and staged items, so the
-     * picker is still shown once the items are picked, and between picks on the mobile app, which assigns one
-     * picklist item at a time. An open item's assignee wins (it reflects a reassignment); otherwise the most
-     * recently assigned item's assignee is used.
-     */
-    Person getPicker(Requisition requisition) {
-        Person currentAssignee = getCurrentAssignee(requisition)
-        if (currentAssignee) {
-            return currentAssignee
-        }
-
-        return requisition?.picklist?.picklistItems?.findAll { PicklistItem item -> item.assignee }
-                ?.max { PicklistItem item -> item.dateAssigned?.time ?: 0L }
-                ?.assignee
+        return requisition?.picklist?.picklistItems?.find { PicklistItem item -> item.assignee }?.assignee
     }
 
     void unassign(Requisition requisition) {

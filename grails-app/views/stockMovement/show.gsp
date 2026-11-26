@@ -371,7 +371,7 @@
                                     <warehouse:message code="picklist.assignee.label" default="Picker"/>
                                 </td>
                                 <td class="value">
-                                    ${picker?.name ?: 'Unassigned'}
+                                    ${currentAssignee?.name ?: 'Unassigned'}
                                 </td>
                             </tr>
                         </g:if>
