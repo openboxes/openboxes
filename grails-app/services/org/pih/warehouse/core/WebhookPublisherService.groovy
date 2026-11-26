@@ -196,6 +196,7 @@ class WebhookPublisherService {
                 triggeredBy: adjustmentTransaction?.createdBy?.name,
                 adjustment: [
                         id: adjustmentTransaction?.id,
+                        transactionNumber: adjustmentTransaction?.transactionNumber,
                         comment: adjustmentTransaction.comment,
                         adjustedBy: adjustmentTransaction.createdBy?.name,
                         dateAdjusted: adjustmentTransaction.transactionDate?.format(
@@ -275,6 +276,7 @@ class WebhookPublisherService {
                 triggeredBy: countedBy?.name,
                 count: [
                         id: adjustmentTransaction?.id ?: baselineTransaction?.id,
+                        transactionNumber: adjustmentTransaction?.transactionNumber ?: baselineTransaction?.transactionNumber,
                         comment: adjustmentTransaction?.comment,
                         countedBy: countedBy?.name,
                         dateCounted: (adjustmentTransaction ?: baselineTransaction).transactionDate?.format(
