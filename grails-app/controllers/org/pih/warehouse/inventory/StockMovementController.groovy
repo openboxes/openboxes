@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.plugins.csv.CSVReaderUtils
 import grails.plugins.csv.CSVWriter
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.InboundWorkflowState
@@ -563,7 +564,7 @@ class StockMovementController {
             Map<String, StockMovementItem> existingItemsMap = stockMovement.lineItems.collectEntries { [it.id, it] }
             Integer sortOrder = (stockMovement.lineItems*.sortOrder.findAll { it != null }.max() ?: 0) + 100
 
-            csv.toCsvReader(settings).eachLine { tokens ->
+            CSVReaderUtils.eachLine(CSVReaderUtils.toCsvReader(csv, settings)) { String[] tokens ->
                 Boolean validateLotAndExpiry = stockMovement.getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND && !stockMovement.electronicType
                 StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens, validateLotAndExpiry)
                 StockMovementItem existingItem = existingItemsMap.get(stockMovementItem.id)
