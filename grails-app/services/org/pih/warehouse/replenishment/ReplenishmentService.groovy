@@ -255,7 +255,11 @@ class ReplenishmentService {
         return replenishmentNumber
     }
 
-    private static boolean isTargetLocation(Location binLocation, ActivityCode[] targetActivityCodes) {
+    /**
+     * Whether the bin is one that replenishment refills (supports any of the target activity codes), and so is no
+     * source to replenish from.
+     */
+    static boolean isTargetLocation(Location binLocation, ActivityCode[] targetActivityCodes) {
         return binLocation?.supportsAny(targetActivityCodes) ?: false
     }
 

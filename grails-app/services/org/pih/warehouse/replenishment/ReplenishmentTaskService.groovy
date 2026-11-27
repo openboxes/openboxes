@@ -56,6 +56,7 @@ class ReplenishmentTaskService {
     InventoryService inventoryService
     PicklistService picklistService
     ProductAvailabilityService productAvailabilityService
+    ReplenishmentService replenishmentService
     UserService userService
 
     @Transactional(readOnly = true)
@@ -178,19 +179,43 @@ class ReplenishmentTaskService {
                 tasks.findAll { it.status == PickTaskStatus.STAGED && it.stagingLocation && (it.quantityPicked ?: 0) > 0 })
 
         List<String> orderIds = tasks.groupBy { it.order.id }.findAll { String orderId, List<ReplenishmentTask> orderTasks ->
-            orderTasks.every { it.status == PickTaskStatus.STAGED && !outstanding[it] }
+            isOrderDone(orderTasks, outstanding)
         }.keySet() as List<String>
         tasks*.discard()
 
-        User completedBy = AuthService.currentUser
-        orderIds.each { String orderId ->
-            Order order = Order.get(orderId)
-            order.status = OrderStatus.COMPLETED
-            order.dateCompleted = new Date()
-            order.completedBy = completedBy
-            order.save(failOnError: true, flush: true)
-            log.info "Completed replenishment order ${order.orderNumber}: all its staged stock is put away"
+        orderIds.each { String orderId -> completeOrder(orderId) }
+    }
+
+    /**
+     * Completes the replenishment order when none of its tasks has anything left to do: all are staged and their staged
+     * stock is put away. Called after a short pick, which may end the last task of a list with nothing to stage (a list
+     * shorted to zero has no putaway that would complete it).
+     */
+    void completeOrderIfDone(String orderId) {
+        OrderItem.withSession { it.flush() }
+        List<ReplenishmentTask> tasks = ReplenishmentTask.findAllByOrder(Order.load(orderId))
+        Map<ReplenishmentTask, BigDecimal> outstanding = getOutstandingQuantities(
+                tasks.findAll { it.status == PickTaskStatus.STAGED && it.stagingLocation && (it.quantityPicked ?: 0) > 0 })
+        boolean done = tasks && isOrderDone(tasks, outstanding)
+        tasks*.discard()
+
+        if (done) {
+            completeOrder(orderId)
         }
+    }
+
+    /** Whether all the tasks of an order are staged with nothing left to put away */
+    private static boolean isOrderDone(List<ReplenishmentTask> orderTasks, Map<ReplenishmentTask, BigDecimal> outstanding) {
+        return orderTasks.every { it.status == PickTaskStatus.STAGED && !outstanding[it] }
+    }
+
+    private void completeOrder(String orderId) {
+        Order order = Order.get(orderId)
+        order.status = OrderStatus.COMPLETED
+        order.dateCompleted = new Date()
+        order.completedBy = AuthService.currentUser
+        order.save(failOnError: true, flush: true)
+        log.info "Completed replenishment order ${order.orderNumber}: none of its tasks has anything left to stage or put away"
     }
 
     private List<ReplenishmentTask> findStagedTasks(Location facility) {
@@ -293,7 +318,13 @@ class ReplenishmentTaskService {
                 throw new UnsupportedOperationException("Unsupported action: ${data?.action}")
         }
 
-        return get(task.id)
+        // Read before the order may complete: the replenishment_task view only has the tasks of open orders
+        ReplenishmentTask updated = get(task.id)
+        if (data?.action == 'short-pick') {
+            // The last task of a list may have ended with nothing to stage
+            completeOrderIfDone(task.order.id)
+        }
+        return updated
     }
 
     /**
@@ -342,8 +373,11 @@ class ReplenishmentTaskService {
     }
 
     void pick(ReplenishmentTask task, String outboundContainerId, String pickedById) {
+        validateOpen(task)
+        validateAssignee(task)
         Location outboundContainer = findInFacility(outboundContainerId, task.facility)
         validateOutboundContainer(outboundContainer)
+        validateSameContainer(task, outboundContainer)
 
         Integer quantity = (task.quantityRequired - (task.quantityPicked ?: 0)).toInteger()
         transferToContainer(task, outboundContainer, quantity)
@@ -371,12 +405,16 @@ class ReplenishmentTaskService {
             throw new IllegalArgumentException("Quantity picked must be zero or more")
         }
 
+        validateAssignee(task)
         boolean newShortage = reasonCode && task.status in OPEN_STATUSES
 
         Location outboundContainer = null
         if (quantityPicked > 0) {
+            // An ended task (picked, or shorted with a reason) takes no more picks: its shortage may be reallocated
+            validateOpen(task)
             outboundContainer = findInFacility(outboundContainerId, task.facility)
             validateOutboundContainer(outboundContainer)
+            validateSameContainer(task, outboundContainer)
         }
 
         PicklistItem picklistItem = PicklistItem.get(task.id)
@@ -395,7 +433,11 @@ class ReplenishmentTaskService {
         boolean anythingPicked = (picklistItem.quantityPicked ?: 0) > 0
         boolean isFullyPicked = picklistItem.quantityPicked == task.quantityRequired.toInteger()
         if (quantityPicked == 0 && reasonCode && !anythingPicked) {
-            // STAGED is the terminal status of a task that was never picked: there is nothing to stage
+            // STAGED is the terminal status of a task that was never picked: there is nothing to stage. A task never
+            // started (e.g. one reallocated from a shortage) goes through PICKING, as PENDING -> STAGED is not allowed.
+            if (task.status == PickTaskStatus.PENDING) {
+                executeStateTransition(task, PickTaskStatus.PICKING)
+            }
             executeStateTransition(task, PickTaskStatus.STAGED)
         } else if (reasonCode || isFullyPicked) {
             executeStateTransition(task, PickTaskStatus.PICKED)
@@ -474,18 +516,22 @@ class ReplenishmentTaskService {
 
     /**
      * Creates tasks of the same replenishment line to pick the shorted quantity from other bins: those with stock
-     * available to allocate (not on hold, not lost and found), but not the bin that came up short nor the bin being
-     * replenished. Takes what there is, in the order availability sorts the bins (FEFO).
+     * available to allocate (not on hold, not lost and found), but not the bin that came up short, nor the bin being
+     * replenished, nor any other bin that replenishment refills (supporting the configured
+     * openboxes.jobs.automaticReplenishmentJob.targetActivityCodes, the rule automatic replenishment allocates by).
+     * Takes what there is, in the order availability sorts the bins (FEFO).
      *
      * @return the ids of the picklist items (tasks) created
      */
     private List<String> reallocateShortage(ReplenishmentTask task, PicklistItem picklistItem, Integer quantityShorted) {
         OrderItem orderItem = picklistItem.orderItem
         Picklist picklist = picklistItem.picklist
+        ActivityCode[] targetActivityCodes = replenishmentService.targetActivityCodes as ActivityCode[]
         // The shorted bin may still show stock until availability is refreshed, so it is left out by name
         List<AvailableItem> candidates = productAvailabilityService.getAvailableBinLocations(task.facility, task.product?.id).findAll {
             AvailableItem item -> item.binLocation && item.pickable && (item.quantityAvailable ?: 0) > 0 &&
-                    item.binLocation.id != task.location?.id && item.binLocation.id != orderItem?.destinationBinLocation?.id
+                    item.binLocation.id != task.location?.id && item.binLocation.id != orderItem?.destinationBinLocation?.id &&
+                    !ReplenishmentService.isTargetLocation(item.binLocation, targetActivityCodes)
         }
 
         List<PicklistItem> created = []
@@ -660,6 +706,44 @@ class ReplenishmentTaskService {
             return location
         }
         return Location.findByLocationNumberAndParentLocation(idOrNumber, facility)
+    }
+
+    /**
+     * Refuses a pick of a task that has ended: PICKED (in full, or short with a reason, whose shortage may already be
+     * reallocated) or STAGED. PickTaskStatus allows PICKED -> PICKED for outbound short picks, so it is checked here.
+     */
+    private static void validateOpen(ReplenishmentTask task) {
+        if (!(task.status in OPEN_STATUSES)) {
+            throw new IllegalStateException("Replenishment task ${task.identifier} is already ${task.status}")
+        }
+    }
+
+    /**
+     * Refuses a pick of a task assigned to someone else, unless the signed-in user is an administrator at the task's
+     * facility. A task nobody started yet can be picked by anyone.
+     */
+    private void validateAssignee(ReplenishmentTask task) {
+        User currentUser = AuthService.currentUser
+        if (!task.assignee || task.assignee.id == currentUser?.id) {
+            return
+        }
+        if (userService.isUserInRoleAtLocation(currentUser, task.facility, RoleType.ROLE_ADMIN)) {
+            return
+        }
+        String message = "Replenishment task ${task.identifier} is assigned to another user"
+        task.errors.reject("assignee", message)
+        throw new ValidationException(message, task.errors)
+    }
+
+    /**
+     * Refuses to put picks of one task in two containers: dropping a container moves the task's whole picked quantity
+     * out of it.
+     */
+    private static void validateSameContainer(ReplenishmentTask task, Location outboundContainer) {
+        if (task.outboundContainer && outboundContainer && task.outboundContainer.id != outboundContainer.id) {
+            throw new IllegalArgumentException("Replenishment task ${task.identifier} is already picked into container " +
+                    "${task.outboundContainer.locationNumber}, the rest must go into the same container")
+        }
     }
 
     private void validateOutboundContainer(Location outboundContainer) {

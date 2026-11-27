@@ -7,8 +7,11 @@ import org.pih.warehouse.api.replenishment.SearchReplenishmentTaskCommand
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.DeliveryTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picking.StagingLocationNotFoundException
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.replenishment.ReplenishmentTask
 
 /**
@@ -210,10 +213,11 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
                                                  reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
 
-        then:
+        then: 'the list has nothing left to do, so it is completed and its task leaves the view'
         e == null
-        replenTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'reasonCode']) ==
-                [status: 'STAGED', quantityPicked: 0, reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE']
+        pick(o.taskIds[0]) == [status: 'STAGED', quantityPicked: 0, reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE']
+        orderStatus(o) == OrderStatus.COMPLETED
+        replenTask(o.taskIds[0]) == null
         onHand(s.dc, s.product) == [BIN: 15, ALT: 20, LNF: 5]
     }
 
@@ -267,9 +271,10 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
                                                  reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
 
-        then:
+        then: 'no task is created; with nothing left to do the list is completed'
         e == null
-        tasksOf(o)*.id == o.taskIds
+        tx { PicklistItem.findAllByOrderItem(PicklistItem.get(o.taskIds[0]).orderItem)*.id } == o.taskIds
+        orderStatus(o) == OrderStatus.COMPLETED
         listOf(s, o) == null
     }
 
@@ -423,5 +428,185 @@ class ReplenishmentTaskIntegrationSpec extends ObafTaskIntegrationSpec {
                 t
             }
         } as Throwable) instanceof org.hibernate.ObjectNotFoundException
+    }
+
+    // ------------------------------------------------------------------ list completion
+
+    OrderStatus orderStatus(ReplenOrder o) {
+        return tx { Order.get(o.orderId).status } as OrderStatus
+    }
+
+    /** The picklist item of a task, readable after its order completed and its task left the replenishment_task view */
+    Map pick(String id) {
+        return tx {
+            PicklistItem item = PicklistItem.get(id)
+            [status: item.status, quantityPicked: item.quantityPicked as Integer, reasonCode: item.reasonCode]
+        } as Map
+    }
+
+    void 'a list shorted to zero is completed: nothing is left to stage or put away'() {
+        given: 'a replenishment of ALT, whose only other stock is in BIN, so nothing can be reallocated'
+        PickSite s = pickSite('RT-CZ')
+        ReplenOrder o = replenOrder(s, [5])
+        replenPatch(o.taskIds[0], [action: 'start'])
+
+        when:
+        Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                                 reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
+
+        then:
+        e == null
+        orderStatus(o) == OrderStatus.COMPLETED
+        tx { Order.get(o.orderId).dateCompleted } != null
+    }
+
+    void 'a list stays open while a task is left: a reallocated shortage, or another task to pick'() {
+        given:
+        PickSite s = pickSite('RT-CO')
+        String disp = bin(s.dc, 'DISP')
+        ReplenOrder reallocated = replenOrder(s, [5], disp)
+        ReplenOrder twoTasks = replenOrder(s, [2, 3])
+        replenPatch(reallocated.taskIds[0], [action: 'start'])
+        replenPatch(twoTasks.taskIds[0], [action: 'start'])
+
+        when: 'the shortage is reallocated to ALT; one of two tasks is shorted to zero'
+        replenPatch(reallocated.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                             reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
+        replenPatch(twoTasks.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                          reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
+
+        then:
+        tasksOf(reallocated).size() == 2
+        orderStatus(reallocated) == OrderStatus.APPROVED
+        orderStatus(twoTasks) == OrderStatus.APPROVED
+
+        when: 'the other task is shorted to zero too'
+        replenPatch(twoTasks.taskIds[1], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                          reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
+
+        then:
+        orderStatus(twoTasks) == OrderStatus.COMPLETED
+    }
+
+    void 'a task never started can be shorted to zero: PENDING -> STAGED goes through PICKING'() {
+        given:
+        PickSite s = pickSite('RT-PZ')
+        ReplenOrder o = replenOrder(s, [5])
+
+        when:
+        Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: null, quantityPicked: 0,
+                                                 reasonCode: 'INSUFFICIENT_QUANTITY_AVAILABLE'])
+
+        then:
+        e == null
+        pick(o.taskIds[0]).status == 'STAGED'
+    }
+
+    // ------------------------------------------------------------------ reallocation from target bins
+
+    void 'shortage: bins that replenishment refills (target activity codes) are not reallocated from'() {
+        given: 'ALT is a display bin (a target of replenishment), RESERVE is not; DISP is replenished'
+        config.set('openboxes.jobs.automaticReplenishmentJob.targetActivityCodes', ['DISPLAY_STOCK'])
+        PickSite s = pickSite('RT-ST2')
+        String disp = bin(s.dc, 'DISP', [ActivityCode.DISPLAY_STOCK])
+        String reserve = bin(s.dc, 'RESERVE')
+        tx {
+            Location alt = Location.get(s.alt)
+            alt.supportedActivities = ((alt.supportedActivities ?: []) as Set<String>) + ActivityCode.DISPLAY_STOCK.id
+            alt.save(flush: true, failOnError: true)
+        }
+        stock(s.dc, s.product, [[s.bin, 20, s.lot, SOON], [s.alt, 20, s.lot, SOON], [reserve, 10, s.lot, SOON]])
+        ReplenOrder o = replenOrder(s, [5], disp)
+        replenPatch(o.taskIds[0], [action: 'start'])
+
+        when:
+        Throwable e = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 2,
+                                                 reasonCode: 'DIFFERENT_LOCATION'])
+
+        then: 'the 3 not found are picked from RESERVE, not from the display bin ALT'
+        e == null
+        tasksOf(o).findAll { it.id != o.taskIds[0] }*.subMap(['location', 'quantityRequired']) ==
+                [[location: 'RESERVE', quantityRequired: 3]]
+    }
+
+    // ------------------------------------------------------------------ ended tasks and containers
+
+    void 'pick: a task that ended short with a reason takes no more picks, and nothing moves'() {
+        given:
+        PickSite s = pickSite('RT-PE')
+        String disp = bin(s.dc, 'DISP')
+        ReplenOrder o = replenOrder(s, [5], disp)
+        replenPatch(o.taskIds[0], [action: 'start'])
+        replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 2,
+                                   reasonCode: 'DAMAGED'])
+        Map<String, Integer> before = onHand(s.dc, s.product)
+
+        when:
+        Throwable pick = replenPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.tote])
+        Throwable shortPick = replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 1])
+
+        then:
+        rootCause(pick) instanceof IllegalStateException
+        rootCause(shortPick) instanceof IllegalStateException
+        replenTask(o.taskIds[0]).subMap(['status', 'quantityPicked']) == [status: 'PICKED', quantityPicked: 2]
+        onHand(s.dc, s.product) == before
+    }
+
+    void 'pick: the rest of a task must go into the container its first picks went into'() {
+        given:
+        PickSite s = pickSite('RT-PC')
+        String tote2 = bin(s.dc, 'TOTE2', [ActivityCode.OUTBOUND_CONTAINER, ActivityCode.HOLD_STOCK], false)
+        ReplenOrder o = replenOrder(s, [5])
+        replenPatch(o.taskIds[0], [action: 'start'])
+        replenPatch(o.taskIds[0], [action: 'short-pick', outboundContainerId: s.tote, quantityPicked: 2])
+
+        when:
+        Throwable other = replenPatch(o.taskIds[0], [action: 'pick', outboundContainerId: tote2])
+        Throwable same = replenPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.tote])
+
+        then:
+        rootCause(other) instanceof IllegalArgumentException
+        same == null
+        replenTask(o.taskIds[0]).subMap(['status', 'quantityPicked', 'outboundContainer']) ==
+                [status: 'PICKED', quantityPicked: 5, outboundContainer: 'TOTE']
+        onHand(s.dc, s.product) == [BIN: 15, ALT: 20, TOTE: 5]
+    }
+
+    // ------------------------------------------------------------------ assignee
+
+    void 'pick: a task assigned to someone else is refused, unless by an administrator; a task not started is open to anyone'() {
+        given: 'one task assigned to picker A, one never started'
+        PickSite s = pickSite('RT-AS')
+        ReplenOrder assigned = replenOrder(s, [2])
+        ReplenOrder adminPicks = replenOrder(s, [2])
+        ReplenOrder notStarted = replenOrder(s, [2])
+        String pickerA = person('PickerA')
+        String pickerB = person('PickerB')
+        String usernameB = tx { User.get(pickerB).username } as String
+        replenPatch(assigned.taskIds[0], [action: 'start', assigneeId: pickerA])
+        replenPatch(adminPicks.taskIds[0], [action: 'start', assigneeId: pickerA])
+
+        when: 'picker B picks the task of A, and the task nobody started'
+        actAs(usernameB)
+        Throwable refused = replenPatch(assigned.taskIds[0], [action: 'pick', outboundContainerId: s.tote])
+        Throwable refusedShort = replenPatch(assigned.taskIds[0], [action: 'short-pick', outboundContainerId: null,
+                                                                   quantityPicked: 0, reasonCode: 'DAMAGED'])
+        Throwable open = replenPatch(notStarted.taskIds[0], [action: 'pick', outboundContainerId: s.tote])
+
+        then:
+        refused instanceof ValidationException
+        refused.message.contains('assigned to another user')
+        refusedShort instanceof ValidationException
+        replenTask(assigned.taskIds[0]).subMap(['status', 'quantityPicked']) == [status: 'PICKING', quantityPicked: 0]
+        open == null
+        replenTask(notStarted.taskIds[0]).status == 'PICKED'
+
+        when: 'an administrator picks the task of A'
+        actAs('admin')
+        Throwable byAdmin = replenPatch(adminPicks.taskIds[0], [action: 'pick', outboundContainerId: s.tote])
+
+        then:
+        byAdmin == null
+        replenTask(adminPicks.taskIds[0]).status == 'PICKED'
     }
 }
