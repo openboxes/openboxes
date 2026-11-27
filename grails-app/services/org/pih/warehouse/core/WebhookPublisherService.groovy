@@ -17,11 +17,14 @@ import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.inventory.ProductAvailabilityService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
+import util.ConfigHelper
 
 import static groovy.json.JsonOutput.toJson
 import static groovy.json.JsonOutput.prettyPrint
@@ -236,6 +239,100 @@ class WebhookPublisherService {
         log.info("Publishing inventory adjustment webhook event for product ${product?.productCode} at facility ${facility?.name}")
         log.debug(prettyPrint(toJson(payload).toString()))
         publishEvent(payload, "openboxes.n8n")
+    }
+
+    /**
+     * Publishes a pick shortage reported on a replenishment pick (pick.shortage): what was expected and picked, why,
+     * by whom, what was held and reallocated, the order creator to tell, and a link to investigate the held stock.
+     * Sent only for facilities with ENABLE_WEBHOOKS.
+     *
+     * @param quantityHeld quantity moved to the hold location, 0 when nothing was moved
+     * @param holdLocation the lost and found location the quantity was moved to, null when the facility has none
+     * @param reallocatedItems the picklist items (replenishment tasks) created to pick the shortage from other bins
+     */
+    void publishPickShortageEvent(PicklistItem picklistItem, Integer quantityHeld, Location holdLocation,
+                                  List<PicklistItem> reallocatedItems) {
+        Location facility = picklistItem?.orderItem?.order?.origin
+        if (!facility) {
+            log.warn("Missing replenishment order or facility of picklist item ${picklistItem?.id}. Skipping the pick shortage webhook.")
+            return
+        }
+        if (!facility.supports(ActivityCode.ENABLE_WEBHOOKS)) {
+            log.info "Location ${facility} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
+            return
+        }
+
+        Map payload = buildPickShortagePayload(picklistItem, quantityHeld, holdLocation, reallocatedItems)
+        log.info("Publishing pick shortage webhook event for order ${payload.order?.orderNumber} at facility ${facility.name}")
+        log.debug(prettyPrint(toJson(payload).toString()))
+        publishEvent(payload, "openboxes.n8n")
+    }
+
+    Map buildPickShortagePayload(PicklistItem picklistItem, Integer quantityHeld, Location holdLocation,
+                                 List<PicklistItem> reallocatedItems) {
+        Order order = picklistItem.orderItem?.order
+        Location facility = order?.origin
+        Person reportedBy = picklistItem.pickedBy ?: picklistItem.assignee
+        Integer quantityExpected = picklistItem.quantity ?: 0
+        Integer quantityPicked = picklistItem.quantityPicked ?: 0
+        Closure locationJson = { Location location ->
+            location ? [id: location.id, locationNumber: location.locationNumber, name: location.name] : null
+        }
+        Closure personJson = { Person person ->
+            // People may be lazy proxies of Person, so the username of a user is read from the User itself
+            person ? [name: person.name, email: person.email, username: User.get(person.id)?.username] : null
+        }
+
+        return [
+                eventId            : UUID.randomUUID().toString(),
+                eventType          : WebhookEventType.PICK_SHORTAGE.name,
+                eventDate          : new Date().format(Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT),
+                triggeredBy        : reportedBy?.name,
+                orderType          : "replenishment",
+                order              : [
+                        id         : order?.id,
+                        orderNumber: order?.orderNumber,
+                        createdBy  : personJson(order?.createdBy),
+                ],
+                product            : [
+                        code: picklistItem.inventoryItem?.product?.productCode,
+                        name: picklistItem.inventoryItem?.product?.name,
+                ],
+                lotNumber          : picklistItem.inventoryItem?.lotNumber,
+                expirationDate     : picklistItem.inventoryItem?.expirationDate?.format(Constants.EXPIRATION_DATE_FORMAT),
+                location           : locationJson(picklistItem.binLocation),
+                destinationLocation: locationJson(picklistItem.orderItem?.destinationBinLocation),
+                quantityExpected   : quantityExpected,
+                quantityPicked     : quantityPicked,
+                quantityShorted    : Math.max(quantityExpected - quantityPicked, 0),
+                reasonCode         : picklistItem.reasonCode,
+                reportedBy         : personJson(reportedBy),
+                dateReported       : (picklistItem.datePicked ?: new Date()).format(Constants.ISO_DATE_TIME_WITH_TIMEZONE_OFFSET_FORMAT),
+                hold               : holdLocation ? [location: locationJson(holdLocation), quantity: quantityHeld ?: 0] : null,
+                investigationUrl   : lostAndFoundReportLink(facility),
+                reallocations      : (reallocatedItems ?: []).collect { PicklistItem item ->
+                    [taskId: item.id, location: locationJson(item.binLocation), quantity: item.quantity]
+                },
+                metadata           : [
+                        facilityId   : facility?.id,
+                        facilityCode : facility?.locationNumber,
+                        facilityName : facility?.name,
+                        webhookId    : UUID.randomUUID().toString(),
+                        attemptNumber: 1
+                ]
+        ]
+    }
+
+    /**
+     * The link to the lost and found report of the facility, where held stock is investigated: absolute when
+     * grails.serverURL is set, otherwise the path within the application (events are sent outside of any request,
+     * so there is no request to take the server address from).
+     */
+    String lostAndFoundReportLink(Location facility) {
+        String path = "/report/showLostAndFoundReport?location.id=${facility?.id}"
+        // grails.serverURL includes the context path, like the links in emails
+        String serverUrl = Holders.config.getProperty('grails.serverURL', String)
+        return serverUrl ? "${serverUrl - ~/\/$/}${path}" : "${ConfigHelper.contextPath}${path}"
     }
 
     /**

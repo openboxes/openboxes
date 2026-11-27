@@ -13,6 +13,7 @@ class Replenishment implements Validateable {
     Location origin
     Location destination
     String replenishmentNumber
+    String description
     Date dateCreated
     Person orderedBy
 
@@ -23,6 +24,7 @@ class Replenishment implements Validateable {
         origin(nullable: true)
         destination(nullable: true)
         replenishmentNumber(nullable: true)
+        description(nullable: true)
         status(nullable: true)
         replenishmentItems(nullable: true)
         dateCreated(nullable: true)

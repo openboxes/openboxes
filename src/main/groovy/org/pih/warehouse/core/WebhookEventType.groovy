@@ -9,7 +9,8 @@ enum WebhookEventType {
     PICK_STARTED('pick.started'),
     PICK_COMPLETED('pick.completed'),
     ADJUSTMENT_CREATED('adjustment.created'),
-    CYCLE_COUNT_COMPLETED('cycleCount.completed');
+    CYCLE_COUNT_COMPLETED('cycleCount.completed'),
+    PICK_SHORTAGE('pick.shortage');
 
     String name
 

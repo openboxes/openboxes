@@ -28,6 +28,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.putaway.discrepancy.PutawayDiscrepancyEvent
+import org.pih.warehouse.replenishment.ReplenishmentTaskService
 import org.pih.warehouse.shipping.Shipment
 
 @Transactional
@@ -493,6 +494,7 @@ class PutawayTaskService {
 
         // Save the task
         save(task)
+        completeStagedReplenishment(task)
 
         if (isCancelRemaining) {
             sendDiscrepancyNotification(task)
@@ -553,6 +555,7 @@ class PutawayTaskService {
         currentItem.parentOrderItem = currentItemParent
         currentItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
         currentItem.save(flush: true, failOnError: true)
+        completeStagedReplenishment(task)
 
         OrderItem remainingOrderItem = order.orderItems.find {
             it.parentOrderItem?.id == (currentItem.parentOrderItem?.id ?: currentItem.id) &&
@@ -561,6 +564,15 @@ class PutawayTaskService {
         } as OrderItem
 
         return PutawayTaskAdapter.toPutawayTask(remainingOrderItem)
+    }
+
+    // Stock put away out of a bin replenishment staging lane may finish a replenishment order
+    private void completeStagedReplenishment(PutawayTask task) {
+        Location origin = Location.get(task.location?.id)
+        if (origin?.supports(ActivityCode.BIN_REPLENISHMENT)) {
+            // Looked up on use, like in PutawayService, to stay out of the bean cycle through putawayService
+            grailsApplication.mainContext.getBean(ReplenishmentTaskService).completeStagedOrders(Location.get(task.facility.id))
+        }
     }
 
     void transferToContainer(PutawayTask task) {

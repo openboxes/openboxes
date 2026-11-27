@@ -51,6 +51,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
+import org.pih.warehouse.replenishment.ReplenishmentTaskService
 import org.pih.warehouse.shipping.Shipment
 
 @Transactional
@@ -67,6 +68,12 @@ class PutawayService implements EventPublisher  {
     @Value('${openboxes.receiving.createReceivingLocation.enabled:true}')
     Boolean dynamicReceivingBinsEnabled
 
+    // Looked up on use, not injected: injecting it closes a bean cycle (stockMovementHistoryProvider -> putawayService
+    // -> replenishmentTaskService -> picklistService -> stockMovementService -> stockMovementHistoryProvider)
+    private ReplenishmentTaskService getReplenishmentTaskService() {
+        return grailsApplication.mainContext.getBean(ReplenishmentTaskService)
+    }
+
     Putaway getPutaway(String id) {
         Order putawayOrder = Order.get(id)
         return Putaway.createFromOrder(putawayOrder)
@@ -79,11 +86,13 @@ class PutawayService implements EventPublisher  {
             if (!putawayCandidate.id) {
                 log.info "Attempting to generate putaway for putaway candidate ..." + new JSONObject(putawayCandidate?.toJson()).toString(4)
 
-                // Get the next available putaway location based on criteria (available vs unavailable, volume, weight, etc)
-                Location putawayLocation = getNextAvailablePutawayLocation(location, putawayCandidate.product)
+                // Keep a preset destination (staged replenishment goes to the bin it refills), otherwise get the next
+                // available putaway location based on criteria (available vs unavailable, volume, weight, etc)
+                Location putawayLocation = putawayCandidate.putawayLocation ?:
+                        getNextAvailablePutawayLocation(location, putawayCandidate.product)
                 if (!putawayLocation) {
                     log.warn("No available putaway location for ${putawayCandidate?.product?.productCode}, lotNumber: ${putawayCandidate?.inventoryItem?.lotNumber?:'Default'}, currentLocation: ${putawayCandidate.currentFacility}.${putawayCandidate?.currentLocation}, quantity=${putawayCandidate.quantity}")
-                    return
+                    continue
                 }
 
                 // Create a new putaway order for the putaway candidate
@@ -195,7 +204,9 @@ class PutawayService implements EventPublisher  {
         putawayItems.removeAll { PutawayItem item ->
             pendingPutawayItems.find {
                 item.currentLocation?.id == it.currentLocation?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
-                        item.product?.id == it.product?.id
+                        item.product?.id == it.product?.id &&
+                        // A preset destination (staged replenishment) tells apart stock of one lane going to other bins
+                        (!item.putawayLocation || item.putawayLocation.id == it.putawayLocation?.id)
             }
         }
 
@@ -211,8 +222,10 @@ class PutawayService implements EventPublisher  {
 
     private List<PutawayItem> getReadyPutawayItems(Location location) {
         List binLocationEntries = productAvailabilityService.getAvailableQuantityOnHandByBinLocation(location)
+        Map<String, List<Map>> stagedForPutaway = getReplenishmentTaskService().getStagedForPutaway(location)
+                .groupBy { Map staged -> "${staged.stagingLocation.id}:${staged.inventoryItem.id}".toString() }
 
-        return binLocationEntries.inject ([], { putawayItems,  binLocationEntry ->
+        return binLocationEntries.inject([], { putawayItems, binLocationEntry ->
             if (binLocationEntry.binLocation?.supports(ActivityCode.RECEIVE_STOCK)) {
                 InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventory(binLocationEntry.product, location.inventory)
 
@@ -229,9 +242,56 @@ class PutawayService implements EventPublisher  {
                         quantity: binLocationEntry.quantity,
                 )
             }
+            if (binLocationEntry.binLocation?.supports(ActivityCode.STAGING_LOCATION)
+                    && binLocationEntry.binLocation?.supports(ActivityCode.BIN_REPLENISHMENT)) {
+                String key = "${binLocationEntry.binLocation.id}:${binLocationEntry.inventoryItem?.id}".toString()
+                return putawayItems + getStagedReplenishmentItems(location, binLocationEntry, stagedForPutaway[key] ?: [])
+            }
 
             return putawayItems
         }) as List<PutawayItem>
+    }
+
+    /**
+     * Stock of a bin replenishment staging lane, one item per bin it was staged for, with that bin preset as the
+     * putaway location. Each takes what its tasks still have to put away, as far as the lane holds it; stock left in
+     * the lane that no task accounts for is offered without a destination.
+     */
+    private List<PutawayItem> getStagedReplenishmentItems(Location location, Map binLocationEntry, List<Map> stagedEntries) {
+        List<PutawayItem> items = []
+        BigDecimal remaining = (binLocationEntry.quantity ?: 0) as BigDecimal
+        stagedEntries.each { Map staged ->
+            BigDecimal quantity = [remaining, staged.quantity as BigDecimal].min()
+            if (quantity <= 0) {
+                return
+            }
+            remaining -= quantity
+            Location destination = staged.destinationLocation as Location
+            // The location level inventory level of the bin being refilled (its min/max), not the facility level one
+            InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventoryAndInternalLocation(
+                    binLocationEntry.product, location.inventory, destination)
+            items << createStagedPutawayItem(location, binLocationEntry, destination, inventoryLevel, quantity)
+        }
+        if (remaining > 0) {
+            items << createStagedPutawayItem(location, binLocationEntry, null, null, remaining)
+        }
+        return items
+    }
+
+    private static PutawayItem createStagedPutawayItem(Location location, Map binLocationEntry, Location destination,
+                                                       InventoryLevel inventoryLevel, BigDecimal quantity) {
+        return new PutawayItem(
+                putawayStatus: PutawayStatus.READY,
+                product: binLocationEntry.product,
+                inventoryItem: binLocationEntry.inventoryItem,
+                inventoryLevel: inventoryLevel,
+                currentLocation: binLocationEntry.binLocation,
+                currentFacility: location,
+                putawayFacility: destination ? location : null,
+                putawayLocation: destination,
+                availableItems: [],
+                quantity: quantity,
+        )
     }
 
     // Deliberately the same status set the sortation flow filters on, so the two features cannot disagree
@@ -243,14 +303,25 @@ class PutawayService implements EventPublisher  {
     }
 
     // Quantity already covered by an open task is subtracted, so a partially tasked bin still offers its remainder
+    // Tasked quantity is taken first from the item going to the task's destination (a staged replenishment lane has
+    // one item per bin), then from the other items of the same bin, lot and product
     private List<PutawayItem> mergeCandidatesWithOpenTasks(List<PutawayItem> readyItems, List<PutawayTask> openTasks) {
-        Map<String, BigDecimal> taskedQuantityByKey = [:].withDefault { 0.0G }
-        openTasks.each { PutawayTask task ->
-            taskedQuantityByKey[candidateKey(task.location, task.inventoryItem, task.product)] += (task.quantity ?: 0.0G)
+        Map<String, List<PutawayItem>> itemsByKey = readyItems.groupBy {
+            candidateKey(it.currentLocation, it.inventoryItem, it.product)
         }
-
-        readyItems.each { PutawayItem item ->
-            item.quantity -= taskedQuantityByKey[candidateKey(item.currentLocation, item.inventoryItem, item.product)]
+        openTasks.each { PutawayTask task ->
+            List<PutawayItem> items = itemsByKey[candidateKey(task.location, task.inventoryItem, task.product)] ?: []
+            BigDecimal taskedQuantity = task.quantity ?: 0.0G
+            List<PutawayItem> sameDestinationFirst = items.sort(false) { PutawayItem item ->
+                item.putawayLocation && item.putawayLocation.id == task.destination?.id ? 0 : 1
+            }
+            sameDestinationFirst.each { PutawayItem item ->
+                BigDecimal taken = [taskedQuantity, item.quantity].min()
+                if (taken > 0) {
+                    item.quantity -= taken
+                    taskedQuantity -= taken
+                }
+            }
         }
 
         List<PutawayItem> putawayItems = readyItems.findAll { it.quantity > 0 }
@@ -440,6 +511,10 @@ class PutawayService implements EventPublisher  {
         }
 
         createPutawayEvent(order, putaway)
+
+        if (putaway.putawayItems.any { it.currentLocation?.supports(ActivityCode.BIN_REPLENISHMENT) }) {
+            getReplenishmentTaskService().completeStagedOrders(putaway.origin)
+        }
 
         grailsApplication.mainContext.publishEvent(new PutawayCompletedEvent(putaway))
 
