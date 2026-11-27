@@ -20,6 +20,11 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class InstantParser extends AbstractDateParser<Instant> {
 
     @Override
+    boolean isDefaultParserForType() {
+        return true
+    }
+
+    @Override
     protected Instant parseImpl(Object date, DateParserContext<Instant> context) {
         switch (date) {
             case String:
@@ -119,6 +124,17 @@ class InstantParser extends AbstractDateParser<Instant> {
             // throw the exception if we have no default timezone to try again with.
             if (!defaultZone) {
                 throw e
+            }
+        }
+
+        // If given a date with a time but no zone (such as "2000-01-01 00:00:00"), we're forced to
+        // make an assumption about what timezone the date is in. Because of this ambiguity, by default
+        // we throw an error in this scenario, but if we opt to allow it (which we do during imports/exports
+        // since Excel cannot store timezone), we parse the date into the given default zone.
+        if (context?.allowDateTimesWithoutTimezone) {
+            ZonedDateTime zonedDateTime = ZonedDateTimeParser.asZonedDateTimeWithoutTimezone(date, defaultZone)
+            if (zonedDateTime) {
+                return zonedDateTime.toInstant()
             }
         }
 

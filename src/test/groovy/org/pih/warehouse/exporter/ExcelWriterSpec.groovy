@@ -16,6 +16,7 @@ import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
 import org.pih.warehouse.core.ConfigService
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
@@ -318,7 +319,8 @@ class ExcelWriterSpec extends Specification {
         ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
                 addHeaderRow: false,
                 fields: [
-                        new BulkDataWriterFieldConfig(fieldName: "value"),
+                        // dateFieldType only applies to java.util.Date values. It is ignored for the other types.
+                        new BulkDataWriterFieldConfig(fieldName: "value", dateFieldType: DateFieldType.INSTANT),
                 ],
         ))
 
@@ -340,19 +342,19 @@ class ExcelWriterSpec extends Specification {
         workbook?.close()
 
         where:
-        scenario           | value                                                  || expectedValue         | expectedFormat
+        scenario           | value                                                                         || expectedValue         | expectedFormat
         // Date-only fields. No timezone conversion required.
-        "LocalDate"        | LocalDate.parse("2000-01-02")                          || EXCEL_2000_01_02      | "yyyy-mm-dd"
-        // Date + time fields. Are converted to the requesting user's timezone (which is +05:30)
-        "Instant Z"        | InstantParser.asInstant("2000-01-02T06:30:00Z")        || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "Instant +1"       | InstantParser.asInstant("2000-01-02T07:30:00+01:00")   || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "Instant -1"       | InstantParser.asInstant("2000-01-02T05:30:00-01:00")   || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "ZonedDateTime Z"  | ZonedDateTime.parse("2000-01-02T06:30:00Z")            || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "ZonedDateTime +1" | ZonedDateTime.parse("2000-01-02T07:30:00+01:00")       || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "ZonedDateTime -1" | ZonedDateTime.parse("2000-01-02T05:30:00-01:00")       || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "Date Z"           | JavaUtilDateParser.asDate("2000-01-02T06:30:00Z")      || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "Date +1"          | JavaUtilDateParser.asDate("2000-01-02T07:30:00+01:00") || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
-        "Date -1"          | JavaUtilDateParser.asDate("2000-01-02T05:30:00-01:00") || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "LocalDate"        | LocalDate.parse("2000-01-02")                                                 || EXCEL_2000_01_02      | "yyyy-mm-dd"
+        // Date + time fields (including java.util.Date with DATE_TIME). Are converted to the requesting user's timezone (which is +05:30)
+        "Instant Z"        | InstantParser.asInstant("2000-01-02T06:30:00Z")                               || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "Instant +1"       | InstantParser.asInstant("2000-01-02T07:30:00+01:00")                          || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "Instant -1"       | InstantParser.asInstant("2000-01-02T05:30:00-01:00")                          || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "ZonedDateTime Z"  | ZonedDateTime.parse("2000-01-02T06:30:00Z")                                   || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "ZonedDateTime +1" | ZonedDateTime.parse("2000-01-02T07:30:00+01:00")                              || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "ZonedDateTime -1" | ZonedDateTime.parse("2000-01-02T05:30:00-01:00")                              || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "Date Z"           | JavaUtilDateParser.asDate("2000-01-02T06:30:00Z", DateFieldType.INSTANT)      || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "Date +1"          | JavaUtilDateParser.asDate("2000-01-02T07:30:00+01:00", DateFieldType.INSTANT) || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
+        "Date -1"          | JavaUtilDateParser.asDate("2000-01-02T05:30:00-01:00", DateFieldType.INSTANT) || EXCEL_2000_01_02_NOON | "yyyy-mm-dd hh:mm:ss"
     }
 
     void "write converts #scenario to the user's timezone, not the server's"() {
@@ -369,7 +371,8 @@ class ExcelWriterSpec extends Specification {
         ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
                 addHeaderRow: false,
                 fields: [
-                        new BulkDataWriterFieldConfig(fieldName: "value"),
+                        // dateFieldType only applies to java.util.Date values. It is ignored for the other types.
+                        new BulkDataWriterFieldConfig(fieldName: "value", dateFieldType: DateFieldType.INSTANT),
                 ],
         ))
 
@@ -382,23 +385,82 @@ class ExcelWriterSpec extends Specification {
         ]
 
         where:
-        scenario                                    | serverTimezone        | userTimezoneId     | value                                             || expectedValue
+        scenario                                    | serverTimezone        | userTimezoneId     | value                                                                    || expectedValue
         // The server timezone should never impact the result. It should always be in the user's timezone.
-        "an Instant with a server in UTC-08"        | "America/Los_Angeles" | "Asia/Kolkata"     | InstantParser.asInstant("2000-01-02T06:30:00Z")   || EXCEL_2000_01_02_NOON
-        "a ZonedDateTime with a server in UTC-08"   | "America/Los_Angeles" | "Asia/Kolkata"     | ZonedDateTime.parse("2000-01-02T06:30:00Z")       || EXCEL_2000_01_02_NOON
-        "a Date with a server in UTC-08"            | "America/Los_Angeles" | "Asia/Kolkata"     | JavaUtilDateParser.asDate("2000-01-02T06:30:00Z") || EXCEL_2000_01_02_NOON
-        "a LocalDate with a server in UTC-08"       | "America/Los_Angeles" | "Asia/Kolkata"     | LocalDate.parse("2000-01-02")                     || EXCEL_2000_01_02
-        "a LocalDate with a server in UTC+14"       | "Pacific/Kiritimati"  | "Pacific/Pago_Pago"| LocalDate.parse("2000-01-02")                     || EXCEL_2000_01_02
+        "an Instant with a server in UTC-08"        | "America/Los_Angeles" | "Asia/Kolkata"     | InstantParser.asInstant("2000-01-02T06:30:00Z")                          || EXCEL_2000_01_02_NOON
+        "a ZonedDateTime with a server in UTC-08"   | "America/Los_Angeles" | "Asia/Kolkata"     | ZonedDateTime.parse("2000-01-02T06:30:00Z")                              || EXCEL_2000_01_02_NOON
+        "a Date with a server in UTC-08"            | "America/Los_Angeles" | "Asia/Kolkata"     | JavaUtilDateParser.asDate("2000-01-02T06:30:00Z", DateFieldType.INSTANT) || EXCEL_2000_01_02_NOON
+        "a LocalDate with a server in UTC-08"       | "America/Los_Angeles" | "Asia/Kolkata"     | LocalDate.parse("2000-01-02")                                            || EXCEL_2000_01_02
+        "a LocalDate with a server in UTC+14"       | "Pacific/Kiritimati"  | "Pacific/Pago_Pago"| LocalDate.parse("2000-01-02")                                            || EXCEL_2000_01_02
         // A datetime that falls on a different day in UTC than it does for the user.
-        "an Instant on the previous day in UTC"     | "UTC"                 | "Asia/Kolkata"     | InstantParser.asInstant("2000-01-01T18:30:00Z")   || EXCEL_2000_01_02
-        "a ZonedDateTime on the previous day in -1" | "UTC"                 | "Asia/Kolkata"     | ZonedDateTime.parse("2000-01-01T17:30:00-01:00")  || EXCEL_2000_01_02
-        "a Date on the next day in UTC"             | "UTC"                 | "Etc/GMT+12"       | JavaUtilDateParser.asDate("2000-01-03T00:00:00Z") || EXCEL_2000_01_02_NOON
+        "an Instant on the previous day in UTC"     | "UTC"                 | "Asia/Kolkata"     | InstantParser.asInstant("2000-01-01T18:30:00Z")                          || EXCEL_2000_01_02
+        "a ZonedDateTime on the previous day in -1" | "UTC"                 | "Asia/Kolkata"     | ZonedDateTime.parse("2000-01-01T17:30:00-01:00")                         || EXCEL_2000_01_02
+        "a Date on the next day in UTC"             | "UTC"                 | "Etc/GMT+12"       | JavaUtilDateParser.asDate("2000-01-03T00:00:00Z", DateFieldType.INSTANT) || EXCEL_2000_01_02_NOON
         // A user in a timezone that observes daylight savings should get the offset that applied at that datetime.
-        "an Instant in winter (EST, -05:00)"        | "UTC"                 | "America/New_York" | InstantParser.asInstant("2000-01-02T17:00:00Z")   || EXCEL_2000_01_02_NOON
-        "an Instant in summer (EDT, -04:00)"        | "UTC"                 | "America/New_York" | InstantParser.asInstant("2000-07-02T16:00:00Z")   || EXCEL_2000_07_02_NOON
-        "a Date in summer (EDT, -04:00)"            | "UTC"                 | "America/New_York" | JavaUtilDateParser.asDate("2000-07-02T16:00:00Z") || EXCEL_2000_07_02_NOON
+        "an Instant in winter (EST, -05:00)"        | "UTC"                 | "America/New_York" | InstantParser.asInstant("2000-01-02T17:00:00Z")                          || EXCEL_2000_01_02_NOON
+        "an Instant in summer (EDT, -04:00)"        | "UTC"                 | "America/New_York" | InstantParser.asInstant("2000-07-02T16:00:00Z")                          || EXCEL_2000_07_02_NOON
+        "a Date in summer (EDT, -04:00)"            | "UTC"                 | "America/New_York" | JavaUtilDateParser.asDate("2000-07-02T16:00:00Z", DateFieldType.INSTANT) || EXCEL_2000_07_02_NOON
         // Sao Paulo's DST started at midnight on 2018-11-04, so midnight didn't exist that day. LocalDates should still be written as exactly midnight, and not as 01:00.
-        "a LocalDate that skips midnight due to DST" | "America/Sao_Paulo"  | "America/Sao_Paulo"| LocalDate.parse("2018-11-04")                     || EXCEL_2018_11_04
+        "a LocalDate that skips midnight due to DST" | "America/Sao_Paulo"  | "America/Sao_Paulo"| LocalDate.parse("2018-11-04")                                            || EXCEL_2018_11_04
+    }
+
+    void "write converts a date-only Date in the server timezone: server #serverTimezone, user #userTimezoneId"() {
+        given: "a server timezone that differs from the user's timezone"
+        TimeZone.setDefault(TimeZone.getTimeZone(serverTimezone))
+        userTimezone = TimeZone.getTimeZone(userTimezoneId)
+
+        and: "a date-only Date, which is stored as midnight in the server's timezone"
+        List<Map> toWrite = [
+                [value: JavaUtilDateParser.asDate(LocalDate.parse("2000-01-02"))],
+        ]
+
+        and: "a valid config"
+        ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
+                addHeaderRow: false,
+                fields: [
+                        new BulkDataWriterFieldConfig(fieldName: "value", dateFieldType: DateFieldType.LOCAL_DATE),
+                ],
+        ))
+
+        when:
+        BulkDataWriterResult<Workbook> result = writer.write(toWrite, ContentType.XLS, config)
+
+        then: "the cell is a date (not a datetime) on the same day, regardless of the user's timezone"
+        Workbook workbook = reopenWorkbook(result)
+        Cell cell = workbook.getSheetAt(0).getRow(0).getCell(0)
+        assert getCellValue(cell) == EXCEL_2000_01_02
+        assert cell.cellStyle.dataFormatString == "yyyy-mm-dd"
+        assert DateUtil.isCellDateFormatted(cell)
+
+        cleanup:
+        workbook?.close()
+
+        where:
+        serverTimezone        | userTimezoneId
+        "UTC"                 | "UTC"
+        "America/Los_Angeles" | "Asia/Kolkata"
+        "Pacific/Kiritimati"  | "Pacific/Pago_Pago"
+        "UTC"                 | "Etc/GMT+12"
+    }
+
+    void "write fails for a Date field without a dateFieldType"() {
+        given:
+        List<Map> toWrite = [
+                [value: new Date()],
+        ]
+
+        and: "a config that doesn't say if the Date is a date or a datetime"
+        ExcelWriterConfig config = initConfig(true, new ExcelWriterConfig(
+                fields: [
+                        new BulkDataWriterFieldConfig(fieldName: "value"),
+                ],
+        ))
+
+        when:
+        writer.write(toWrite, ContentType.XLS, config)
+
+        then:
+        thrown(IllegalStateException)
     }
 
     void "write succeeds with an empty dataset"() {

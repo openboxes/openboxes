@@ -2,7 +2,9 @@ package org.pih.warehouse.core.date
 
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import org.apache.commons.lang.StringUtils
+import org.apache.poi.ss.usermodel.DateUtil
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.databinding.DataBindingConstants
@@ -16,10 +18,19 @@ import org.pih.warehouse.databinding.DataBindingConstants
 class LocalDateParser extends AbstractDateParser<LocalDate> {
 
     @Override
+    boolean isDefaultParserForType() {
+        return true
+    }
+
+    @Override
     protected LocalDate parseImpl(Object date, DateParserContext<LocalDate> context) {
         switch (date) {
             case String:
                 return asLocalDate(date as String)
+            case double:
+            case Double:
+            case BigDecimal:
+                return asLocalDate(date as double, context)
             case Date:
                 return asLocalDate(date as Date, currentTimezone)
             default:
@@ -37,6 +48,24 @@ class LocalDateParser extends AbstractDateParser<LocalDate> {
      */
     static LocalDate asLocalDate(String date) {
         return StringUtils.isBlank(date) ? null : LocalDate.parse(date.trim(), DataBindingConstants.DATE_FORMAT)
+    }
+
+    /**
+     * Parse an Excel formatted date (a double representing the number of days since the Excel epoch) to a LocalDate.
+     * See InstantParser.asInstant(Double...) for details on how Excel represents dates.
+     */
+    static LocalDate asLocalDate(Double excelDate, DateParserContext context=null) {
+        if (excelDate == null) {
+            return null
+        }
+
+        boolean use1904Windowing = context?.epochDate == EpochDate.EXCEL_1904
+
+        // TODO: getLocalDateTime is better but is only in POI 4.1.2+ (see InstantParser.asInstant(Double...)).
+        // Read the double into a Date of some timezone, then to a LocalDate in that timezone. This causes the
+        // two UTCs here cancel each other out. All that matters is that we use the same offset for both operations.
+        Date date = DateUtil.getJavaDate(excelDate, use1904Windowing, TimeZone.getTimeZone(ZoneOffset.UTC), true)
+        return asLocalDate(date, ZoneOffset.UTC)
     }
 
     /**

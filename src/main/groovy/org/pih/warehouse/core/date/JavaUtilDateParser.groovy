@@ -1,6 +1,5 @@
 package org.pih.warehouse.core.date
 
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -8,7 +7,6 @@ import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
 
 import org.pih.warehouse.DateUtil
-import org.pih.warehouse.databinding.DataBindingConstants
 
 /**
  * Deserializes input objects into Dates.
@@ -20,56 +18,104 @@ import org.pih.warehouse.databinding.DataBindingConstants
 @Component
 class JavaUtilDateParser extends AbstractDateParser<Date> {
 
+    private static final String MISSING_DATE_FIELD_TYPE_MESSAGE = "java.util.Date is used for both date-only and " +
+            "datetime fields, so a dateFieldType must be specified when parsing to a Date."
+
+    /**
+     * Intentionally not the default parser for Date. Date is used for both date-only and datetime fields, so callers
+     * must call the parser manually, explicitly declaring which type it is (see {@link DateFieldType}).
+     */
+    @Override
+    boolean isDefaultParserForType() {
+        return false
+    }
+
     @Override
     protected Date parseImpl(Object date, DateParserContext<Date> context) {
-        switch (date) {
-            case String:
-                return asDate(date as String)
+        // If the source object's type is unambiguous, parse straight from it.
+        switch(date) {
+            case LocalDate:
+                return asDate(date as LocalDate)
             case Instant:
                 return asDate(date as Instant)
             case ZonedDateTime:
                 return asDate(date as ZonedDateTime)
-            case LocalDate:
-                return asDate(date as LocalDate)
+            default:
+                // Otherwise the type is ambiguous so we need to rely on dateFieldType.
+                break
+        }
+
+        switch (context?.dateFieldType) {
+            case DateFieldType.LOCAL_DATE:
+                return parseAsLocalDate(date, context)
+            case DateFieldType.INSTANT:
+                return parseAsInstant(date, context)
+            default:
+                throw new IllegalArgumentException(MISSING_DATE_FIELD_TYPE_MESSAGE)
+        }
+    }
+
+    /**
+     * Parses a date-only field (see {@link DateFieldType#LOCAL_DATE}). Date-only fields are stored as midnight in the
+     * system timezone (which is also how JavaUtilDateFormatter displays them), so we parse to a LocalDate, then convert
+     * it to a Date in that timezone. Supports date-only Strings (ex: "2000-01-31") and Excel formatted dates.
+     */
+    private Date parseAsLocalDate(Object date, DateParserContext<Date> context) {
+        switch (date) {
+            case String:
+                return asDate(LocalDateParser.asLocalDate(date as String))
+            case double:
+            case Double:
+            case BigDecimal:
+                return asDate(LocalDateParser.asLocalDate(date as double, context))
             default:
                 throw new UnsupportedOperationException("Cannot parse date of type [${date.class}]")
         }
     }
 
     /**
-     * Binds a String to a (deprecated) java.util.Date. If no format is given, will use the default configured format,
-     * which defaults the given date to midnight in the server timezone if that info is not provided in the date string.
+     * Parses a datetime field (see {@link DateFieldType#INSTANT}). We parse it the same way as an Instant, which means
+     * that Excel formatted dates, date-only Strings and (if the context allows them) datetime Strings without a
+     * timezone are in the user's timezone. This mirrors how BulkDataWriter exports java.util.Date datetime fields.
+     */
+    private Date parseAsInstant(Object date, DateParserContext<Date> context) {
+        switch (date) {
+            case String:
+                return asDate(InstantParser.asInstant(date as String, currentTimezone, context as DateParserContext))
+            case double:
+            case Double:
+            case BigDecimal:
+                return asDate(InstantParser.asInstant(date as double, currentTimezone, context as DateParserContext))
+            default:
+                throw new UnsupportedOperationException("Cannot parse date of type [${date.class}]")
+        }
+    }
+
+    /**
+     * Binds a String to a (deprecated) java.util.Date.
+     *
+     * Unlike the parse method, this method is static, and so has no access to the requesting user's timezone. As such:
+     * - LOCAL_DATE: Expects a date-only String (ex: "2000-01-31"). Results in midnight in the system timezone.
+     * - INSTANT: Expects a datetime String that includes the timezone (ex: "2000-01-31T13:00:00-05:00"). Strings
+     *            without a timezone (including date-only Strings) are rejected because we have no timezone to assume.
      *
      * @Deprecated Only exists to support old endpoints that manually bind their data. New APIs should not use this
      *             approach, and should use Command Objects in controller method args to auto-bind the request body.
      */
-    static Date asDate(String date, SimpleDateFormat format=null) {
+    static Date asDate(String date, DateFieldType dateFieldType) {
         if (StringUtils.isBlank(date)) {
             return null
         }
 
-        String dateSanitized = date.trim()
-
-        // If we're given a specific format, use that to parse the string directly to a Date. We shouldn't ever need
-        // to define this unless we know we're going to be given input in a non-conventional format. The flexible
-        // format should cover all the normal cases.
-        if (format != null) {
-            return format.parse(dateSanitized)
+        switch (dateFieldType) {
+            case DateFieldType.LOCAL_DATE:
+                return asDate(LocalDateParser.asLocalDate(date))
+            case DateFieldType.INSTANT:
+                // No default timezone, so the String must specify one.
+                return asDate(InstantParser.asInstant(date))
+            default:
+                throw new IllegalArgumentException(MISSING_DATE_FIELD_TYPE_MESSAGE)
         }
-
-        // Otherwise, try to parse using our flexible list of supported formats. We parse to an Instant and then convert
-        // to a Date since it allows us to use DateTimeFormatter, which is less error-prone than SimpleDateFormat.
-        Instant instant = Instant.from(DataBindingConstants.FLEXIBLE_DATE_TIME_ZONE_FORMAT
-                // We calculate the timezone offset dynamically instead of putting it directly into the formatter
-                // in the rare case that the server is configured in a system timezone that is sensitive to daylight
-                // savings time (ex: America/Vancouver is PST (-08:00) from November-March and PDT (-07:00) otherwise).
-                // This way, we can gracefully handle DST rollovers.
-                // TODO: A bug in JDK 8 prevents us from being able to do this. Once we upgrade to Java 9+, we can
-                //       re-enable this line and remove the "parseDefaulting" in the FLEXIBLE_DATE_TIME_ZONE_FORMAT
-                //       https://stackoverflow.com/questions/41999421/how-does-datetimeformatters-override-zone-work-when-parsing
-                //.withZone(DateUtil.getSystemZoneOffset())
-                .parse(dateSanitized))
-        return Date.from(instant)
     }
 
     /**

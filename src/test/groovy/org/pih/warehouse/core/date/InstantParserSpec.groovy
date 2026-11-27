@@ -40,18 +40,23 @@ class InstantParserSpec extends Specification {
         assert instantParser.parse(givenDate).toString() == expectedConvertedDate
 
         where:
-        givenDate                   || expectedConvertedDate  | scenario
-        "2000-01-01T00:00:00.000Z"  || "2000-01-01T00:00:00Z" | "Full string in proper ISO format"
-        "2000-01-01T00:00:00.000 Z" || "2000-01-01T00:00:00Z" | "Full string, space before timezone"
-        "2000-01-01 00:00:00.000Z"  || "2000-01-01T00:00:00Z" | "Replace 'T' with space"
-        "2000-01-01T000000000Z"     || "2000-01-01T00:00:00Z" | "Time with no separator"
-        "2000-01-01T00000000Z"      || "2000-01-01T00:00:00Z" | "Time with no separator, shorter millis"
-        "2000-01-01T0000000Z"       || "2000-01-01T00:00:00Z" | "Time with no separator, shorter millis"
-        "2000-01-01T000000Z"        || "2000-01-01T00:00:00Z" | "Time with no separator, no millis"
-        "2000-01-01T0000Z"          || "2000-01-01T00:00:00Z" | "Time with no separator, no seconds"
-        "2000-01-01T00:00:00:000Z"  || "2000-01-01T00:00:00Z" | "Time with millis replace '.' with ':'"
-        "2000-01-01T00:00:00:00Z"   || "2000-01-01T00:00:00Z" | "Time with millis replace '.' with ':', shorter millis"
-        "2000-01-01T00:00:00:0Z"    || "2000-01-01T00:00:00Z" | "Time with millis replace '.' with ':', shorter millis"
+        givenDate                   || expectedConvertedDate      | scenario
+        "2000-01-01T00:00:00.000Z"  || "2000-01-01T00:00:00Z"     | "Full string in proper ISO format"
+        "2000-01-01T00:00:00.000 Z" || "2000-01-01T00:00:00Z"     | "Full string, space before timezone"
+        "2000-01-01 00:00:00.000Z"  || "2000-01-01T00:00:00Z"     | "Replace 'T' with space"
+        "2000-01-01T000000000Z"     || "2000-01-01T00:00:00Z"     | "Time with no separator"
+        "2000-01-01T00000000Z"      || "2000-01-01T00:00:00Z"     | "Time with no separator, shorter millis"
+        "2000-01-01T0000000Z"       || "2000-01-01T00:00:00Z"     | "Time with no separator, shorter millis"
+        "2000-01-01T000000Z"        || "2000-01-01T00:00:00Z"     | "Time with no separator, no millis"
+        "2000-01-01T0000Z"          || "2000-01-01T00:00:00Z"     | "Time with no separator, no seconds"
+        "2000-01-01T00:00:00:000Z"  || "2000-01-01T00:00:00Z"     | "Time with millis replace '.' with ':'"
+        "2000-01-01T00:00:00:00Z"   || "2000-01-01T00:00:00Z"     | "Time with millis replace '.' with ':', shorter millis"
+        "2000-01-01T00:00:00:0Z"    || "2000-01-01T00:00:00Z"     | "Time with millis replace '.' with ':', shorter millis"
+        "2000-01-01T00:00:00.123Z"  || "2000-01-01T00:00:00.123Z" | "Non-zero millis"
+        "2000-01-01T00:00:00.12Z"   || "2000-01-01T00:00:00.120Z" | "Non-zero millis, shorter"
+        "2000-01-01T00:00:00.1Z"    || "2000-01-01T00:00:00.100Z" | "Non-zero millis, shortest"
+        "2000-01-01T00:00:00:123Z"  || "2000-01-01T00:00:00.123Z" | "Non-zero millis replace '.' with ':'"
+        "2000-01-01T000000123Z"     || "2000-01-01T00:00:00.123Z" | "Non-zero millis, time with no separator"
 
         // Note that even though timezone-specific dates are given, Instant is always in reference to UTC so timezone
         // information is lost (unlike ZonedDateTime, where it is preserved).
@@ -235,5 +240,36 @@ class InstantParserSpec extends Specification {
      */
     Date newDate(String date){
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mmXXX").parse(date)
+    }
+
+    void 'parse binds a datetime String without a timezone in the user timezone, if allowed: #value'() {
+        given:
+        sessionManagerStub.getTimezone() >> TimeZone.getTimeZone("Asia/Kolkata")  // +05:30
+
+        expect:
+        assert instantParser.parse(value, new DateParserContext(allowDateTimesWithoutTimezone: true)) == Instant.parse("2000-01-02T06:30:00Z")
+
+        where:
+        value << ["2000-01-02 12:00:00", "2000-01-02T12:00:00", "2000-01-02 12:00"]
+    }
+
+    void 'parse keeps the non-zero fractional seconds of a datetime String without a timezone, if allowed'() {
+        given:
+        sessionManagerStub.getTimezone() >> TimeZone.getTimeZone("Asia/Kolkata")
+
+        expect:
+        assert instantParser.parse("2000-01-02 12:00:00.123", new DateParserContext(allowDateTimesWithoutTimezone: true)) ==
+                Instant.parse("2000-01-02T06:30:00.123Z")
+    }
+
+    void 'parse rejects a datetime String without a timezone by default'() {
+        given:
+        sessionManagerStub.getTimezone() >> TimeZone.getTimeZone("Asia/Kolkata")
+
+        when:
+        instantParser.parse("2000-01-02 12:00:00")
+
+        then:
+        thrown(DateTimeParseException)
     }
 }

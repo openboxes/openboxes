@@ -49,7 +49,10 @@ class DateParser {
     /**
      * Parses a given date object into a java.util.Date.
      */
-    Date parseToDate(Object date, DateParserContext<Date> context=null) {
-        return javaUtilDateParser.parse(date, context)
+    Date parseToDate(Object date, DateFieldType dateFieldType, DateParserContext<Date> context=null) {
+        DateParserContext<Date> contextToUse = context ?: new DateParserContext<Date>()
+        contextToUse.dateFieldType = dateFieldType
+
+        return javaUtilDateParser.parse(date, contextToUse)
     }
 }

@@ -1,26 +1,40 @@
 package org.pih.warehouse.core.date
 
-import java.text.SimpleDateFormat
+import java.time.DateTimeException
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import org.pih.warehouse.DateUtil
+import org.pih.warehouse.core.session.SessionManager
 
 @Unroll
 class JavaUtilDateParserSpec extends Specification {
 
-    @Shared
+    private static final String SERVER_TIMEZONE = "America/Los_Angeles"
+    private static final String USER_TIMEZONE = "Asia/Kolkata"
+
     JavaUtilDateParser javaUtilDateParser
 
+    TimeZone originalServerTimezone
+
     void setup() {
+        originalServerTimezone = TimeZone.getDefault()
+        TimeZone.setDefault(TimeZone.getTimeZone(SERVER_TIMEZONE))
+
         javaUtilDateParser = new JavaUtilDateParser()
+        javaUtilDateParser.sessionManager = Stub(SessionManager) {
+            getTimezone() >> TimeZone.getTimeZone(USER_TIMEZONE)
+        }
+    }
+
+    void cleanup() {
+        TimeZone.setDefault(originalServerTimezone)
     }
 
     void 'parse should safely handle null dates'() {
@@ -28,140 +42,248 @@ class JavaUtilDateParserSpec extends Specification {
         assert javaUtilDateParser.parse(null) == null
     }
 
-    void 'parse should successfully parse a String using the default format for case: #scenario'() {
-        given:
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC))
-
-        when: 'we parse to a Date in the system local timezone'
-        Date date = javaUtilDateParser.parse(givenDate)
-
-        then: 'we format the Date to UTC for asserting against'
-        assert expectedConvertedDate == format.format(date)
-
-        where:
-        givenDate                   || expectedConvertedDate  | scenario
-        "2000-01-01T00:00:00Z"      || "2000-01-01T00:00:00Z" | "Full string in proper ISO format"
-        "2000-01-01T00:00Z"         || "2000-01-01T00:00:00Z" | "No seconds"
-        "2000-01-01T00:00:00-05"    || "2000-01-01T05:00:00Z" | "Timezone conforming to X format w/ negative"
-        "2000-01-01T00:00:00-0500"  || "2000-01-01T05:00:00Z" | "Timezone conforming to XX format w/ negative"
-        "2000-01-01T00:00:00-05:00" || "2000-01-01T05:00:00Z" | "Timezone conforming to XXX format w/ negative"
-        "2000-01-01T00:00:00+00"    || "2000-01-01T00:00:00Z" | "Timezone conforming to X format w/ zero"
-        "2000-01-01T00:00:00+0000"  || "2000-01-01T00:00:00Z" | "Timezone conforming to XX format w/ zero"
-        "2000-01-01T00:00:00+00:00" || "2000-01-01T00:00:00Z" | "Timezone conforming to XXX format w/ zero"
-        "2000-01-01T00:00:00+05"    || "1999-12-31T19:00:00Z" | "Timezone conforming to X format w/ positive"
-        "2000-01-01T00:00:00+0500"  || "1999-12-31T19:00:00Z" | "Timezone conforming to XX format w/ positive"
-        "2000-01-01T00:00:00+05:00" || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive"
-
-        "01/01/2000 00:00:00 Z"     || "2000-01-01T00:00:00Z" | "Full string in our format"
-        "01/01/2000 00:00 Z"        || "2000-01-01T00:00:00Z" | "No seconds our format"
-        "01/01/2000 00:00 -05"      || "2000-01-01T05:00:00Z" | "Timezone conforming to X format w/ negative our format"
-        "01/01/2000 00:00 -0500"    || "2000-01-01T05:00:00Z" | "Timezone conforming to XX format w/ negative our format"
-        "01/01/2000 00:00 -05:00"   || "2000-01-01T05:00:00Z" | "Timezone conforming to XXX format w/ negative our format"
-        "01/01/2000 00:00 +00"      || "2000-01-01T00:00:00Z" | "Timezone conforming to X format w/ zero our format"
-        "01/01/2000 00:00 +0000"    || "2000-01-01T00:00:00Z" | "Timezone conforming to XX format w/ zero our format"
-        "01/01/2000 00:00 +00:00"   || "2000-01-01T00:00:00Z" | "Timezone conforming to XXX format w/ zero our format"
-        "01/01/2000 00:00 +05"      || "1999-12-31T19:00:00Z" | "Timezone conforming to X format w/ positive our format"
-        "01/01/2000 00:00 +0500"    || "1999-12-31T19:00:00Z" | "Timezone conforming to XX format w/ positive our format"
-        "01/01/2000 00:00 +05:00"   || "1999-12-31T19:00:00Z" | "Timezone conforming to XXX format w/ positive our format"
-
-        // When not given a time, we default to midnight.
-        "01/01/2000 Z"              || "2000-01-01T00:00:00Z" | "No time our format"
-        "2000-01-01 Z"              || "2000-01-01T00:00:00Z" | "No time ISO format"
-    }
-
-    void 'parse should successfully parse a String when no timezone is given for case: #scenario'() {
-        given: 'the current timezone offset of the system'
-        ZoneOffset zone = DateUtil.getSystemZoneOffset()
-
-        and: 'a format to make assertions with'
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        format.setTimeZone(TimeZone.getTimeZone(zone))
-
-        when:'we parse to a Date in the system local timezone'
-        Date date = javaUtilDateParser.parse(givenDate)
-
-        then: 'we format the Date (still in the system local time) for asserting against'
-        assert expectedConvertedDate + zone == format.format(date)
-
-        where:
-        givenDate          || expectedConvertedDate | scenario
-        "01/01/2000 00:00" || "2000-01-01T00:00:00" | "No timezone our format"
-        "2000-01-01 00:00" || "2000-01-01T00:00:00" | "No timezone ISO format"
-        "01/01/2000"       || "2000-01-01T00:00:00" | "No time or timezone our format"
-        "2000-01-01"       || "2000-01-01T00:00:00" | "No time or timezone ISO format"
-    }
-
-    void 'parse should fail to parse a String using the default format for case: #failureReason'() {
+    void 'parse should fail when no dateFieldType is given'() {
         when:
-        javaUtilDateParser.parse(givenDate)
+        javaUtilDateParser.parse("2000-01-01")
 
         then:
-        thrown(exception)
-
-        where:
-        givenDate    || exception              | failureReason
-        "01 01 2000" || DateTimeParseException | "spaces not supported as separator"
-        "01/01/00"   || DateTimeParseException | "two digit year format not supported"
+        thrown(IllegalArgumentException)
     }
 
-    void 'parse should successfully convert an Instant to a Date for case: #scenario'() {
+    void 'parse as a LOCAL_DATE fails for a String that contains a time'() {
         given:
-        Instant instant = Instant.parse(givenDate)
-
-        and: 'a formatter for stringifying the date to make assertions with'
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        format.setTimeZone(TimeZone.getTimeZone("UTC"))
+        DateParserContext<Date> context = new DateParserContext<Date>(dateFieldType: DateFieldType.LOCAL_DATE)
 
         when:
-        Date date = javaUtilDateParser.parse(instant)
+        javaUtilDateParser.parse("2000-01-02T00:00:00Z", context)
 
         then:
-        assert format.format(date) == expectedConvertedDate
-
-        where:
-        givenDate                  || expectedConvertedDate     | scenario
-        "2000-01-01T00:00:11Z"     || "2000-01-01T00:00:11Z"    | "UTC timezone with seconds precision"
-        "2000-01-01T00:00:11.111Z" || "2000-01-01T00:00:11Z"    | "UTC timezone with millis precision"
+        thrown(DateTimeParseException)
     }
 
-    void 'parse should successfully convert a ZonedDateTime to a Date'() {
+    void 'parse as a LOCAL_DATE binds #scenario to midnight in the server timezone, not the user timezone'() {
         given:
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(givenDate)
+        DateParserContext<Date> context = new DateParserContext<Date>(dateFieldType: DateFieldType.LOCAL_DATE)
 
-        and: 'a formatter for stringifying the date to make assertions with'
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        format.setTimeZone(TimeZone.getTimeZone("UTC"))
-
-        when:
-        Date date = javaUtilDateParser.parse(zonedDateTime)
-
-        then: 'assert the dates match, dynamically appending the offset because it depends on the system running the test'
-        assert format.format(date) == expectedConvertedDate
+        expect:
+        assert formatInServerTimezone(javaUtilDateParser.parse(value, context)) == "2000-01-02T00:00:00-08:00"
 
         where:
-        givenDate                   || expectedConvertedDate  | scenario
+        scenario                  | value
+        "an ISO date String"      | "2000-01-02"
+        "an Excel style String"   | "01/02/2000"
+        "an Excel date (Double)"  | 36527d
+        "an Excel date (decimal)" | 36527.0G
+    }
+
+    void 'parse should parse a LOCAL_DATE String to midnight in the server timezone for case: #scenario'() {
+        when:
+        Date date = javaUtilDateParser.parse(
+                givenDate, new DateParserContext<Date>(dateFieldType: DateFieldType.LOCAL_DATE))
+
+        then:
+        assert formatInServerTimezone(date) == "2000-01-01T00:00:00-08:00"
+
+        where:
+        givenDate    || scenario
+        "01/01/2000" || "Our format"
+        "2000-01-01" || "ISO format"
+        "2000/01/01" || "Slashes"
+        "20000101"   || "No separator"
+    }
+
+    void 'parse as an INSTANT fails for a datetime String without a timezone, if not allowed'() {
+        given:
+        DateParserContext<Date> context = new DateParserContext<Date>(dateFieldType: DateFieldType.INSTANT)
+
+        when:
+        javaUtilDateParser.parse("2000-01-02 12:00:00", context)
+
+        then:
+        thrown(DateTimeParseException)
+    }
+
+    void 'parse as an INSTANT binds #scenario'() {
+        given:
+        DateParserContext<Date> context = new DateParserContext<Date>(dateFieldType: DateFieldType.INSTANT)
+
+        expect:
+        assert formatInUtc(javaUtilDateParser.parse(value, context)) == expectedDate
+
+        where:
+        scenario                                       | value                       || expectedDate
+        "a String with an offset, using that offset"   | "2000-01-02T12:00:00+01:00" || "2000-01-02T11:00:00Z"
+        "a String in UTC"                              | "2000-01-02T12:00:00Z"      || "2000-01-02T12:00:00Z"
+        "a date-only String, at midnight for the user" | "2000-01-02"                || "2000-01-01T18:30:00Z"
+        "an Excel datetime, in the user's timezone"    | 36527.5d                    || "2000-01-02T06:30:00Z"
+    }
+
+    void 'parse as an INSTANT binds datetime String #value without a timezone in the user timezone, if allowed'() {
+        given:
+        DateParserContext<Date> context = new DateParserContext<Date>(
+                dateFieldType: DateFieldType.INSTANT,
+                allowDateTimesWithoutTimezone: true,
+        )
+
+        expect: 'the format that we export to (and that Excel displays), and the ISO format'
+        assert formatInUtc(javaUtilDateParser.parse(value, context)) == "2000-01-02T06:30:00Z"
+
+        where:
+        value << ["2000-01-02 12:00:00", "2000-01-02T12:00:00", "2000-01-02 12:00"]
+    }
+
+    void 'parse and asDate should parse an INSTANT String with a timezone, ignoring the user timezone, for case: #scenario'() {
+        when:
+        Date asDate = JavaUtilDateParser.asDate(givenDate, DateFieldType.INSTANT)
+        Date parse = javaUtilDateParser.parse(givenDate, new DateParserContext<Date>(dateFieldType: DateFieldType.INSTANT))
+
+        then:
+        assert formatInUtc(asDate) == expectedDate
+        assert formatInUtc(parse) == expectedDate
+
+        where:
+        givenDate                   || expectedDate               | scenario
+        "2000-01-01T00:00:00Z"      || "2000-01-01T00:00:00Z"     | "Full string in proper ISO format"
+        "2000-01-01T00:00Z"         || "2000-01-01T00:00:00Z"     | "No seconds"
+        "2000-01-01T00:00:00.123Z"  || "2000-01-01T00:00:00.123Z" | "Non-zero millis"
+        "2000-01-01T00:00:00-05"    || "2000-01-01T05:00:00Z"     | "Timezone conforming to X format w/ negative"
+        "2000-01-01T00:00:00-0500"  || "2000-01-01T05:00:00Z"     | "Timezone conforming to XX format w/ negative"
+        "2000-01-01T00:00:00-05:00" || "2000-01-01T05:00:00Z"     | "Timezone conforming to XXX format w/ negative"
+        "2000-01-01T00:00:00+00"    || "2000-01-01T00:00:00Z"     | "Timezone conforming to X format w/ zero"
+        "2000-01-01T00:00:00+0000"  || "2000-01-01T00:00:00Z"     | "Timezone conforming to XX format w/ zero"
+        "2000-01-01T00:00:00+00:00" || "2000-01-01T00:00:00Z"     | "Timezone conforming to XXX format w/ zero"
+        "2000-01-01T00:00:00+05"    || "1999-12-31T19:00:00Z"     | "Timezone conforming to X format w/ positive"
+        "2000-01-01T00:00:00+0500"  || "1999-12-31T19:00:00Z"     | "Timezone conforming to XX format w/ positive"
+        "2000-01-01T00:00:00+05:00" || "1999-12-31T19:00:00Z"     | "Timezone conforming to XXX format w/ positive"
+
+        // The format that the frontend sometimes sends (ex: StockMovement.dateShipped)
+        "01/01/2000 00:00:00 Z"     || "2000-01-01T00:00:00Z"     | "Full string in our format"
+        "01/01/2000 00:00 Z"        || "2000-01-01T00:00:00Z"     | "No seconds our format"
+        "01/01/2000 00:00 -05"      || "2000-01-01T05:00:00Z"     | "Timezone conforming to X format w/ negative our format"
+        "01/01/2000 00:00 -0500"    || "2000-01-01T05:00:00Z"     | "Timezone conforming to XX format w/ negative our format"
+        "01/01/2000 00:00 -05:00"   || "2000-01-01T05:00:00Z"     | "Timezone conforming to XXX format w/ negative our format"
+        "01/01/2000 00:00 +00"      || "2000-01-01T00:00:00Z"     | "Timezone conforming to X format w/ zero our format"
+        "01/01/2000 00:00 +0000"    || "2000-01-01T00:00:00Z"     | "Timezone conforming to XX format w/ zero our format"
+        "01/01/2000 00:00 +00:00"   || "2000-01-01T00:00:00Z"     | "Timezone conforming to XXX format w/ zero our format"
+        "01/01/2000 00:00 +05"      || "1999-12-31T19:00:00Z"     | "Timezone conforming to X format w/ positive our format"
+        "01/01/2000 00:00 +0500"    || "1999-12-31T19:00:00Z"     | "Timezone conforming to XX format w/ positive our format"
+        "01/01/2000 00:00 +05:00"   || "1999-12-31T19:00:00Z"     | "Timezone conforming to XXX format w/ positive our format"
+    }
+
+    void 'asDate should fail when no dateFieldType is given'() {
+        when:
+        JavaUtilDateParser.asDate("2000-01-01", null)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    void 'asDate should return null for a blank String with dateFieldType #dateFieldType'() {
+        expect:
+        assert JavaUtilDateParser.asDate(" ", dateFieldType) == null
+
+        where:
+        dateFieldType << DateFieldType.values().toList()
+    }
+
+    void 'asDate should fail to parse an INSTANT String without a time and timezone for case: #scenario'() {
+        when: 'asDate is static so has no user timezone to fall back to'
+        JavaUtilDateParser.asDate(givenDate, DateFieldType.INSTANT)
+
+        then:
+        thrown(DateTimeException)
+
+        where:
+        givenDate          || scenario
+        "01/01/2000 00:00" || "No timezone our format"
+        "2000-01-01 00:00" || "No timezone ISO format"
+        "01/01/2000"       || "No time or timezone our format"
+        "2000-01-01"       || "No time or timezone ISO format"
+        "01/01/2000 Z"     || "No time our format"
+        "2000-01-01 Z"     || "No time ISO format"
+    }
+
+    void 'asDate should fail to parse a LOCAL_DATE String for case: #failureReason'() {
+        when:
+        JavaUtilDateParser.asDate(givenDate, DateFieldType.LOCAL_DATE)
+
+        then:
+        thrown(DateTimeParseException)
+
+        where:
+        givenDate              || failureReason
+        "01 01 2000"           || "spaces not supported as separator"
+        "01/01/00"             || "two digit year format not supported"
+        "2000-01-01T00:00:00Z" || "time is not allowed for a date-only field"
+    }
+
+    void 'asDate should parse a LOCAL_DATE String to midnight in the server timezone for case: #scenario'() {
+        when:
+        Date date = JavaUtilDateParser.asDate(givenDate, DateFieldType.LOCAL_DATE)
+
+        then:
+        assert formatInServerTimezone(date) == "2000-01-01T00:00:00-08:00"
+
+        where:
+        givenDate    || scenario
+        "01/01/2000" || "Our format"
+        "2000-01-01" || "ISO format"
+        "2000/01/01" || "Slashes"
+        "20000101"   || "No separator"
+    }
+
+    void 'asDate should successfully convert an Instant to a Date for case: #scenario'() {
+        when:
+        Date date = JavaUtilDateParser.asDate(Instant.parse(givenDate))
+
+        then:
+        assert formatInUtc(date) == expectedDate
+
+        where:
+        givenDate                     || expectedDate               | scenario
+        "2000-01-01T00:00:11Z"        || "2000-01-01T00:00:11Z"     | "seconds precision"
+        "2000-01-01T00:00:11.111Z"    || "2000-01-01T00:00:11.111Z" | "millis precision"
+        "2000-01-01T00:00:11.111999Z" || "2000-01-01T00:00:11.111Z" | "micros precision, which Date truncates to millis"
+    }
+
+    void 'asDate should successfully convert a ZonedDateTime to a Date for case: #scenario'() {
+        when:
+        Date date = JavaUtilDateParser.asDate(ZonedDateTime.parse(givenDate))
+
+        then:
+        assert formatInUtc(date) == expectedDate
+
+        where:
+        givenDate                   || expectedDate           | scenario
         "2000-01-01T00:00:00Z"      || "2000-01-01T00:00:00Z" | "UTC timezone"
         "2000-01-01T00:00:00+05:00" || "1999-12-31T19:00:00Z" | "+05 to UTC (backwards conversion)"
         "2000-01-01T00:00:00-05:00" || "2000-01-01T05:00:00Z" | "-05 to UTC (forwards conversion)"
     }
 
-    void 'parse should successfully convert a LocalDate to a Date'(){
-        given:
-        LocalDate localDate = LocalDate.now()
-        String expectedDate = localDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-
-        and: 'the current timezone offset of the system'
-        ZoneOffset offset = DateUtil.getSystemZoneOffset()
-
-        and: 'a format to make assertions with'
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-        format.setTimeZone(TimeZone.getTimeZone(offset))
-
+    void 'asDate should convert a LocalDate to midnight in the server timezone, using the offset of that date, for case: #scenario'() {
         when:
-        Date date = javaUtilDateParser.parse(localDate)
+        Date date = JavaUtilDateParser.asDate(LocalDate.parse(givenDate))
 
-        then: 'format the Date to a string in current the system offset for asserting against'
-        assert format.format(date) == "${expectedDate}T00:00:00${offset}"
+        then:
+        assert formatInServerTimezone(date) == expectedDate
+
+        where:
+        givenDate    || expectedDate                | scenario
+        "2000-01-01" || "2000-01-01T00:00:00-08:00" | "standard time"
+        "2000-07-01" || "2000-07-01T00:00:00-07:00" | "daylight savings time"
+    }
+
+    /**
+     * Prints the instant that the Date represents (in UTC). Fractional seconds are only printed when non-zero.
+     */
+    private static String formatInUtc(Date date) {
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date.toInstant().atOffset(ZoneOffset.UTC))
+    }
+
+    /**
+     * Prints the Date in the server timezone (see setup), including the offset of the server at that date.
+     */
+    private static String formatInServerTimezone(Date date) {
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date.toInstant().atZone(ZoneId.of(SERVER_TIMEZONE)))
     }
 }

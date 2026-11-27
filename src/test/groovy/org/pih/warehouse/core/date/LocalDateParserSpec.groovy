@@ -80,6 +80,24 @@ class LocalDateParserSpec extends Specification {
         "2000-01-01T00:00+06:00" | 'GMT+05:00'       || "1999-12-31"          | "+06 to +05 (backwards conversion)"
     }
 
+    void 'parse should convert an Excel date to a LocalDate for case: #scenario'() {
+        given: 'the parser should ignore both the server and user timezones'
+        sessionManagerStub.getTimezone() >> TimeZone.getTimeZone("Pacific/Kiritimati")  // +14:00
+
+        and:
+        DateParserContext context = new DateParserContext(epochDate: epochDate)
+
+        expect:
+        assert localDateParser.parse(excelDate, context) == LocalDate.parse(expected)
+
+        where:
+        excelDate | epochDate                  || expected     | scenario
+        36527d    | EpochDate.UNIX_EPOCH       || "2000-01-02" | "A Double using the default (1900) Excel epoch"
+        36527.0G  | EpochDate.UNIX_EPOCH       || "2000-01-02" | "A BigDecimal"
+        36527.75d | EpochDate.UNIX_EPOCH       || "2000-01-02" | "A datetime late in the day keeps the same date"
+        35065d    | EpochDate.EXCEL_1904       || "2000-01-02" | "A Double using the 1904 Excel epoch"
+    }
+
     /**
      * Convenience method to build a Date for tests.
      */

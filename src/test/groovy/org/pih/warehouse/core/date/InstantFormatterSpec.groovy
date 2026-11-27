@@ -80,14 +80,14 @@ class InstantFormatterSpec extends Specification {
         locale         | format                 | offset      || expectedResult              | scenario
         Locale.ENGLISH | DateDisplayFormat.GSP  | 'Z'         || '01/Jan/2000 00:00'         | 'GSP format localization in english UTC'
         Locale.ITALIAN | DateDisplayFormat.GSP  | 'Z'         || 'gen-01-2000 00:00'         | 'GSP format localization in non-english UTC'
-        Locale.ENGLISH | DateDisplayFormat.CSV  | 'Z'         || '01/Jan/2000 00:00:00'      | 'CSV format localization (english) UTC'
-        Locale.ITALIAN | DateDisplayFormat.CSV  | 'Z'         || '01/gen/2000 00:00:00'      | 'CSV format localization (non-english) UTC'
+        Locale.ENGLISH | DateDisplayFormat.CSV  | 'Z'         || '2000-01-01 00:00:00'       | 'CSV format matches Excel (english) UTC'
+        Locale.ITALIAN | DateDisplayFormat.CSV  | 'Z'         || '2000-01-01 00:00:00'       | 'CSV format matches Excel (non-english) UTC'
         Locale.ENGLISH | DateDisplayFormat.JSON | 'Z'         || '2000-01-01T00:00:00Z'      | 'JSON format uses ISO strings (english) UTC'
         Locale.ITALIAN | DateDisplayFormat.JSON | 'Z'         || '2000-01-01T00:00:00Z'      | 'JSON format uses ISO strings (non-english) UTC'
         Locale.ENGLISH | DateDisplayFormat.GSP  | 'GMT+01:00' || '01/Jan/2000 01:00'         | 'GSP format localization in english UTC+1'
         Locale.ITALIAN | DateDisplayFormat.GSP  | 'GMT+01:00' || 'gen-01-2000 01:00'         | 'GSP format localization in non-english UTC+1'
-        Locale.ENGLISH | DateDisplayFormat.CSV  | 'GMT+01:00' || '01/Jan/2000 01:00:00'      | 'CSV format localization (english) UTC+1'
-        Locale.ITALIAN | DateDisplayFormat.CSV  | 'GMT+01:00' || '01/gen/2000 01:00:00'      | 'CSV format localization (non-english) UTC+1'
+        Locale.ENGLISH | DateDisplayFormat.CSV  | 'GMT+01:00' || '2000-01-01 01:00:00'       | 'CSV format matches Excel (english) UTC+1'
+        Locale.ITALIAN | DateDisplayFormat.CSV  | 'GMT+01:00' || '2000-01-01 01:00:00'       | 'CSV format matches Excel (non-english) UTC+1'
         Locale.ENGLISH | DateDisplayFormat.JSON | 'GMT+01:00' || '2000-01-01T01:00:00+01:00' | 'JSON format uses ISO strings (english) UTC+1'
         Locale.ITALIAN | DateDisplayFormat.JSON | 'GMT+01:00' || '2000-01-01T01:00:00+01:00' | 'JSON format uses ISO strings (non-english) UTC+1'
     }

@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
 import org.pih.warehouse.core.*
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.date.DateParser
 import org.pih.warehouse.core.date.InstantParser
 import org.pih.warehouse.core.date.JavaUtilDateParser
@@ -233,7 +234,7 @@ class LoadDataService {
         InventoryItem inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                 product,
                 csvReaderRow["Lot number"],
-                dateParser.parseToDate(csvReaderRow["Expiration date"])
+                dateParser.parseToDate(csvReaderRow["Expiration date"], DateFieldType.LOCAL_DATE)
         )
         int newQuantity = csvReaderRow["Physical QOH"] as int
         int quantityOnHand = availableItems.get(binLocation, inventoryItem)?.quantityOnHand ?: 0

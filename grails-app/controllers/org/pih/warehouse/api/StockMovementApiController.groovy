@@ -19,6 +19,7 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.StockMovementParamsCommand
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.date.DateParser
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.core.Person
@@ -370,11 +371,12 @@ class StockMovementApiController {
 
         // Dates aren't bound properly using default JSON binding
         if (jsonObject.containsKey("dateShipped")) {
-            stockMovement.dateShipped = dateParser.parseToDate(jsonObject.remove("dateShipped"))
+            stockMovement.dateShipped = dateParser.parseToDate(jsonObject.remove("dateShipped"), DateFieldType.INSTANT)
         }
 
         if (jsonObject.containsKey("dateRequested")) {
-            stockMovement.dateRequested = dateParser.parseToDate(jsonObject.remove("dateRequested"))
+            stockMovement.dateRequested =
+                    dateParser.parseToDate(jsonObject.remove("dateRequested"), DateFieldType.LOCAL_DATE)
         }
 
         // If the stocklist.id key is present and empty, then we need to remove the stocklist from the stock movement
@@ -447,7 +449,8 @@ class StockMovementApiController {
             // FIXME Lookup inventory item by product, lot number, expiration date
             stockMovementItem.inventoryItem = lineItem?.inventoryItem?.id ? InventoryItem.load(lineItem?.inventoryItem?.id) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
-            stockMovementItem.expirationDate = dateParser.parseToDate(lineItem["expirationDate"])
+            stockMovementItem.expirationDate =
+                    dateParser.parseToDate(lineItem["expirationDate"], DateFieldType.LOCAL_DATE)
 
             // Sort order (optional)
             stockMovementItem.sortOrder = lineItem.sortOrder && !lineItem.isNull("sortOrder") ? new Integer(lineItem.sortOrder) : null

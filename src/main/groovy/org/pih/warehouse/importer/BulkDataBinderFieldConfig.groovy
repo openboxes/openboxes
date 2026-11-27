@@ -1,5 +1,6 @@
 package org.pih.warehouse.importer
 
+import org.pih.warehouse.core.date.DateFieldType
 import org.pih.warehouse.core.parser.Parser
 import org.pih.warehouse.core.parser.ParserContext
 
@@ -27,4 +28,12 @@ class BulkDataBinderFieldConfig {
      * Defines any custom behaviour when parsing the field.
      */
     ParserContext parserContext
+
+    /**
+     * What the field represents if it is a java.util.Date. Required when auto-binding a java.util.Date field without
+     * an explicit parser, because Date is used for both date-only and datetime fields. Ignored for all other types.
+     *
+     * See {@link org.pih.warehouse.core.date.JavaUtilDateParser} for how each is parsed.
+     */
+    DateFieldType dateFieldType
 }
