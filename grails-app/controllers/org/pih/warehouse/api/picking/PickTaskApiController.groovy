@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software.
+ **/
 package org.pih.warehouse.api.picking
 
 import grails.converters.JSON
@@ -21,6 +30,7 @@ class PickTaskApiController extends RestfulController<PickTask> {
             read: 'GET',
             patch: 'PATCH',
             drop: 'PATCH',
+            dropContainer: 'PATCH',
             reallocate: 'POST'
     ]
 
@@ -118,7 +128,38 @@ class PickTaskApiController extends RestfulController<PickTask> {
         render([data: newTasks.collect { it.toJson() }] as JSON)
     }
 
-    def drop() {
+    def drop(DropPickTaskCommand command) {
+        Location facility = facilityFor(RoleType.ROLE_ASSISTANT)
+        if (!facility) {
+            return
+        }
+        if (isBlank(command.stagingLocationId)) {
+            render(status: HttpStatus.BAD_REQUEST.value(),
+                    [errorCode: 400, errorMessage: "Staging location is required"] as JSON)
+            return
+        }
+        // Validated here rather than relying on the automatic pass: the facility comes from the URL,
+        // which is not part of the binding source for a request carrying a JSON body.
+        command.facility = facility
+        if (!command.validate()) {
+            throw new ValidationException("Validation errors", command.errors)
+        }
+
+        try {
+            pickTaskService.dropToStaging(command)
+        } catch (StagingLocationNotFoundException e) {
+            log.info "Drop at facility ${facility.id} rejected: ${e.message}"
+            render(status: HttpStatus.NOT_FOUND.value(), [errorCode: 404, errorMessage: e.message] as JSON)
+            return
+        }
+        render status: 200
+    }
+
+    /**
+     * Deprecated: drops a whole outbound container. Kept for mobile app versions released before
+     * the scoped drop endpoint; remove once they are no longer in use.
+     */
+    def dropContainer() {
         Location facility = facilityFor(RoleType.ROLE_ASSISTANT)
         if (!facility) {
             return

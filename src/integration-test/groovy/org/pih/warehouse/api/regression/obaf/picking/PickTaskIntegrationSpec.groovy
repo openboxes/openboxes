@@ -113,8 +113,8 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
 
         expect:
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: 'no-such-tote']).message.contains('does not exist')
-        // no container, or a tote of another facility: there is no such tote at the task's facility
-        pickPatch(o.taskIds[0], [action: 'pick']).message.contains('does not exist')
+        // no container is required unless the facility allows the bypass; a tote of another facility does not exist here
+        pickPatch(o.taskIds[0], [action: 'pick']).message.contains('is required')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: otherTote]).message.contains('does not exist')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.alt]).message.contains('OUTBOUND_CONTAINER')
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: noHold]).message.contains('HOLD_STOCK')
@@ -573,7 +573,7 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         PickOrder o = pickOrder(s, [3])
 
         expect: 'nothing has been picked into the tote yet'
-        dropError(s.tote, [action: 'drop', stagingLocationId: s.staging]).message.contains('is empty')
+        dropError(s.tote, [action: 'drop', stagingLocationId: s.staging]).message.contains('No picked items')
 
         when:
         pickPatch(o.taskIds[0], [action: 'pick', outboundContainerId: s.tote, pickedById: person()])
@@ -588,7 +588,6 @@ class PickTaskIntegrationSpec extends ObafTaskIntegrationSpec {
         onHand(s.dc, s.product) == [BIN: 17, ALT: 20, TOTE: 3]
     }
 
-    @PendingFeature(reason = 'PickTaskService.groovy:429-433 drop finds the tasks to stage from the STOCK in the tote; without TRACK_INTERNAL_TRANSACTIONS a pick never moves stock into the tote (transferToContainer skips), so a PICKED task can never be dropped ("Outbound container ... is empty") and the order never reaches STAGED')
     void 'drop at a facility without TRACK_INTERNAL_TRANSACTIONS stages the picked tasks'() {
         given:
         PickSite s = pickSite('PT-DRN', DeliveryTypeCode.LOCAL_DELIVERY, false)
