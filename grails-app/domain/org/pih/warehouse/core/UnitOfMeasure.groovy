@@ -50,6 +50,14 @@ class UnitOfMeasure implements Serializable {
     String toString() { return name }
 
     @Override
+    int hashCode() {
+        if (this.id != null) {
+            return this.id.hashCode()
+        }
+        return super.hashCode()
+    }
+
+    @Override
     boolean equals(Object o) {
         if (o instanceof UnitOfMeasure) {
             UnitOfMeasure that = (UnitOfMeasure) o
