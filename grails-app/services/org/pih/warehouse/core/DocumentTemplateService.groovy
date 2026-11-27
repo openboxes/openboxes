@@ -20,6 +20,7 @@ import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
 import grails.gorm.transactions.Transactional
 import groovy.text.Template
 import org.grails.gsp.GroovyPagesTemplateEngine
+import org.hibernate.Hibernate
 import org.jxls.common.Context
 import org.jxls.util.JxlsHelper
 import org.pih.warehouse.forecasting.ForecastingService
@@ -191,11 +192,12 @@ class DocumentTemplateService {
         order.paymentTerm = orderInstance.paymentTerm?:""
 
         def nullAddress = [address:"", address2: "", city: "", stateOrProvince: "", description: ""]
-        Organization vendor = orderInstance.originParty
+        // A lazy Party association is a Hibernate proxy of Party even when the row is an Organization
+        Organization vendor = Hibernate.unproxy(orderInstance.originParty)
         order.vendor = vendor?.properties?:[:]
         order.vendor.address = vendor?.defaultLocation?.address?:nullAddress
 
-        Organization buyer = orderInstance.destinationParty
+        Organization buyer = Hibernate.unproxy(orderInstance.destinationParty)
         order.buyer = buyer?.properties?:[:]
         order.buyer.address = buyer?.defaultLocation?.address?:nullAddress
 

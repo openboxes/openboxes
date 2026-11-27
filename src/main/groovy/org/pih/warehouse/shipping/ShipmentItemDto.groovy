@@ -1,5 +1,6 @@
 package org.pih.warehouse.shipping
 
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.dtos.DomainDto
 import org.pih.warehouse.location.LocationSimpleDto
 import org.pih.warehouse.product.lot.ProductLotDto
@@ -28,7 +29,8 @@ class ShipmentItemDto implements DomainDto<ShipmentItem> {
                 productLot: ProductLotDto.from(shipmentItem.inventoryItem),
                 binLocation: LocationSimpleDto.from(shipmentItem.binLocation),
                 quantity: shipmentItem.quantity,
-                recipientId: shipmentItem.recipient?.id,
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                recipientId: Hibernate.unproxy(shipmentItem.recipient)?.id,
                 donorId: shipmentItem.donorId,
                 supplierCode: supplierCode,
                 container: ContainerSimpleDto.from(shipmentItem.container),

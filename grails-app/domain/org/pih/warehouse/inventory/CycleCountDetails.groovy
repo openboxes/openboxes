@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
@@ -67,9 +68,10 @@ class CycleCountDetails implements Serializable {
                         dateRequested    : dateRequested,
                         dateInitiated    : dateInitiated,
                         dateRecorded     : dateRecorded,
-                        requestedBy      : [id: requestedBy?.id, name: requestedBy?.name],
-                        initiatedBy      : [id: initiatedBy?.id, name: initiatedBy?.name],
-                        recordedBy       : [id: recordedBy?.id, name: recordedBy?.name],
+                        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                        requestedBy      : [id: Hibernate.unproxy(requestedBy)?.id, name: requestedBy?.name],
+                        initiatedBy      : [id: Hibernate.unproxy(initiatedBy)?.id, name: initiatedBy?.name],
+                        recordedBy       : [id: Hibernate.unproxy(recordedBy)?.id, name: recordedBy?.name],
 
                 ],
                 inventoryItem    : [
@@ -83,7 +85,7 @@ class CycleCountDetails implements Serializable {
                         internalLocation: location?.toJson(LocationTypeCode.INTERNAL)
                 ],
                 blindCount       : [
-                        assignee          : [id: blindCountAssignee?.id, name: blindCountAssignee?.name],
+                        assignee          : [id: Hibernate.unproxy(blindCountAssignee)?.id, name: blindCountAssignee?.name],
                         dateCounted       : blindCountDateCounted,
                         quantityOnHand    : blindCountQuantityOnHand,
                         quantityCounted   : blindCountQuantityCounted,
@@ -94,7 +96,7 @@ class CycleCountDetails implements Serializable {
 
                 ],
                 verificationCount: [
-                        assignee          : [id: verificationCountAssignee?.id, name: verificationCountAssignee?.name],
+                        assignee          : [id: Hibernate.unproxy(verificationCountAssignee)?.id, name: verificationCountAssignee?.name],
                         dateCounted       : verificationCountDateCounted,
                         quantityOnHand    : verificationCountQuantityOnHand,
                         quantityCounted   : verificationCountQuantityCounted,

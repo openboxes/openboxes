@@ -1,6 +1,7 @@
 package org.pih.warehouse.inventory
 
 import grails.validation.Validateable
+import org.hibernate.Hibernate
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
@@ -320,7 +321,8 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
     // (with required approval)
     Boolean canUserEdit(String userId, Location location) {
         User user = User.get(userId)
-        Boolean isUserRequestor = user.id == requestedBy?.id
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+        Boolean isUserRequestor = user.id == Hibernate.unproxy(requestedBy)?.id
         Boolean isLocationOrigin = origin?.id == location?.id
         Boolean isLocationDestination = destination?.id == location?.id
         return (isUserRequestor &&
@@ -335,7 +337,7 @@ class OutboundStockMovement implements Serializable, Validateable, Historizable 
                 (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
                 user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
                 user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
-                user?.id == requestedBy?.id))
+                user?.id == Hibernate.unproxy(requestedBy)?.id))
     }
 
     boolean isApprovalRequired() {

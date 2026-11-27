@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import org.apache.commons.csv.CSVPrinter
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.FetchMode
+import org.hibernate.Hibernate
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.UnitOfMeasure
@@ -258,7 +259,8 @@ class InvoiceService {
         Invoice invoice = new Invoice()
         invoice.name = order.name
         invoice.description = order.description
-        invoice.partyFrom = order.destinationParty
+        // A lazy Party association is a Hibernate proxy of Party even when the row is an Organization
+        invoice.partyFrom = Hibernate.unproxy(order.destinationParty)
         invoice.party = order.origin.organization
         invoice.dateInvoiced = LocalDate.now().toDate()
         invoice.currencyUom = UnitOfMeasure.findByCode(order.currencyCode)

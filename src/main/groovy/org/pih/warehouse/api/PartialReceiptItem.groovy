@@ -1,5 +1,6 @@
 package org.pih.warehouse.api
 
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
@@ -94,7 +95,8 @@ class PartialReceiptItem {
                 "binLocation.name"              : binLocation?.name,
                 "binLocation.zoneId"            : binLocation?.zone?.id,
                 "binLocation.zoneName"          : binLocation?.zone?.name,
-                "recipient.id"                  : recipient?.id,
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                "recipient.id"                  : Hibernate.unproxy(recipient)?.id,
                 "recipient.name"                : recipient?.name,
                 quantityShipped                 : quantityShipped,
                 quantityReceived                : quantityReceived,

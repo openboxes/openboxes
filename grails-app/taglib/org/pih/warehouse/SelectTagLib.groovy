@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.BudgetCodeFilterCommand
 import org.pih.warehouse.core.BudgetCodeService
 import org.pih.warehouse.product.CategoryService
@@ -358,7 +359,8 @@ class SelectTagLib {
 
     def selectProductSupplier = { attrs, body ->
         Product product = Product.get(attrs?.product?.id)
-        Organization supplier = Organization.get(attrs?.supplier?.id)
+        // A lazy Party association is a Hibernate proxy of Party even when the row is an Organization
+        Organization supplier = Organization.get(Hibernate.unproxy(attrs?.supplier)?.id)
         log.info ("product: ${product}, supplier ${supplier}")
         attrs.from = ProductSupplier.findAllByProductAndSupplier(product, supplier).findAll { it.active } ?: []
         attrs.optionKey = 'id'

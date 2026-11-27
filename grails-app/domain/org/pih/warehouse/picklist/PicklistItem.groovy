@@ -10,6 +10,7 @@
 package org.pih.warehouse.picklist
 
 import grails.util.Holders
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
@@ -107,7 +108,8 @@ class PicklistItem implements Serializable {
             inventoryItemId     : inventoryItem?.id,
             quantity            : quantity,
             quantityPicked      : quantityPicked,
-            pickedBy            : pickedBy?.id,
+            // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+            pickedBy            : Hibernate.unproxy(pickedBy)?.id,
             datePicked          : datePicked,
             reasonCode          : reasonCode,
             comment             : comment,

@@ -2,6 +2,7 @@ package org.pih.warehouse.order
 
 import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringUtils
+import org.hibernate.Hibernate
 
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.IdentifierService
@@ -52,7 +53,8 @@ class PurchaseOrderIdentifierService extends IdentifierService<Order> {
         IdentifierGeneratorContext innerContext = context ?: new IdentifierGeneratorContext()
         for (int i=0; i<maxAttempts; i++) {
 
-            String sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
+            // A lazy Party association is a Hibernate proxy of Party even when the row is an Organization
+            String sequenceNumber = getNextSequenceNumber(Hibernate.unproxy(order.destinationParty).id)
             innerContext.customProperties.put('sequenceNumber', sequenceNumber)
 
             String identifier = super.generate(order, innerContext)

@@ -16,6 +16,7 @@ import grails.plugins.csv.CSVMapReader
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
+import org.hibernate.Hibernate
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.allocation.AllocationRequest
@@ -341,7 +342,8 @@ class StockMovementService {
         if (stockMovement.destination) shipment.destination = stockMovement.destination
         if (stockMovement.origin) shipment.origin = stockMovement.origin
         if (stockMovement.description) shipment.description = stockMovement.description
-        if (stockMovement.requestedBy) shipment.createdBy = stockMovement.requestedBy
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+        if (stockMovement.requestedBy) shipment.createdBy = Hibernate.unproxy(stockMovement.requestedBy)
         if (stockMovement.dateRequested) shipment.dateCreated = stockMovement.dateRequested
         shipment.name = stockMovement.generateName()
 
@@ -2441,7 +2443,8 @@ class StockMovementService {
         shipment.description = order.orderNumber
         shipment.origin = order.origin
         shipment.destination = order.destination
-        shipment.createdBy = order.orderedBy
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+        shipment.createdBy = Hibernate.unproxy(order.orderedBy)
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
         shipment.shipmentNumber = shipmentIdentifierService.generate(shipment)
 
@@ -3804,9 +3807,10 @@ class StockMovementService {
     }
 
     Boolean canRollbackApproval(Location location, User user, StockMovement stockMovement) {
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
         return (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
                 userService.isUserAdmin(user) ||
-                user?.id == stockMovement?.requestedBy?.id) &&
+                user?.id == Hibernate.unproxy(stockMovement?.requestedBy)?.id) &&
                 stockMovement.isInApprovalState()
     }
 

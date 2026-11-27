@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
@@ -80,7 +81,8 @@ class PartialReceivingApiController {
                     "Lot/Serial No."         : it?.lotNumber ?: "",
                     "Expiration date"        : it?.expirationDate?.format("MM/dd/yyyy") ?: "",
                     "Bin Location"           : it?.binLocation ?: "",
-                    Recipient                : it?.recipient?.id ?: "",
+                    // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                    Recipient                : Hibernate.unproxy(it?.recipient)?.id ?: "",
                     "Shipped (each)"         : it?.quantityShipped ?: "",
                     Received                 : it?.quantityReceived ?: "",
                     "To receive"             : it?.quantityRemaining ?: "",
@@ -123,8 +125,9 @@ class PartialReceivingApiController {
                     receiptItemId ? it?.receiptItem?.id == receiptItemId : it?.shipmentItem?.id == shipmentItemId
                 }
 
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
                 if ((expirationDate && Constants.EXPIRATION_DATE_FORMATTER.parse(expirationDate).format(Constants.EXPIRATION_DATE_FORMAT) != partialReceiptItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT))
-                        || ((recipientId && recipientId != partialReceiptItem?.recipient?.id) || (!recipientId && partialReceiptItem.recipient))
+                        || ((recipientId && recipientId != Hibernate.unproxy(partialReceiptItem?.recipient)?.id) || (!recipientId && partialReceiptItem.recipient))
                         || ((lotNumber && lotNumber != partialReceiptItem.lotNumber) || (!lotNumber && partialReceiptItem.lotNumber))
                         || ((binLocation && binLocation != partialReceiptItem.binLocation.name) || (!binLocation && partialReceiptItem.binLocation))
                         || ((code && code != partialReceiptItem.product.productCode) || (!code && partialReceiptItem.product.productCode))) {

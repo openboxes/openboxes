@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.validation.Validateable
+import org.hibernate.Hibernate
 import org.pih.warehouse.requisition.RequisitionItem
 
 class StocklistItem implements Validateable {
@@ -29,7 +30,8 @@ class StocklistItem implements Validateable {
                 "location.name"     : requisitionItem?.requisition?.origin?.name,
                 "locationGroup.id"  : requisitionItem?.requisition?.origin?.locationGroup?.id,
                 "locationGroup.name": requisitionItem?.requisition?.origin?.locationGroup?.name,
-                "manager.id"        : requisitionItem?.requisition?.requestedBy?.id,
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                "manager.id"        : Hibernate.unproxy(requisitionItem?.requisition?.requestedBy)?.id,
                 "manager.name"      : requisitionItem?.requisition?.requestedBy?.name,
                 "manager.email"     : requisitionItem?.requisition?.requestedBy?.email,
                 uom                 : requisitionItem?.product?.unitOfMeasure,
