@@ -43,6 +43,8 @@ class ProductPrice implements Serializable {
 
     static mapping = {
         id generator: 'uuid'
+        // TO_DATE is a reserved word in MariaDB 12.3+, so the column name must be quoted
+        toDate column: '`to_date`'
     }
 
     static constraints = {
