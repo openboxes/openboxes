@@ -148,6 +148,8 @@
 - {kind: method-fallthrough, path: '/api/pickTasks/{id}', methods: [PATCH], target: pickTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/putawayTasks', methods: [PUT, PATCH, DELETE], target: putawayTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/putawayTasks/{id}', methods: [PATCH], target: putawayTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/replenishmentTasks', methods: [PUT, PATCH, DELETE], target: replenishmentTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/replenishmentTasks/{id}', methods: [PATCH], target: replenishmentTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/reports/auto-issuance-transactions', methods: [POST, PUT, PATCH, DELETE], target: autoIssuanceTransactionReportApi/getAutoIssuanceTransactions, reason: *fallthrough}
 
 # OBAF PickUrlMappings / PutawayUrlMappings (task APIs): methods missing from their method maps.
@@ -161,3 +163,9 @@
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks/{id}', methods: [POST], target: putawayTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks/{id}/alternate-destinations', methods: [POST, PUT, PATCH, DELETE], target: putawayTaskApi/index, reason: *fallthrough}
 - {kind: method-fallthrough, path: '/api/facilities/{facility}/putaway-tasks/{id}/status', methods: [GET, POST, PUT, DELETE], target: putawayTaskApi/index, reason: *fallthrough}
+
+# OBAF ReplenishmentUrlMappings (bin replenishment task API): methods missing from its method maps.
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/replenishments', methods: [POST, PUT, PATCH, DELETE], target: replenishmentTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/replenishment-tasks', methods: [POST, PUT, PATCH, DELETE], target: replenishmentTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/replenishment-tasks/containers/{outboundContainerId}', methods: [GET, POST, PUT, DELETE], target: replenishmentTaskApi/index, reason: *fallthrough}
+- {kind: method-fallthrough, path: '/api/facilities/{facility}/replenishment-tasks/{id}', methods: [POST, PUT, DELETE], target: replenishmentTaskApi/index, reason: *fallthrough}

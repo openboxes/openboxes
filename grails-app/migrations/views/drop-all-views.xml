@@ -60,6 +60,8 @@
       DROP VIEW IF EXISTS substitution_item;
       DROP VIEW IF EXISTS supplier;
       DROP VIEW IF EXISTS stock_movement;
+      DROP VIEW IF EXISTS pick_task;
+      DROP VIEW IF EXISTS replenishment_task;
     </sql>
   </changeSet>
 </databaseChangeLog>
