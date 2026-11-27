@@ -16,6 +16,7 @@
                 <tr class="prop">
                     <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
                     <th><g:message code="location.zoneLocations.label" default="Zone Location"/></th>
+                    <th><g:message code="location.sortOrder.label" default="Sort order"/></th>
                     <th><g:message code="location.locationType.label"/></th>
                     <th><g:message code="default.actions.label"></g:message></th>
                 </tr>
@@ -35,6 +36,9 @@
                             <a href="${request.contextPath}/location/edit/${zoneLocation?.id}" fragment="location-details-tab">
                                 ${zoneLocation.name}
                             </a>
+                        </td>
+                        <td>
+                            ${zoneLocation?.sortOrder}
                         </td>
                         <td>
                             ${zoneLocation?.locationType?.name}

@@ -95,6 +95,18 @@ class LocationController {
                 params.supportedActivities = supportedActivities?.empty ? [ActivityCode.NONE.id] : supportedActivities
             }
 
+            List<String> invalidColorFields = []
+            ['bgColor', 'fgColor'].each { String field ->
+                String color = params[field]?.toString()?.trim()
+                if (color) {
+                    if (color.matches(/#?[0-9A-Fa-f]{6}/)) {
+                        params[field] = color.replaceFirst('^#', '').toUpperCase()
+                    } else {
+                        invalidColorFields << field
+                    }
+                }
+            }
+
             locationInstance.properties = params
 
             if (!locationInstance.id && !locationInstance.organization) {
@@ -105,7 +117,14 @@ class LocationController {
                 }
             }
 
-            if (locationInstance.validate() && !locationInstance.hasErrors()) {
+            boolean valid = locationInstance.validate()
+            // validate() resets the errors, so the color errors can only be added after it
+            invalidColorFields.each { String field ->
+                locationInstance.errors.rejectValue(field, "location.color.invalid.message", [params[field]] as Object[],
+                        "{0} is not a valid color. Use a six-digit hex code, with or without a leading #")
+            }
+
+            if (valid && !locationInstance.hasErrors()) {
                 try {
                     if (locationInstance?.address?.validate() && !locationInstance?.address?.hasErrors()) {
                         locationInstance.address.save()
@@ -145,6 +164,8 @@ class LocationController {
                 // Refresh only if editing, not creating a brand new location, thus if has id
                 if (locationInstance?.id) {
                     locationInstance.refresh()
+                    // refresh() keeps GORM's change tracking, so the flush at commit would validate again and drop these errors
+                    locationInstance.trackChanges()
                 }
                 render(view: "edit", model: [locationInstance: locationInstance])
                 return

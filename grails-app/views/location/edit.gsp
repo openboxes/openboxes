@@ -262,32 +262,45 @@
                                 </td>
                             </tr>
 
-                            <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZoneLocation()}">
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label for="bgColor"><warehouse:message
-                                                code="location.bgColor.label"/></label>
-                                    </td>
-                                    <td valign="top"
-                                        class="value ${hasErrors(bean: locationInstance, field: 'bgColor', 'errors')}">
-                                        <g:textField name="bgColor"
-                                                     value="${locationInstance?.bgColor}"
-                                                     class="text" size="10"/>
-                                    </td>
-                                </tr>
-                                <tr class="prop">
-                                    <td valign="top" class="name">
-                                        <label for="fgColor"><warehouse:message
-                                                code="location.fgColor.label"/></label>
-                                    </td>
-                                    <td valign="top"
-                                        class="value ${hasErrors(bean: locationInstance, field: 'fgColor', 'errors')}">
-                                        <g:textField name="fgColor"
-                                                     value="${locationInstance?.fgColor}"
-                                                     class="text" size="10"/>
-                                    </td>
-                                </tr>
-                            </g:if>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="bgColor"><warehouse:message
+                                            code="location.bgColor.label"/></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <g:textField name="bgColor"
+                                                 value="${locationInstance?.bgColor}"
+                                                 class="text" size="10"/>
+                                    <input type="color" class="color-swatch" data-target="bgColor"
+                                           aria-label="${warehouse.message(code: 'location.bgColor.label')}"
+                                           style="vertical-align: middle;"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="fgColor"><warehouse:message
+                                            code="location.fgColor.label"/></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <g:textField name="fgColor"
+                                                 value="${locationInstance?.fgColor}"
+                                                 class="text" size="10"/>
+                                    <input type="color" class="color-swatch" data-target="fgColor"
+                                           aria-label="${warehouse.message(code: 'location.fgColor.label')}"
+                                           style="vertical-align: middle;"/>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="sortOrder"><warehouse:message
+                                            code="location.sortOrder.label"/></label>
+                                </td>
+                                <td valign="top" class="value">
+                                    <g:textField name="sortOrder"
+                                                 value="${locationInstance?.sortOrder}"
+                                                 class="text" size="10"/>
+                                </td>
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name" rowspan="2">
                                     <label for="name"><warehouse:message
@@ -709,6 +722,23 @@
           }
         }
     );
+
+    // The swatch has no name, so only the text field is submitted
+    $(".color-swatch").each(function () {
+      var swatch = $(this);
+      var textField = $("#" + swatch.data("target"));
+      var syncSwatch = function () {
+        var hex = $.trim(textField.val() || "").replace(/^#/, "");
+        if (/^[0-9A-Fa-f]{6}$/.test(hex)) {
+          swatch.val("#" + hex.toLowerCase());
+        }
+      };
+      syncSwatch();
+      textField.on("input", syncSwatch);
+      swatch.on("input change", function () {
+        textField.val(swatch.val().replace(/^#/, "").toUpperCase());
+      });
+    });
 
     // Define all dialog windows
     $("#dlgShowContents").dialog({autoOpen: false, modal: true, width: 800});
