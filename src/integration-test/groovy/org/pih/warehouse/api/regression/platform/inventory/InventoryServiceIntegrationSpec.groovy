@@ -539,6 +539,38 @@ class InventoryServiceIntegrationSpec extends IntegrationSpec {
         }
     }
 
+    void 'saveRecordInventoryCommand records the rows around a row that was removed on the page'() {
+        given: 'a product without stock'
+        String productId = tx {
+            authService.currentUser = User.findByUsername('admin')
+            new ProductTestBuilder().randomizedName().category(Category.get(ids.parent)).build(true).id
+        }
+        String suffix = UUID.randomUUID().toString().take(6)
+
+        when: 'rows 0 and 2 are submitted (row 1 was removed), which binds as a gap in the rows'
+        RecordInventoryCommand command = tx {
+            authService.currentLocation = depot()
+            RecordInventoryCommand cmd = new RecordInventoryCommand(product: Product.get(productId),
+                    inventory: depot().inventory, transactionDate: new Date(System.currentTimeMillis() - 60 * 1000))
+            cmd.recordInventoryRows.addAll([
+                    new RecordInventoryRowCommand(lotNumber: "G0-${suffix}", binLocation: bin1(), oldQuantity: 0, newQuantity: 4),
+                    null,
+                    new RecordInventoryRowCommand(lotNumber: "G2-${suffix}", binLocation: bin2(), oldQuantity: 0, newQuantity: 6),
+            ])
+            inventoryService.saveRecordInventoryCommand(cmd, [:])
+            return cmd
+        }
+
+        then: 'both rows are recorded in their bins'
+        !command.hasErrors()
+        command.recordInventoryRows*.lotNumber == ["G0-${suffix}", "G2-${suffix}"]*.toString()
+        tx {
+            Product product = Product.get(productId)
+            [inventoryService.getQuantityFromBinLocation(depot(), bin1(), InventoryItem.findByProductAndLotNumber(product, "G0-${suffix}")),
+             inventoryService.getQuantityFromBinLocation(depot(), bin2(), InventoryItem.findByProductAndLotNumber(product, "G2-${suffix}"))]
+        } == [4, 6]
+    }
+
     void 'the available items and products of a location are the lots with stock'() {
         expect:
         tx {
