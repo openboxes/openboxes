@@ -300,7 +300,7 @@ class IndicatorDataService {
                 new IndicatorDatasets('Average Fill Rate', averageFillRateResult, null, 'line'),
         ];
 
-        int averageLastMonth = averageFillRateResult[averageFillRateResult.size - 1]
+        int averageLastMonth = averageFillRateResult[averageFillRateResult.size() - 1]
 
         ColorNumber colorNumber = new ColorNumber(averageLastMonth, 'Fill Rate Last Month', null, null, 90)
         colorNumber.setConditionalColors(87, colorNumber.value2)

@@ -36,7 +36,7 @@ class CalculateHistoricalQuantityJob {
                 log.info "There are ${dates.size()} remaining to be processed"
             }
 
-            Date nextDate = dates.pop()
+            Date nextDate = dates.removeLast()
             // We need the next date that has not already been processed
             // FIXME This could get stuck if there's a date that generates 0 inventory snapshot records (but that should not happen)
             log.info "Triggering inventory snapshot for date ${nextDate}"
