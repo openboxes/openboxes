@@ -94,22 +94,22 @@
                         <table id="inventoryTable">
                             <thead>
                             <tr>
-                                <th class="center"><warehouse:message code="inventoryLevel.status.label" default="Status"/></th>
-                                <th><warehouse:message code="product.productCode.label" default="Code"/></th>
-                                <th><warehouse:message code="product.label" default="Product"/></th>
-                                <th class="left"><warehouse:message code="product.productFamily.label" default="Product Family"/></th>
-                                <th><warehouse:message code="category.label" default="Category"/></th>
-                                <th class="left"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
-                                <th><warehouse:message code="product.unitOfMeasure.label" default="Unit of measure"/></th>
-                                <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label" default="Minimum quantity"/></th>
-                                <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label" default="Reorder quantity"/></th>
-                                <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label" default="inventoryLevel.maximumQuantity.label"/></th>
-                                <th class="center border-right"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
-                                <th class="center border-right"><warehouse:message code="default.quantityAvailableToPromise.label" default="Quantity ATP"/></th>
-                                <th title="${g.message(code: "product.lastPaid.label", default: "Last Paid")}">
+                                <th class="center" title="${g.message(code: 'report.inventorySummary.status.tooltip.label')}"><g:message code="inventoryLevel.status.label" default="Status"/></th>
+                                <th title="${g.message(code: 'report.inventorySummary.productCode.tooltip.label')}"><g:message code="product.productCode.label" default="Code"/></th>
+                                <th title="${g.message(code: 'report.inventorySummary.product.tooltip.label')}"><g:message code="product.label" default="Product"/></th>
+                                <th class="left" title="${g.message(code: 'report.inventorySummary.productFamily.tooltip.label')}"><g:message code="product.productFamily.label" default="Product Family"/></th>
+                                <th title="${g.message(code: 'report.inventorySummary.category.tooltip.label')}"><g:message code="category.label" default="Category"/></th>
+                                <th class="left" title="${g.message(code: 'report.inventorySummary.abcClass.tooltip.label')}"><g:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
+                                <th title="${g.message(code: 'report.inventorySummary.unitOfMeasure.tooltip.label')}"><g:message code="product.unitOfMeasure.label" default="Unit of measure"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventorySummary.minimumQuantity.tooltip.label')}"><g:message code="inventoryLevel.minimumQuantity.label" default="Minimum quantity"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventorySummary.reorderQuantity.tooltip.label')}"><g:message code="inventoryLevel.reorderQuantity.label" default="Reorder quantity"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventorySummary.maximumQuantity.tooltip.label')}"><g:message code="inventoryLevel.maximumQuantity.label" default="inventoryLevel.maximumQuantity.label"/></th>
+                                <th class="center border-right" title="${g.message(code: 'report.inventorySummary.quantityOnHand.tooltip.label')}"><g:message code="default.quantityOnHand.label" default="Quantity On Hand"/></th>
+                                <th class="center border-right" title="${g.message(code: 'report.inventorySummary.quantityAvailable.tooltip.label')}"><g:message code="default.quantityAvailable.label" default="Quantity Available"/></th>
+                                <th title="${g.message(code: 'report.inventorySummary.unitPrice.tooltip.label')}">
                                     <g:message code="product.unitPrice.label" default="Unit Price"/>
                                 </th>
-                                <th class="center"><warehouse:message code="product.totalValue.label" default="Total amount"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventorySummary.totalValue.tooltip.label')}"><g:message code="product.totalValue.label" default="Total amount"/></th>
                             </tr>
                             </thead>
                             <tbody>
