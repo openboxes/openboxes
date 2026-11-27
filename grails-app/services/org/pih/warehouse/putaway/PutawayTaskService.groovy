@@ -3,7 +3,10 @@ package org.pih.warehouse.putaway
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.hibernate.NullPrecedence
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.Order as CriteriaOrder
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
@@ -66,8 +69,12 @@ class PutawayTaskService {
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
 
+        // Without an explicit sort (e.g. the mobile app) tasks follow the walk path of their destinations
+        boolean sortByWalkPath = !params.sort
+        Map listParams = sortByWalkPath ? [max: max, offset: offset] : [max: max, offset: offset, sort: sort, order: sortOrder]
+
         // Search for putaway tasks based on user-provided search parameters
-        List<PutawayTask> tasks = PutawayTask.createCriteria().list(max: max, offset: offset, sort: sort, order: sortOrder) {
+        List<PutawayTask> tasks = PutawayTask.createCriteria().list(listParams) {
             if (statuses) {
                 'in'('status', statuses)
             }
@@ -106,6 +113,15 @@ class PutawayTaskService {
             }
             if (createdBefore) {
                 le('dateCreated', createdBefore)
+            }
+            if (sortByWalkPath) {
+                createAlias('destination', 'd', CriteriaSpecification.LEFT_JOIN)
+                createAlias('d.zone', 'dz', CriteriaSpecification.LEFT_JOIN)
+                order(CriteriaOrder.asc('dz.sortOrder').nulls(NullPrecedence.LAST))
+                order(CriteriaOrder.asc('d.sortOrder').nulls(NullPrecedence.LAST))
+                order(CriteriaOrder.asc('d.name').nulls(NullPrecedence.LAST))
+                order('dateCreated', 'asc')
+                order('id', 'asc')
             }
         }
 
@@ -740,7 +756,7 @@ class PutawayTaskService {
             // We're cross-docking so we want to find similar locations in the same cross-docking zone
             if (task?.destination?.supports(ActivityCode.CROSS_DOCKING)) {
                 if (task.destination.zone) {
-                    return Location.findAllByParentLocationAndZone(task.facility, task.destination.zone)
+                    return Location.findAllByParentLocationAndZone(task.facility, task.destination.zone).sort(false, WALK_PATH_ORDER)
                 }
                 else {
                     // TODO return the locations that share the same DeliveryTypeCode as the destination
@@ -748,8 +764,25 @@ class PutawayTaskService {
                 }
             }
         }
-        // return preferred putaway locations
-        return InventoryLevel.getPutawayLocations(task.facility, task.product)
+        // return preferred putaway locations, the preferred bin (if any) staying first
+        List<Location> putawayLocations = InventoryLevel.getPutawayLocations(task.facility, task.product)
+        if (InventoryLevel.findPreferredBinLocation(task.facility, task.product)) {
+            return [putawayLocations.head()] + putawayLocations.tail().sort(false, WALK_PATH_ORDER)
+        }
+        return putawayLocations.sort(false, WALK_PATH_ORDER)
+    }
+
+    private static final Comparator<Location> WALK_PATH_ORDER = { Location a, Location b ->
+        compareNullsLast(a?.zone?.sortOrder, b?.zone?.sortOrder) ?:
+                compareNullsLast(a?.sortOrder, b?.sortOrder) ?:
+                compareNullsLast(a?.name?.toLowerCase(), b?.name?.toLowerCase())
+    } as Comparator<Location>
+
+    private static int compareNullsLast(Comparable a, Comparable b) {
+        if (a == null || b == null) {
+            return a == null ? (b == null ? 0 : 1) : -1
+        }
+        return a <=> b
     }
 
     void sendDiscrepancyNotification(PutawayTask task) {
