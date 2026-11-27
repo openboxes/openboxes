@@ -69,7 +69,7 @@ class IndicatorDataService {
             code : label,
             message : messageService.getMessage(label)
             ]
-            listLabels.push(monthLabel)
+            listLabels.add(monthLabel)
 
             // Expired items
             if (i == 0) {
@@ -161,7 +161,7 @@ class IndicatorDataService {
 
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
 
-            listLabels.push("${monthLabel} ${monthBegin.year + 1900}")
+            listLabels.add("${monthLabel} ${monthBegin.year + 1900}")
 
             def averageFillRate = dataService.executeQuery("""
             select avg(fr.fill_rate) FROM fill_rate as fr
@@ -179,7 +179,7 @@ class IndicatorDataService {
                 'origin'      : location.id,
             ]);
 
-            averageFillRate[0] == null ? averageFillRateResult.push(0) : averageFillRateResult.push(averageFillRate[0][0])
+            averageFillRate[0] == null ? averageFillRateResult.add(0) : averageFillRateResult.add(averageFillRate[0][0])
 
             def requestLinesSubmitted = dataService.executeQuery("""
             select count(fr.id) FROM fill_rate as fr
@@ -197,7 +197,7 @@ class IndicatorDataService {
                 'origin'      : location.id,
             ]);
 
-            requestLinesSubmitted[0] == null ? requestLinesSubmittedResult.push(0) : requestLinesSubmittedResult.push(requestLinesSubmitted[0][0])
+            requestLinesSubmitted[0] == null ? requestLinesSubmittedResult.add(0) : requestLinesSubmittedResult.add(requestLinesSubmitted[0][0])
 
             def linesCancelledStockout = dataService.executeQuery("""
             select count(fr.id) FROM fill_rate as fr
@@ -215,7 +215,7 @@ class IndicatorDataService {
                 'origin'      : location.id,
             ]);
 
-            linesCancelledStockout[0] == null ? linesCancelledStockoutResult.push(0) : linesCancelledStockoutResult.push(linesCancelledStockout[0][0])
+            linesCancelledStockout[0] == null ? linesCancelledStockoutResult.add(0) : linesCancelledStockoutResult.add(linesCancelledStockout[0][0])
         }
 
             averageFillRateResult = averageFillRateResult.collect{ it * 100 }
@@ -273,7 +273,7 @@ class IndicatorDataService {
             monthBegin.set(month: today.month - i, date: 1)
             monthEnd.set(month: today.month - i + 1, date: 1)
             String monthLabel = new java.text.DateFormatSymbols().months[monthBegin.month]
-            listLabels.push("${monthLabel} ${monthBegin.year + 1900}")
+            listLabels.add("${monthLabel} ${monthBegin.year + 1900}")
 
             def averageFillRate = dataService.executeQuery("""
             select avg(fr.fill_rate) FROM fill_rate as fr
@@ -291,7 +291,7 @@ class IndicatorDataService {
                 'listValues'  : listValues,
             ]);
 
-            averageFillRate[0] == null ? averageFillRateResult.push(0) : averageFillRateResult.push(averageFillRate[0][0])
+            averageFillRate[0] == null ? averageFillRateResult.add(0) : averageFillRateResult.add(averageFillRate[0][0])
         }
 
         averageFillRateResult = averageFillRateResult.collect{ it * 100 }
@@ -351,7 +351,7 @@ class IndicatorDataService {
 
         List listData = []
         for (item in inventoryData) {
-            listData.push(item.value ? item.value : 0)
+            listData.add(item.value ? item.value : 0)
         }
 
         String urlContextPath = ConfigHelper.contextPath;
@@ -858,7 +858,7 @@ class IndicatorDataService {
             ColorNumber colorNumber = new ColorNumber(percentage, subtitle)
             colorNumber.setConditionalColors(listErrorSuccessIntervals.get(it)[0], listErrorSuccessIntervals.get(it)[1])
             colorNumber.value = "${colorNumber.value}%"
-            listPercentageNumbers.push(colorNumber)
+            listPercentageNumbers.add(colorNumber)
         }
         MultipleNumbersIndicator multipleNumbersIndicator = new MultipleNumbersIndicator(listPercentageNumbers)
 
@@ -940,9 +940,9 @@ class IndicatorDataService {
             def expiredLastDayOfMonth = filledValuesExpiredLastDayOfMonth == null ? 0 : filledValuesExpiredLastDayOfMonth[i]
             def sum = removedDueToExpiry + notExpiredLastDayOfMonth + expiredLastDayOfMonth
             if (sum == 0) {
-                percentage.push(0)
+                percentage.add(0)
             } else {
-                percentage.push(Math.round((removedDueToExpiry / sum) * 100) / 100)
+                percentage.add(Math.round((removedDueToExpiry / sum) * 100) / 100)
             }
         }
 
@@ -1008,8 +1008,8 @@ class IndicatorDataService {
 
         percentageAdHoc.each {
             if (RequisitionType.listRequestTypes().contains(it[1])) {
-                listLabels.push(it[1].toString())
-                listData.push(it[0])
+                listLabels.add(it[1].toString())
+                listData.add(it[0])
             }
         }
 
@@ -1044,8 +1044,8 @@ class IndicatorDataService {
                 ]);
 
         stockOutLastMonth.each {
-                listLabels.push(it[1].toString())
-                listData.push(it[0])
+                listLabels.add(it[1].toString())
+                listData.add(it[0])
         }
 
         List<IndicatorDatasets> datasets = [
@@ -1290,7 +1290,7 @@ class IndicatorDataService {
 
             String monthLabel = new java.text.DateFormatSymbols().months[tmpDate.month].substring(0, 3)
             String yearLabel = tmpDate.year + 1900
-            labels.push("${monthLabel} ${yearLabel}")
+            labels.add("${monthLabel} ${yearLabel}")
         }
 
         return labels
