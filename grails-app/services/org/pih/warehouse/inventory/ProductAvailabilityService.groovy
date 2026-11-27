@@ -28,6 +28,7 @@ import org.hibernate.jdbc.ReturningWork
 import org.hibernate.SQLQuery
 import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
+import org.hibernate.type.Type
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AllocatedItem
 import org.pih.warehouse.api.AvailableItem
@@ -919,80 +920,10 @@ class ProductAvailabilityService {
         }
 
         List<String> productIds = products*.id?.unique()
-        String productFilter = productIds ? "AND ii.product_id IN (:productIds)" : ""
-
-        // A sortable key that orders transactions the same way as Transaction.compareTo. Fixed width (40 chars) so
-        // that we can append the transaction id and use MAX() to find the most recent baseline transaction.
-        //
-        // Transactions can tie on the key: dates are stored to the second, and a baseline and its adjustment are
-        // often created together with the same transaction date. On a tie the baseline comes first, so credits and
-        // debits that tie with it are counted. If two baselines tie, the one with the highest id wins.
-        String sortKey = """CONCAT(DATE_FORMAT(t.transaction_date, '%Y%m%d%H%i%s%f'),
-                                  DATE_FORMAT(t.date_created, '%Y%m%d%H%i%s%f'))"""
-
-        // The transaction entries (of the given products) that happened at the facility before the given date.
-        //
-        // For a few products (e.g. the transaction report's details dialog), start from their inventory items. Left to
-        // itself, the optimizer starts from the transaction types and reads every transaction of each type at every
-        // facility, which takes as long for one product as for the whole facility (~4s at a large facility, vs 0.2s).
-        // For many products that's the better plan: starting from the products got slower than it past ~1000 of them.
-        String entriesJoin = (productIds && productIds.size() <= PRODUCT_FIRST_JOIN_LIMIT) ? """
-            FROM inventory_item ii
-            STRAIGHT_JOIN transaction_entry te ON te.inventory_item_id = ii.id
-            STRAIGHT_JOIN transaction t ON t.id = te.transaction_id
-            STRAIGHT_JOIN transaction_type tt ON tt.id = t.transaction_type_id
-        """ : """
-            FROM transaction t
-            JOIN transaction_entry te ON te.transaction_id = t.id
-            JOIN inventory_item ii ON ii.id = te.inventory_item_id
-            JOIN transaction_type tt ON tt.id = t.transaction_type_id
-        """
-        String entriesBeforeDate = """
-            ${entriesJoin}
-            WHERE t.inventory_id = :inventoryId
-            AND t.transaction_date < :at
-            ${productFilter}
-        """
-
-        String query = """
-            SELECT e.inventory_item_id AS inventory_item_id,
-                   e.bin_location_id AS bin_location_id,
-                   SUM(CASE e.transaction_code WHEN 'DEBIT' THEN -e.quantity ELSE e.quantity END) AS quantity_on_hand
-            FROM (
-                SELECT te.inventory_item_id, te.bin_location_id, te.quantity, ii.product_id,
-                       t.id AS transaction_id, tt.transaction_code, ${sortKey} AS sort_key
-                ${entriesBeforeDate}
-            ) e
-            LEFT JOIN (
-                SELECT ii.product_id, MAX(CONCAT(${sortKey}, t.id)) AS baseline
-                ${entriesBeforeDate}
-                AND tt.transaction_code = 'PRODUCT_INVENTORY'
-                GROUP BY ii.product_id
-            ) product_baseline ON product_baseline.product_id = e.product_id
-            LEFT JOIN (
-                SELECT te.inventory_item_id, MAX(CONCAT(${sortKey}, t.id)) AS baseline
-                ${entriesBeforeDate}
-                AND tt.transaction_code = 'INVENTORY'
-                GROUP BY te.inventory_item_id
-            ) item_baseline ON item_baseline.inventory_item_id = e.inventory_item_id
-            WHERE (product_baseline.baseline IS NULL
-                OR e.sort_key > LEFT(product_baseline.baseline, 40)
-                OR e.transaction_id = SUBSTRING(product_baseline.baseline, 41)
-                OR (e.sort_key = LEFT(product_baseline.baseline, 40) AND e.transaction_code IN ('CREDIT', 'DEBIT')))
-            AND (item_baseline.baseline IS NULL
-                OR e.sort_key > LEFT(item_baseline.baseline, 40)
-                OR e.transaction_id = SUBSTRING(item_baseline.baseline, 41)
-                OR (e.sort_key = LEFT(item_baseline.baseline, 40) AND e.transaction_code IN ('CREDIT', 'DEBIT')))
-            GROUP BY e.inventory_item_id, e.bin_location_id
+        String query = withOptimizerSwitch("""
+            ${quantityOnHandAtDateSql(productIds)}
             HAVING quantity_on_hand <> 0
-        """
-
-        // MariaDB's split_materialized optimization turns the baseline subqueries into LATERAL DERIVED tables that
-        // get re-executed for every transaction entry, which takes the query from seconds to many minutes.
-        // SET STATEMENT only applies to this one query. MySQL doesn't have this optimization (or this syntax).
-        if (isMariaDb()) {
-            query = "SET STATEMENT optimizer_switch='split_materialized=off' FOR ${query}"
-        }
+        """)
 
         SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
         // Flush any pending changes to these tables first so that the result includes them
@@ -1028,6 +959,258 @@ class ProductAvailabilityService {
                     quantityOnHand: result.quantity_on_hand,
             )
         }
+    }
+
+    /**
+     * Counts the days that each product was out of stock at a facility, i.e. the days where its quantity on hand at
+     * the end of the day, summed over every inventory item and bin, was zero or less (see endOfDaySql).
+     *
+     * Only products with transactions at the facility before the end of the period are returned. A product whose first
+     * transaction is during the period is only counted from that day on.
+     *
+     * @param facility The location to count stockouts at.
+     * @param products The products to count stockouts for. If null or empty, counts them for all products.
+     * @param startDate The first day of the period (from midnight).
+     * @param days The number of days in the period.
+     * @return the number of days that each product was out of stock, keyed on product id
+     */
+    Map<String, Integer> getStockoutDays(Location facility, Collection<Product> products, Date startDate, int days) {
+        List<Map> rows = queryEndOfDay(facility, products, startDate, days, """
+            SELECT product_id, SUM(CASE WHEN balance <= 0 THEN days_held ELSE 0 END) AS stockout_days
+            FROM end_of_day
+            GROUP BY product_id
+        """, [stockout_days: StandardBasicTypes.INTEGER])
+        return rows.collectEntries { Map row -> [row.product_id, row.stockout_days] }
+    }
+
+    /**
+     * Runs a query on the stock of each product at the end of each day of a period that had transactions (see
+     * endOfDaySql). The select follows the CTEs, so it can add more of its own (starting with a comma).
+     *
+     * @param scalars The columns that the select returns, other than product_id, and their types.
+     */
+    private List<Map> queryEndOfDay(Location facility, Collection<Product> products, Date startDate, int days,
+                                    String select, Map<String, Type> scalars) {
+        if (!facility?.inventory || !startDate || days <= 0) {
+            return []
+        }
+
+        Date start = new Date(startDate.time).clearTime()
+        Date end = start + days
+        List<String> productIds = products*.id?.unique()
+
+        String query = withOptimizerSwitch("""
+            ${endOfDaySql(productIds, days)}
+            ${select}
+        """)
+
+        SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
+        sqlQuery.addSynchronizedEntityClass(Transaction)
+                .addSynchronizedEntityClass(TransactionEntry)
+                .addSynchronizedEntityClass(InventoryItem)
+        sqlQuery.addScalar("product_id", StandardBasicTypes.STRING)
+        scalars.each { String column, Type type -> sqlQuery.addScalar(column, type) }
+        sqlQuery.setString("inventoryId", facility.inventory.id)
+                .setTimestamp("at", start)
+                .setTimestamp("start", start)
+                .setTimestamp("end", end)
+                .setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        if (productIds) {
+            sqlQuery.setParameterList("productIds", productIds)
+        }
+        return sqlQuery.list()
+    }
+
+    /**
+     * CTEs that end with end_of_day: the quantity on hand of each product (summed over every inventory item and bin)
+     * at the end of each day of a period that had transactions (day_index, counting from 0), and the number of days
+     * that it held for (days_held), until the next day with transactions or the end of the period. The stock doesn't
+     * change on the days in between. Takes the :inventoryId, :at and :start (both the start of the period), :end and
+     * (if productIds are given) :productIds parameters.
+     *
+     * Rather than calculating the stock on each day, it calculates the stock at the start of the period (the same as
+     * getQuantityOnHandAtDate), then replays the transactions in the period with window functions. It follows the same
+     * rules as getQuantityOnHandAtDate:
+     * - A PRODUCT_INVENTORY transaction resets the stock of the product to the quantities in the transaction (and
+     *   every inventory item that is not in it to zero). The stock at the start of the period is treated as one.
+     * - An INVENTORY transaction resets the stock of each of its inventory items to the quantity in the transaction,
+     *   so the stock of the product changes by the difference.
+     * - On a tie, baselines come first, then other transactions, each in order of id.
+     *
+     * Only products with transactions at the facility before the end of the period have rows. A product whose first
+     * transaction is during the period has no rows before that day.
+     */
+    private static String endOfDaySql(List<String> productIds, int days) {
+        return """
+            WITH opening AS (
+                -- The stock of each inventory item at the start of the period, including items that have none
+                SELECT ii.product_id, q.inventory_item_id, SUM(q.quantity_on_hand) AS quantity
+                FROM (${quantityOnHandAtDateSql(productIds)}) q
+                JOIN inventory_item ii ON ii.id = q.inventory_item_id
+                GROUP BY ii.product_id, q.inventory_item_id
+            ),
+            item_events AS (
+                -- The stock at the start of the period, as a baseline that comes before every transaction
+                SELECT product_id, inventory_item_id, 'PRODUCT_INVENTORY' AS transaction_code, '' AS event_key,
+                       0 AS day_index, quantity
+                FROM opening
+                UNION ALL
+                -- The net quantity of each transaction in the period per inventory item (summed over bins)
+                SELECT ii.product_id, te.inventory_item_id, tt.transaction_code,
+                       CONCAT(${SORT_KEY},
+                              CASE WHEN tt.transaction_code IN ('PRODUCT_INVENTORY', 'INVENTORY') THEN '0' ELSE '1' END,
+                              t.id) AS event_key,
+                       TIMESTAMPDIFF(DAY, :start, t.transaction_date) AS day_index,
+                       SUM(CASE tt.transaction_code WHEN 'DEBIT' THEN -te.quantity ELSE te.quantity END) AS quantity
+                ${entriesJoin(productIds)}
+                WHERE t.inventory_id = :inventoryId
+                AND t.transaction_date >= :start
+                AND t.transaction_date < :end
+                ${productFilter(productIds)}
+                GROUP BY ii.product_id, te.inventory_item_id, tt.transaction_code, t.id, t.transaction_date,
+                         t.date_created
+            ),
+            epochs AS (
+                -- Number the baselines so that each one starts a new running total. A product baseline resets
+                -- every inventory item of the product, an INVENTORY transaction resets only its own items.
+                SELECT e.*,
+                       SUM(transaction_code = 'PRODUCT_INVENTORY')
+                           OVER (PARTITION BY product_id ORDER BY event_key) AS product_epoch,
+                       SUM(transaction_code = 'INVENTORY')
+                           OVER (PARTITION BY inventory_item_id ORDER BY event_key) AS item_epoch
+                FROM item_events e
+            ),
+            item_balances AS (
+                SELECT e.*,
+                       SUM(quantity) OVER (PARTITION BY inventory_item_id, product_epoch, item_epoch
+                                           ORDER BY event_key) AS item_balance
+                FROM epochs e
+            ),
+            item_changes AS (
+                -- An INVENTORY transaction changes the stock of the product by the difference between the counted
+                -- quantity and the stock of the item just before it (zero if the item had none since the last
+                -- product baseline). Everything else changes it by its quantity.
+                SELECT b.*,
+                       CASE WHEN transaction_code = 'INVENTORY'
+                            THEN item_balance - COALESCE(LAG(item_balance) OVER (
+                                     PARTITION BY inventory_item_id, product_epoch ORDER BY event_key), 0)
+                            ELSE quantity END AS quantity_change
+                FROM item_balances b
+            ),
+            product_events AS (
+                SELECT product_id, event_key, day_index, MAX(product_epoch) AS product_epoch,
+                       SUM(quantity_change) AS quantity_change
+                FROM item_changes
+                GROUP BY product_id, event_key, day_index
+            ),
+            product_balances AS (
+                SELECT p.*,
+                       SUM(quantity_change) OVER (PARTITION BY product_id, product_epoch ORDER BY event_key) AS balance,
+                       ROW_NUMBER() OVER (PARTITION BY product_id, day_index ORDER BY event_key DESC) AS last_of_day
+                FROM product_events p
+            ),
+            end_of_day AS (
+                -- The stock at the end of each day with transactions, and the number of days until the next one
+                SELECT product_id, day_index, balance,
+                       -- MariaDB's LEAD has no default argument
+                       COALESCE(LEAD(day_index) OVER (PARTITION BY product_id ORDER BY day_index), ${days}) - day_index
+                           AS days_held
+                FROM product_balances
+                WHERE last_of_day = 1
+            )
+        """
+    }
+
+
+    // A sortable key that orders transactions the same way as Transaction.compareTo. Fixed width (40 chars) so that
+    // we can append the transaction id and use MAX() to find the most recent baseline transaction.
+    //
+    // Transactions can tie on the key: dates are stored to the second, and a baseline and its adjustment are often
+    // created together with the same transaction date. On a tie the baseline comes first, so credits and debits that
+    // tie with it are counted. If two baselines tie, the one with the highest id wins.
+    private static final String SORT_KEY = """CONCAT(DATE_FORMAT(t.transaction_date, '%Y%m%d%H%i%s%f'),
+                                                     DATE_FORMAT(t.date_created, '%Y%m%d%H%i%s%f'))"""
+
+    /**
+     * The FROM clause that joins transaction entries to their transactions, inventory items and transaction types.
+     *
+     * For a few products (e.g. the transaction report's details dialog), start from their inventory items. Left to
+     * itself, the optimizer starts from the transaction types and reads every transaction of each type at every
+     * facility, which takes as long for one product as for the whole facility (~4s at a large facility, vs 0.2s).
+     * For many products that's the better plan: starting from the products got slower than it past ~1000 of them.
+     */
+    private static String entriesJoin(List<String> productIds) {
+        return (productIds && productIds.size() <= PRODUCT_FIRST_JOIN_LIMIT) ? """
+            FROM inventory_item ii
+            STRAIGHT_JOIN transaction_entry te ON te.inventory_item_id = ii.id
+            STRAIGHT_JOIN transaction t ON t.id = te.transaction_id
+            STRAIGHT_JOIN transaction_type tt ON tt.id = t.transaction_type_id
+        """ : """
+            FROM transaction t
+            JOIN transaction_entry te ON te.transaction_id = t.id
+            JOIN inventory_item ii ON ii.id = te.inventory_item_id
+            JOIN transaction_type tt ON tt.id = t.transaction_type_id
+        """
+    }
+
+    private static String productFilter(List<String> productIds) {
+        return productIds ? "AND ii.product_id IN (:productIds)" : ""
+    }
+
+    /**
+     * The query behind getQuantityOnHandAtDate (see its rules), with the :inventoryId, :at and (if productIds are
+     * given) :productIds parameters. Returns inventory_item_id, bin_location_id and quantity_on_hand, including the
+     * items where quantity on hand is zero.
+     */
+    private static String quantityOnHandAtDateSql(List<String> productIds) {
+        // The transaction entries (of the given products) that happened at the facility before the given date
+        String entriesBeforeDate = """
+            ${entriesJoin(productIds)}
+            WHERE t.inventory_id = :inventoryId
+            AND t.transaction_date < :at
+            ${productFilter(productIds)}
+        """
+
+        return """
+            SELECT e.inventory_item_id AS inventory_item_id,
+                   e.bin_location_id AS bin_location_id,
+                   SUM(CASE e.transaction_code WHEN 'DEBIT' THEN -e.quantity ELSE e.quantity END) AS quantity_on_hand
+            FROM (
+                SELECT te.inventory_item_id, te.bin_location_id, te.quantity, ii.product_id,
+                       t.id AS transaction_id, tt.transaction_code, ${SORT_KEY} AS sort_key
+                ${entriesBeforeDate}
+            ) e
+            LEFT JOIN (
+                SELECT ii.product_id, MAX(CONCAT(${SORT_KEY}, t.id)) AS baseline
+                ${entriesBeforeDate}
+                AND tt.transaction_code = 'PRODUCT_INVENTORY'
+                GROUP BY ii.product_id
+            ) product_baseline ON product_baseline.product_id = e.product_id
+            LEFT JOIN (
+                SELECT te.inventory_item_id, MAX(CONCAT(${SORT_KEY}, t.id)) AS baseline
+                ${entriesBeforeDate}
+                AND tt.transaction_code = 'INVENTORY'
+                GROUP BY te.inventory_item_id
+            ) item_baseline ON item_baseline.inventory_item_id = e.inventory_item_id
+            WHERE (product_baseline.baseline IS NULL
+                OR e.sort_key > LEFT(product_baseline.baseline, 40)
+                OR e.transaction_id = SUBSTRING(product_baseline.baseline, 41)
+                OR (e.sort_key = LEFT(product_baseline.baseline, 40) AND e.transaction_code IN ('CREDIT', 'DEBIT')))
+            AND (item_baseline.baseline IS NULL
+                OR e.sort_key > LEFT(item_baseline.baseline, 40)
+                OR e.transaction_id = SUBSTRING(item_baseline.baseline, 41)
+                OR (e.sort_key = LEFT(item_baseline.baseline, 40) AND e.transaction_code IN ('CREDIT', 'DEBIT')))
+            GROUP BY e.inventory_item_id, e.bin_location_id
+        """
+    }
+
+    /**
+     * MariaDB's split_materialized optimization turns the baseline subqueries of quantityOnHandAtDateSql into LATERAL
+     * DERIVED tables that get re-executed for every transaction entry, which takes the query from seconds to many
+     * minutes. SET STATEMENT only applies to this one query. MySQL doesn't have this optimization (or this syntax).
+     */
+    private String withOptimizerSwitch(String query) {
+        return isMariaDb() ? "SET STATEMENT optimizer_switch='split_materialized=off' FOR ${query}" : query
     }
 
     private Boolean mariaDb
