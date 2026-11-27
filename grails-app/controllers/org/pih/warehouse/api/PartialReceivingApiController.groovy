@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.plugins.csv.CSVReaderUtils
 import org.grails.web.json.JSONObject
 import org.hibernate.Hibernate
 import org.pih.warehouse.core.Constants
@@ -105,7 +106,7 @@ class PartialReceivingApiController {
 
             String csv = new String(importFile.bytes)
             def settings = [separatorChar: ',', skipLines: 1]
-            csv.toCsvReader(settings).eachLine { tokens ->
+            CSVReaderUtils.eachLine(CSVReaderUtils.toCsvReader(csv, settings)) { String[] tokens ->
                 String receiptItemId = tokens[0] ?: null
                 String shipmentItemId = tokens[1] ?: null
                 String code = tokens[2] ?: null

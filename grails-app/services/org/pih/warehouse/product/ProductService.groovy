@@ -622,7 +622,7 @@ class ProductService {
         def products = new ArrayList<Product>()
 
         // Iterate over each line and either update an existing product or create a new product
-        csv.toCsvReader(['skipLines': 1, 'separatorChar': delimiter]).eachLine { tokens ->
+        CSVReaderUtils.eachLine(CSVReaderUtils.toCsvReader(csv, ['skipLines': 1, 'separatorChar': delimiter])) { String[] tokens ->
             def product = Product.findByIdOrProductCode(tokens[0], tokens[1])
             println "GET EXISTING PRODUCT " + tokens[0] + " OR " + tokens[1]
             if (product) {
@@ -1267,7 +1267,7 @@ class ProductService {
         List rows = []
 
         // Iterate over each line and either update an existing product or create a new product
-        csv.toCsvReader(['skipLines': 1]).eachLine { tokens ->
+        CSVReaderUtils.eachLine(CSVReaderUtils.toCsvReader(csv, ['skipLines': 1])) { String[] tokens ->
 
             if (tokens.length != 4) {
                 throw new IllegalArgumentException("Expected columns: Catalog Code, Category, Product Code, Product Name")
