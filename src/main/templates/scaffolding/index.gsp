@@ -3,33 +3,25 @@
     <head>
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="\${message(code: '${propertyName}.label', default: '${className}')}" />
-        <title><warehouse:message code="default.list.label" args="[entityName]" /></title>
-        <asset:stylesheet src="main.css"/>
-        <asset:stylesheet src="mobile.css"/>
+        <title><g:message code="default.list.label" args="[entityName]" /></title>
+        <content tag="pageTitle"><g:message code="default.list.label" args="[entityName]" /></content>
     </head>
     <body>
-        <div class="button-bar">
-            <g:link class="button" action="index">
-                <img src="\${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
-                <warehouse:message code="default.list.label" args="[entityName]"/>
-            </g:link>
-            <g:link class="button" action="create">
-                <img src="\${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                <warehouse:message code="default.add.label" args="[entityName]"/>
-            </g:link>
-        </div>
-        <div id="list-${propertyName}" class="box content scaffold-create" role="main">
-            <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
+        <div class="body">
             <g:if test="\${flash.message}">
-                <div class="message" role="status">\${flash.message}</div>
+                <div class="message" role="status" aria-label="message">\${flash.message}</div>
             </g:if>
-            <f:table collection="\${${propertyName}List}" />
-            <g:set var="totalCount" value="\${${propertyName}Count ?: 0}"/>
-            <g:if test="\${totalCount > params.max}">
-                <div class="paginateButtons">
-                    <g:paginate total="\${${propertyName}Count ?: 0}" />
-                </div>
-            </g:if>
+            <g:render template="/common/scaffoldButtonBar" model="[entityName: entityName]" />
+            <div id="list-${propertyName}" class="box" role="main">
+                <h2><g:message code="default.list.label" args="[entityName]" /></h2>
+                <f:table collection="\${${propertyName}List}" />
+                <g:set var="totalCount" value="\${${propertyName}Count ?: 0}"/>
+                <g:if test="\${totalCount > params.max}">
+                    <div class="paginateButtons border-top">
+                        <g:paginate total="\${totalCount}" />
+                    </div>
+                </g:if>
+            </div>
         </div>
     </body>
 </html>

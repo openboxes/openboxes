@@ -4,32 +4,28 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="\${message(code: '${propertyName}.label', default: '${className}')}" />
         <title><g:message code="default.show.label" args="[entityName]" /></title>
-        <asset:stylesheet src="main.css"/>
-        <asset:stylesheet src="mobile.css"/>
+        <content tag="pageTitle"><g:message code="default.show.label" args="[entityName]" /></content>
     </head>
     <body>
-        <div class="button-bar">
-            <g:link class="button" action="index">
-                <img src="\${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
-                <warehouse:message code="default.list.label" args="[entityName]"/>
-            </g:link>
-            <g:link class="button" action="create">
-                <img src="\${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
-                <warehouse:message code="default.add.label" args="[entityName]"/>
-            </g:link>
-        </div>
-        <div id="show-${propertyName}" class="box content scaffold-show" role="main">
-            <h1><g:message code="default.show.label" args="[entityName]" /></h1>
+        <div class="body">
             <g:if test="\${flash.message}">
-                <div class="message" role="status">\${flash.message}</div>
+                <div class="message" role="status" aria-label="message">\${flash.message}</div>
             </g:if>
-            <f:display bean="${propertyName}" />
-            <g:form resource="\${this.${propertyName}}" method="DELETE">
-                <fieldset class="buttons">
-                    <g:link class="edit button" action="edit" resource="\${this.${propertyName}}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
-                    <input class="delete button" type="submit" value="\${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('\${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-                </fieldset>
-            </g:form>
+            <g:render template="/common/scaffoldButtonBar" model="[entityName: entityName]" />
+            <div id="show-${propertyName}" class="box" role="main">
+                <h2><g:message code="default.show.label" args="[entityName]" /></h2>
+                <f:display bean="${propertyName}" />
+                <div class="buttons border-top">
+                    <g:form resource="\${this.${propertyName}}" method="DELETE">
+                        <g:link class="button" action="edit" resource="\${this.${propertyName}}">
+                            <g:message code="default.button.edit.label" default="Edit" />
+                        </g:link>
+                        <input class="button" type="submit"
+                               value="\${message(code: 'default.button.delete.label', default: 'Delete')}"
+                               onclick="return confirm('\${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                    </g:form>
+                </div>
+            </div>
         </div>
     </body>
 </html>
