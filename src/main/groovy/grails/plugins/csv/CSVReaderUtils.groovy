@@ -1,5 +1,6 @@
 // Vendored from org.grails.plugins:csv:1.0.1 (Apache-2.0); the plugin has no Grails 7 release.
 // Source: repo.grails.org csv-1.0.1-sources.jar. Unmodified except this header.
+// Full license text: src/main/resources/META-INF/licenses/csv/LICENSE.txt
 /*
  * Copyright 2010 Les Hazlewood
  *
