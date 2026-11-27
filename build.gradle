@@ -258,7 +258,11 @@ dependencies {
     implementation 'org.liquibase:liquibase-core'
     // Needed to support the use of 'modifyColumn' in liquibase migrations.
     // Version must match the BOM-managed version of liquibase core.
-    implementation 'org.liquibase.ext:liquibase-modify-column:4.27.0'
+    implementation('org.liquibase.ext:liquibase-modify-column:4.27.0') {
+        // Its parent POM drags in liquibase-commercial, a fat jar bundling an un-shaded Jackson 2.15.3 that
+        // clashes with the BOM-managed Jackson (NoSuchMethodError: BufferRecycler.releaseToPool() on Tomcat).
+        exclude group: 'org.liquibase', module: 'liquibase-commercial'
+    }
 
     // --- Sentry (jakarta variants; custom tracing classes import io.sentry.spring.jakarta) ---
     implementation "io.sentry:sentry-logback:${sentryVersion}"
