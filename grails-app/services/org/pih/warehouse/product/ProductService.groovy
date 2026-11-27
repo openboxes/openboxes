@@ -1372,11 +1372,18 @@ class ProductService {
     /**
      * Get all products matching the given terms and categories.
      *
+     * The product code also matches with spaces ignored and case-insensitive, so a code stored as "TL  60272Y" is
+     * found by the term "TL 60272Y" or "TL60272Y". This applies per term: callers that split the query on spaces
+     * (the web lookups) pass "TL" and "60272Y" as separate terms, so it helps them only for unsplit input.
+     *
      * @param terms
      * @param categories
+     * @param returnIds return product ids instead of products
+     * @param matchCodeAnywhere match the space-free code anywhere instead of only as a prefix
+     *        (e.g. "60272Y" finds "TL  60272Y")
      * @return
      */
-    def searchProducts(String[] terms, List<Category> categories, boolean returnIds = false) {
+    def searchProducts(String[] terms, List<Category> categories, boolean returnIds = false, boolean matchCodeAnywhere = false) {
         def results = Product.createCriteria().list {
             if (returnIds) {
                 projections {
@@ -1396,9 +1403,14 @@ class ProductService {
             if (terms) {
                 terms.each { term ->
                     term = term + "%"
+                    String compactCode = term.replace(' ', '').toLowerCase(Locale.ROOT)
                     or {
                         ilike("name", "%" + term)
                         ilike("productCode", term)
+                        if (compactCode != "%") {
+                            sqlRestriction("lower(replace({alias}.product_code, ' ', '')) like ?",
+                                    [(matchCodeAnywhere ? "%" : "") + compactCode])
+                        }
                         and {
                             ilike("synonym.name", "%" + term)
                             eq("synonym.synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
