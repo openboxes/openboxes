@@ -238,6 +238,14 @@ paths:
     $ref: 'paths/putaway-task.yaml#/~1api~1facilities~1{facility}~1putaway-tasks~1{id}~1alternate-destinations'
   '/api/facilities/{facility}/putaway-tasks/{id}/status':
     $ref: 'paths/putaway-task.yaml#/~1api~1facilities~1{facility}~1putaway-tasks~1{id}~1status'
+  '/api/facilities/{facility}/replenishment-tasks':
+    $ref: 'paths/replenishment-task.yaml#/~1api~1facilities~1{facility}~1replenishment-tasks'
+  '/api/facilities/{facility}/replenishment-tasks/containers/{outboundContainerId}':
+    $ref: 'paths/replenishment-task.yaml#/~1api~1facilities~1{facility}~1replenishment-tasks~1containers~1{outboundContainerId}'
+  '/api/facilities/{facility}/replenishment-tasks/{id}':
+    $ref: 'paths/replenishment-task.yaml#/~1api~1facilities~1{facility}~1replenishment-tasks~1{id}'
+  '/api/facilities/{facility}/replenishments':
+    $ref: 'paths/replenishment-task.yaml#/~1api~1facilities~1{facility}~1replenishments'
   '/api/fulfillments':
     $ref: 'paths/fulfillment.yaml#/~1api~1fulfillments'
   '/api/fulfillments/validate':
@@ -538,6 +546,10 @@ paths:
     $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1{receiptId}~1items~1batch'
   '/api/receipts/v2/{receiptId}/shipmentItems/{shipmentItemId}/receiptItems':
     $ref: 'paths/receipt.yaml#/~1api~1receipts~1v2~1{receiptId}~1shipmentItems~1{shipmentItemId}~1receiptItems'
+  '/api/replenishmentTasks':
+    $ref: 'paths/replenishment-task.yaml#/~1api~1replenishmentTasks'
+  '/api/replenishmentTasks/{id}':
+    $ref: 'paths/replenishment-task.yaml#/~1api~1replenishmentTasks~1{id}'
   '/api/replenishments':
     $ref: 'paths/replenishment.yaml#/~1api~1replenishments'
   '/api/replenishments/statusOptions':
