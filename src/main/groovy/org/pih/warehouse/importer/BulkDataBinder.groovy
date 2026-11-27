@@ -187,19 +187,24 @@ class BulkDataBinder {
     private def parseField(
             Object fieldValue, Class fieldType, BulkDataBinderFieldConfig fieldConfig, EpochDate epochDate) {
 
-        // We have custom data-binding handling for java.util.Date because it needs to know if it
-        // is a date-only (LocalDate) or a datetime (Instant).
+        // We have custom data-binding handling for when the field is an enum and no parser was explicitly specified.
+        BulkDataBinderFieldConfig fieldConfigToUse = fieldConfig
+        if (fieldConfig.parser == null && fieldType?.isEnum()) {
+            fieldConfigToUse = BulkDataBinderFieldConfigDefaults.buildDefaultEnumFieldConfig(fieldType)
+        }
+
+        // Similarly for java.util.Date, which needs to know if it is a date-only (LocalDate) or datetime (Instant).
         if (fieldConfig.parser == null && fieldType != null && Date.isAssignableFrom(fieldType)) {
             return parseJavaUtilDateField(fieldValue, fieldConfig, epochDate)
         }
 
-        Parser parser = fieldConfig.parser != null ?
-                context.getBean(fieldConfig.parser) :
+        Parser parser = fieldConfigToUse.parser != null ?
+                context.getBean(fieldConfigToUse.parser) :
                 defaultTypeParser.getDefaultParser(fieldType)
 
         // When binding data that is coming from an Excel file, we need to know the epoch date that the file uses
         // (which differs depending on your OS). This is only relevant for date fields.
-        ParserContext context = fieldConfig.parserContext ?: parser.getDefaultContext()
+        ParserContext context = fieldConfigToUse.parserContext ?: parser.getDefaultContext()
         if (context instanceof DateParserContext) {
             context.epochDate = epochDate
             // Excel can't store timezones, so datetimes in our exports don't have one.
@@ -226,6 +231,7 @@ class BulkDataBinder {
     }
 
     private Map<String, Class> mapFieldNamesToType(Class clazz) {
-        return clazz.getDeclaredFields().collectEntries { [it.name, it.type] }
+        // Fetch all properties of the object, including inherited ones.
+        return clazz.metaClass.properties.collectEntries { [it.name, it.type] }
     }
 }

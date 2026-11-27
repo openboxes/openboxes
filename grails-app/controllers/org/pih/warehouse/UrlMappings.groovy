@@ -1215,6 +1215,11 @@ class UrlMappings {
             action = [POST: "importData"]
         }
 
+        "/api/bulkData/export/template" {
+            controller = { "exportApi" }
+            action = [POST: "exportTemplate"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

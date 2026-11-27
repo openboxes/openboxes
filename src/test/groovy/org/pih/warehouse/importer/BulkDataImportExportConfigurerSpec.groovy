@@ -6,6 +6,8 @@ import spock.lang.Unroll
 import testutil.MessageLocalizerStub
 
 import org.pih.warehouse.core.ConfigService
+import org.pih.warehouse.core.file.FileNamePart
+import org.pih.warehouse.core.http.ContentType
 import org.pih.warehouse.core.session.SessionManager
 import org.pih.warehouse.core.formatter.DefaultTypeFormatter
 import org.pih.warehouse.core.parser.DoubleParser
@@ -16,7 +18,7 @@ import org.pih.warehouse.exporter.CsvWriter
 import org.pih.warehouse.exporter.ExcelWriter
 
 @Unroll
-class BulkDataImportConfigurerSpec extends Specification {
+class BulkDataImportExportConfigurerSpec extends Specification {
 
     void "every content type the configurer supports resolves to a writer, including #contentType"() {
         given: "the resolver wired with the configurer and the real writers"
@@ -29,6 +31,29 @@ class BulkDataImportConfigurerSpec extends Specification {
 
         and: "so a writer must be found for it too, otherwise the export fails with a null writer"
         assert resolver.getBulkDataWriter(contentType) != null
+
+        where:
+        contentType << new StatusConfigurer().supportedContentTypes.toList()
+    }
+
+    void "getSupportedContentTypes fails when the readers and writers support different content types"() {
+        when:
+        new MismatchedContentTypesConfigurer().supportedContentTypes
+
+        then:
+        RuntimeException e = thrown()
+        assert e.message.contains("Readers and writers must support the same content types")
+    }
+
+    void "the configured file name is resolvable for #contentType"() {
+        given:
+        BulkDataExportComponentResolver resolver = new BulkDataExportComponentResolver(
+                Optional.of([new StatusConfigurer()]),
+                Optional.of(buildWriters()))
+
+        expect:
+        assert resolver.getFileNameArgs(BulkDataType.INVENTORY, contentType) ==
+                ["StatusReport", FileNamePart.CURRENT_TIME]
 
         where:
         contentType << new StatusConfigurer().supportedContentTypes.toList()
@@ -90,7 +115,7 @@ class BulkDataImportConfigurerSpec extends Specification {
         Status status
     }
 
-    static class StatusConfigurer extends BulkDataImportConfigurer<StatusImportRow, StatusExportRow> {
+    static class StatusConfigurer extends BulkDataImportExportConfigurer<StatusImportRow> {
         @Override
         BulkDataType getBulkDataType() {
             return BulkDataType.INVENTORY
@@ -99,8 +124,16 @@ class BulkDataImportConfigurerSpec extends Specification {
         @Override
         protected BulkDataImportExportConfig getImportExportConfig() {
             return configBuilder()
+                    .fileName("StatusReport", FileNamePart.CURRENT_TIME)
                     .autoBoundField("A", "status", "statusRow.status.label")
                     .build()
+        }
+    }
+
+    static class MismatchedContentTypesConfigurer extends StatusConfigurer {
+        @Override
+        Set<ContentType> getReaderContentTypes() {
+            return [ContentType.CSV] as Set  // Excludes XLS, but the writer supports it. This is invalid config!
         }
     }
 
@@ -111,7 +144,7 @@ class BulkDataImportConfigurerSpec extends Specification {
     static class NotesExportRow {
     }
 
-    static class ImportOnlyFieldConfigurer extends BulkDataImportConfigurer<NotesImportRow, NotesExportRow> {
+    static class ImportOnlyFieldConfigurer extends BulkDataImportExportConfigurer<NotesImportRow> {
         @Override
         BulkDataType getBulkDataType() {
             return BulkDataType.INVENTORY

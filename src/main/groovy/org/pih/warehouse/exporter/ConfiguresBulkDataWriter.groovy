@@ -23,4 +23,13 @@ trait ConfiguresBulkDataWriter {
      * @return The set of content types that can be handled by the writer.
      */
     abstract Set<ContentType> getSupportedContentTypes()
+
+    /**
+     * @return The fields to join together to construct the exported file name.
+     *         Can include {@link org.pih.warehouse.core.file.FileNamePart} placeholders.
+     *         An empty list means use the default name.
+     */
+    List<Object> getFileNameArgs() {
+        return null
+    }
 }

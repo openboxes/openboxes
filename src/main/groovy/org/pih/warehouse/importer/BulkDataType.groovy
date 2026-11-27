@@ -10,6 +10,7 @@ package org.pih.warehouse.importer
  */
 enum BulkDataType {
     CATEGORY,
+    CYCLE_COUNT_CANDIDATE,
     CYCLE_COUNT_ITEM,
     CYCLE_COUNT_RECOUNT_ITEM,
     INVENTORY,

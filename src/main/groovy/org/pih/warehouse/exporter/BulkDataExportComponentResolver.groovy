@@ -60,6 +60,14 @@ class BulkDataExportComponentResolver {
     }
 
     /**
+     * @return The fields to join together to construct the exported file name for the given feature and content type.
+     *         Null or empty if the feature doesn't configure a file name.
+     */
+    List<Object> getFileNameArgs(BulkDataType bulkDataType, ContentType contentType) {
+        writerConfigsByDataAndContentType.get(bulkDataType, contentType)?.getFileNameArgs()
+    }
+
+    /**
      * @return The writer associated with the given content type.
      */
     BulkDataWriter getBulkDataWriter(ContentType contentType) {

@@ -1343,59 +1343,6 @@ class CycleCountServiceSpec extends Specification implements DataTest {
     }
 
     // ---------------------------------------------------------------------------------------------
-    // Export: CSV of cycle count candidates
-    // ---------------------------------------------------------------------------------------------
-
-    void 'getCycleCountCsv should render one row per candidate after the header'() {
-        given:
-        Category category = new Category(name: "Medicines")
-        category.save(validate: false)
-        Product product = createProduct("AB12", "Ibuprofen 200mg")
-        product.category = category
-        CycleCountCandidate candidate = new CycleCountCandidate(
-                product: product,
-                abcClass: "A",
-                internalLocations: "A1,B2",
-                dateLastCount: Date.parse("yyyy-MM-dd", "2008-01-10"),
-                quantityOnHand: 42,
-        )
-
-        when:
-        String csv = cycleCountService.getCycleCountCsv([candidate]).out.toString()
-        List<String> lines = csv.readLines()
-
-        then:
-        assert lines.size() == 2
-        assert lines[0] == 'Code,Product,Product Family,Category,Formularies,ABC Classification,Bin Location,Tag,Last Counted,QoH'
-
-        and: 'the full data row is pinned, so a swapped or dropped column cannot slip through'
-        // Note: values containing commas are escaped twice - once by the explicit escape call in the
-        // service, once by the CSV printer itself - hence the doubled quotes around the bin list.
-        assert lines[1] == 'AB12,Ibuprofen 200mg,,Medicines,,A,"""A1,B2""",,10/01/2008,42'
-    }
-
-    void 'getCycleCountCsv should render safe defaults for a sparse candidate'() {
-        given: 'a candidate with no product details, no locations and no count history'
-        CycleCountCandidate candidate = new CycleCountCandidate(product: createProduct("AB12"))
-
-        when:
-        String csv = cycleCountService.getCycleCountCsv([candidate]).out.toString()
-        List<String> lines = csv.readLines()
-
-        then: 'the row renders empty strings for missing text and zero for missing quantity'
-        assert lines.size() == 2
-        assert lines[1] == 'AB12,Product AB12,,,,,,,,0'
-    }
-
-    void 'getCycleCountCsv should render only the header when there are no candidates'() {
-        expect:
-        assert cycleCountService.getCycleCountCsv(candidates).out.toString().readLines().size() == 1
-
-        where:
-        candidates << [[], null]
-    }
-
-    // ---------------------------------------------------------------------------------------------
     // Export: count form XLS
     // ---------------------------------------------------------------------------------------------
 

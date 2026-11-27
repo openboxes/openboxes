@@ -2,7 +2,6 @@ package org.pih.warehouse.exporter
 
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
-import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
@@ -60,8 +59,8 @@ class CsvWriter extends BulkDataWriter<String, CsvWriterConfig> {
                 List<String> formattedRow = []
                 for (fieldConfig in fieldConfigsOrdered) {
                     Object cellValue = rowToWrite.get(fieldConfig.fieldName)
-                    String cellValueFormatted = formatCellValue(cellValue, fieldConfig)
-                    formattedRow.add(StringEscapeUtils.escapeCsv(cellValueFormatted))
+                    // The printer automatically handles quoting and escaping values.
+                    formattedRow.add(formatCellValue(cellValue, fieldConfig) as String)
                 }
                 printer.printRecord(formattedRow)
             }

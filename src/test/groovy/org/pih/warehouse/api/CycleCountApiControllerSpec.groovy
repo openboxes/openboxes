@@ -3,8 +3,6 @@ package org.pih.warehouse.api
 import grails.gorm.PagedResultList
 import grails.plugins.rendering.pdf.PdfRenderingService
 import grails.validation.ValidationException
-import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVPrinter
 import org.apache.http.HttpStatus
 import org.grails.datastore.mapping.query.Query
 import testutil.ApiControllerSpec
@@ -28,7 +26,6 @@ import org.pih.warehouse.inventory.CycleCountStartRecountBatchCommand
 import org.pih.warehouse.inventory.CycleCountStartRecountCommand
 import org.pih.warehouse.inventory.PendingCycleCountRequest
 import org.pih.warehouse.product.Product
-import org.testcontainers.shaded.com.google.common.net.HttpHeaders
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -101,40 +98,6 @@ class CycleCountApiControllerSpec extends ApiControllerSpec<CycleCountApiControl
         response.json.totalCount == 2
         response.contentType.contains(JSON_FORMAT)
         response.status == HttpStatus.SC_OK
-    }
-
-    void 'getCandidates should return CSV response when format is csv'() {
-        given:
-        CycleCountCandidateFilterCommand filterParams = new CycleCountCandidateFilterCommand(format: "csv")
-        CycleCountCandidate cycleCountCandidate1 = Mock(CycleCountCandidate)
-        CycleCountCandidate cycleCountCandidate2 = Mock(CycleCountCandidate)
-        Query mockQuery = Stub(Query) {
-            list() >> [cycleCountCandidate1,
-                       cycleCountCandidate2]
-        }
-        List<CycleCountCandidate> mockedCandidates = Spy(PagedResultList, constructorArgs: [mockQuery]) {
-            getTotalCount() >> mockQuery.list().size()
-        }
-        cycleCountService.getCycleCountCsv(mockedCandidates) >> {
-            StringWriter sw = new StringWriter()
-            CSVPrinter csvPrinter = new CSVPrinter(sw, CSVFormat.DEFAULT.withHeader("ID"))
-            mockedCandidates.each { csvPrinter.printRecord(it.hashCode()) }
-            csvPrinter.flush()
-            return csvPrinter
-        }
-        controller.params.facilityId = FACILITY_ID
-        cycleCountService.getCandidates(filterParams, FACILITY_ID) >> mockedCandidates
-
-        when:
-        controller.getCandidates(filterParams)
-
-        then:
-        response.contentType.contains(CSV_FORMAT)
-        response.getHeader(HttpHeaders.CONTENT_DISPOSITION).startsWith("attachment; filename=\"CycleCountReport-")
-        response.status == HttpStatus.SC_OK
-        response.text.contains("ID")
-        response.text.contains(cycleCountCandidate1.hashCode() as String)
-        response.text.contains(cycleCountCandidate2.hashCode() as String)
     }
 
     void 'getPendingCycleCountRequests should return valid JSON'() {

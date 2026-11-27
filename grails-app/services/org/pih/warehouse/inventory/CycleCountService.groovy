@@ -3,8 +3,6 @@ package org.pih.warehouse.inventory
 import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.apache.commons.csv.CSVPrinter
-import org.apache.commons.lang.StringEscapeUtils
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Criterion
@@ -21,7 +19,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.mapper.SmartMapper
-import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductCatalogItem
@@ -131,7 +128,9 @@ class CycleCountService {
             // but we want to include them in the results
             if (command.showCycleCountsInProgress) {
                 or {
-                    inList("status", command.statuses)
+                    if (command.statuses) {
+                        inList("status", command.statuses)
+                    }
                     eq("hasStockOnHandOrNegativeStock", command.includeStockOnHandOrNegativeStock)
                 }
             }
@@ -403,40 +402,6 @@ class CycleCountService {
             throw new ValidationException("Invalid cycle count request", cycleCountRequest.errors)
         }
         return cycleCountRequest
-    }
-
-    CSVPrinter getCycleCountCsv(List<CycleCountCandidate> candidates) {
-        CSVPrinter csv = CSVUtils.getCSVPrinter()
-
-        csv.printRecord(
-                "Code",
-                "Product",
-                "Product Family",
-                "Category",
-                "Formularies",
-                "ABC Classification",
-                "Bin Location",
-                "Tag",
-                "Last Counted",
-                "QoH",
-        )
-
-        candidates?.each { CycleCountCandidate candidate ->
-            csv.printRecord(
-                    StringEscapeUtils.escapeCsv(candidate?.product?.productCode),
-                    candidate?.product?.name ?: "",
-                    candidate?.product?.productFamily ?: "",
-                    StringEscapeUtils.escapeCsv(candidate?.product?.category?.name ?: ""),
-                    candidate?.product?.productCatalogs?.join(", ") ?: "",
-                    StringEscapeUtils.escapeCsv(candidate?.abcClass),
-                    StringEscapeUtils.escapeCsv(candidate?.internalLocations ?: ""),
-                    StringEscapeUtils.escapeCsv(candidate?.product?.tags?.tag?.join(", ")),
-                    candidate?.dateLastCount?.format(Constants.EUROPEAN_DATE_FORMAT) ?: "",
-                    candidate?.quantityOnHand ?: 0,
-            )
-        }
-
-        return csv
     }
 
     List<Map> getCountFormXls(List<CycleCountDto> cycleCounts) {

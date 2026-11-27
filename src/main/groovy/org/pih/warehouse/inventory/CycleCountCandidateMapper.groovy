@@ -47,4 +47,20 @@ class CycleCountCandidateMapper implements SerializationMapper<CycleCountCandida
             ]
         }
     }
+
+    @Override
+    Map<String, Object> serializeTabular(CycleCountCandidate source) {
+        return [
+                productCode: source?.product?.productCode,
+                productName: source?.product?.name,
+                productFamily: source?.product?.productFamily,
+                category: source?.product?.category?.name,
+                productCatalogs: source?.product?.productCatalogs?.join(", "),
+                abcClass: source?.abcClass,
+                binLocations: source?.internalLocations,
+                tags: source?.product?.tags?.tag?.join(", "),
+                lastCounted: source?.dateLastCount,
+                quantityOnHand: source?.quantityOnHand ?: 0,
+        ] as Map<String, Object>
+    }
 }
