@@ -12,6 +12,7 @@ package org.pih.warehouse.batch
 import grails.core.GrailsApplication
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.pih.warehouse.api.GenericApiService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.UploadService
@@ -43,6 +44,23 @@ import org.springframework.web.multipart.support.StandardMultipartHttpServletReq
 
 class BatchController {
 
+    /**
+     * The exporter is feature-agnostic, but sometimes we need to apply feature-specific filters to
+     * the exported data. We define this as an allowlist of filters/closures to restrict the filtering
+     * down to only the operations that we choose to support.
+     *
+     * Keyed by resource type, then by filter name.
+     */
+    private static final Map<String, Map<String, Closure>> DOWNLOAD_FILTERS = [
+            Location: [
+                    excludeReceivingLocations: {
+                        locationType {
+                            ne('id', Constants.RECEIVING_LOCATION_TYPE_ID)
+                        }
+                    },
+            ],
+    ]
+
     DataService dataService
     DocumentService documentService
     GrailsApplication grailsApplication
@@ -64,12 +82,22 @@ class BatchController {
     def downloadExcel() {
         println "Download XLS template " + params
 
-        def objects = genericApiService.getList(params.type, [:])
-        def domainClass = genericApiService.getDomainClass(params.type)
+        String type = params.type
+        Closure criteria = null
+        if (params.filter) {
+            criteria = DOWNLOAD_FILTERS.get(type)?.get(params.filter)
+            if (!criteria) {
+                response.sendError(400, "Unsupported filter '${params.filter}' for type '${type}'")
+                return
+            }
+        }
+
+        def objects = genericApiService.getList(type, [:], criteria)
+        def domainClass = genericApiService.getDomainClass(type)
         def data = dataService.transformObjects(objects, domainClass.PROPERTIES)
 
         response.contentType = "application/vnd.ms-excel"
-        response.setHeader 'Content-disposition', "attachment; filename=\"${params.type}.xls\""
+        response.setHeader 'Content-disposition', "attachment; filename=\"${type}.xls\""
         documentService.generateExcel(response.outputStream, data)
         response.outputStream.flush()
     }

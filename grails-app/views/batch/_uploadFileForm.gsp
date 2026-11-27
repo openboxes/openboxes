@@ -109,7 +109,14 @@
                                 </g:link>
                             </td>
                             <td>
-                                <g:link controller="batch" action="downloadExcel" params="[type:'Location']">
+                                %{--
+                                    OBPIH-8147: We opt to filter out receiving locations since there are so many of them
+                                    that we surpassed the max number of rows that a .xls file can support. It is worth
+                                    noting that this obscures the behaviour because it means we're not returning ALL
+                                    locations. However, we eventually want to redo this page to support xlsx files and
+                                    user input filters, so this is designed to be a temporary solution.
+                                 --}%
+                                <g:link controller="batch" action="downloadExcel" params="[type: 'Location', filter: 'excludeReceivingLocations']">
                                     <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
                                 </g:link>
                             </td>
