@@ -107,18 +107,18 @@
                     <table id="binLocationReportTable">
                         <thead>
                             <tr class="prop">
-                                <th class="center"><g:message code="default.status.label"/></th>
-                                <th class="center"><g:message code="product.productCode.label"/></th>
-                                <th class="center"><g:message code="product.label"/></th>
-                                <th class="center"><g:message code="location.zone.label"/></th>
-                                <th class="center"><g:message code="location.binLocation.label"/></th>
-                                <th class="center"><g:message code="inventoryItem.lotNumber.label"/></th>
-                                <th class="center"><g:message code="inventoryItem.expirationDate.label"/></th>
-                                <th class="center"><g:message code="default.quantityOnHand.label"/></th>
-                                <th class="center"><g:message code="default.quantityAvailable.label"/></th>
-                                <th class="center"><g:message code="default.uom.label"/></th>
-                                <th class="center"><g:message code="product.unitCost.label"/></th>
-                                <th class="center"><g:message code="product.totalValue.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.status.tooltip.label')}"><g:message code="default.status.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.productCode.tooltip.label')}"><g:message code="product.productCode.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.product.tooltip.label')}"><g:message code="product.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.zone.tooltip.label')}"><g:message code="location.zone.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.binLocation.tooltip.label')}"><g:message code="location.binLocation.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.lotNumber.tooltip.label')}"><g:message code="inventoryItem.lotNumber.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.expirationDate.tooltip.label')}"><g:message code="inventoryItem.expirationDate.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.quantityOnHand.tooltip.label')}"><g:message code="default.quantityOnHand.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.quantityAvailable.tooltip.label')}"><g:message code="default.quantityAvailable.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.uom.tooltip.label')}"><g:message code="default.uom.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.unitCost.tooltip.label')}"><g:message code="product.unitCost.label"/></th>
+                                <th class="center" title="${g.message(code: 'report.inventoryDetails.totalValue.tooltip.label')}"><g:message code="product.totalValue.label"/></th>
                             </tr>
                         </thead>
                     </table>
