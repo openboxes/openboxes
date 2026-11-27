@@ -1,7 +1,6 @@
 package org.pih.warehouse.api.regression.obaf.jobs
 
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.PendingFeature
 
 import org.pih.warehouse.allocation.AllocationMode
 import org.pih.warehouse.allocation.AllocationService
@@ -342,7 +341,6 @@ class ObafJobsIntegrationSpec extends ObafIntegrationSpec {
         tx { putawayOrders(dc)*.orderedBy*.id.every { it } }
     }
 
-    @PendingFeature(reason = 'PutawayService.groovy:84-86 generatePutaways RETURNS (not continue) on the first candidate without a putaway location, so every later candidate at the facility is skipped')
     void 'AutomaticPutawayGenerationJob: a product without a slot does not stop the others getting one'() {
         given:
         config.set('openboxes.jobs.automaticPutawayGenerationJob.enabled', true)
