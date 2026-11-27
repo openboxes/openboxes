@@ -4,6 +4,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import grails.util.Holders
 import grails.validation.Validateable
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -475,7 +476,8 @@ class StockMovement implements Validateable, Historizable {
                 "Lot number"                        : lineItem?.lotNumber ?: "",
                 "Expiration date (MM/dd/yyyy)"      : lineItem?.expirationDate ? lineItem?.expirationDate?.format("MM/dd/yyyy") : "",
                 "Quantity (required)"               : lineItem?.quantityRequested ?: "",
-                "Recipient id"                      : lineItem?.recipient?.id ?: ""
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                "Recipient id"                      : Hibernate.unproxy(lineItem?.recipient)?.id ?: ""
         ]
     }
 
@@ -494,7 +496,8 @@ class StockMovement implements Validateable, Historizable {
 
     Boolean canUserRollbackApproval(User user) {
         // Approval can be rolled back by user who is approver or requestor
-        return approvers?.contains(user) || requestedBy?.id == user?.id
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+        return approvers?.contains(user) || Hibernate.unproxy(requestedBy)?.id == user?.id
     }
 
     boolean isInApprovalState() {
@@ -507,7 +510,7 @@ class StockMovement implements Validateable, Historizable {
                 (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
                         user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
                         user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
-                        user?.id == requestedBy?.id))
+                        user?.id == Hibernate.unproxy(requestedBy)?.id))
     }
 
     boolean isApprovalRequired() {
@@ -520,7 +523,7 @@ class StockMovement implements Validateable, Historizable {
     // (with required approval)
     Boolean canUserEdit(String userId, Location location) {
         User user = User.get(userId)
-        Boolean isUserRequestor = user.id == requestedBy?.id
+        Boolean isUserRequestor = user.id == Hibernate.unproxy(requestedBy)?.id
         Boolean isLocationOrigin = origin?.id == location?.id
         Boolean isLocationDestination = destination?.id == location?.id
         return (isUserRequestor &&

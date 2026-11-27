@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.lang.StringUtils
 import grails.validation.Validateable
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -114,7 +115,8 @@ class PutawayItem implements Validateable {
                 "inventoryItem.id"            : inventoryItem?.id,
                 "inventoryItem.lotNumber"     : inventoryItem?.lotNumber,
                 "inventoryItem.expirationDate": inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                "recipient.id"                : recipient?.id,
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                "recipient.id"                : Hibernate.unproxy(recipient)?.id,
                 "recipient.name"              : recipient?.name,
                 currentBins                   : currentBins,
                 'preferredBin.id'             : preferredBin?.id,

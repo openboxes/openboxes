@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.hibernate.Hibernate
 import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -110,7 +111,8 @@ class StocklistItemService {
                     "location.name"     : it.origin?.name,
                     "locationGroup.id"  : it.origin?.locationGroup?.id,
                     "locationGroup.name": it.origin?.locationGroup?.name,
-                    "manager.id"        : it.requestedBy?.id,
+                    // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                    "manager.id"        : Hibernate.unproxy(it.requestedBy)?.id,
                     "manager.name"      : it.requestedBy?.name,
             ]
         }

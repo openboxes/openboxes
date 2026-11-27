@@ -14,6 +14,7 @@ import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.plugins.csv.CSVWriter
 import org.grails.web.json.JSONObject
+import org.hibernate.Hibernate
 import org.pih.warehouse.api.InboundWorkflowState
 import org.pih.warehouse.api.receiving.v2.ReceiptV2Service
 import org.pih.warehouse.api.StockMovement
@@ -386,7 +387,8 @@ class StockMovementController {
         Requisition requisition = Requisition.get(params.id)
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
         flash.message = g.message(code: "request.rejectReason.message") + ": ${stockMovement.identifier}"
-        Comment comment = new Comment(recipient: requisition.requestedBy)
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+        Comment comment = new Comment(recipient: Hibernate.unproxy(requisition.requestedBy))
         render(view: "addComment", model: [stockMovement: stockMovement, comment: comment, approvalStatus: StockMovementStatusCode.REJECTED])
     }
 

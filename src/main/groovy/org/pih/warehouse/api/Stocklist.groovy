@@ -1,6 +1,7 @@
 package org.pih.warehouse.api
 
 import grails.validation.Validateable
+import org.hibernate.Hibernate
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.requisition.Requisition
@@ -26,7 +27,8 @@ class Stocklist implements Validateable {
                 "destination.name": destination?.name,
                 "origin.id"       : origin?.id,
                 "origin.name"     : origin?.name,
-                "requestedBy.id"  : requestedBy?.id,
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                "requestedBy.id"  : Hibernate.unproxy(requestedBy)?.id,
                 "requestedBy.name": requestedBy?.name
         ]
     }

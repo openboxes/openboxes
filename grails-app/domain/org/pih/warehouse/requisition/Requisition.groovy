@@ -9,6 +9,7 @@
  * */
 package org.pih.warehouse.requisition
 
+import org.hibernate.Hibernate
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
@@ -424,7 +425,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 id                   : id,
                 name                 : name,
                 version              : version,
-                requestedById        : requestedBy?.id,
+                // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+                requestedById        : Hibernate.unproxy(requestedBy)?.id,
                 requestedByName      : requestedBy?.name,
                 description          : description,
                 dateRequested        : dateRequested.format("MM/dd/yyyy"),

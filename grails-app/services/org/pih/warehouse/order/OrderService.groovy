@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import grails.util.Holders
 import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.hibernate.Hibernate
 import org.hibernate.sql.JoinType
 
 import grails.plugins.csv.CSVMapReader
@@ -281,7 +282,8 @@ class OrderService {
 
         orderCommand.origin = Location.get(orderInstance?.origin?.id)
         orderCommand.destination = Location.get(orderInstance?.destination?.id)
-        orderCommand.orderedBy = Person.get(orderInstance?.orderedBy?.id)
+        // A lazy Person association is a Hibernate proxy of Person even when the row is a User
+        orderCommand.orderedBy = Person.get(Hibernate.unproxy(orderInstance?.orderedBy)?.id)
         orderCommand.dateOrdered = orderInstance?.dateOrdered
         orderCommand.order = orderInstance
         orderInstance?.listOrderItems()?.each {
@@ -374,7 +376,8 @@ class OrderService {
     }
 
     Order saveOrder(Order order) {
-        if (order.destinationParty?.id != sessionManager.getCurrentLocation().organizationId) {
+        // A lazy Party association is a Hibernate proxy of Party even when the row is an Organization
+        if (Hibernate.unproxy(order.destinationParty)?.id != sessionManager.getCurrentLocation().organizationId) {
             order.errors.rejectValue("destinationParty", "order.destinationParty.invalid.differentOrganization")
             throw new ValidationException("Unable to save order due to errors", order.errors)
         }
