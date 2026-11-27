@@ -45,10 +45,12 @@ class GenericApiService {
         return domainClass.clazz
     }
 
-    List getList(String resourceName, Map params) {
+    List getList(String resourceName, Map params, Closure criteria = null) {
         Class domainClass = getDomainClass(resourceName)
-        List list = domainClass.list(params)
-        return list
+        if (criteria) {
+            return domainClass.createCriteria().list(params ?: [:], criteria)
+        }
+        return domainClass.list(params)
     }
 
     Object getObject(String resourceName, String id) {
