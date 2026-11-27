@@ -4,6 +4,8 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 import org.springframework.stereotype.Component
 
+import org.pih.warehouse.core.Constants
+
 /**
  * A formatter that converts Instants to Strings.
  */
@@ -27,11 +29,12 @@ class InstantFormatter extends AbstractDateFormatter<Instant> {
 
     @Override
     DateTimeFormatter getCsvFormatter() {
-        // We format our CSV exports using an ISO-like pattern (regardless of locale) because we want to ensure that if
-        // the same CSV is later imported, it won't fail on date format errors. We could export to a locale-specific
-        // pattern but we'd need to verify that each of those patterns can be handled by our data binders. For now,
-        // we stick with ISO pattern because it's a universally accepted date format and is guaranteed to work.
-        return CSV_DATE_TIME_FORMATTER
+        /*
+         * We format CSV datetimes in the same way that we format dates for Excel (see ExcelCellStyles) because it
+         * ensures consistency when doing an import. Excel does not support including timezone in the date format,
+         * so when this datetime is imported we assume it is in the user's timezone.
+         */
+        return Constants.EXCEL_DATE_TIME_FORMATTER
     }
 
     @Override

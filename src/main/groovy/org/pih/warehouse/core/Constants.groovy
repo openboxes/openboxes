@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 class Constants {
 
@@ -50,6 +51,15 @@ class Constants {
     static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
     static final String GENERATE_NAME_DATE_FORMAT = "ddMMMyyyy"
     static final String EUROPEAN_DATE_FORMAT_WITH_TIME = "${EUROPEAN_DATE_FORMAT} HH:mm"
+
+    /**
+     * How we represent a datetime string in Excel. (Excel does not support storing timezone for dates.)
+     * Using an ISO-like format guarantees that dates will behave the same regardless of locale.
+     * If we instead formatted dates like "01/02/2000", Excel in the US would interpret it as January 2nd,
+     * but in Europe it would interpret it as February 1st.
+     */
+    static final String EXCEL_DATE_TIME = "yyyy-MM-dd HH:mm:ss"
+    static final DateTimeFormatter EXCEL_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(Constants.EXCEL_DATE_TIME)
 
     static final String SPANISH_MEXICO_ORDER_IMPORT_DATE_FORMAT = "dd/MM/yyyy"
     static final String DEFAULT_ORDER_IMPORT_DATE_FORMAT = "MM/dd/yyyy"
