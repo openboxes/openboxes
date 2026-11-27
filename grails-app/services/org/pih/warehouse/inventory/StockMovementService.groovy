@@ -2439,6 +2439,9 @@ class StockMovementService {
                     transaction.errors)
         }
 
+        // The transfer in to staging is not flushed yet, and the refresh reads transaction entries from the database
+        Transaction.withSession { session -> session.flush() }
+
         productAvailabilityService.refreshProductsAvailability(facility.id, [suggestedItem.inventoryItem?.product?.id],
                 [suggestedItem.binLocation?.id, stagingLocation.id], false)
     }
