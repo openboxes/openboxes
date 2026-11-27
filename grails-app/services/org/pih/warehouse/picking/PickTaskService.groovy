@@ -3,8 +3,10 @@ package org.pih.warehouse.picking
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.hibernate.NullPrecedence
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.Order
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.PickTaskStatus
 import org.pih.warehouse.api.picking.SearchPickTaskCommand
@@ -121,10 +123,14 @@ class PickTaskService {
                 }
             }
 
-            order("priority", "asc")
-            order("dateCreated", "asc")
+            // Tasks follow the walk path: zone, then bin location, with unsequenced ones last
             createAlias("location", "l", CriteriaSpecification.LEFT_JOIN)
-            order("l.name", "asc")
+            createAlias("l.zone", "z", CriteriaSpecification.LEFT_JOIN)
+            order(Order.asc("z.sortOrder").nulls(NullPrecedence.LAST))
+            order(Order.asc("l.sortOrder").nulls(NullPrecedence.LAST))
+            order(Order.asc("l.name").nulls(NullPrecedence.LAST))
+            order("dateCreated", "asc")
+            order("id", "asc")
         }
 
         // PickTask is a denormalized snapshot (see the pick_task DB view), not live-linked to the stock
