@@ -357,16 +357,6 @@ class InventoryItemController {
         render(template: "showProductDemand", model: [product: product])
     }
 
-
-    def showInventorySnapshot() {
-        def location = Location.get(session.warehouse.id)
-        def product = Product.get(params.id)
-        def inventorySnapshots = InventorySnapshot.findAllByProductAndLocation(product, location)
-        render(template: "showInventorySnapshot", model: [inventorySnapshots: inventorySnapshots, product: product])
-
-    }
-
-
     def showDocuments() {
         def productInstance = Product.get(params.id)
         render(template: "showDocuments", model: [productInstance: productInstance])
