@@ -591,6 +591,13 @@ openboxes:
             cronExpression: "0 */5 * * * ?"     # every five minutes
             delayInMilliseconds: 6000 # workaround to delay AutomaticIssuanceJob after RefreshProductAvailabilityJob (delayed by 5000 ms); it needs product refresh to complete first, so keep it ~1 s longer
 
+        # Generate replenishment lists for bins below minimum (triggered after picking completes)
+        automaticReplenishmentJob:
+            enabled: false
+            cronExpression: "0 */30 * * * ?"    # every thirty minutes
+            delayInMilliseconds: 5000           # added on top of the product availability refresh delay
+            targetActivityCodes: []
+
         automaticAllocationJob:
             enabled: true
             cronExpression: "0 */5 * * * ?"     # every five minutes
