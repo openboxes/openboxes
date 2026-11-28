@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import org.apache.http.client.utils.URIBuilder
 import org.grails.web.json.JSONObject
 
 class CurrencyService {
@@ -23,8 +24,9 @@ class CurrencyService {
         try {
             String urlTemplate = grailsApplication.config.openboxes.locale.currencyApi.url
             String apiKey = grailsApplication.config.openboxes.locale.currencyApi.apiKey
+            String apiKeyParameter = grailsApplication.config.openboxes.locale.currencyApi.apiKeyParameter
             String defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
-            String url = buildUrl(urlTemplate, defaultCurrencyCode, apiKey)
+            String url = buildUrl(urlTemplate, defaultCurrencyCode, apiKey, apiKeyParameter)
             data = apiClientService.get(url)
         } catch (Exception e) {
             log.error("Error trying to fetch exchange rates from the currency API ", e)
@@ -41,15 +43,12 @@ class CurrencyService {
 
     /**
      * Fills the base currency into the configured URL template and, when an
-     * API key is configured, appends it as access_key (the parameter
-     * exchangeratesapi.io expects) unless the template already sets one.
+     * API key is configured, sets it as the query parameter named by
+     * apiKeyParameter (provider-specific, so it lives in the config too).
      */
-    static String buildUrl(String urlTemplate, String baseCurrencyCode, String apiKey) {
-        String url = String.format(urlTemplate, baseCurrencyCode)
-        if (apiKey && !url.contains("access_key=")) {
-            url += (url.contains("?") ? "&" : "?") + "access_key=" + URLEncoder.encode(apiKey, "UTF-8")
-        }
-        return url
+    static String buildUrl(String urlTemplate, String baseCurrencyCode, String apiKey, String apiKeyParameter) {
+        URIBuilder builder = new URIBuilder(String.format(urlTemplate, baseCurrencyCode))
+        return (apiKey && apiKeyParameter ? builder.setParameter(apiKeyParameter, apiKey) : builder).toString()
     }
 
     @Transactional

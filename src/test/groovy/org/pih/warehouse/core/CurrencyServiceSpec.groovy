@@ -13,17 +13,19 @@ class CurrencyServiceSpec extends Specification implements ServiceUnitTest<Curre
         config.openboxes.locale.defaultCurrencyCode = "USD"
     }
 
-    void 'buildUrl should return #expected for template #template and key #apiKey'() {
+    void 'buildUrl should return #expected for template #template, key #apiKey and parameter #parameter'() {
         expect:
-        CurrencyService.buildUrl(template, "USD", apiKey) == expected
+        assert CurrencyService.buildUrl(template, "USD", apiKey, parameter) == expected
 
         where:
-        template                                       | apiKey || expected
-        "https://api.example.com/latest?base=%s"       | ""     || "https://api.example.com/latest?base=USD"
-        "https://api.example.com/latest?base=%s"       | null   || "https://api.example.com/latest?base=USD"
-        "https://api.example.com/latest?base=%s"       | "k1"   || "https://api.example.com/latest?base=USD&access_key=k1"
-        "https://api.example.com/latest/%s"            | "k1"   || "https://api.example.com/latest/USD?access_key=k1"
-        "https://api.example.com/latest?access_key=k0&base=%s" | "k1" || "https://api.example.com/latest?access_key=k0&base=USD"
+        template                                               | apiKey | parameter    || expected
+        "https://api.example.com/latest?base=%s"               | ""     | "access_key" || "https://api.example.com/latest?base=USD"
+        "https://api.example.com/latest?base=%s"               | null   | "access_key" || "https://api.example.com/latest?base=USD"
+        "https://api.example.com/latest?base=%s"               | "k1"   | "access_key" || "https://api.example.com/latest?base=USD&access_key=k1"
+        "https://api.example.com/latest?base=%s"               | "k1"   | "apikey"     || "https://api.example.com/latest?base=USD&apikey=k1"
+        "https://api.example.com/latest/%s"                    | "k1"   | "access_key" || "https://api.example.com/latest/USD?access_key=k1"
+        "https://api.example.com/latest?access_key=k0&base=%s" | "k1"   | "access_key" || "https://api.example.com/latest?base=USD&access_key=k1"
+        "https://api.example.com/latest?base=%s"               | "k1"   | null         || "https://api.example.com/latest?base=USD"
     }
 
     void 'getExchangeRates should throw when the API returns an error instead of rates'() {
@@ -37,7 +39,7 @@ class CurrencyServiceSpec extends Specification implements ServiceUnitTest<Curre
 
         then:
         ApiException e = thrown()
-        e.message.contains("missing_access_key")
+        assert e.message.contains("missing_access_key")
     }
 
     void 'getExchangeRates should return the response when it has rates'() {
@@ -47,6 +49,6 @@ class CurrencyServiceSpec extends Specification implements ServiceUnitTest<Curre
         }
 
         expect:
-        service.getExchangeRates().rates.EUR == 0.91
+        assert service.getExchangeRates().rates.EUR == 0.91
     }
 }
