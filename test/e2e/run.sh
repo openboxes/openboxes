@@ -1,42 +1,66 @@
 #!/usr/bin/env bash
 # Build, bring up, seed, test and tear down the OpenBoxes end-to-end stack for this checkout.
 #
-# usage: test/e2e/run.sh [--project mobile-api|flows|all] [--keep-up] [--reuse] [--known-gaps]
-#                        [-- <extra playwright args>]
+# usage: test/e2e/run.sh [--project mobile-api|flows|scenarios|all] [--keep-up] [--reuse] [--known-gaps]
+#                        [--profile default|scenarios] [--issuance-job on|off]
+#                        [--allocation-max-attempts <n>] [--war <path>] [-- <extra playwright args>]
 #
-#   --project    mobile-api (the mobile API contract), flows (warehouse flows), all (default)
+#   --project    mobile-api (the mobile API contract), flows (warehouse flows; default profile only),
+#                scenarios (needs --profile scenarios; not there yet), all (the default: mobile-api and
+#                flows on the default profile, scenarios on the scenarios profile)
 #   --keep-up    leave the stack running afterwards (test/e2e/down.sh stops it)
 #   --reuse      use a stack that is already up (skip build/up/seed; implies --keep-up)
 #   --known-gaps run every KNOWN-GAP (test.fixme) as a normal test: an open gap fails, a fixed one passes
+#   --profile, --issuance-job, --allocation-max-attempts
+#                the stack profile and its switches (lib/common.sh); each profile and attempt limit
+#                has its own compose project, ports and reports directory
+#   --war        a prebuilt WAR (also E2E_WAR), used as is: no build
 #
 # The WAR is built from this checkout once per HEAD commit (test/e2e/build-war.sh). The CDN mirror
 # (test/e2e/cdn-mirror/cache) is fetched first when it is missing.
 #
-# Reports (build/e2e/reports): junit.xml, html/ (traces of failures inside), contract-coverage.json,
-# app.log (the app container log), cdn-mirror.{json,txt} (per page: third-party URLs served from the
-# CDN mirror or missing from it), summary.txt. The exit status is Playwright's.
+# Reports (build/e2e/reports, build/e2e/reports-scenarios[-a<n>] for the scenarios profile): junit.xml,
+# html/ (traces of failures inside), contract-coverage.json, app.log (the app container log),
+# cdn-mirror.{json,txt} (per page: third-party URLs served from the CDN mirror or missing from it),
+# summary.txt. The exit status is Playwright's.
 set -euo pipefail
 E2E_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=lib/common.sh
-source "$E2E_DIR/lib/common.sh"
 
 PROJECT=all; KEEP=0; REUSE=0; GAPS=0; EXTRA=()
+need_value() { [[ $# -ge 2 ]] || { echo "$1 needs a value" >&2; exit 2; }; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --project) PROJECT="$2"; shift 2 ;;
+    --project) need_value "$@"; PROJECT="$2"; shift 2 ;;
     --keep-up) KEEP=1; shift ;;
     --reuse) REUSE=1; KEEP=1; shift ;;
     --known-gaps) GAPS=1; shift ;;
+    --profile) need_value "$@"; export E2E_PROFILE="$2"; shift 2 ;;
+    --issuance-job) need_value "$@"; export E2E_ISSUANCE_JOB="$2"; shift 2 ;;
+    --allocation-max-attempts) need_value "$@"; export E2E_ALLOCATION_MAX_ATTEMPTS="$2"; shift 2 ;;
+    --war) need_value "$@"; export E2E_WAR="$2"; shift 2 ;;
     --) shift; EXTRA=("$@"); break ;;
-    -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,25p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
-case "$PROJECT" in mobile-api|flows|all) ;; *) echo "--project must be mobile-api|flows|all" >&2; exit 2 ;; esac
+# after the arguments: the profile decides the project, the ports and the config values
+# shellcheck source=lib/common.sh
+source "$E2E_DIR/lib/common.sh"
+case "$PROJECT" in mobile-api|flows|scenarios|all) ;; *) echo "--project must be mobile-api|flows|scenarios|all" >&2; exit 2 ;; esac
+# The flows' fixtures rely on the parked polling crons of the default profile: on the scenarios
+# profile `all` is the scenarios project, and flows is refused (mobile-api runs on both).
+if [[ $E2E_PROFILE == scenarios ]]; then
+  [[ $PROJECT != all ]] || PROJECT=scenarios
+  [[ $PROJECT != flows ]] || { echo "--project flows needs the default profile (its fixtures expect the polling crons parked)" >&2; exit 2; }
+fi
+if [[ $PROJECT == scenarios ]]; then
+  [[ $E2E_PROFILE == scenarios ]] || { echo "--project scenarios needs --profile scenarios" >&2; exit 2; }
+  if [[ ! -d "$E2E_DIR/tests/scenarios" ]]; then log "no scenarios project yet (test/e2e/tests/scenarios): nothing to run"; exit 0; fi
+fi
 
 ensure_cdn_mirror
 
-REPORTS="$E2E_WORK/reports"
+REPORTS="$E2E_REPORTS"
 rm -rf "$REPORTS"; mkdir -p "$REPORTS"
 start=$(date +%s)
 
@@ -45,7 +69,7 @@ teardown() {
   if [[ $KEEP -eq 0 ]]; then "$E2E_DIR/down.sh" --logs "$REPORTS/app.log" || true
   else
     compose_running logs --no-color app > "$REPORTS/app.log" 2>&1 || true
-    log "stack left up at $E2E_BASE_URL (test/e2e/down.sh stops it)"
+    log "stack left up at $E2E_BASE_URL ($(down_hint) stops it)"
   fi
 }
 
@@ -53,7 +77,7 @@ if [[ $REUSE -eq 0 ]]; then
   trap teardown EXIT
   "$E2E_DIR/up.sh"
 else
-  curl -fsS -o /dev/null "$E2E_BASE_URL/api/status" || { echo "--reuse: no stack answers at $E2E_BASE_URL" >&2; exit 1; }
+  require_running_stack
   trap teardown EXIT
   log "reusing the running stack (OpenBoxes $(cat "$E2E_WORK/running-sha-$E2E_PROJECT" 2>/dev/null || echo '?'))"
 fi
@@ -68,7 +92,7 @@ status=0
 end=$(date +%s)
 
 {
-  echo "OpenBoxes $(cat "$E2E_WORK/running-sha-$E2E_PROJECT" 2>/dev/null || head_sha)  project=$PROJECT  known-gaps=$GAPS  exit=$status"
+  echo "OpenBoxes $(cat "$E2E_WORK/running-sha-$E2E_PROJECT" 2>/dev/null || head_sha)  $(cat "$(running_settings_file)" 2>/dev/null || stack_settings)  project=$PROJECT  known-gaps=$GAPS  exit=$status"
   echo "stack ready in $(( ready - start )) s, tests $(( end - ready )) s, total $(( end - start )) s (teardown not included)"
   python3 - "$REPORTS/junit.xml" <<'PY' || true
 import sys, xml.etree.ElementTree as ET
@@ -76,7 +100,7 @@ root = ET.parse(sys.argv[1]).getroot()
 per = {}
 for ts in root.iter('testsuite'):
     name = ts.get('name', '')
-    suite = 'mobile-api' if name.startswith('mobile-api') else ('flows' if name.startswith('flows') else 'setup')
+    suite = next((p for p in ('mobile-api', 'flows', 'scenarios') if name.startswith(p)), 'setup')
     for tc in ts.iter('testcase'):
         r = per.setdefault(suite, {'tests': 0, 'failed': 0, 'skipped': 0})
         r['tests'] += 1

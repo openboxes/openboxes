@@ -5,9 +5,10 @@ E2E_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$E2E_DIR/lib/common.sh"
 LOGS=""
+need_value() { [[ $# -ge 2 ]] || { echo "$1 needs a value" >&2; exit 2; }; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --logs) LOGS="$2"; shift 2 ;;
+    --logs) need_value "$@"; LOGS="$2"; shift 2 ;;
     -h|--help) sed -n '2p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
@@ -17,5 +18,5 @@ if [[ -n "$LOGS" ]]; then
   compose_running logs --no-color app > "$LOGS" 2>&1 || true
 fi
 compose_running down --volumes --remove-orphans >&2
-rm -f "$E2E_WORK/running-sha-$E2E_PROJECT"
+rm -f "$E2E_WORK/running-sha-$E2E_PROJECT" "$(running_settings_file)"
 log "stopped $E2E_PROJECT"
